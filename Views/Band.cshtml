@@ -14,7 +14,7 @@
         @foreach (Song song in album.Songs)
         {
             <div>
-                <h5><em>@song.Title</em></h5>
+                <h5><a href="@song.Url()">@song.Title</a></h5>
                 <h6>@song.Lyrics</h6>
                 <hr />
             </div>
