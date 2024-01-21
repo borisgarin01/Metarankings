@@ -1,0 +1,24 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Band>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@{
+    Layout = null;
+}
+
+<h1><em>@Model.BandName</em></h1>
+@foreach (Album album in Model.Albums)
+{
+    <div>
+        <h4>@album.Title</h4>
+        <h5>@album.ReleaseDate.ToString("dd/MM/yyyy")</h5>
+        @foreach (Song song in album.Songs)
+        {
+            <div>
+                <h5><em>@song.Title</em></h5>
+                <h6>@song.Lyrics</h6>
+                <hr />
+            </div>
+        }
+        <hr />
+    </div>
+}
