@@ -1,0 +1,313 @@
+﻿@using System.Globalization
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<GameDetailsPageModel>
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html lang="ru-RU">
+<head>
+    <link rel="stylesheet" type="text/css" href="~/css/div.css" media="screen" />
+</head>
+<body>
+    <div class="headerer">
+        <div class="header-bottom">
+            <div class="header clear nav-menu">
+                <div class="menu-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="logo">
+                    <a href="https://metarankings.ru"><span>Meta</span>Rankings</a>
+                </div>
+                <div class="nav">
+                    <ul>
+                        <li>
+                            <span onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-movies/">Фильмы</a></span>
+                            <div class="movie-drop">
+                                <a href="https://metarankings.ru/new-movies/">Новинки</a>
+                                <a href="https://metarankings.ru/coming-soon/">Скоро</a>
+                                <a href="https://metarankings.ru/most-waiting-films/">Ожидаемые</a>
+                                <a href="https://metarankings.ru/meta/movies/">Обзоры</a>
+                                <a href="https://metarankings.ru/best-movies/">Топ фильмов</a>
+                                <a href="https://metarankings.ru/best-movies-2015/">Фильмы 2015</a>
+                                <a href="https://metarankings.ru/best-boeviki/2015/">Боевики 2015</a>
+                                <a href="https://metarankings.ru/best-horror/2015/">Ужасы 2015</a>
+                                <a href="https://metarankings.ru/best-comedy/2015/">Комедии 2015</a>
+                                <a href="https://metarankings.ru/best-thrillers/2015/">Триллеры 2015</a>
+                                <a href="https://metarankings.ru/best-fantasy/2015/">Фантастика 2015</a>
+                                <a href="https://metarankings.ru/best-fentezi/2015/">Фэнтези 2015</a>
+                                <a href="https://metarankings.ru/best-dramy/2015/">Драмы 2015</a>
+                                <a href="https://metarankings.ru/best-melodramas/2015/">Мелодрамы 2015</a>
+                                <a href="https://metarankings.ru/best-cartoons/2015/">Мультфильмы 2015</a>
+                                <a href="https://metarankings.ru/best-serials/">Сериалы</a>
+                            </div>
+                        </li>
+                        <li class="active">
+                            <span onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-games/">Игры</a></span>
+                            <div class="game-drop">
+                                <a href="https://metarankings.ru/new-games/">Новинки</a>
+                                <a href="https://metarankings.ru/release-date/">Дата выхода</a>
+                                <a href="https://metarankings.ru/most-waiting-games/">Ожидаемые</a>
+                                <a href="https://metarankings.ru/meta/games/">Обзоры</a>
+                                <a href="https://metarankings.ru/best-games/">Топ игр</a>
+                                <a href="https://metarankings.ru/best-games-2015/">Игры 2015</a>
+                                <a href="https://metarankings.ru/best-pc-games/">ПК</a>
+                                <a href="https://metarankings.ru/best-ps4-games/">PS4</a>
+                                <a href="https://metarankings.ru/best-xboxone-games/">Xbox One</a>
+                                <a href="https://metarankings.ru/best-switch-games/">Switch</a>
+                                <a href="https://metarankings.ru/top-action-games/">Экшены</a>
+                                <a href="https://metarankings.ru/top-shooters/">Шутеры</a>
+                                <a href="https://metarankings.ru/top-horrors/">Хорроры</a>
+                                <a href="https://metarankings.ru/top-igry-priklyucheniya/">Приключения</a>
+                                <a href="https://metarankings.ru/top-rpg-games/">РПГ</a>
+                                <a href="https://metarankings.ru/best-strategii/">Стратегии</a>
+                                <a href="https://metarankings.ru/best-gonki/">Гонки</a>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="https://metarankings.ru/meta/collections/">Подборки</a>
+                        </li>
+                        <li>
+                            <a href="https://metarankings.ru/user-reviews/">Отзывы</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="nav-login">
+                    <ul>
+                        <li><span class="user-login popauthor" title="Войти на сайт"></span></li>
+                    </ul>
+                </div><div class="search_form">
+                    <form method="get" id="searchform" action="https://metarankings.ru/search/">
+                        <fieldset>
+                            <input name="text" type="search" id="search" placeholder="Название игры или фильма..." autocomplete="off" />
+                            <button type="submit"></button>
+                        </fieldset>
+                    </form>
+                    <div id="search_form-result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper">
+
+        <div class="game-menu">
+            <div class="platform-menu">
+                <ul>
+                    <li>
+                        <a class="bst" href="https://metarankings.ru/best-games-2023/">Лучшие игры 2023</a>
+                    </li>
+                    <li>
+                        <a class="bst" href="https://metarankings.ru/best-games-2022/">2022</a>
+                    </li>
+                    <li>
+                        <a class="mnew" href="https://metarankings.ru/new-games/">Новые игры</a>
+                    </li>
+                    <li>
+                        <a href="https://metarankings.ru/release-date/">Дата выхода игр</a>
+                    </li>
+                    <li>
+                        <a href="https://metarankings.ru/most-waiting-games/">Самые ожидаемые игры</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="container" class="clear">
+            <div class="sidebar">
+
+                <div class="widget">
+                    <div class="widget-body">
+                        <div class="graph">
+                            <h3>Рейтинг <a href="#critics">критиков</a> на основе 5 обзоров</h3>
+                            <div class="graph-body"><div class="rating-graph mark-8" style="width:82%"><span class="score-graph">8.2</span></div></div>
+                            <h3>Рейтинг <a href="#users">игроков</a> на основе 42 оценок</h3>
+                            <div class="graph-body"><div class="rating-graph mark-7" style="width:71%"><span class="score-graph">7.1</span></div></div>
+                            <span>Метарейтинг</span> <span class="metaranking">?</span>
+                            <div class="graph-body"><div class="rating-graph mark-8" style="width:76%"><span class="score-graph">7.6</span></div></div>
+                            <div class="wait-stat">Ожидания: 2%</div>
+                            <div class="graph-body"><div class="rating-wait mark-0" style="width:2%"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="content" class="lcol">
+                <div class="entry" itemscope itemtype="http://schema.org/Game">
+                    <div class="post single clear game" id="post_8347">
+                        <div class="post-meta">
+                            <h1><span itemprop="name">@Model.GameName</span></h1>
+                            <link itemprop="url" href="https://metarankings.ru/anno-2205/">
+                            <meta itemprop="datePublished" content="2015-11-03">
+                        </div>
+                        <div id="tcontent">
+                            <div class="video-content">
+                                <div id="content-trailer">
+                                    <iframe src="https://www.youtube.com/embed/S7jJAYD-FtE" height="280" width="100%" allowfullscreen="" style="border-width:0"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            <div class="thumb">
+                                <img class="post-image" src="@Model.ImageSource" alt="Обложка игры Anno 2205" title="Игра Anno 2205" itemprop="image">
+                                <div class="watch-trailer">
+                                    <h3><span class="twatch"><span class="p-twatch">Трейлер</span></span></h3>
+                                </div>
+                            </div>
+                            <div id="ratings" itemprop="aggregateRating" itemscope="" itemtype="http://schema.org/AggregateRating">
+                                <meta itemprop="bestRating" content="10">
+                                <meta itemprop="worstRating" content="1">
+                                <meta itemprop="ratingCount" content="42">
+                                <div class="ratings-mark7">
+                                    <div id="post-ratings-8347" class="post-ratings" data-nonce="bd595cc65b">
+                                        <div class="rating">
+                                            <div class="ratings7-mark7-score" itemprop="ratingValue">
+                                                @Model.Rating
+                                            </div>
+                                            Оценки: <span>42</span>
+                                        </div>
+                                        <div class="your-score">
+                                            <img id="rating_8347_1" class="rating-on mark-1" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="1" onmouseover="current_rating(8347, 1, '1');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
+                                            <img id="rating_8347_2" class="rating-on mark-2" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="2" onmouseover="current_rating(8347, 2, '2');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_8347_3" class="rating-on mark-3" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="3" onmouseover="current_rating(8347, 3, '3');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
+                                            <img id="rating_8347_4" class="rating-on mark-4" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="4" onmouseover="current_rating(8347, 4, '4');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
+                                            <img id="rating_8347_5" class="rating-on mark-5" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="5" onmouseover="current_rating(8347, 5, '5');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_8347_6" class="rating-on mark-6" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="6" onmouseover="current_rating(8347, 6, '6');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
+                                            <img id="rating_8347_7" class="rating-on mark-7" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="7" onmouseover="current_rating(8347, 7, '7');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_8347_8" class="rating-on mark-8" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="8" onmouseover="current_rating(8347, 8, '8');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
+                                            <img id="rating_8347_9" class="rating-on mark-9" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="9" onmouseover="current_rating(8347, 9, '9');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_8347_10" class="rating-on mark-10" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="10" onmouseover="current_rating(8347, 10, '10');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
+                                            <span class="post-ratings-text" id="ratings_8347_text">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="featured-game">
+                                <p><span class="label">Разработчик:</span> <a href="/razrabotchiki/ubisoft_entertainment/">@Model.Developer </a>, ...</p>
+                                <p><span class="label">Издатель:</span> <a href="/izdateli/ubisoft_entertainment/">@Model.Publisher </a> </p>
+                                <p><span class="label">Платформы:</span> <a href="https://metarankings.ru/meta/games/pc/">@Model.Platforms.First()</a></p>
+                                <p><span class="label">Жанр:</span> <a href="https://metarankings.ru/genre/strategiya/">@Model.Genres.First()</a></p>
+                                <p><span class="label">Локализация:</span><a href="https://metarankings.ru/igry-na-russkom-yazyke/"> @Model.Localization</a></p>
+                                <p><span class="label">Дата выхода:</span> <span class="release-date">@Model.ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("ru-RU"))</span></p>
+                            </div>
+
+                            <div class="description">
+                                <h2>Описание</h2>
+                                <div itemprop="description">
+                                    <p>@Model.Description</p>
+                                </div>
+
+                            </div>
+
+                            <div class="podborki">
+                                <p>
+                                    <a href="https://metarankings.ru/best-games-2015/">Игры 2015</a>
+                                    <a class="mark-link" href="https://metarankings.ru/best-pc-games/">Топ игр на ПК</a>
+                                    <a class="mark-link" href="https://metarankings.ru/best-strategii/">стратегии</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="ads-horizont-hor-1">
+                            <!-- Yandex.RTB R-A-201169-7 -->
+                            <div id="yandex_rtb_R-A-201169-7-1"></div>
+                            <script>
+                                window.yaContextCb.push(() => {
+                                    Ya.Context.AdvManager.render({
+                                        renderTo: 'yandex_rtb_R-A-201169-7-1',
+                                        blockId: 'R-A-201169-7'
+                                    })
+                                })</script>
+                        </div>
+                        <div class="share">
+                            <div class="share-text">Поделитесь с друзьями в социальных сетях</div>
+                            <span class="vko" onclick="window.open('/click.php?https://vk.com/share.php?url=https://metarankings.ru/anno-2205/', 'newwindow','width=200,height=150'); return false;"></span>
+                            <span class="tw" onclick="window.open('/click.php?https://twitter.com/share?url=https://metarankings.ru/anno-2205/&amp;text=Anno+2205+-+отзывы,+оценки,+обзоры+и+рейтинг+-+', 'newwindow','width=500,height=300'); return false;"></span>
+                            <span class="odn" onclick="window.open('/click.php?https://connect.ok.ru/offer?url=https://metarankings.ru/anno-2205/&title=Anno+2205', 'newwindow','width=550,height=350'); return false;"></span>
+                        </div>
+
+                        <div class="post-footer">
+                            <h2>Трейлер и скриншоты</h2>
+                            <div class="video">
+                                <img class="img-trailer" alt="Трейлер Anno 2205" title="Трейлер Anno 2205" src="https://img.youtube.com/vi/S7jJAYD-FtE/default.jpg" width="100" height="75">
+                                <span class="play"></span>
+                            </div>
+                            <ul class="gallery">
+                                <li><img class="attachment-screenshot" src="https://metarankings.ru/images/uploads/Anno-2205-boxart-cover.jpg" data-original="https://metarankings.ru/images/uploads/Anno-2205-boxart-cover.jpg" alt="Скриншоты Anno 2205" title="Anno 2205" width="100" height="75"></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="videoreviews" class="video-reviews">
+                        <h3>Видеообзоры</h3>
+                        <p>Видеообзоры от Youtube-блогеров. Вы можете добавить свое или найденное видео.</p>
+                        <div class="add-videos">
+                            +
+                            <div class="author-video">
+                                Добавить видео
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ads-horizont-hor-1">
+                    </div>
+                    <div class="reviews">
+                        <div id="reviews">
+                            <h2 id="critics">Отзывы и оценки критиков <span>Anno 2205</span></h2>
+                            <div class="reviews_list">
+                                <p>Ниже собраны отзывы и оценки разных интернет-изданий с цитатами из обзоров. Мы не учитываем безоценочные рецензии, так как не умеем определять их исходя из написанного текста и не можем додумывать их за автора. Мы пытаемся составить максимально объективный рейтинг на основе реально выставленных оценок.</p>
+                                <div id="review-1" class="critic-text-mark-9">
+                                    <div class="review-meta">
+                                        <div class="small-score-mark-9">
+                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">9</span>
+                                        </div>
+                                        <div class="review-author"><p><a href="/critics/gmbox/"><span>Gmbox</span></a> Автор отзыва: Не указан</p></div>
+                                    </div>
+                                    <p>Anno 2205 — великолепное продолжение серии. Здесь все уместно, изменения стали улучшением старой механики, упрощения пошли на пользу, а новые условности объяснены технологиями будущего. И главное: вместо одного сеттинга вы получаете три разных — каждый со своим уникальным климатом, геймплеем и настроением. Игра постоянно удивляет: едва отстроив метрополию, вы начинаете сагу об освоении Северного Полюса...</p>
+                                    <a rel="nofollow" class="review-link" href="/click/?site=http://gmbox.ru/anno-2205/recenziya-na-anno-2205" target="_blank">Читать обзор полностью</a>
+                                </div>
+                                <div id="review-2" class="critic-text-mark-9">
+                                    <div class="review-meta">
+                                        <div class="small-score-mark-9">
+                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">8.5</span>
+                                        </div>
+                                        <div class="review-author"><p><a href="/critics/игромания/"><span>Игромания</span></a> Автор отзыва: Не указан</p></div>
+                                    </div>
+                                    <p>Anno 2205 впечатляет своими декорациями и окружает привычный геймплей макро-оболочкой. Последняя создает проблемы и их решения, о которых прежде и речи не шло. Anno от этого, безусловно, выигрывает, а то многие после анонса Anno Online решили, что игра так и останется двумерной браузеркой. Появились важные мелочи — модули у строений, транспортные лимиты, — малыми средствами меняющие игровой процесс. </p>
+                                    <a rel="nofollow" class="review-link" href="/click/?site=http://www.igromania.ru/articles/564482/Rokfeller_na_Lune_Obzor_Anno_2205.htm" target="_blank">Читать обзор полностью</a>
+                                </div>
+                                <div id="review-3" class="critic-text-mark-8">
+                                    <div class="review-meta">
+                                        <div class="small-score-mark-8">
+                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">8.2</span>
+                                        </div>
+                                        <div class="review-author"><p><a href="/critics/gameguru/"><span>GameGuru</span></a> Автор отзыва: Не указан</p></div>
+                                    </div>
+                                    <p>Перед нами все та же приятная, но незамысловатая экономическая стратегия в лучших традициях немецкой школы. Не столько бросающая вызов предпринимательским талантам, сколько позволяющая почувствовать себя умнее, предаваясь созерцанию роста милого футуристического города. Как всегда добротная. Как всегда без сюрпризов. А большего от Anno, в общем-то, и не требуется. </p>
+                                    <a rel="nofollow" class="review-link" href="/click/?site=http://gameguru.ru/games/anno2205/obzor_anno_2205_sedmoj_raz_v_pervyj_klass/articles.html" target="_blank">Читать обзор полностью</a>
+                                </div>
+                                <div id="review-4" class="critic-text-mark-8">
+                                    <div class="review-meta">
+                                        <div class="small-score-mark-8">
+                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">8</span>
+                                        </div>
+                                        <div class="review-author"><p><a href="/critics/3dnews/"><span>3DNews</span></a> Автор отзыва: Не указан</p></div>
+                                    </div>
+                                    <p>Anno 2205 — в первую очередь экономическая стратегия. И в этом качестве она, безусловно, хороша. Красивая, дружелюбная — но в то же время продуманная и вовсе не такая простая, как может показаться. Бездумно нагородить домов и фабрик может каждый, и поначалу это даже будет приносить прибыль. Но построить такую систему, чтобы все регионы работали в унисон, дополняя друг друга...</p>
+                                    <a rel="nofollow" class="review-link" href="/click/?site=http://www.3dnews.ru/923155" target="_blank">Читать обзор полностью</a>
+                                </div>
+                                <div id="review-5" class="critic-text-mark-8">
+                                    <div class="review-meta">
+                                        <div class="small-score-mark-8">
+                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">7.5</span>
+                                        </div>
+                                        <div class="review-author"><p><a href="/critics/vgtimes/"><span>VGTimes</span></a> Автор отзыва: Не указан</p></div>
+                                    </div>
+                                    <p>Anno 2205 пытается копировать идеи классических градостроительных симуляторов, вроде SimCity (2013), с упором именно на стратегическую, а не тактическую или бизнес-составляющую. Причем последнее либо было вырезано, либо оказуалено донельзя — игра вполне может выйти на консолях. Результат, впрочем, оказался крайне плачевен.</p>
+                                    <a rel="nofollow" class="review-link" href="/click/?site=http://vgtimes.ru/pc-news/29114-obzor-anno-2205-obrezok-ot-obrubka.html" target="_blank">Читать обзор полностью</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

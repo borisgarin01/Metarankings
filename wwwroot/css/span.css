@@ -1,0 +1,31 @@
+﻿span.score-graph {
+    font-size: 14px;
+    font-weight: 600;
+    font-size: 16px;
+    margin-left: 5px;
+    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif,fontello;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+    background: #9ad77f;
+    color: #005000;
+    height: 24px;
+    line-height: 24px;
+    opacity: 0.9;
+    vertical-align: middle;
+    width: 10px;
+    font-weight: 350;
+    color: #000;
+    font-size: 16px;
+    margin-top: 20px;
+    color: #111;
+    font-size: 13px;
+    background: #fff;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    line-height: 1;
+    text-align: left;
+}
