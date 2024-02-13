@@ -3,7 +3,7 @@
     font-weight: 600;
     font-size: 16px;
     margin-left: 5px;
-    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif,fontello;
+    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif;
     margin: 0;
     padding: 0;
     border: 0;
@@ -25,7 +25,38 @@
     color: #111;
     font-size: 13px;
     background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
+}
+
+span.userlogin-popup-author {
+    font-size: 20px;
+    padding: 0 8px 0 0;
+    font-family: fontello;
+    color: #333;
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+    color: #777;
+    display: inline-block;
+    overflow: hidden;
+    text-align: center;
+    padding: 22px 12px;
+    float: left;
+    list-style: outside none none;
+    overflow: hidden;
+    text-align: center;
+    list-style: none;
+    list-style-type: disc;
+    background: #fff;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
+    line-height: 1;
+    text-align: left;
+    content: '\e82f';
 }

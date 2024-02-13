@@ -3,7 +3,6 @@
     height: 100px;
     width: 100%;
     top: 0;
-    height: 100px;
     margin: 0;
     padding: 0;
     border: 0;
@@ -12,8 +11,7 @@
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -23,7 +21,6 @@ div.header-bottom {
     background: #fff;
     width: 100%;
     box-shadow: 0 2px 3px 0 rgba(0,0,0,.06);
-    height: 55px;
     position: fixed;
     z-index: 10000;
     top: 0;
@@ -33,10 +30,8 @@ div.header-bottom {
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -44,9 +39,7 @@ div.header-bottom {
 div.header {
     width: 1000px;
     margin: 0 auto;
-    width: auto;
     height: auto;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
@@ -54,71 +47,47 @@ div.header {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
     content: ".";
-    display: block;
-    height: 0;
     clear: both;
     visibility: visible;
 }
 
 div.menu-icon {
     display: block;
-    display: none;
     width: 30px;
     height: 30px;
     position: relative;
     cursor: pointer;
     float: left;
     margin: 15px 0 15px 10px;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
     background: transparent;
-    display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
 
 div.logo {
     font-size: 16px;
-    font-size: 20px;
     padding: 18px 0;
-    font-size: 26px;
-    padding: 16px 0;
     margin-left: 10px;
-    font-size: 28px;
-    padding: 14px 0;
-    font-size: 32px;
     float: left;
-    margin-left: 15px;
-    padding: 10px 0;
-    font-size: 24px;
-    margin-left: 15px;
-    font-size: 25px;
     font-family: Verdana,sans-serif;
-    padding: 15px 0;
     overflow: hidden;
-    float: left;
     font-weight: bold;
     margin: 0;
-    padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
     line-height: 1;
     text-align: left;
 }
@@ -136,17 +105,14 @@ div.nav {
     opacity: 1;
     visibility: hidden;
     float: none;
-    position: relative;
     margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -168,8 +134,7 @@ div.nav-login {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -181,11 +146,9 @@ div.search_form {
     padding-right: 0;
     margin: 0;
     margin-right: 0;
-    width: 300px;
     margin-top: 15px;
     float: right;
     position: relative;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
@@ -193,10 +156,8 @@ div.search_form {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
-    text-align: left;
 }
 
 div.wrapper {
@@ -204,16 +165,13 @@ div.wrapper {
     background: #fff;
     margin: 0 auto;
     position: relative;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -227,8 +185,7 @@ div.game-menu {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -243,10 +200,8 @@ div.platform-menu {
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -256,15 +211,13 @@ div.sidebar {
     width: 300px;
     float: right;
     margin: 0;
-    padding: 0;
     border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -279,8 +232,7 @@ div.widget {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -294,8 +246,7 @@ div.widget-body {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -308,12 +259,10 @@ div.graph {
     padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -321,19 +270,15 @@ div.graph {
 div.graph-body {
     background: #f7f7f7;
     margin: 4px 0 10px;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
     font-weight: 350;
     color: #111;
-    font-size: 13px;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -349,10 +294,8 @@ div.lcol {
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -367,8 +310,7 @@ div.entry {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -386,8 +328,7 @@ div.video-content {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -402,43 +343,12 @@ div.post-content {
     font-size: 100%;
     vertical-align: baseline;
     background: transparent;
-    display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
-    background: #fff;
     width: 670px;
     float: left;
-    margin-bottom: 20px;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    font-size: 100%;
-    vertical-align: baseline;
-    background: transparent;
-    display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
-    text-align: left;
-    width: 1000px;
-    background: #fff;
-    margin: 0 auto;
     position: relative;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    font-size: 100%;
-    vertical-align: baseline;
-    background: transparent;
-    display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
-    text-align: left;
 }
 
 div.thumb {
@@ -449,7 +359,6 @@ div.thumb {
     margin: 0 15px 0 0;
     overflow: hidden;
     border-radius: 4px;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
@@ -458,14 +367,9 @@ div.thumb {
     background: transparent;
     display: block;
     color: #555;
-    margin: 10px 0;
-    font-size: 14px;
     line-height: normal;
     margin-left: 115px;
-    line-height: 1.2;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
 
@@ -478,29 +382,19 @@ div.watch-trailer {
     text-align: center;
     width: 100%;
     margin: 0;
-    padding: 0;
     border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
-    color: #555;
-    margin: 10px 0;
-    font-size: 14px;
     line-height: normal;
     margin-left: 115px;
-    line-height: 1.2;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
-    text-align: left;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
 }
 
 div.ratings-mark7 {
     margin: 0;
     margin-bottom: 5px;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
@@ -509,14 +403,9 @@ div.ratings-mark7 {
     background: transparent;
     display: block;
     color: #555;
-    margin: 10px 0;
-    font-size: 14px;
     line-height: normal;
     margin-left: 115px;
-    line-height: 1.2;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
 
@@ -530,14 +419,9 @@ div.post-ratings {
     background: transparent;
     display: block;
     color: #555;
-    margin: 10px 0;
-    font-size: 14px;
     line-height: normal;
     margin-left: 115px;
-    line-height: 1.2;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
 
@@ -545,32 +429,22 @@ div.rating {
     font-size: 14px;
     padding: 0 0 4px 0;
     margin: 0;
-    padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
     background: transparent;
     display: block;
     color: #555;
-    margin: 10px 0;
-    font-size: 14px;
     line-height: normal;
     margin-left: 115px;
-    line-height: 1.2;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
 
 div.ratings7-mark7-score {
     background: #efda65;
     color: #796700;
-    height: 50px;
-    line-height: 50px;
-    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif,fontello;
-    color: #555;
+    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif;
     font-size: 32px;
     width: 70px;
     height: 50px;
@@ -583,22 +457,9 @@ div.ratings7-mark7-score {
     padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
-    font-size: 14px;
-    padding: 0 0 4px 0;
-    color: #555;
-    margin: 10px 0;
-    font-size: 14px;
-    line-height: normal;
     margin-left: 115px;
-    line-height: 1.2;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
-    text-align: left;
 }
 
 div.your-score {
@@ -610,7 +471,6 @@ div.featured-game {
     margin: 0;
     overflow: hidden;
     color: #111;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
@@ -618,15 +478,9 @@ div.featured-game {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    color: #555;
-    margin: 10px 0;
-    font-size: 14px;
     line-height: normal;
     margin-left: 115px;
-    line-height: 1.2;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
 
@@ -639,16 +493,10 @@ div.description {
     font-size: 100%;
     vertical-align: baseline;
     background: transparent;
-    display: block;
     color: #555;
-    margin: 10px 0;
-    font-size: 14px;
     line-height: normal;
     margin-left: 115px;
-    line-height: 1.2;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
 
@@ -662,14 +510,9 @@ div.podborki {
     background: transparent;
     display: block;
     color: #555;
-    margin: 10px 0;
-    font-size: 14px;
     line-height: normal;
     margin-left: 115px;
-    line-height: 1.2;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
 
@@ -678,7 +521,6 @@ div.ads-horizont-hor-1 {
     margin: 30px 0;
     overflow: hidden;
     width: 100%;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
@@ -686,10 +528,8 @@ div.ads-horizont-hor-1 {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
-    text-align: left;
 }
 
 div.share {
@@ -699,17 +539,13 @@ div.share {
     padding: 15px;
     text-align: center;
     margin: 0;
-    padding: 0;
-    border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
-    text-align: left;
 }
 
 div.share-text {
@@ -720,19 +556,12 @@ div.share-text {
     padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
     background: transparent;
     display: block;
-    margin-bottom: 25px;
-    border: 1px solid #ccc;
     border-radius: 4px;
-    padding: 15px;
     text-align: center;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
-    text-align: left;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
 }
 
 div.post-footer {
@@ -744,8 +573,7 @@ div.post-footer {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -754,27 +582,18 @@ div.video {
     width: 31%;
     margin: 1%;
     height: 90px;
-    width: 23%;
-    margin: 1%;
-    height: 85px;
     display: inline-block;
     float: left;
     position: relative;
-    width: 15.5%;
-    margin: 0.5%;
-    height: 75px;
     overflow: hidden;
     border-radius: 4px;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
     background: transparent;
-    display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -782,7 +601,6 @@ div.video {
 div.video-reviews {
     margin: 10px 0 10px 0;
     overflow: hidden;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
@@ -790,43 +608,30 @@ div.video-reviews {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
 
 div.add-videos {
     width: 31%;
-    height: 90px;
     margin: 1% 1% 35px 1%;
-    width: 23%;
     height: 85px;
-    margin: 1% 1% 35px 1%;
     background: #a1a1a1;
     color: #fff;
-    width: 15.5%;
-    height: 75px;
     display: inline-block;
     position: relative;
     cursor: pointer;
     font-size: 60px;
     text-align: center;
-    margin: 0.5% 0.5% 35px 0.5%;
     float: left;
     border-radius: 4px;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
-    display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
-    text-align: left;
 }
 
 div.ads-horizont-hor-1 {
@@ -834,7 +639,6 @@ div.ads-horizont-hor-1 {
     margin: 30px 0;
     overflow: hidden;
     width: 100%;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
@@ -842,15 +646,12 @@ div.ads-horizont-hor-1 {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
-    text-align: left;
 }
 
 div.reviews {
     margin: 15px 0;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
@@ -858,8 +659,7 @@ div.reviews {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     line-height: 1;
     text-align: left;
 }
@@ -872,70 +672,49 @@ div.reviews_list {
     padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
 
 div.critic-text-mark-9 {
     background: #edffe5;
     padding: 10px;
-    background: #f3f3f3;
     color: #333;
     margin: 15px 0;
-    padding: 15px;
     border-radius: 3px;
-    margin: 0;
-    padding: 0;
     border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
-    color: #777;
-    font-size: 14px;
     line-height: normal;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
 
 div.critic-text-mark-8 {
     background: #edffe5;
     padding: 10px;
-    background: #f3f3f3;
     color: #333;
     margin: 15px 0;
-    padding: 15px;
     border-radius: 3px;
-    margin: 0;
-    padding: 0;
     border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
-    color: #777;
-    font-size: 14px;
     line-height: normal;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
+
 }
 
 div.review-meta {
     margin: 5px 0 20px 0;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
@@ -943,17 +722,10 @@ div.review-meta {
     vertical-align: baseline;
     background: transparent;
     display: block;
-    background: #f3f3f3;
     color: #333;
-    margin: 15px 0;
-    padding: 15px;
     border-radius: 3px;
-    color: #777;
-    font-size: 14px;
     line-height: normal;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
 
@@ -962,47 +734,19 @@ div.small-score-mark-9 {
     box-shadow: none;
     float: left;
     font-size: 20px;
-    margin: -5px 10px 0 0;
     width: 40px;
     height: 40px;
     line-height: 40px;
     text-shadow: none;
     background: #9ad77f;
     color: #005000;
-    width: 35px;
-    height: 25px;
-    font-size: 16px;
-    line-height: 25px;
-    margin: 0;
-    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif,fontello;
-    color: #000;
-    background: #d9d9d9;
-    font-size: 20px;
-    width: 45px;
-    height: 30px;
-    line-height: 30px;
+    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif;
     text-align: center;
-    margin: 5px auto;
     border-radius: 2px;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
-    background: #f3f3f3;
-    color: #333;
-    margin: 15px 0;
-    padding: 15px;
-    border-radius: 3px;
-    color: #777;
-    font-size: 14px;
-    line-height: normal;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
-    text-align: left;
 }
 
 div.small-score-mark-8 {
@@ -1016,41 +760,14 @@ div.small-score-mark-8 {
     text-shadow: none;
     background: #a0d787;
     color: #005000;
-    width: 35px;
-    height: 25px;
-    font-size: 16px;
-    line-height: 25px;
-    margin: 0;
-    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif,fontello;
-    color: #000;
-    background: #d9d9d9;
-    font-size: 20px;
-    width: 45px;
-    height: 30px;
-    line-height: 30px;
+    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif;
     text-align: center;
-    margin: 5px auto;
     border-radius: 2px;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
     display: block;
-    background: #f3f3f3;
-    color: #333;
-    margin: 15px 0;
-    padding: 15px;
-    border-radius: 3px;
-    color: #777;
-    font-size: 14px;
-    line-height: normal;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
-    text-align: left;
 }
 
 div.review-author {
@@ -1061,16 +778,23 @@ div.review-author {
     font-size: 100%;
     vertical-align: baseline;
     background: transparent;
-    background: #f3f3f3;
     color: #333;
-    margin: 15px 0;
-    padding: 15px;
     border-radius: 3px;
-    color: #777;
-    font-size: 14px;
     line-height: normal;
-    background: #fff;
-    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif',fontello;
-    line-height: 1;
+    font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
+}
+
+div.ratings7-mark7-score {
+    background: #efda65;
+    color: #796700;
+    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif;
+    font-size: 32px;
+    width: 70px;
+    height: 50px;
+    float: left;
+    line-height: 50px;
+    text-align: center;
+    margin-right: 10px;
+    border-radius: 4px;
 }
