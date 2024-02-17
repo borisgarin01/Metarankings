@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using Umbraco.Cms.Core.Models
 @using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<GameDetailsPageModel>
 @{
@@ -32,44 +33,19 @@
                         <li>
                             <span onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-movies/">Фильмы</a></span>
                             <div class="movie-drop">
-                                <a href="https://metarankings.ru/new-movies/">Новинки</a>
-                                <a href="https://metarankings.ru/coming-soon/">Скоро</a>
-                                <a href="https://metarankings.ru/most-waiting-films/">Ожидаемые</a>
-                                <a href="https://metarankings.ru/meta/movies/">Обзоры</a>
-                                <a href="https://metarankings.ru/best-movies/">Топ фильмов</a>
-                                <a href="https://metarankings.ru/best-movies-2015/">Фильмы 2015</a>
-                                <a href="https://metarankings.ru/best-boeviki/2015/">Боевики 2015</a>
-                                <a href="https://metarankings.ru/best-horror/2015/">Ужасы 2015</a>
-                                <a href="https://metarankings.ru/best-comedy/2015/">Комедии 2015</a>
-                                <a href="https://metarankings.ru/best-thrillers/2015/">Триллеры 2015</a>
-                                <a href="https://metarankings.ru/best-fantasy/2015/">Фантастика 2015</a>
-                                <a href="https://metarankings.ru/best-fentezi/2015/">Фэнтези 2015</a>
-                                <a href="https://metarankings.ru/best-dramy/2015/">Драмы 2015</a>
-                                <a href="https://metarankings.ru/best-melodramas/2015/">Мелодрамы 2015</a>
-                                <a href="https://metarankings.ru/best-cartoons/2015/">Мультфильмы 2015</a>
-                                <a href="https://metarankings.ru/best-serials/">Сериалы</a>
+                                @foreach (Link link in Model.MoviesKindsPagesUrls)
+                                {
+                                    <a href="@link.Url" target="@link.Target">@link.Name</a>
+                                }
                             </div>
                         </li>
                         <li class="active">
                             <span onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-games/">Игры</a></span>
                             <div class="game-drop">
-                                <a href="https://metarankings.ru/new-games/">Новинки</a>
-                                <a href="https://metarankings.ru/release-date/">Дата выхода</a>
-                                <a href="https://metarankings.ru/most-waiting-games/">Ожидаемые</a>
-                                <a href="https://metarankings.ru/meta/games/">Обзоры</a>
-                                <a href="https://metarankings.ru/best-games/">Топ игр</a>
-                                <a href="https://metarankings.ru/best-games-2015/">Игры 2015</a>
-                                <a href="https://metarankings.ru/best-pc-games/">ПК</a>
-                                <a href="https://metarankings.ru/best-ps4-games/">PS4</a>
-                                <a href="https://metarankings.ru/best-xboxone-games/">Xbox One</a>
-                                <a href="https://metarankings.ru/best-switch-games/">Switch</a>
-                                <a href="https://metarankings.ru/top-action-games/">Экшены</a>
-                                <a href="https://metarankings.ru/top-shooters/">Шутеры</a>
-                                <a href="https://metarankings.ru/top-horrors/">Хорроры</a>
-                                <a href="https://metarankings.ru/top-igry-priklyucheniya/">Приключения</a>
-                                <a href="https://metarankings.ru/top-rpg-games/">РПГ</a>
-                                <a href="https://metarankings.ru/best-strategii/">Стратегии</a>
-                                <a href="https://metarankings.ru/best-gonki/">Гонки</a>
+                                @foreach (Link link in Model.GamesKindsPagesUrls)
+                                {
+                                    <a href="@link.Url" target="@link.Target">@link.Name</a>
+                                }
                             </div>
                         </li>
                         <li>
@@ -204,9 +180,13 @@
 
                             <div class="podborki">
                                 <p>
-                                    <a href="https://metarankings.ru/best-games-2015/">Игры 2015</a>
+                                    @foreach (string tag in Model.Tags)
+                                    {
+                                        <a href="#">@tag</a>
+                                    }
+                                    @* <a href="https://metarankings.ru/best-games-2015/">Игры 2015</a>
                                     <a class="mark-link" href="https://metarankings.ru/best-pc-games/">Топ игр на ПК</a>
-                                    <a class="mark-link" href="https://metarankings.ru/best-strategii/">стратегии</a>
+                                    <a class="mark-link" href="https://metarankings.ru/best-strategii/">стратегии</a> *@
                                 </p>
                             </div>
                         </div>
@@ -314,4 +294,6 @@
         </div>
     </div>
 </body>
+<script src="~/js/jquery.js"></script>
+<script src="~/js/jquery-migrate.min.js"></script>
 </html>

@@ -20,6 +20,8 @@ namespace Metarankings.Models
         public DateTime ReleaseDate => this.Value<DateTime>("releaseDate");
         public IHtmlEncodedString Description => this.Value<IHtmlEncodedString>("description");
         public string ImageSource => this.Value<string>("image");
-
+        public IEnumerable<string> Tags => this.Value<IEnumerable<string>>("tags");
+        public IEnumerable<Link> MoviesKindsPagesUrls => this.Value<IEnumerable<Link>>("moviesKindsPagesUrls");
+        public IEnumerable<Link> GamesKindsPagesUrls => this.Value<IEnumerable<Link>>("gamesKindsPagesUrls");
     }
 }
