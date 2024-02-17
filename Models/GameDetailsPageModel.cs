@@ -23,5 +23,12 @@ namespace Metarankings.Models
         public IEnumerable<string> Tags => this.Value<IEnumerable<string>>("tags");
         public IEnumerable<Link> MoviesKindsPagesUrls => this.Value<IEnumerable<Link>>("moviesKindsPagesUrls");
         public IEnumerable<Link> GamesKindsPagesUrls => this.Value<IEnumerable<Link>>("gamesKindsPagesUrls");
+        public Link CollectionsURL => this.Value<IEnumerable<Link>>("collectionsURL").First();
+        public Link ReviewsURL => this.Value<IEnumerable<Link>>("reviewsURL").First();
+        public Link BestGamesOfThisGameReleaseYear => this.Value<IEnumerable<Link>>("bestGamesOfThisGameReleaseYear").First();
+        public Link BestGamesOfPreviousYearForGameReleaseYear => this.Value<IEnumerable<Link>>("bestGamesOfPreviousYearForGameReleaseYear").First();
+        public Link NewGames => this.Value<IEnumerable<Link>>("newGames").First();
+        public Link GamesReleaseDate => this.Value<IEnumerable<Link>>("gamesReleaseDate").First();
+        public Link MostExpectedGames => this.Value<IEnumerable<Link>>("mostExpectedGames").First();
     }
 }

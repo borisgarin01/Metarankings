@@ -49,10 +49,10 @@
                             </div>
                         </li>
                         <li>
-                            <a href="https://metarankings.ru/meta/collections/">Подборки</a>
+                            <a href="@Model.CollectionsURL.Url" target="@Model.CollectionsURL.Target">@Model.CollectionsURL.Name</a>
                         </li>
                         <li>
-                            <a href="https://metarankings.ru/user-reviews/">Отзывы</a>
+                            <a href="@Model.ReviewsURL.Url" target="@Model.ReviewsURL.Target">@Model.ReviewsURL.Name</a>
                         </li>
                     </ul>
                 </div>
@@ -79,19 +79,19 @@
             <div class="platform-menu">
                 <ul>
                     <li>
-                        <a class="bst" href="https://metarankings.ru/best-games-2023/">Лучшие игры 2023</a>
+                        <a class="bst" href="@Model.BestGamesOfThisGameReleaseYear.Url" target="@Model.BestGamesOfThisGameReleaseYear.Target">@Model.BestGamesOfThisGameReleaseYear.Name</a>
                     </li>
                     <li>
-                        <a class="bst" href="https://metarankings.ru/best-games-2022/">2022</a>
+                        <a class="bst" href="@Model.BestGamesOfPreviousYearForGameReleaseYear.Url" target="@Model.BestGamesOfPreviousYearForGameReleaseYear.Target">@Model.BestGamesOfPreviousYearForGameReleaseYear.Name</a>
                     </li>
                     <li>
-                        <a class="mnew" href="https://metarankings.ru/new-games/">Новые игры</a>
+                        <a class="mnew" href="@Model.NewGames.Url" target="@Model.NewGames.Target">@Model.BestGamesOfPreviousYearForGameReleaseYear.Name</a>
                     </li>
                     <li>
-                        <a href="https://metarankings.ru/release-date/">Дата выхода игр</a>
+                        <a href="@Model.GamesReleaseDate.Url" target="@Model.GamesReleaseDate.Target">@Model.GamesReleaseDate.Name</a>
                     </li>
                     <li>
-                        <a href="https://metarankings.ru/most-waiting-games/">Самые ожидаемые игры</a>
+                        <a href="@Model.MostExpectedGames.Url" target="@Model.MostExpectedGames.Target">@Model.MostExpectedGames.Name</a>
                     </li>
                 </ul>
             </div>
