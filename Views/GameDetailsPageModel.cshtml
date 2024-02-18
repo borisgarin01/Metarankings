@@ -215,7 +215,7 @@
                                 <span class="play"></span>
                             </div>
                             <ul class="gallery">
-                                <li><img class="attachment-screenshot" src="https://metarankings.ru/images/uploads/Anno-2205-boxart-cover.jpg" data-original="https://metarankings.ru/images/uploads/Anno-2205-boxart-cover.jpg" alt="Скриншоты Anno 2205" title="Anno 2205" width="100" height="75"></li>
+                                <li><img class="attachment-screenshot" src="https://metarankings.ru/images/uploads/Anno-2205-boxart-cover.jpg" data-original="https://metarankings.ru/images/uploads/Anno-2205-boxart-cover.jpg" alt="Скриншоты @Model.GameName" title="@Model.GameName" width="100" height="75"></li>
                             </ul>
                         </div>
                     </div>
@@ -233,59 +233,22 @@
                     </div>
                     <div class="reviews">
                         <div id="reviews">
-                            <h2 id="critics">Отзывы и оценки критиков <span>Anno 2205</span></h2>
+                            <h2 id="critics">Отзывы и оценки критиков <span>@Model.GameName</span></h2>
                             <div class="reviews_list">
                                 <p>Ниже собраны отзывы и оценки разных интернет-изданий с цитатами из обзоров. Мы не учитываем безоценочные рецензии, так как не умеем определять их исходя из написанного текста и не можем додумывать их за автора. Мы пытаемся составить максимально объективный рейтинг на основе реально выставленных оценок.</p>
-                                <div id="review-1" class="critic-text-mark-9">
-                                    <div class="review-meta">
-                                        <div class="small-score-mark-9">
-                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">9</span>
+                                @foreach (GameJournalistsCompanyReviewModel gameReviewModel in Model.Children<GameJournalistsCompanyReviewModel>())
+                                {
+                                    <div class="@(gameReviewModel.Score>8.5 ? "critic-text-mark-9" : "critic-text-mark-9")">
+                                        <div class="review-meta">
+                                            <div class="@(gameReviewModel.Score>8.5?"small-score-mark-9": "small-score-mark-9")">
+                                                <span data-title="Оценка отзыва из 10 баллов" class="tooltip">9</span>
+                                            </div>
+                                            <div class="review-author"><p><a href="/critics/gmbox/"><span>@gameReviewModel.JournalistsCompanyName</span></a> Автор отзыва: @((!string.IsNullOrWhiteSpace(gameReviewModel.AuthorName) ? gameReviewModel.AuthorName : "Не указан"))</p></div>
                                         </div>
-                                        <div class="review-author"><p><a href="/critics/gmbox/"><span>Gmbox</span></a> Автор отзыва: Не указан</p></div>
+                                        <p>@gameReviewModel.Text</p>
+                                        <a rel="nofollow" class="review-link" href="/click/?site=http://gmbox.ru/anno-2205/recenziya-na-anno-2205" target="_blank">Читать обзор полностью</a>
                                     </div>
-                                    <p>Anno 2205 — великолепное продолжение серии. Здесь все уместно, изменения стали улучшением старой механики, упрощения пошли на пользу, а новые условности объяснены технологиями будущего. И главное: вместо одного сеттинга вы получаете три разных — каждый со своим уникальным климатом, геймплеем и настроением. Игра постоянно удивляет: едва отстроив метрополию, вы начинаете сагу об освоении Северного Полюса...</p>
-                                    <a rel="nofollow" class="review-link" href="/click/?site=http://gmbox.ru/anno-2205/recenziya-na-anno-2205" target="_blank">Читать обзор полностью</a>
-                                </div>
-                                <div id="review-2" class="critic-text-mark-9">
-                                    <div class="review-meta">
-                                        <div class="small-score-mark-9">
-                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">8.5</span>
-                                        </div>
-                                        <div class="review-author"><p><a href="/critics/игромания/"><span>Игромания</span></a> Автор отзыва: Не указан</p></div>
-                                    </div>
-                                    <p>Anno 2205 впечатляет своими декорациями и окружает привычный геймплей макро-оболочкой. Последняя создает проблемы и их решения, о которых прежде и речи не шло. Anno от этого, безусловно, выигрывает, а то многие после анонса Anno Online решили, что игра так и останется двумерной браузеркой. Появились важные мелочи — модули у строений, транспортные лимиты, — малыми средствами меняющие игровой процесс. </p>
-                                    <a rel="nofollow" class="review-link" href="/click/?site=http://www.igromania.ru/articles/564482/Rokfeller_na_Lune_Obzor_Anno_2205.htm" target="_blank">Читать обзор полностью</a>
-                                </div>
-                                <div id="review-3" class="critic-text-mark-8">
-                                    <div class="review-meta">
-                                        <div class="small-score-mark-8">
-                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">8.2</span>
-                                        </div>
-                                        <div class="review-author"><p><a href="/critics/gameguru/"><span>GameGuru</span></a> Автор отзыва: Не указан</p></div>
-                                    </div>
-                                    <p>Перед нами все та же приятная, но незамысловатая экономическая стратегия в лучших традициях немецкой школы. Не столько бросающая вызов предпринимательским талантам, сколько позволяющая почувствовать себя умнее, предаваясь созерцанию роста милого футуристического города. Как всегда добротная. Как всегда без сюрпризов. А большего от Anno, в общем-то, и не требуется. </p>
-                                    <a rel="nofollow" class="review-link" href="/click/?site=http://gameguru.ru/games/anno2205/obzor_anno_2205_sedmoj_raz_v_pervyj_klass/articles.html" target="_blank">Читать обзор полностью</a>
-                                </div>
-                                <div id="review-4" class="critic-text-mark-8">
-                                    <div class="review-meta">
-                                        <div class="small-score-mark-8">
-                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">8</span>
-                                        </div>
-                                        <div class="review-author"><p><a href="/critics/3dnews/"><span>3DNews</span></a> Автор отзыва: Не указан</p></div>
-                                    </div>
-                                    <p>Anno 2205 — в первую очередь экономическая стратегия. И в этом качестве она, безусловно, хороша. Красивая, дружелюбная — но в то же время продуманная и вовсе не такая простая, как может показаться. Бездумно нагородить домов и фабрик может каждый, и поначалу это даже будет приносить прибыль. Но построить такую систему, чтобы все регионы работали в унисон, дополняя друг друга...</p>
-                                    <a rel="nofollow" class="review-link" href="/click/?site=http://www.3dnews.ru/923155" target="_blank">Читать обзор полностью</a>
-                                </div>
-                                <div id="review-5" class="critic-text-mark-8">
-                                    <div class="review-meta">
-                                        <div class="small-score-mark-8">
-                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">7.5</span>
-                                        </div>
-                                        <div class="review-author"><p><a href="/critics/vgtimes/"><span>VGTimes</span></a> Автор отзыва: Не указан</p></div>
-                                    </div>
-                                    <p>Anno 2205 пытается копировать идеи классических градостроительных симуляторов, вроде SimCity (2013), с упором именно на стратегическую, а не тактическую или бизнес-составляющую. Причем последнее либо было вырезано, либо оказуалено донельзя — игра вполне может выйти на консолях. Результат, впрочем, оказался крайне плачевен.</p>
-                                    <a rel="nofollow" class="review-link" href="/click/?site=http://vgtimes.ru/pc-news/29114-obzor-anno-2205-obrezok-ot-obrubka.html" target="_blank">Читать обзор полностью</a>
-                                </div>
+                                }
                             </div>
                         </div>
                     </div>
