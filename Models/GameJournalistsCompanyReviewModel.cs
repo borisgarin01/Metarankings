@@ -9,6 +9,7 @@ namespace Metarankings.Models
         public GameJournalistsCompanyReviewModel(IPublishedContent content, IPublishedValueFallback publishedValueFallback) : base(content, publishedValueFallback)
         {
         }
+
         public GameDetailsPageModel GameDetailsPageModel => this.Value<GameDetailsPageModel>("gameDetailsPageModel");
         public float Score => this.Value<float>("score");
         public string JournalistsCompanyName => this.Value<string>("journalistsCompanyName");

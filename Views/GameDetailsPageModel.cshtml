@@ -236,7 +236,7 @@
                             <h2 id="critics">Отзывы и оценки критиков <span>@Model.GameName</span></h2>
                             <div class="reviews_list">
                                 <p>Ниже собраны отзывы и оценки разных интернет-изданий с цитатами из обзоров. Мы не учитываем безоценочные рецензии, так как не умеем определять их исходя из написанного текста и не можем додумывать их за автора. Мы пытаемся составить максимально объективный рейтинг на основе реально выставленных оценок.</p>
-                                @foreach (GameJournalistsCompanyReviewModel gameReviewModel in Model.Children<GameJournalistsCompanyReviewModel>())
+                                @foreach (GameJournalistsCompanyReviewModel gameReviewModel in Model.GameReviews)
                                 {
                                     <div class="@(gameReviewModel.Score>8.5 ? "critic-text-mark-9" : "critic-text-mark-9")">
                                         <div class="review-meta">
