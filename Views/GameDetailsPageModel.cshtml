@@ -241,7 +241,7 @@
                                     <div class="@(gameReviewModel.Score>7.5 ? "critic-text-mark-9" : "critic-text-mark-7")">
                                         <div class="review-meta">
                                             <div class="@(gameReviewModel.Score>7.5?"small-score-mark-9": "small-score-mark-7")">
-                                                <span data-title="Оценка отзыва из 10 баллов" class="tooltip">9</span>
+                                                <span data-title="Оценка отзыва из 10 баллов" class="tooltip">@gameReviewModel.Score</span>
                                             </div>
                                             <div class="review-author"><p><a href="/critics/gmbox/"><span>@gameReviewModel.JournalistsCompanyName</span></a> Автор отзыва: @((!string.IsNullOrWhiteSpace(gameReviewModel.AuthorName) ? gameReviewModel.AuthorName : "Не указан"))</p></div>
                                         </div>
