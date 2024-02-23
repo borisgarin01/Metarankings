@@ -252,6 +252,9 @@
                             </div>
                         </div>
                     </div>
+                    <div>
+                        Общий рейтинг критиков = <span>@Model.GameReviews.Average(criticGameReview => criticGameReview.Score)</span>
+                    </div>
                 </div>
             </div>
         </div>
