@@ -56,7 +56,7 @@ div.header {
 }
 
 div.menu-icon {
-    display: block;
+    display: none;
     width: 30px;
     height: 30px;
     position: relative;
@@ -90,6 +90,12 @@ div.logo {
     line-height: 1;
     text-align: left;
 }
+
+    div.logo a {
+        color: #c3c3c3;
+        text-decoration: none;
+        transition: all .5s ease 0s;
+    }
 
 div.nav {
     background: #383838;
@@ -159,6 +165,7 @@ div.search_form {
 }
 
 div.wrapper {
+    margin-left: 115px;
     width: 1000px;
     background: #fff;
     margin: 0 auto;
@@ -366,7 +373,6 @@ div.thumb {
     display: block;
     color: #555;
     line-height: normal;
-    margin-left: 115px;
     font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
@@ -402,7 +408,6 @@ div.ratings-mark7 {
     display: block;
     color: #555;
     line-height: normal;
-    margin-left: 115px;
     font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
@@ -418,7 +423,6 @@ div.post-ratings {
     display: block;
     color: #555;
     line-height: normal;
-    margin-left: 115px;
     font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
@@ -451,13 +455,30 @@ div.ratings7-mark7-score {
     text-align: center;
     margin-right: 10px;
     border-radius: 4px;
-    margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
     vertical-align: baseline;
     display: block;
-    margin-left: 115px;
+}
+
+div.ratings9-mark-9-score {
+    background: #9ad77f;
+    color: #005000;
+    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif;
+    font-size: 32px;
+    width: 70px;
+    height: 50px;
+    float: left;
+    line-height: 50px;
+    text-align: center;
+    margin-right: 10px;
+    border-radius: 4px;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    vertical-align: baseline;
+    display: block;
 }
 
 div.your-score {
@@ -493,7 +514,6 @@ div.description {
     background: transparent;
     color: #555;
     line-height: normal;
-    margin-left: 115px;
     font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
 }
@@ -781,18 +801,4 @@ div.review-author {
     line-height: normal;
     font-family: 'Segoe UI',Helvetica,Arial,'Sans-Serif';
     text-align: left;
-}
-
-div.ratings7-mark7-score {
-    background: #efda65;
-    color: #796700;
-    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif;
-    font-size: 32px;
-    width: 70px;
-    height: 50px;
-    float: left;
-    line-height: 50px;
-    text-align: center;
-    margin-right: 10px;
-    border-radius: 4px;
 }

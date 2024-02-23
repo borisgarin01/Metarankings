@@ -143,7 +143,7 @@
                                 <div class="ratings-mark7">
                                     <div id="post-ratings-8347" class="post-ratings" data-nonce="bd595cc65b">
                                         <div class="rating">
-                                            <div class="ratings7-mark7-score" itemprop="ratingValue">
+                                            <div class="@(Model.Rating>7.5? "ratings9-mark-9-score" : "ratings7-mark7-score")" itemprop="ratingValue">
                                                 @Model.Rating
                                             </div>
                                             Оценки: <span>42</span>
@@ -238,9 +238,9 @@
                                 <p>Ниже собраны отзывы и оценки разных интернет-изданий с цитатами из обзоров. Мы не учитываем безоценочные рецензии, так как не умеем определять их исходя из написанного текста и не можем додумывать их за автора. Мы пытаемся составить максимально объективный рейтинг на основе реально выставленных оценок.</p>
                                 @foreach (GameJournalistsCompanyReviewModel gameReviewModel in Model.GameReviews)
                                 {
-                                    <div class="@(gameReviewModel.Score>8.5 ? "critic-text-mark-9" : "critic-text-mark-9")">
+                                    <div class="@(gameReviewModel.Score>8.5 ? "critic-text-mark-9" : "critic-text-mark-7")">
                                         <div class="review-meta">
-                                            <div class="@(gameReviewModel.Score>8.5?"small-score-mark-9": "small-score-mark-9")">
+                                            <div class="@(gameReviewModel.Score>7.5?"small-score-mark-9": "small-score-mark-7")">
                                                 <span data-title="Оценка отзыва из 10 баллов" class="tooltip">9</span>
                                             </div>
                                             <div class="review-author"><p><a href="/critics/gmbox/"><span>@gameReviewModel.JournalistsCompanyName</span></a> Автор отзыва: @((!string.IsNullOrWhiteSpace(gameReviewModel.AuthorName) ? gameReviewModel.AuthorName : "Не указан"))</p></div>
