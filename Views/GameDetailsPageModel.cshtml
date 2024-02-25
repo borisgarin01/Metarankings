@@ -233,10 +233,10 @@
                     </div>
                     <div class="reviews">
                         <div id="reviews">
-                            <h2 id="critics">Отзывы и оценки критиков <span>@Model.GameName</span></h2>
+                            <h2 id="critics">Отзывы и оценки критиков<span class="game-name-in-comments-title">@Model.GameName</span></h2>
                             <div class="reviews_list">
                                 <p>Ниже собраны отзывы и оценки разных интернет-изданий с цитатами из обзоров. Мы не учитываем безоценочные рецензии, так как не умеем определять их исходя из написанного текста и не можем додумывать их за автора. Мы пытаемся составить максимально объективный рейтинг на основе реально выставленных оценок.</p>
-                                @foreach (GameJournalistsCompanyReviewModel gameReviewModel in Model.GameReviews)
+                                @foreach (GameJournalistsCompanyReviewModel gameReviewModel in Model.GameJournalistsCompanyReviewsModels)
                                 {
                                     <div class="@(gameReviewModel.Score>7.5 ? "critic-text-mark-9" : "critic-text-mark-7")">
                                         <div class="review-meta">
@@ -253,7 +253,47 @@
                         </div>
                     </div>
                     <div>
-                        Общий рейтинг критиков = <span>@Model.GameReviews.Average(criticGameReview => criticGameReview.Score)</span>
+                        Общий рейтинг критиков = <span>@Model.GameJournalistsCompanyReviewsModels.Average(criticGameReview => criticGameReview.Score)</span>
+                    </div>
+                    <div class="reviews">
+                        <div id="comments">
+                            <h2 id="users">Отзывы и оценки игроков<span class="game-name-in-comments-title">@Model.GameName</span></h2>
+                            <p>
+                                Если вы уже поиграли в игру, расскажите, что вы о ней думаете. Расскажите о ее сильных и слабых сторонах, о ее плюсах и минусах. Это будет полезно знать другим людям, которые хотят в нее поиграть. Перед написанием отзыва ознакомьтесь с <a rel="nofollow" href="/polzovatelskoe-soglashenie/#bans">нашими правилами</a>.
+                            </p>
+                            <div class="reviews_list">
+                                <ol>
+                                    @foreach (GamePlayerReviewModel gamePlayerReviewModel in Model.GamePlayersReviewsModels)
+                                    {
+                                        string score = "";
+                                        if (gamePlayerReviewModel.Score == 9)
+                                        {
+                                            score = "comments-li-mark9";
+                                        }
+                                        else if (gamePlayerReviewModel.Score == 1)
+                                        {
+                                            score = "comments-li-mark1";
+                                        }
+                                        <li class="@score">
+                                            <div>
+                                                <div class="ureview-text">
+                                                    <div class="comment-meta">
+                                                        <div class="@(gamePlayerReviewModel.Score==9?"critic-text-mark-9":"critic-text-mark-7")">
+                                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">@gamePlayerReviewModel.Score</span>
+                                                        </div>
+                                                        <p class="user-reviews-author comment-author"><span>@gamePlayerReviewModel.CommentAuthor</span></p> <p class="comment-date">Отзыв от @gamePlayerReviewModel.CreateDate.ToString("dd.MM.yyyy")</p><div class="rating-com">
+                                                        </div>
+                                                    </div>
+                                                    <div class="review-text">
+                                                        <p>@gamePlayerReviewModel.Text</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                </ol>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

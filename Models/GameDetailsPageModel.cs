@@ -30,6 +30,7 @@ namespace Metarankings.Models
         public Link NewGames => this.Value<IEnumerable<Link>>("newGames").First();
         public Link GamesReleaseDate => this.Value<IEnumerable<Link>>("gamesReleaseDate").First();
         public Link MostExpectedGames => this.Value<IEnumerable<Link>>("mostExpectedGames").First();
-        public IEnumerable<GameJournalistsCompanyReviewModel> GameReviews => (this.Value<IEnumerable<IPublishedContent>>("reviews").Count()>0)? this.Value<IEnumerable<IPublishedContent>>("reviews").Select(a=>a as GameJournalistsCompanyReviewModel):Enumerable.Empty<GameJournalistsCompanyReviewModel>();
+        public IEnumerable<GameJournalistsCompanyReviewModel> GameJournalistsCompanyReviewsModels => (this.Value<IEnumerable<IPublishedContent>>("gameJournalistsCompanyReviewsModels") != null) ? this.Value<IEnumerable<IPublishedContent>>("gameJournalistsCompanyReviewsModels").Select(a => a as GameJournalistsCompanyReviewModel) : Enumerable.Empty<GameJournalistsCompanyReviewModel>();
+        public IEnumerable<GamePlayerReviewModel> GamePlayersReviewsModels => (this.Value<IEnumerable<IPublishedContent>>("gamePlayersReviewsModels") != null) ? this.Value<IEnumerable<IPublishedContent>>("gamePlayersReviewsModels").Select(a => a as GamePlayerReviewModel) : Enumerable.Empty<GamePlayerReviewModel>();
     }
 }
