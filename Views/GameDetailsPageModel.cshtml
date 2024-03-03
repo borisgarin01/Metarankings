@@ -1,19 +1,39 @@
 ﻿@using System.Globalization
-@using Umbraco.Cms.Core.Models
-@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<GameDetailsPageModel>
-@{
-    Layout = null;
-}
-
+@inherits UmbracoViewPage<GameDetailsPageModel>
 
 <!DOCTYPE html>
 <html lang="ru-RU">
 <head>
-    <link rel="stylesheet" type="text/css" href="~/css/style.css" media="all" />
-    <link rel="stylesheet" type="text/css" href="~/css/div.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="~/css/img.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="~/css/span.css" media="screen" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@Model.GameName (игра @Model.ReleaseDate.Year) — отзывы игроков, обзоры критиков, оценки, рейтинг</title>
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel='stylesheet' id='metarankings-style-css' href='https://metarankings.ru/wp-content/themes/metarankings/style.css' type='text/css' media='all' />
+    <script type='text/javascript' src='https://metarankings.ru/wp-includes/js/jquery/jquery.js'></script>
+    <script type='text/javascript' src='https://metarankings.ru/wp-includes/js/jquery/jquery-migrate.min.js'></script>
+    <meta name="description" content="Игра Terminator: Dark Fate - Defiance - отзывы игроков, обзоры критиков, дата выхода, подробное описание, рейтинг, трейлер, оценки пользователей и платформы" />
+
+    <link rel="canonical" href="https://metarankings.ru/terminator-dark-fate-defiance/" />
+    <meta name="theme-color" content="#fff" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="MetaRankings">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="32x32" href="/apple-touch-icon-32x32.png">
+    <link rel="apple-touch-icon" sizes="16x16" href="/apple-touch-icon-16x16.png">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@@MetaRankings" />
+    <meta property="og:title" content="@Model.GameName — отзывы игроков, обзоры критиков, оценки, рейтинг" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://metarankings.ru/terminator-dark-fate-defiance/" />
+    <meta property="og:image" content="https://metarankings.ru/images/uploads/2024/02/terminator-dark-fate-defiance-boxart-cover.jpg" />
+    <meta property="og:site_name" content="MetaRankings" />
+    <script>window.yaContextCb = window.yaContextCb || []</script>
+    <script src="https://yandex.ru/ads/system/context.js" async></script>
+    <script src="https://aflt.market.yandex.ru/widget/script/api" async></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9064246890106061"
+            crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="headerer">
@@ -33,35 +53,59 @@
                         <li>
                             <span onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-movies/">Фильмы</a></span>
                             <div class="movie-drop">
-                                @foreach (Link link in Model.MoviesKindsPagesUrls)
-                                {
-                                    <a href="@link.Url" target="@link.Target">@link.Name</a>
-                                }
+                                <a href="https://metarankings.ru/new-movies/">Новинки</a>
+                                <a href="https://metarankings.ru/coming-soon/">Скоро</a>
+                                <a href="https://metarankings.ru/most-waiting-films/">Ожидаемые</a>
+                                <a href="https://metarankings.ru/meta/movies/">Обзоры</a>
+                                <a href="https://metarankings.ru/best-movies/">Топ фильмов</a>
+                                <a href="https://metarankings.ru/best-movies-2024/">Фильмы 2024</a>
+                                <a href="https://metarankings.ru/best-boeviki/2024/">Боевики 2024</a>
+                                <a href="https://metarankings.ru/best-horror/2024/">Ужасы 2024</a>
+                                <a href="https://metarankings.ru/best-comedy/2024/">Комедии 2024</a>
+                                <a href="https://metarankings.ru/best-thrillers/2024/">Триллеры 2024</a>
+                                <a href="https://metarankings.ru/best-fantasy/2024/">Фантастика 2024</a>
+                                <a href="https://metarankings.ru/best-fentezi/2024/">Фэнтези 2024</a>
+                                <a href="https://metarankings.ru/best-dramy/2024/">Драмы 2024</a>
+                                <a href="https://metarankings.ru/best-melodramas/2024/">Мелодрамы 2024</a>
+                                <a href="https://metarankings.ru/best-cartoons/2024/">Мультфильмы 2024</a>
+                                <a href="https://metarankings.ru/best-serials/">Сериалы</a>
                             </div>
                         </li>
                         <li class="active">
                             <span onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-games/">Игры</a></span>
                             <div class="game-drop">
-                                @foreach (Link link in Model.GamesKindsPagesUrls)
-                                {
-                                    <a href="@link.Url" target="@link.Target">@link.Name</a>
-                                }
+                                <a href="https://metarankings.ru/new-games/">Новинки</a>
+                                <a href="https://metarankings.ru/release-date/">Дата выхода</a>
+                                <a href="https://metarankings.ru/most-waiting-games/">Ожидаемые</a>
+                                <a href="https://metarankings.ru/meta/games/">Обзоры</a>
+                                <a href="https://metarankings.ru/best-games/">Топ игр</a>
+                                <a href="https://metarankings.ru/best-games-2024/">Игры 2024</a>
+                                <a href="https://metarankings.ru/best-pc-games/">ПК</a>
+                                <a href="https://metarankings.ru/best-ps4-games/">PS4</a>
+                                <a href="https://metarankings.ru/best-xboxone-games/">Xbox One</a>
+                                <a href="https://metarankings.ru/best-switch-games/">Switch</a>
+                                <a href="https://metarankings.ru/top-action-games/">Экшены</a>
+                                <a href="https://metarankings.ru/top-shooters/">Шутеры</a>
+                                <a href="https://metarankings.ru/top-horrors/">Хорроры</a>
+                                <a href="https://metarankings.ru/top-igry-priklyucheniya/">Приключения</a>
+                                <a href="https://metarankings.ru/top-rpg-games/">РПГ</a>
+                                <a href="https://metarankings.ru/best-strategii/">Стратегии</a>
+                                <a href="https://metarankings.ru/best-gonki/">Гонки</a>
                             </div>
                         </li>
                         <li>
-                            <a href="@Model.CollectionsURL.Url" target="@Model.CollectionsURL.Target">@Model.CollectionsURL.Name</a>
+                            <a href="https://metarankings.ru/meta/collections/">Подборки</a>
                         </li>
                         <li>
-                            <a href="@Model.ReviewsURL.Url" target="@Model.ReviewsURL.Target">@Model.ReviewsURL.Name</a>
+                            <a href="https://metarankings.ru/user-reviews/">Отзывы</a>
                         </li>
                     </ul>
                 </div>
-                <div class="nav-login">
+                <div class="nav_login">
                     <ul>
-                        <li><span class="userlogin-popup-author" title="Войти на сайт"></span></li>
+                        <li><span class="user-login popauthor" title="Войти на сайт"></span></li>
                     </ul>
-                </div>
-                <div class="search_form">
+                </div><div class="search_form">
                     <form method="get" id="searchform" action="https://metarankings.ru/search/">
                         <fieldset>
                             <input name="text" type="search" id="search" placeholder="Название игры или фильма..." autocomplete="off" />
@@ -79,19 +123,19 @@
             <div class="platform-menu">
                 <ul>
                     <li>
-                        <a class="bst" href="@Model.BestGamesOfThisGameReleaseYear.Url" target="@Model.BestGamesOfThisGameReleaseYear.Target">@Model.BestGamesOfThisGameReleaseYear.Name</a>
+                        <a class="bst" href="https://metarankings.ru/best-games-2023/">Лучшие игры 2023</a>
                     </li>
                     <li>
-                        <a class="bst" href="@Model.BestGamesOfPreviousYearForGameReleaseYear.Url" target="@Model.BestGamesOfPreviousYearForGameReleaseYear.Target">@Model.BestGamesOfPreviousYearForGameReleaseYear.Name</a>
+                        <a class="bst" href="https://metarankings.ru/best-games-2022/">2022</a>
                     </li>
                     <li>
-                        <a class="mnew" href="@Model.NewGames.Url" target="@Model.NewGames.Target">@Model.NewGames.Name</a>
+                        <a class="mnew" href="https://metarankings.ru/new-games/">Новые игры</a>
                     </li>
                     <li>
-                        <a href="@Model.GamesReleaseDate.Url" target="@Model.GamesReleaseDate.Target">@Model.GamesReleaseDate.Name</a>
+                        <a href="https://metarankings.ru/release-date/">Дата выхода игр</a>
                     </li>
                     <li>
-                        <a href="@Model.MostExpectedGames.Url" target="@Model.MostExpectedGames.Target">@Model.MostExpectedGames.Name</a>
+                        <a href="https://metarankings.ru/most-waiting-games/">Самые ожидаемые игры</a>
                     </li>
                 </ul>
             </div>
@@ -102,12 +146,12 @@
                 <div class="widget">
                     <div class="widget-body">
                         <div class="graph">
-                            <h3>Рейтинг <a href="#critics">критиков</a> на основе 5 обзоров</h3>
-                            <div class="graph-body"><div class="rating-graph mark-8" style="width:82%"><span class="score-graph">8.2</span></div></div>
-                            <h3>Рейтинг <a href="#users">игроков</a> на основе 42 оценок</h3>
-                            <div class="graph-body"><div class="rating-graph mark-7" style="width:71%"><span class="score-graph">7.1</span></div></div>
+                            <h3>Рейтинг <a href="#critics">критиков</a> на основе 1 обзора</h3>
+                            <div class="graph-body"><div class="rating-graph mark-8" style="width:75%"><span class="score-graph">7.5</span></div></div>
+                            <h3>Рейтинг <a href="#users">игроков</a> на основе 14 оценок</h3>
+                            <div class="graph-body"><div class="rating-graph mark-5" style="width:51%"><span class="score-graph">5.1</span></div></div>
                             <span>Метарейтинг</span> <span class="metaranking">?</span>
-                            <div class="graph-body"><div class="rating-graph mark-8" style="width:76%"><span class="score-graph">7.6</span></div></div>
+                            <div class="graph-body"><div class="rating-graph mark-6" style="width:62%"><span class="score-graph">6.2</span></div></div>
                             <div class="wait-stat">Ожидания: 2%</div>
                             <div class="graph-body"><div class="rating-wait mark-0" style="width:2%"></div></div>
                         </div>
@@ -116,22 +160,22 @@
             </div>
             <div id="content" class="lcol">
                 <div class="entry" itemscope itemtype="http://schema.org/Game">
-                    <div class="post single clear game" id="post_8347">
+                    <div class="post single clear game" id="post_23382">
                         <div class="post-meta">
                             <h1><span itemprop="name">@Model.GameName</span></h1>
-                            <link itemprop="url" href="https://metarankings.ru/anno-2205/">
-                            <meta itemprop="datePublished" content="2015-11-03">
+                            <link itemprop="url" href="@this.Url">
+                            <meta itemprop="datePublished" content="2024-02-21">
                         </div>
                         <div id="tcontent">
                             <div class="video-content">
                                 <div id="content-trailer">
-                                    <iframe src="https://www.youtube.com/embed/S7jJAYD-FtE" height="280" width="100%" allowfullscreen="" style="border-width:0"></iframe>
+                                    <iframe title="Трейлер @Model.GameName" src="https://www.youtube.com/embed/RtxXcWC_1sw" height="280" width="100%" allowfullscreen="" style="border-width:0"></iframe>
                                 </div>
                             </div>
                         </div>
                         <div class="post-content">
                             <div class="thumb">
-                                <img class="post-image" src="@Model.ImageSource" alt="Обложка игры Anno 2205" title="Игра Anno 2205" itemprop="image">
+                                <img class="post-image" src="@Model.ImageSource" alt="Обложка игры Terminator: Dark Fate &#8212; Defiance" title="Игра @Model.GameName" itemprop="image">
                                 <div class="watch-trailer">
                                     <h3><span class="twatch"><span class="p-twatch">Трейлер</span></span></h3>
                                 </div>
@@ -139,34 +183,28 @@
                             <div id="ratings" itemprop="aggregateRating" itemscope="" itemtype="http://schema.org/AggregateRating">
                                 <meta itemprop="bestRating" content="10">
                                 <meta itemprop="worstRating" content="1">
-                                <meta itemprop="ratingCount" content="42">
-                                <div class="ratings-mark7">
-                                    <div id="post-ratings-8347" class="post-ratings" data-nonce="bd595cc65b">
+                                <meta itemprop="ratingCount" content="14">
+                                <div class="ratings mark-5">
+                                    <div id="post-ratings-23382" class="post-ratings" data-nonce="2c8e283591">
                                         <div class="rating">
-                                            <div class="@(Model.Rating>7.5? "ratings9-mark-9-score" : "ratings7-mark7-score")" itemprop="ratingValue">
-                                                @Model.Rating
+                                            <div class="score" itemprop="ratingValue">
+                                                @(Math.Round(Convert.ToDouble((Model.GameJournalistsCompanyReviewsModels.Average(a => a.Score) + Model.GamePlayersReviewsModels.Average(a => a.Score)) / 2), 1))
                                             </div>
-                                            Оценки: <span>42</span>
+                                            Оценки: <span>14</span>
                                         </div>
                                         <div class="your-score">
-                                            <img id="rating_8347_1" class="rating-on mark-1" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="1" onmouseover="current_rating(8347, 1, '1');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
-                                            <img id="rating_8347_2" class="rating-on mark-2" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="2" onmouseover="current_rating(8347, 2, '2');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_8347_3" class="rating-on mark-3" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="3" onmouseover="current_rating(8347, 3, '3');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
-                                            <img id="rating_8347_4" class="rating-on mark-4" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="4" onmouseover="current_rating(8347, 4, '4');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
-                                            <img id="rating_8347_5" class="rating-on mark-5" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="5" onmouseover="current_rating(8347, 5, '5');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_8347_6" class="rating-on mark-6" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="6" onmouseover="current_rating(8347, 6, '6');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
-                                            <img id="rating_8347_7" class="rating-on mark-7" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="7" onmouseover="current_rating(8347, 7, '7');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_8347_8" class="rating-on mark-8" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="8" onmouseover="current_rating(8347, 8, '8');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
-                                            <img id="rating_8347_9" class="rating-on mark-9" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="9" onmouseover="current_rating(8347, 9, '9');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_8347_10" class="rating-on mark-10" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="10" onmouseover="current_rating(8347, 10, '10');" onmouseout="ratings_off(7.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" />
-                                            <span class="post-ratings-text" id="ratings_8347_text">0</span>
+                                            <img id="rating_23382_1" class="rating-on mark-1" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="1" onmouseover="current_rating(23382, 1, '1');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_2" class="rating-on mark-2" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="2" onmouseover="current_rating(23382, 2, '2');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_3" class="rating-on mark-3" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="3" onmouseover="current_rating(23382, 3, '3');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_4" class="rating-on mark-4" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="4" onmouseover="current_rating(23382, 4, '4');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_5" class="rating-on mark-5" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="5" onmouseover="current_rating(23382, 5, '5');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_6" class="rating-on mark-6" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="6" onmouseover="current_rating(23382, 6, '6');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_7" class="rating-on mark-7" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="7" onmouseover="current_rating(23382, 7, '7');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_8" class="rating-on mark-8" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="8" onmouseover="current_rating(23382, 8, '8');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_9" class="rating-on mark-9" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="9" onmouseover="current_rating(23382, 9, '9');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_10" class="rating-on mark-10" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="10" onmouseover="current_rating(23382, 10, '10');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /> <span class="post-ratings-text" id="ratings_23382_text">0</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="featured-game">
-                                <p><span class="label">Разработчик:</span> <a href="/razrabotchiki/ubisoft_entertainment/">@Model.Developer </a>, ...</p>
-                                <p><span class="label">Издатель:</span> <a href="/izdateli/ubisoft_entertainment/">@Model.Publisher </a> </p>
+                                <p><span class="label">Разработчик:</span> <a href="/razrabotchiki/slitherine/">@Model.Developer</a>, ...</p>
+                                <p><span class="label">Издатель:</span> <a href="/izdateli/slitherine/">@Model.Publisher</a> </p>
                                 <p><span class="label">Платформы:</span> <a href="https://metarankings.ru/meta/games/pc/">@Model.Platforms.First()</a></p>
                                 <p><span class="label">Жанр:</span> <a href="https://metarankings.ru/genre/strategiya/">@Model.Genres.First()</a></p>
-                                <p><span class="label">Локализация: </span><a href="https://metarankings.ru/igry-na-russkom-yazyke/">@Model.Localization</a></p>
+                                <p><span class="label">Локализация:</span> <a href="https://metarankings.ru/igry-na-russkom-yazyke/">@Model.Localization</a></p>
                                 <p><span class="label">Дата выхода:</span> <span class="release-date">@Model.ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("ru-RU"))</span></p>
                             </div>
 
@@ -180,17 +218,13 @@
 
                             <div class="podborki">
                                 <p>
-                                    @foreach (string tag in Model.Tags)
-                                    {
-                                        <a href="#">@tag</a>
-                                    }
-                                    @* <a href="https://metarankings.ru/best-games-2015/">Игры 2015</a>
+                                    <a href="https://metarankings.ru/best-games-2024/">Игры 2024</a>
                                     <a class="mark-link" href="https://metarankings.ru/best-pc-games/">Топ игр на ПК</a>
-                                    <a class="mark-link" href="https://metarankings.ru/best-strategii/">стратегии</a> *@
+                                    <a class="mark-link" href="https://metarankings.ru/best-strategii/">стратегии</a>
                                 </p>
                             </div>
                         </div>
-                        <div class="ads-horizont-hor-1">
+                        <div class="ads-horizont hor-1">
                             <!-- Yandex.RTB R-A-201169-7 -->
                             <div id="yandex_rtb_R-A-201169-7-1"></div>
                             <script>
@@ -203,19 +237,21 @@
                         </div>
                         <div class="share">
                             <div class="share-text">Поделитесь с друзьями в социальных сетях</div>
-                            <span class="vko" onclick="window.open('/click.php?https://vk.com/share.php?url=https://metarankings.ru/anno-2205/', 'newwindow','width=200,height=150'); return false;"></span>
-                            <span class="tw" onclick="window.open('/click.php?https://twitter.com/share?url=https://metarankings.ru/anno-2205/&amp;text=Anno+2205+-+отзывы,+оценки,+обзоры+и+рейтинг+-+', 'newwindow','width=500,height=300'); return false;"></span>
-                            <span class="odn" onclick="window.open('/click.php?https://connect.ok.ru/offer?url=https://metarankings.ru/anno-2205/&title=Anno+2205', 'newwindow','width=550,height=350'); return false;"></span>
+                            <span class="vko" onclick="window.open('/click.php?https://vk.com/share.php?url=https://metarankings.ru/terminator-dark-fate-defiance/', 'newwindow','width=200,height=150'); return false;"></span>
+                            <span class="tw" onclick="window.open('/click.php?https://twitter.com/share?url=https://metarankings.ru/terminator-dark-fate-defiance/&amp;text=Terminator%3A+Dark+Fate+%26%238212%3B+Defiance+-+отзывы,+оценки,+обзоры+и+рейтинг+-+', 'newwindow','width=500,height=300'); return false;"></span>
+                            <span class="odn" onclick="window.open('/click.php?https://connect.ok.ru/offer?url=https://metarankings.ru/terminator-dark-fate-defiance/&title=Terminator%3A+Dark+Fate+%26%238212%3B+Defiance', 'newwindow','width=550,height=350'); return false;"></span>
                         </div>
 
                         <div class="post-footer">
                             <h2>Трейлер и скриншоты</h2>
                             <div class="video">
-                                <img class="img-trailer" alt="Трейлер Anno 2205" title="Трейлер Anno 2205" src="https://img.youtube.com/vi/S7jJAYD-FtE/default.jpg" width="100" height="75">
+                                <img class="img-trailer" alt="Трейлер Terminator: Dark Fate &#8212; Defiance" title="Трейлер Terminator: Dark Fate &#8212; Defiance" src="https://img.youtube.com/vi/RtxXcWC_1sw/default.jpg" width="100" height="75">
                                 <span class="play"></span>
                             </div>
                             <ul class="gallery">
-                                <li><img class="attachment-screenshot" src="https://metarankings.ru/images/uploads/Anno-2205-boxart-cover.jpg" data-original="https://metarankings.ru/images/uploads/Anno-2205-boxart-cover.jpg" alt="Скриншоты @Model.GameName" title="@Model.GameName" width="100" height="75"></li>
+                                <li>
+                                    <img class="attachment-screenshot" src="@Model.ImageSource" data-original="@Model.ImageSource" alt="Скриншоты @Model.GameName" title="@Model.GameName" width="100" height="75">
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -229,77 +265,486 @@
                             </div>
                         </div>
                     </div>
-                    <div class="ads-horizont-hor-1">
+                    <div class="ads-horizont hor-1">
                     </div>
                     <div class="reviews">
                         <div id="reviews">
-                            <h2 id="critics">Отзывы и оценки критиков<span class="game-name-in-comments-title">@Model.GameName</span></h2>
+                            <h2 id="critics">Отзывы и оценки критиков <span>@Model.GameName</span></h2>
                             <div class="reviews_list">
                                 <p>Ниже собраны отзывы и оценки разных интернет-изданий с цитатами из обзоров. Мы не учитываем безоценочные рецензии, так как не умеем определять их исходя из написанного текста и не можем додумывать их за автора. Мы пытаемся составить максимально объективный рейтинг на основе реально выставленных оценок.</p>
-                                @foreach (GameJournalistsCompanyReviewModel gameReviewModel in Model.GameJournalistsCompanyReviewsModels)
+                                @foreach (GameJournalistsCompanyReviewModel gameJournalistsCompanyReviewModel in Model.GameJournalistsCompanyReviewsModels)
                                 {
-                                    <div class="@(gameReviewModel.Score>7.5 ? "critic-text-mark-9" : "critic-text-mark-7")">
+                                    <div class="critic-text mark-8">
                                         <div class="review-meta">
-                                            <div class="@(gameReviewModel.Score>7.5?"small-score-mark-9": "small-score-mark-7")">
-                                                <span data-title="Оценка отзыва из 10 баллов" class="tooltip">@gameReviewModel.Score</span>
+                                            <div class="small-score mark-8">
+                                                <span data-title="Оценка отзыва из 10 баллов" class="tooltip">@gameJournalistsCompanyReviewModel.Score</span>
                                             </div>
-                                            <div class="review-author"><p><a href="/critics/gmbox/"><span>@gameReviewModel.JournalistsCompanyName</span></a> Автор отзыва: @((!string.IsNullOrWhiteSpace(gameReviewModel.AuthorName) ? gameReviewModel.AuthorName : "Не указан"))</p></div>
+                                            <div class="review-author"><p><a href="/critics/cubiq/"><span>@gameJournalistsCompanyReviewModel.JournalistsCompanyName</span></a> Отзыв: @gameJournalistsCompanyReviewModel.AuthorName</p></div>
                                         </div>
-                                        <p>@gameReviewModel.Text</p>
-                                        <a rel="nofollow" class="review-link" href="/click/?site=http://gmbox.ru/anno-2205/recenziya-na-anno-2205" target="_blank">Читать обзор полностью</a>
+                                        <p>@gameJournalistsCompanyReviewModel.Text</p>
+                                        <a rel="nofollow" class="allreviews" href="/click/?site=https://cubiq.ru/terminator-dark-fate-defiance-review/" target="_blank">›</a>
                                     </div>
                                 }
                             </div>
                         </div>
+                        <div>
+                            Общий рейтинг критиков = <span>@Math.Round(Model.GameJournalistsCompanyReviewsModels.Average(a => a.Score), 1)</span>
+                        </div>
+                        <span class="links-add">Добавить обзор</span>
                     </div>
-                    <div>
-                        Общий рейтинг критиков = <span>@Model.GameJournalistsCompanyReviewsModels.Average(criticGameReview => criticGameReview.Score)</span>
+                    <div class="ads-horizont hor-1">
+                        <!-- Yandex.RTB R-A-201169-5 -->
+                        <div id="yandex_rtb_R-A-201169-5_2"></div>
+                        <script>
+                            window.yaContextCb.push(() => {
+                                Ya.Context.AdvManager.render({
+                                    renderTo: "yandex_rtb_R-A-201169-5_2",
+                                    blockId: "R-A-201169-5"
+                                })
+                            })</script>
                     </div>
-                    <div class="reviews">
+                    <div class="user-reviews comments">
                         <div id="comments">
-                            <h2 id="users">Отзывы и оценки игроков<span class="game-name-in-comments-title">@Model.GameName</span></h2>
-                            <p>
-                                Если вы уже поиграли в игру, расскажите, что вы о ней думаете. Расскажите о ее сильных и слабых сторонах, о ее плюсах и минусах. Это будет полезно знать другим людям, которые хотят в нее поиграть. Перед написанием отзыва ознакомьтесь с <a rel="nofollow" href="/polzovatelskoe-soglashenie/#bans">нашими правилами</a>.
-                            </p>
-                            <div class="reviews_list">
-                                <ol>
-                                    @foreach (GamePlayerReviewModel gamePlayerReviewModel in Model.GamePlayersReviewsModels)
-                                    {
-                                        string score = "";
-                                        if (gamePlayerReviewModel.Score == 9)
+                            <h2 id="users">Отзывы и оценки игроков <span>@Model.GameName</span></h2>
+                            @if (!Model.GamePlayersReviewsModels.Any())
+                            {
+                                <div class="reviews-none"><p>Отзывов от игроков пока нет. Вы можете стать первым(ой), добавив свой.  Если вы уже в нее играли, расскажите, что вы о ней думаете. Расскажите о ее сильных и слабых сторонах, о ее плюсах и минусах. Это будет полезно знать другим людям, которые хотят в нее поиграть. Перед написанием ознакомьтесь с <a rel="nofollow" href="/polzovatelskoe-soglashenie/#bans">нашими правилами</a>.</p></div>
+                            }
+                            else
+                            {
+                                <p>Если вы уже поиграли в игру, расскажите, что вы о ней думаете. Расскажите о ее сильных и слабых сторонах, о ее плюсах и минусах. Это будет полезно знать другим людям, которые хотят в нее поиграть. Перед написанием отзыва ознакомьтесь с <a rel="nofollow" href="/polzovatelskoe-soglashenie/#bans">нашими правилами</a>.</p>
+                                <div class="comment_list">
+                                    <ol>
+                                        @foreach (GamePlayerReviewModel gamePlayerReviewModel in Model.GamePlayersReviewsModels)
                                         {
-                                            score = "comments-li-mark9";
-                                        }
-                                        else if (gamePlayerReviewModel.Score == 1)
-                                        {
-                                            score = "comments-li-mark1";
-                                        }
-                                        <li class="@score">
-                                            <div>
-                                                <div class="ureview-text">
-                                                    <div class="comment-meta">
-                                                        <div class="@(gamePlayerReviewModel.Score==9?"critic-text-mark-9":"critic-text-mark-7")">
-                                                            <span data-title="Оценка отзыва из 10 баллов" class="tooltip">@gamePlayerReviewModel.Score</span>
+                                            <li class="mark-1">
+                                                <div>
+                                                    <div class="ureview-text">
+                                                        <div class="comment-meta">
+                                                            <div class="small-score mark-1">
+                                                                <span data-title="Оценка отзыва из 10 баллов" class="tooltip">@gamePlayerReviewModel.Score</span>
+                                                            </div>
+                                                            <p class="user-reviews-author comment-author"><span>@gamePlayerReviewModel.CommentAuthor</span></p> <p class="comment-date">
+                                                                Отзыв от @gamePlayerReviewModel.PublishDate.ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("ru-RU"))
+                                                            </p>
+                                                            <div class="rating-com">
+                                                                <span class="ldc-ul_like" onclick="alter_ul_post_values(this,'2048','c_like')">+ <span>10</span></span><span class="ldc-ul_dislike" onclick="alter_ul_post_values(this,'2048','c_dislike')">- <span>2</span></span>
+                                                            </div>
                                                         </div>
-                                                        <p class="user-reviews-author comment-author"><span>@gamePlayerReviewModel.CommentAuthor</span></p> <p class="comment-date">Отзыв от @gamePlayerReviewModel.CreateDate.ToString("dd.MM.yyyy")</p><div class="rating-com">
+                                                        <div class="review-text">
+                                                            <p>@gamePlayerReviewModel.Text</p>
                                                         </div>
-                                                    </div>
-                                                    <div class="review-text">
-                                                        <p>@gamePlayerReviewModel.Text</p>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </li>
-                                    }
-                                </ol>
-                            </div>
+                                            </li>
+                                        }
+                                    </ol>
+                                </div>
+                            }
+                        </div>
+                        <div id="respond" class="comment-respond">
+                            <h3 id="reply-title" class="comment-reply-title"><span>Добавить отзыв</span> <small><a rel="nofollow" id="cancel-comment-reply-link" href="/terminator-dark-fate-defiance/#respond" style="display:none;">Отменить ответ</a></small></h3>
+                            <form action="https://metarankings.ru/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
+                                <div class="commform-author"><p>Ваше имя <span>Обязательно!</span></p><div><input type="text" name="metarankings-name" id="author" tabindex="2" /></div></div>
+                                <div class="commform-textarea"><div><div class="count"><span id="count">0</span> (60 символов - минимум)</div><label for="comment">Ваш отзыв... <span>(не менее 60 символов, без мата, оскорблений, капса и без ссылок на сторонние ресурсы)</span></label><textarea name="metarankings-comm" id="comment" cols="50" rows="7" tabindex="1"></textarea></div></div>												<p class="form-submit">
+                                    <input name="submit" type="submit" id="submit" value="Отправить" />
+                                    <input type='hidden' name='comment_post_ID' value='23382' id='comment_post_ID' />
+                                    <input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+                                </p>
+                            </form>
+                        </div><!-- #respond -->
+                        <script type="text/javascript">
+                            setInterval(ShowCount, 390); function ShowCount() { var Count = document.getElementById('comment').value.length; document.getElementById('count').innerHTML = Count; }
+                        </script>
+                    </div>
+                    <div class="ads-horizont hor-1">
+                        <script type="text/javascript">
+                            (function (w) {
+                                function start() {
+                                    w.removeEventListener("YaMarketAffiliateLoad", start);
+                                    w.YaMarketAffiliate.createWidget({
+                                        type: "models",
+                                        containerId: "marketWidget",
+                                        params: {
+                                            clid: 2492732,
+                                            searchType: "attractive",
+                                            themeId: 4
+                                        }
+                                    });
+                                }
+                                w.YaMarketAffiliate
+                                    ? start()
+                                    : w.addEventListener("YaMarketAffiliateLoad", start);
+                            })(window);
+                        </script>
+                        <div id="marketWidget"></div>
+                    </div>
+                </div>
+
+                <div class="news-module">
+                    <div class="news-item">
+                        <a href="https://metarankings.ru/luchshie-igrovye-smartfony-v-2023-2024-godu/" title="Лучшие игровые смартфоны в 2023 &#8212; 2024 году"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/01/luchshie-igrovye-smartfony-v-2023-2024-445x250.jpg" alt="Лучшие игровые смартфоны в 2023 &#8212; 2024 году"><span class="news-title">Лучшие игровые смартфоны в 2023 &#8212; 2024 году</span></a>
+                    </div>
+                    <div class="news-item">
+                        <a href="https://metarankings.ru/luchshie-igrovye-naushniki-i-garnitury-v-2022-2023-godu/" title="Лучшие игровые наушники и гарнитуры в 2022-2023 году"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2022/06/luchshie-igrovye-naushniki-v-2022-2023-445x250.jpg" alt="Лучшие игровые наушники и гарнитуры в 2022-2023 году"><span class="news-title">Лучшие игровые наушники и гарнитуры в 2022-2023 году</span></a>
+                    </div>
+                </div>
+
+                <div class="list clear similar">
+                    <h2>Похожие игры</h2>
+                    <a href="https://metarankings.ru/terminator-resistance-annihilation-line/" title="Terminator: Resistance — Annihilation Line">
+                        <div class="featured-image">
+                            <img class="post-image" src="https://metarankings.ru/images/uploads/2021/12/terminator-resistance-annihilation-line-box-art-cover-196x281.jpeg" alt="Terminator: Resistance — Annihilation Line">
+                            <div class="small-score mark-0">0</div>
+                            <span>Terminator: Resistance — Annihilation Line</span>
+                        </div>
+                    </a>
+                    <a href="https://metarankings.ru/terminator-resistance/" title="Terminator Resistance">
+                        <div class="featured-image">
+                            <img class="post-image" src="https://metarankings.ru/images/uploads/terminator-resistance-box-art-cover-195x281.jpg" alt="Terminator Resistance">
+                            <div class="small-score mark-7">7.4</div>
+                            <span>Terminator Resistance</span>
+                        </div>
+                    </a>
+                    <a href="https://metarankings.ru/skull-bones/" title="Skull and Bones">
+                        <div class="featured-image">
+                            <img class="post-image" src="https://metarankings.ru/images/uploads/2022/11/skull-bones-boxart-cover-196x281.jpg" alt="Skull and Bones">
+                            <div class="small-score mark-6">5.6</div>
+                            <span>Skull and Bones</span>
+                        </div>
+                    </a>
+                    <a href="https://metarankings.ru/stargate-timekeepers/" title="Stargate: Timekeepers">
+                        <div class="featured-image">
+                            <img class="post-image" src="https://metarankings.ru/images/uploads/2024/01/stargate-timekeepers-boxart-cover-200x268.jpg" alt="Stargate: Timekeepers">
+                            <div class="small-score mark-0">0</div>
+                            <span>Stargate: Timekeepers</span>
+                        </div>
+                    </a>
+                    <a href="https://metarankings.ru/the-universim/" title="The Universim">
+                        <div class="featured-image">
+                            <img class="post-image" src="https://metarankings.ru/images/uploads/2024/01/the-universim-193x281.jpg" alt="The Universim">
+                            <div class="small-score mark-0">0</div>
+                            <span>The Universim</span>
+                        </div>
+                    </a>
+                    <a href="https://metarankings.ru/war-hospital/" title="War Hospital">
+                        <div class="featured-image">
+                            <img class="post-image" src="https://metarankings.ru/images/uploads/2024/01/war-hospital-cover-art-196x281.jpg" alt="War Hospital">
+                            <div class="small-score mark-6">5.5</div>
+                            <span>War Hospital</span>
+                        </div>
+                    </a>
+                    <a href="https://metarankings.ru/steamworld-build/" title="SteamWorld Build">
+                        <div class="featured-image">
+                            <img class="post-image" src="https://metarankings.ru/images/uploads/2023/12/steamworld-build-cover-art-196x281.jpg" alt="SteamWorld Build">
+                            <div class="small-score mark-6">6.2</div>
+                            <span>SteamWorld Build</span>
+                        </div>
+                    </a>
+                    <a href="https://metarankings.ru/persona-5-tactica/" title="Persona 5 Tactica">
+                        <div class="featured-image">
+                            <img class="post-image" src="https://metarankings.ru/images/uploads/2023/11/persona-5-tactica-cover-art-196x281.jpg" alt="Persona 5 Tactica">
+                            <div class="small-score mark-6">6</div>
+                            <span>Persona 5 Tactica</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="sidebar rcol">
+                <div class="widget">
+                    <div class="widget-body">
+                        <ul>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/suicide-squad-kill-the-justice-league/">Suicide Squad: Kill the Justice League</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/prince-of-persia-the-lost-crown/">Prince of Persia: The Lost Crown</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/robocop-rogue-city/">Robocop: Rogue City</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/game-alan-wake-2/">Alan Wake 2</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/marvels-spider-man-2/">Marvel’s Spider-Man 2</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/cyberpunk-2077-phantom-liberty/">Cyberpunk 2077: Phantom Liberty</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/lies-of-p/">Lies of P</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/starfield/">Starfield</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/baldurs-gate-3/">Baldur&#8217;s Gate 3</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/final-fantasy-16/">Final Fantasy XVI</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/diablo-iv/">Diablo IV</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/star-wars-jedi-survivor/">Star Wars Jedi: Survivor</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/resident-evil-4/">Resident Evil 4</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/atomic-heart/">Atomic Heart</a></span>
+                                </div>
+                            </li>
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="https://metarankings.ru/hogwarts-legacy/">Hogwarts Legacy</a></span>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="podborki">
+                            <a href="https://metarankings.ru/best-movies-2024/">Фильмы 2024</a>
+                            <a href="https://metarankings.ru/best-games-2024/">Игры 2024</a>
+                            <a href="https://metarankings.ru/best-boeviki/2024/">Боевики 2024</a>
+                            <a href="https://metarankings.ru/best-comedy/2024/">Комедии 2024</a>
+                            <a href="https://metarankings.ru/best-horror/2024/">Ужасы 2024</a>
+                            <a href="https://metarankings.ru/best-cartoons/2024/">Мультфильмы 2024</a>
                         </div>
                     </div>
                 </div>
+
+            </div>
+        </div>
+        <div class="footer">
+            <script>
+                [].forEach.call(document.querySelectorAll('img[data-src]'), function (img) {
+                    img.setAttribute('src', img.getAttribute('data-src'));
+                    img.onload = function () {
+                        img.removeAttribute('data-src');
+                    };
+                });
+            </script>
+            <script>
+                (function ($) {
+                    $(function () {
+                        $('.menu-icon').on('click', function () {
+                            $(this).closest('.header').toggleClass('menu-open');
+                        });
+                    });
+                })(jQuery);
+            </script>
+            <script>
+                jQuery('#comments').append('<div class="your-score"><p>Ваша оценка</p></div>');
+                jQuery(window).scroll(function () {
+                    if (jQuery(this).scrollTop() > 1200) {
+                        jQuery('#comments').append(jQuery('.ratings'));
+                    } else {
+                        jQuery('#ratings').append(jQuery('#comments> .ratings'));
+                    }
+                });
+            </script>
+            <script>
+                jQuery(function ($) {
+                    $(window).scroll(function () {
+                        if ($(this).scrollTop() >= 90) {
+                            $('.header-bottom').addClass('sticky');
+                        }
+                        else {
+                            $('.header-bottom').removeClass('sticky');
+                        }
+                    });
+                });
+            </script>
+            <script>
+                jQuery(document).ready(function ($) {
+                    $("#toTop").hide();
+                    $(function () {
+                        $(window).scroll(function () {
+                            if ($(this).scrollTop() > 300) {
+                                $('#toTop').fadeIn();
+                            } else {
+                                $('#toTop').fadeOut();
+                            }
+                        });
+                        $('#toTop').click(function () {
+                            $('body,html').animate({
+                                scrollTop: 0
+                            }, 800);
+                            return false;
+                        });
+                    });
+                });
+            </script>
+            <script type="text/javascript">
+                var isProcessing = false;
+                function alter_ul_post_values(obj, post_id, ul_type) {
+
+                    if (isProcessing)
+                        return;
+                    isProcessing = true;
+
+                    jQuery(obj).find("span").html("..");
+                    jQuery.ajax({
+                        type: "POST",
+                        url: "https://metarankings.ru/wp-content/plugins/like-dislike/ajax_counter.php",
+                        data: "post_id=" + post_id + "&up_type=" + ul_type,
+                        success: function (msg) {
+                            jQuery(obj).find("span").html(msg);
+                            isProcessing = false;
+                        }
+                    });
+                }
+            </script>
+            <script type='text/javascript'>
+                /* <![CDATA[ */
+                var ratingsL10n = { "plugin_url": "https:\/\/metarankings.ru\/wp-content\/plugins\/wp-postratings", "ajax_url": "https:\/\/metarankings.ru\/wp-admin\/admin-ajax.php", "text_wait": "Please rate only 1 post at a time.", "image": "squares", "image_ext": "gif", "max": "10", "show_loading": "0", "show_fading": "1", "custom": "0" };
+                var ratings_mouseover_image = new Image(); ratings_mouseover_image.src = ratingsL10n.plugin_url + "/images/" + ratingsL10n.image + "/rating_over." + ratingsL10n.image_ext;;
+                /* ]]> */
+            </script>
+            <script type='text/javascript' src='https://metarankings.ru/wp-content/plugins/wp-postratings/postratings-js.js'></script>
+            <script type='text/javascript' src='https://metarankings.ru/wp-content/themes/metarankings/js/jquery.cycle.all.min.js'></script>
+            <script type='text/javascript' src='https://metarankings.ru/wp-content/themes/metarankings/js/script.js'></script>
+            <script type='text/javascript' src='https://metarankings.ru/wp-content/themes/metarankings/js/comments.js'></script>
+            <!-- Yandex.RTB R-A-201169-20 -->
+            <script>
+                window.yaContextCb.push(() => {
+                    Ya.Context.AdvManager.render({
+                        "blockId": "R-A-201169-20",
+                        "type": "topAd"
+                    })
+                })
+            </script>
+
+            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-63304078-1"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag() { dataLayer.push(arguments); }
+                gtag('js', new Date());
+
+                gtag('config', 'UA-63304078-1');
+            </script>
+
+            <script src="https://metarankings.ru/user-ip.php"></script>
+            <script type="text/javascript">
+                (function (m, e, t, r, i, k, a) {
+                    m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
+                    m[i].l = 1 * new Date();
+                    for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+                    k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+                })
+                    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+                ym(57119962, "init", {
+                    clickmap: true,
+                    trackLinks: true,
+                    accurateTrackBounce: true,
+                    webvisor: true,
+                    params: { 'ip': userip }
+                });
+            </script>
+            <noscript><div><img src="https://mc.yandex.ru/watch/57119962" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+            <!-- Rating Mail.ru counter -->
+            <script type="text/javascript">
+                var _tmr = window._tmr || (window._tmr = []);
+                _tmr.push({ id: "2595025", type: "pageView", start: (new Date()).getTime() });
+                (function (d, w, id) {
+                    if (d.getElementById(id)) return;
+                    var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+                    ts.src = "https://top-fwz1.mail.ru/js/code.js";
+                    var f = function () { var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s); };
+                    if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+                })(document, window, "topmailru-code");
+            </script><noscript>
+                <div>
+                    <img src="https://top-fwz1.mail.ru/counter?id=2595025;js=na" style="border:0;position:absolute;left:-9999px;" alt="Top.Mail.Ru" />
+                </div>
+            </noscript>
+            <!-- //Rating Mail.ru counter -->
+            <div class="copyright">
+                &copy; 2014 - 2024 <span data-title="MetaRankings" class="tooltip">MetaRankings</span>
+                <a rel="nofollow" href="/about/" data-title="О сайте" class="tooltip">О нас</a>
+                <a rel="nofollow" href="/contact/" data-title="Форма обратной связи" class="tooltip">Связь</a>
+                <a rel="nofollow" href="/polzovatelskoe-soglashenie/" data-title="Пользовательское соглашение" class="tooltip">Пользовательское соглашение</a>
+                <a rel="nofollow" href="/politika-konfidencialnosti/" data-title="Политика конфиденциальности" class="tooltip">Конфиденциальность</a>
+            </div>
+            <div class="credits">
+                <span class="pegi"><span data-title="Сайт может содержать контент не предназначенный лицам до 18 лет" class="tooltip">18+</span></span>
+                <a rel="nofollow" href="/click.php?https://vk.com/metarankings_ru" target="_blank"><span class="vko"></span></a>
+                <a rel="nofollow" href="/click.php?https://twitter.com/metarankings" target="_blank"><span class="tw"></span></a>
+                <!--LiveInternet counter--><script>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <!--
+                                               document.write("<img src='https://counter.yadro.ru/hit?t44.6;r" +
+                                                   escape(document.referrer) + ((typeof (screen) == "undefined") ? "" :
+                                                       ";s" + screen.width + "*" + screen.height + "*" + (screen.colorDepth ?
+                                                           screen.colorDepth : screen.pixelDepth)) + ";u" + escape(document.URL) +
+                                                   ";" + Math.random() +
+                                                   "' alt='' title='LiveInternet' " +
+                                                   "border='0' width='31' height='31'>")
+                                               //--></script><!--/LiveInternet-->
             </div>
         </div>
     </div>
+    <div class="wbody" onclick="show('none')"></div>
+    <div class="window">
+    </div>
+    <div class="popup_block">
+        <form action="https://metarankings.ru/login.php?redirect_to=https%3A%2F%2Fmetarankings.ru%2Fterminator-dark-fate-defiance%2F" id="loginForm" method="post">
+            <div class="field">
+                <label>Имя пользователя</label>
+                <div class="input">
+                    <input type="text" name="log" value="" id="login" />
+                </div>
+            </div>
+            <div class="field">
+                <a rel="nofollow" href="https://metarankings.ru/login.php?action=lostpassword" id="forgot">Забыли?</a>
+                <label>Пароль</label>
+                <div class="input">
+                    <input type="password" name="pwd" value="" id="pass" />
+                </div>
+            </div>
+            <div class="submit">
+                <button name="submit" type="submit">Войти</button>
+                <div class="registr"><a rel="nofollow" href="https://metarankings.ru/login.php?action=register">Регистрация</a></div>
+            </div>
+        </form>
+    </div>
+    <div class="window-image">
+        <div class="modal-image-wrap">
+            <div class="modal-image">
+                <div class="modal-left"></div>
+                <div class="modal-right"></div>
+            </div>
+            <img src="" alt="">
+        </div>
+    </div>
+    <div id="toTop" class="toTop">↑</div>
 </body>
-<script src="~/js/jquery.js"></script>
-<script src="~/js/jquery-migrate.min.js"></script>
 </html>
