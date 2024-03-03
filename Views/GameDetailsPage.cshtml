@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using Umbraco.Cms.Core.Models
 @inherits UmbracoViewPage<GameDetailsPageModel>
 
 <!DOCTYPE html>
@@ -56,51 +57,26 @@
                         <li>
                             <span onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-movies/">Фильмы</a></span>
                             <div class="movie-drop">
-                                <a href="https://metarankings.ru/new-movies/">Новинки</a>
-                                <a href="https://metarankings.ru/coming-soon/">Скоро</a>
-                                <a href="https://metarankings.ru/most-waiting-films/">Ожидаемые</a>
-                                <a href="https://metarankings.ru/meta/movies/">Обзоры</a>
-                                <a href="https://metarankings.ru/best-movies/">Топ фильмов</a>
-                                <a href="https://metarankings.ru/best-movies-2024/">Фильмы 2024</a>
-                                <a href="https://metarankings.ru/best-boeviki/2024/">Боевики 2024</a>
-                                <a href="https://metarankings.ru/best-horror/2024/">Ужасы 2024</a>
-                                <a href="https://metarankings.ru/best-comedy/2024/">Комедии 2024</a>
-                                <a href="https://metarankings.ru/best-thrillers/2024/">Триллеры 2024</a>
-                                <a href="https://metarankings.ru/best-fantasy/2024/">Фантастика 2024</a>
-                                <a href="https://metarankings.ru/best-fentezi/2024/">Фэнтези 2024</a>
-                                <a href="https://metarankings.ru/best-dramy/2024/">Драмы 2024</a>
-                                <a href="https://metarankings.ru/best-melodramas/2024/">Мелодрамы 2024</a>
-                                <a href="https://metarankings.ru/best-cartoons/2024/">Мультфильмы 2024</a>
-                                <a href="https://metarankings.ru/best-serials/">Сериалы</a>
+                                @foreach (Link url in Model.MoviesKindsPagesUrls)
+                                {
+                                    <a href="#">@url.Name</a>
+                                }
                             </div>
                         </li>
                         <li class="active">
                             <span onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-games/">Игры</a></span>
                             <div class="game-drop">
-                                <a href="https://metarankings.ru/new-games/">Новинки</a>
-                                <a href="https://metarankings.ru/release-date/">Дата выхода</a>
-                                <a href="https://metarankings.ru/most-waiting-games/">Ожидаемые</a>
-                                <a href="https://metarankings.ru/meta/games/">Обзоры</a>
-                                <a href="https://metarankings.ru/best-games/">Топ игр</a>
-                                <a href="https://metarankings.ru/best-games-2024/">Игры 2024</a>
-                                <a href="https://metarankings.ru/best-pc-games/">ПК</a>
-                                <a href="https://metarankings.ru/best-ps4-games/">PS4</a>
-                                <a href="https://metarankings.ru/best-xboxone-games/">Xbox One</a>
-                                <a href="https://metarankings.ru/best-switch-games/">Switch</a>
-                                <a href="https://metarankings.ru/top-action-games/">Экшены</a>
-                                <a href="https://metarankings.ru/top-shooters/">Шутеры</a>
-                                <a href="https://metarankings.ru/top-horrors/">Хорроры</a>
-                                <a href="https://metarankings.ru/top-igry-priklyucheniya/">Приключения</a>
-                                <a href="https://metarankings.ru/top-rpg-games/">РПГ</a>
-                                <a href="https://metarankings.ru/best-strategii/">Стратегии</a>
-                                <a href="https://metarankings.ru/best-gonki/">Гонки</a>
+                                @foreach (Link url in Model.GamesKindsPagesUrls)
+                                {
+                                    <a href="#">@url.Name</a>
+                                }
                             </div>
                         </li>
                         <li>
-                            <a href="https://metarankings.ru/meta/collections/">Подборки</a>
+                            <a href="#">@Model.CollectionsURL.Name</a>
                         </li>
                         <li>
-                            <a href="https://metarankings.ru/user-reviews/">Отзывы</a>
+                            <a href="#">@Model.ReviewsURL.Name</a>
                         </li>
                     </ul>
                 </div>
@@ -221,9 +197,10 @@
 
                             <div class="podborki">
                                 <p>
-                                    <a href="https://metarankings.ru/best-games-2024/">Игры 2024</a>
-                                    <a class="mark-link" href="https://metarankings.ru/best-pc-games/">Топ игр на ПК</a>
-                                    <a class="mark-link" href="https://metarankings.ru/best-strategii/">стратегии</a>
+                                    @foreach (string tag in Model.Tags)
+                                    {
+                                        <a href="#">@tag</a>
+                                    }
                                 </p>
                             </div>
                         </div>
@@ -718,7 +695,7 @@
                 <a rel="nofollow" href="/click.php?https://vk.com/metarankings_ru" target="_blank"><span class="vko"></span></a>
                 <a rel="nofollow" href="/click.php?https://twitter.com/metarankings" target="_blank"><span class="tw"></span></a>
                 <!--LiveInternet counter--><script>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <!--
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <!--
                                                document.write("<img src='https://counter.yadro.ru/hit?t44.6;r" +
                                                    escape(document.referrer) + ((typeof (screen) == "undefined") ? "" :
                                                        ";s" + screen.width + "*" + screen.height + "*" + (screen.colorDepth ?
