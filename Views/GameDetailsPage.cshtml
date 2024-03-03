@@ -11,12 +11,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@Model.GameName (игра @Model.ReleaseDate.Year) — отзывы игроков, обзоры критиков, оценки, рейтинг</title>
     <link rel="icon" href="/favicon.png" type="image/png" />
-    <link rel='stylesheet' id='metarankings-style-css' href='https://metarankings.ru/wp-content/themes/metarankings/style.css' type='text/css' media='all' />
-    <script type='text/javascript' src='https://metarankings.ru/wp-includes/js/jquery/jquery.js'></script>
-    <script type='text/javascript' src='https://metarankings.ru/wp-includes/js/jquery/jquery-migrate.min.js'></script>
+    <link rel='stylesheet' href='~/css/style.css' type='text/css' media='all' />
+    <script type='text/javascript' src='~/js/jquery.js'></script>
+    <script type='text/javascript' src='~/js/jquery-migrate.min.js'></script>
     <meta name="description" content="Игра Terminator: Dark Fate - Defiance - отзывы игроков, обзоры критиков, дата выхода, подробное описание, рейтинг, трейлер, оценки пользователей и платформы" />
 
-    <link rel="canonical" href="https://metarankings.ru/terminator-dark-fate-defiance/" />
+    <link rel="canonical" href="@this.Url" />
     <meta name="theme-color" content="#fff" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="MetaRankings">
@@ -50,12 +50,12 @@
                     <span></span>
                 </div>
                 <div class="logo">
-                    <a href="https://metarankings.ru"><span>Meta</span>Rankings</a>
+                    <a href="/"><span>Meta</span>Rankings</a>
                 </div>
                 <div class="nav">
                     <ul>
                         <li>
-                            <span onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-movies/">Фильмы</a></span>
+                            <span onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});"><a href="best-movies/">Фильмы</a></span>
                             <div class="movie-drop">
                                 @foreach (Link url in Model.MoviesKindsPagesUrls)
                                 {
@@ -64,7 +64,7 @@
                             </div>
                         </li>
                         <li class="active">
-                            <span onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-games/">Игры</a></span>
+                            <span onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"><a href="best-games/">Игры</a></span>
                             <div class="game-drop">
                                 @foreach (Link url in Model.GamesKindsPagesUrls)
                                 {
@@ -102,19 +102,19 @@
             <div class="platform-menu">
                 <ul>
                     <li>
-                        <a class="bst" href="https://metarankings.ru/best-games-2023/">Лучшие игры 2023</a>
+                        <a class="bst" href="best-games-2023">Лучшие игры 2023</a>
                     </li>
                     <li>
-                        <a class="bst" href="https://metarankings.ru/best-games-2022/">2022</a>
+                        <a class="bst" href="best-games-2022">2022</a>
                     </li>
                     <li>
-                        <a class="mnew" href="https://metarankings.ru/new-games/">Новые игры</a>
+                        <a class="mnew" href="new-games">Новые игры</a>
                     </li>
                     <li>
-                        <a href="https://metarankings.ru/release-date/">Дата выхода игр</a>
+                        <a href="release-date">Дата выхода игр</a>
                     </li>
                     <li>
-                        <a href="https://metarankings.ru/most-waiting-games/">Самые ожидаемые игры</a>
+                        <a href="most-waiting-games">Самые ожидаемые игры</a>
                     </li>
                 </ul>
             </div>
