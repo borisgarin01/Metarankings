@@ -36,6 +36,9 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
+    @{
+        string mark = string.Empty;
+    }
     <div class="headerer">
         <div class="header-bottom">
             <div class="header clear nav-menu">
@@ -317,13 +320,28 @@
                                     <ol>
                                         @foreach (GamePlayerReviewModel gamePlayerReviewModel in Model.GamePlayersReviewsModels)
                                         {
-                                            <li class="mark-1">
+                                            @if (gamePlayerReviewModel.Score == 1)
+                                            {
+                                                mark = "mark-1";
+                                            }
+                                            else if (gamePlayerReviewModel.Score == 9)
+                                            {
+                                                mark = "mark-9";
+                                            }
+                                            else if (gamePlayerReviewModel.Score == 0)
+                                            {
+                                                mark = "mark-0";
+                                            }
+                                            <li class="@mark">
                                                 <div>
                                                     <div class="ureview-text">
                                                         <div class="comment-meta">
-                                                            <div class="small-score mark-1">
-                                                                <span data-title="Оценка отзыва из 10 баллов" class="tooltip">@gamePlayerReviewModel.Score</span>
-                                                            </div>
+                                                            @if (gamePlayerReviewModel.Score != 0)
+                                                            {
+                                                                <div class="small-score @mark">
+                                                                    <span data-title="Оценка отзыва из 10 баллов" class="tooltip">@gamePlayerReviewModel.Score</span>
+                                                                </div>
+                                                            }
                                                             <p class="user-reviews-author comment-author"><span>@gamePlayerReviewModel.CommentAuthor</span></p> <p class="comment-date">
                                                                 Отзыв от @gamePlayerReviewModel.PublishDate.ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("ru-RU"))
                                                             </p>
