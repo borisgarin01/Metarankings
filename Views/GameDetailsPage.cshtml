@@ -68,7 +68,7 @@
                             <div class="game-drop">
                                 @foreach (Link url in Model.GamesKindsPagesUrls)
                                 {
-                                    <a href="#">@url.Name</a>
+                                    <a href="@url.Url">@url.Name</a>
                                 }
                             </div>
                         </li>
@@ -449,81 +449,16 @@
                 <div class="widget">
                     <div class="widget-body">
                         <ul>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/suicide-squad-kill-the-justice-league/">Suicide Squad: Kill the Justice League</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/prince-of-persia-the-lost-crown/">Prince of Persia: The Lost Crown</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/robocop-rogue-city/">Robocop: Rogue City</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/game-alan-wake-2/">Alan Wake 2</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/marvels-spider-man-2/">Marvel’s Spider-Man 2</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/cyberpunk-2077-phantom-liberty/">Cyberpunk 2077: Phantom Liberty</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/lies-of-p/">Lies of P</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/starfield/">Starfield</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/baldurs-gate-3/">Baldur&#8217;s Gate 3</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/final-fantasy-16/">Final Fantasy XVI</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/diablo-iv/">Diablo IV</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/star-wars-jedi-survivor/">Star Wars Jedi: Survivor</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/resident-evil-4/">Resident Evil 4</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/atomic-heart/">Atomic Heart</a></span>
-                                </div>
-                            </li>
-                            <li class="recent-reviews">
-                                <div class="ureview-text">
-                                    <span class="title-reviews"><a href="https://metarankings.ru/hogwarts-legacy/">Hogwarts Legacy</a></span>
-                                </div>
-                            </li>
+                            @foreach (Link rightSideGameLink in Model.RightSideGamesLinks)
+                            {
+                                <li class="recent-reviews">
+                                    <div class="ureview-text">
+                                        <span class="title-reviews">
+                                            <a href="@rightSideGameLink.Url">@rightSideGameLink.Name</a>
+                                        </span>
+                                    </div>
+                                </li>
+                            }
                         </ul>
                         <div class="podborki">
                             <a href="https://metarankings.ru/best-movies-2024/">Фильмы 2024</a>
