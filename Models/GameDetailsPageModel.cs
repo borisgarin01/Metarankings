@@ -32,6 +32,8 @@ namespace Metarankings.Models
         public Link MostExpectedGames => this.Value<IEnumerable<Link>>("mostExpectedGames").First();
         public IEnumerable<GameJournalistsCompanyReviewModel> GameJournalistsCompanyReviewsModels => (this.Value<IEnumerable<IPublishedContent>>("gameJournalistsCompanyReviewsModels") != null) ? this.Value<IEnumerable<IPublishedContent>>("gameJournalistsCompanyReviewsModels").Select(a => a as GameJournalistsCompanyReviewModel) : Enumerable.Empty<GameJournalistsCompanyReviewModel>();
         public IEnumerable<GamePlayerReviewModel> GamePlayersReviewsModels => (this.Value<IEnumerable<IPublishedContent>>("gamePlayersReviewsModels") != null) ? this.Value<IEnumerable<IPublishedContent>>("gamePlayersReviewsModels").Select(a => a as GamePlayerReviewModel) : Enumerable.Empty<GamePlayerReviewModel>();
+
+        public IEnumerable<Link> RightSideGamesLinks => this.Value<IEnumerable<Link>>("rightSideGamesLinks") != null ? this.Value<IEnumerable<Link>>("rightSideGamesLinks").Select(a => a as Link) : Enumerable.Empty<Link>();
         //TODO: make trailers and screenshots customizable
     }
 }
