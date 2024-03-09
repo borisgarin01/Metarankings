@@ -14,6 +14,6 @@ namespace Metarankings.Models
         public string CommentAuthor => this.Value<string>("commentAuthor");
         public float? Score => this.Value<float?>("score");
         public DateTime PublishDate => this.Value<DateTime>("publishDate");
-        public IHtmlEncodedString Text => this.Value<IHtmlEncodedString>("text");
+        public string Text => this.Value<string>("text");
     }
 }
