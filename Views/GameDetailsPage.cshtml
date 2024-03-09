@@ -192,8 +192,9 @@
                                     float worstGameJournalistsCompanyReviewsModelsRating = 0;
                                     if (gameJournalistsCompanyReviewsModelsWithScore != null)
                                     {
-                                        if (gameJournalistsCompanyReviewsModelsWithScore.Count()>0){
-                                        bestGameJournalistsCompanyReviewsModelsRating = gameJournalistsCompanyReviewsModelsWithScore.Max(a => a.Score.Value);
+                                        if (gameJournalistsCompanyReviewsModelsWithScore.Count() > 0)
+                                        {
+                                            bestGameJournalistsCompanyReviewsModelsRating = gameJournalistsCompanyReviewsModelsWithScore.Max(a => a.Score.Value);
                                             worstGameJournalistsCompanyReviewsModelsRating = gameJournalistsCompanyReviewsModelsWithScore.Min(a => a.Score.Value);
                                         }
                                     }
