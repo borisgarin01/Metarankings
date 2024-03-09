@@ -1,6 +1,6 @@
 ﻿@using System.Globalization
 @using Umbraco.Cms.Core.Models
-@inherits UmbracoViewPage<GameDetailsPageModel>
+@inherits UmbracoViewPage<Game>
 
 <!DOCTYPE html>
 <html lang="ru-RU">
@@ -267,7 +267,7 @@
                                             <a href="@link.Url">@link.Name</a>
                                         }
                                     }
-                                <p><span class="label">Локализация:</span> <a href="https://metarankings.ru/igry-na-russkom-yazyke/">@Model.Localization</a></p>
+                                <p><span class="label">Локализация:</span> <a href="@Model.Localization.Url">@Model.Localization.Name</a></p>
                                 <p><span class="label">Дата выхода:</span> <span class="release-date">@Model.ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("ru-RU"))</span></p>
                             </div>
 
