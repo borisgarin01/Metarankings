@@ -57,7 +57,7 @@
             averageGameJournalistsScore = Math.Round(Model.GameJournalistsCompanyReviewsModels.Where(a => a.Score.HasValue).Average(a => a.Score.Value), 1);
             averageGameJournalistsScoreForStyles = Convert.ToInt32(Math.Round(averageGameJournalistsScore, 0));
         }
-        metarating = (averagePlayersScore + averageGameJournalistsScore) / 2;
+        metarating = Math.Round((averagePlayersScore + averageGameJournalistsScore) / 2,1);
         metaratingForStyles = Math.Round(metarating);
     }
     <div class="headerer">
