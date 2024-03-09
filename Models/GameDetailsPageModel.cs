@@ -10,26 +10,22 @@ namespace Metarankings.Models
         public GameDetailsPageModel(IPublishedContent content, IPublishedValueFallback publishedValueFallback) : base(content, publishedValueFallback)
         {
         }
+        public BaseDetailsPageModel BaseDetailsPageModel => this.Value<IPublishedContent>("baseDetailsPageModel") as BaseDetailsPageModel;
         public string GameName => this.Value<string>("gameName");
         public float Rating => this.Value<float>("rating");
-        public string Developer => this.Value<string>("developer");
-        public string Publisher => this.Value<string>("publisher");
-        public string[] Platforms => this.Value<string[]>("platforms");
-        public string[] Genres => this.Value<string[]>("genres");
-        public string Localization => this.Value<string>("localization");
+        public IEnumerable<Link> Developers => this.Value<IEnumerable<Link>>("developers");
+        public Link Publisher => this.Value<IEnumerable<Link>>("publisher").First();
+        public Link[] Platforms => this.Value<Link[]>("platforms") == null ? Array.Empty<Link>() : this.Value<Link[]>("platforms");
+        public Link[] Genres => this.Value<Link[]>("genres") == null ? Array.Empty<Link>() : this.Value<Link[]>("genres");
+        public Link Localization => this.Value<Link>("localization");
         public DateTime ReleaseDate => this.Value<DateTime>("releaseDate");
         public IHtmlEncodedString Description => this.Value<IHtmlEncodedString>("description");
         public string ImageSource => this.Value<string>("image");
-        public IEnumerable<string> Tags => this.Value<IEnumerable<string>>("tags");
-        public IEnumerable<Link> MoviesKindsPagesUrls => this.Value<IEnumerable<Link>>("moviesKindsPagesUrls");
-        public IEnumerable<Link> GamesKindsPagesUrls => this.Value<IEnumerable<Link>>("gamesKindsPagesUrls");
-        public Link CollectionsURL => this.Value<IEnumerable<Link>>("collectionsURL").First();
-        public Link ReviewsURL => this.Value<IEnumerable<Link>>("reviewsURL").First();
+        public IEnumerable<string> Tags => this.Value<IEnumerable<string>>("tags") == null ? Array.Empty<string>(): this.Value<IEnumerable<string>>("tags");
         public Link BestGamesOfThisGameReleaseYear => this.Value<IEnumerable<Link>>("bestGamesOfThisGameReleaseYear").First();
         public Link BestGamesOfPreviousYearForGameReleaseYear => this.Value<IEnumerable<Link>>("bestGamesOfPreviousYearForGameReleaseYear").First();
         public Link NewGames => this.Value<IEnumerable<Link>>("newGames").First();
         public Link GamesReleaseDate => this.Value<IEnumerable<Link>>("gamesReleaseDate").First();
-        public Link MostExpectedGames => this.Value<IEnumerable<Link>>("mostExpectedGames").First();
         public IEnumerable<GameJournalistsCompanyReviewModel> GameJournalistsCompanyReviewsModels => (this.Value<IEnumerable<IPublishedContent>>("gameJournalistsCompanyReviewsModels") != null) ? this.Value<IEnumerable<IPublishedContent>>("gameJournalistsCompanyReviewsModels").Select(a => a as GameJournalistsCompanyReviewModel) : Enumerable.Empty<GameJournalistsCompanyReviewModel>();
         public IEnumerable<GamePlayerReviewModel> GamePlayersReviewsModels => (this.Value<IEnumerable<IPublishedContent>>("gamePlayersReviewsModels") != null) ? this.Value<IEnumerable<IPublishedContent>>("gamePlayersReviewsModels").Select(a => a as GamePlayerReviewModel) : Enumerable.Empty<GamePlayerReviewModel>();
 

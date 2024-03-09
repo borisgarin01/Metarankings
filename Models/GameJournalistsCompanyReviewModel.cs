@@ -11,7 +11,7 @@ namespace Metarankings.Models
         }
 
         public GameDetailsPageModel GameDetailsPageModel => this.Value<GameDetailsPageModel>("gameDetailsPageModel");
-        public float Score => this.Value<float>("score");
+        public float? Score => this.Value<float?>("score");
         public string JournalistsCompanyName => this.Value<string>("journalistsCompanyName");
         public string AuthorName => this.Value<string>("authorName");
         public IHtmlEncodedString Text => this.Value<IHtmlEncodedString>("text");
