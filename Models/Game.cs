@@ -4,10 +4,10 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Metarankings.Models
 {
-    [PublishedModel("gameDetailsPageModel")]
-    public class GameDetailsPageModel : PublishedContentModel
+    [PublishedModel("game")]
+    public class Game : PublishedContentModel
     {
-        public GameDetailsPageModel(IPublishedContent content, IPublishedValueFallback publishedValueFallback) : base(content, publishedValueFallback)
+        public Game(IPublishedContent content, IPublishedValueFallback publishedValueFallback) : base(content, publishedValueFallback)
         {
         }
         public BaseDetailsPageModel BaseDetailsPageModel => this.Value<IPublishedContent>("baseDetailsPageModel") as BaseDetailsPageModel;
@@ -15,11 +15,11 @@ namespace Metarankings.Models
         public float Rating => this.Value<float>("rating");
         public IEnumerable<Link> Developers => this.Value<IEnumerable<Link>>("developers");
         public Link Publisher => this.Value<IEnumerable<Link>>("publisher").First();
-        public Link[] Platforms => this.Value<Link[]>("platforms") == null ? Array.Empty<Link>() : this.Value<Link[]>("platforms");
-        public Link[] Genres => this.Value<Link[]>("genres") == null ? Array.Empty<Link>() : this.Value<Link[]>("genres");
-        public Link Localization => this.Value<Link>("localization");
+        public IEnumerable<Link> Platforms => this.Value<IEnumerable<Link>>("platforms") == null ? Array.Empty<Link>() : this.Value<IEnumerable<Link>>("platforms");
+        public IEnumerable<Link> Genres => this.Value<IEnumerable<Link>>("genres") == null ? Array.Empty<Link>() : this.Value<IEnumerable<Link>>("genres");
+        public Link Localization => this.Value<IEnumerable<Link>>("localization").First();
         public DateTime ReleaseDate => this.Value<DateTime>("releaseDate");
-        public IHtmlEncodedString Description => this.Value<IHtmlEncodedString>("description");
+        public string Description => this.Value<string>("description");
         public string ImageSource => this.Value<string>("image");
         public IEnumerable<string> Tags => this.Value<IEnumerable<string>>("tags") == null ? Array.Empty<string>(): this.Value<IEnumerable<string>>("tags");
         public Link BestGamesOfThisGameReleaseYear => this.Value<IEnumerable<Link>>("bestGamesOfThisGameReleaseYear").First();

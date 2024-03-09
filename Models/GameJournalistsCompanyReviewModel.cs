@@ -10,7 +10,7 @@ namespace Metarankings.Models
         {
         }
 
-        public GameDetailsPageModel GameDetailsPageModel => this.Value<GameDetailsPageModel>("gameDetailsPageModel");
+        public Game GameDetailsPageModel => this.Value<Game>("gameDetailsPageModel");
         public float? Score => this.Value<float?>("score");
         public string JournalistsCompanyName => this.Value<string>("journalistsCompanyName");
         public string AuthorName => this.Value<string>("authorName");
