@@ -39,6 +39,26 @@
 <body>
     @{
         string mark = string.Empty;
+        int gamePlayersReviewsModelsWithScoreCount = Model.GamePlayersReviewsModels.Where(a => a.Score.HasValue).Count();
+        int gameJournalistsCompanyReviewsModelsCount = Model.GameJournalistsCompanyReviewsModels.Count();
+        double averagePlayersScore = 0;
+        double averageGameJournalistsScore = 0;
+        int averagePlayersScoreForStyles = 0;
+        int averageGameJournalistsScoreForStyles = 0;
+        double metarating = 0;
+        double metaratingForStyles = 0;
+        if (gamePlayersReviewsModelsWithScoreCount > 0)
+        {
+            averagePlayersScore = Math.Round(Model.GamePlayersReviewsModels.Where(a => a.Score.HasValue).Average(a => a.Score.Value), 1);
+            averagePlayersScoreForStyles = Convert.ToInt32(Math.Round(averagePlayersScore, 0));
+        }
+        if (gameJournalistsCompanyReviewsModelsCount > 0)
+        {
+            averageGameJournalistsScore = Math.Round(Model.GameJournalistsCompanyReviewsModels.Where(a => a.Score.HasValue).Average(a => a.Score.Value), 1);
+            averageGameJournalistsScoreForStyles = Convert.ToInt32(Math.Round(averageGameJournalistsScore, 0));
+        }
+        metarating = (averagePlayersScore + averageGameJournalistsScore) / 2;
+        metaratingForStyles = Math.Round(metarating);
     }
     <div class="headerer">
         <div class="header-bottom">
@@ -57,26 +77,26 @@
                         <li>
                             <span onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});"><a href="best-movies/">Фильмы</a></span>
                             <div class="movie-drop">
-                                @foreach (Link url in Model.MoviesKindsPagesUrls)
+                                @foreach (Link url in Model.BaseDetailsPageModel.MoviesKindsPagesUrls)
                                 {
-                                    <a href="#">@url.Name</a>
+                                    <a href="@url.Url.Replace("year", Model.ReleaseDate.Year.ToString())">@url.Name.Replace("year", Model.ReleaseDate.Year.ToString())</a>
                                 }
                             </div>
                         </li>
                         <li class="active">
                             <span onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"><a href="best-games/">Игры</a></span>
                             <div class="game-drop">
-                                @foreach (Link url in Model.GamesKindsPagesUrls)
+                                @foreach (Link url in Model.BaseDetailsPageModel.GamesKindsPagesUrls)
                                 {
-                                    <a href="@url.Url">@url.Name</a>
+                                    <a href="@url.Url.Replace("year", Model.ReleaseDate.Year.ToString())">@url.Name.Replace("year", Model.ReleaseDate.Year.ToString())</a>
                                 }
                             </div>
                         </li>
                         <li>
-                            <a href="#">@Model.CollectionsURL.Name</a>
+                            <a href="#">@Model.BaseDetailsPageModel.CollectionsURL.Name</a>
                         </li>
                         <li>
-                            <a href="#">@Model.ReviewsURL.Name</a>
+                            <a href="#">@Model.BaseDetailsPageModel.ReviewsURL.Name</a>
                         </li>
                     </ul>
                 </div>
@@ -125,12 +145,12 @@
                 <div class="widget">
                     <div class="widget-body">
                         <div class="graph">
-                            <h3>Рейтинг <a href="#critics">критиков</a> на основе 1 обзора</h3>
-                            <div class="graph-body"><div class="rating-graph mark-8" style="width:75%"><span class="score-graph">7.5</span></div></div>
-                            <h3>Рейтинг <a href="#users">игроков</a> на основе 14 оценок</h3>
-                            <div class="graph-body"><div class="rating-graph mark-5" style="width:51%"><span class="score-graph">5.1</span></div></div>
+                            <h3>Рейтинг <a href="#critics">критиков</a> на основе @Model.GameJournalistsCompanyReviewsModels.Count() обзора</h3>
+                            <div class="graph-body"><div class="rating-graph mark-@averageGameJournalistsScoreForStyles" style="width:@(averageGameJournalistsScore*10)%"><span class="score-graph">@averageGameJournalistsScore</span></div></div>
+                            <h3>Рейтинг <a href="#users">игроков</a> на основе @Model.GamePlayersReviewsModels.Count() оценок</h3>
+                            <div class="graph-body"><div class="rating-graph mark-@averagePlayersScoreForStyles" style="width:@(averagePlayersScore*10)%"><span class="score-graph">@averagePlayersScore</span></div></div>
                             <span>Метарейтинг</span> <span class="metaranking">?</span>
-                            <div class="graph-body"><div class="rating-graph mark-6" style="width:62%"><span class="score-graph">6.2</span></div></div>
+                            <div class="graph-body"><div class="rating-graph mark-@metaratingForStyles" style="width:@(metaratingForStyles*10)%"><span class="score-graph">@metaratingForStyles</span></div></div>
                             <div class="wait-stat">Ожидания: 2%</div>
                             <div class="graph-body"><div class="rating-wait mark-0" style="width:2%"></div></div>
                         </div>
@@ -160,16 +180,57 @@
                                 </div>
                             </div>
                             <div id="ratings" itemprop="aggregateRating" itemscope="" itemtype="http://schema.org/AggregateRating">
-                                <meta itemprop="bestRating" content="10">
-                                <meta itemprop="worstRating" content="1">
-                                <meta itemprop="ratingCount" content="14">
-                                <div class="ratings mark-5">
+                                @{
+                                    int bestRating;
+                                    int worstRating;
+
+                                    var gameJournalistsCompanyReviewsModelsWithScore = Model.GameJournalistsCompanyReviewsModels.Where(a => a.Score.HasValue);
+
+                                    var gamePlayersReviewsModelsWithScore = Model.GamePlayersReviewsModels.Where(a => a.Score.HasValue);
+
+                                    float bestGameJournalistsCompanyReviewsModelsRating = 0;
+                                    float worstGameJournalistsCompanyReviewsModelsRating = 0;
+                                    if (gameJournalistsCompanyReviewsModelsWithScore != null)
+                                    {
+                                        if (gameJournalistsCompanyReviewsModelsWithScore.Count()>0){
+                                        bestGameJournalistsCompanyReviewsModelsRating = gameJournalistsCompanyReviewsModelsWithScore.Max(a => a.Score.Value);
+                                            worstGameJournalistsCompanyReviewsModelsRating = gameJournalistsCompanyReviewsModelsWithScore.Min(a => a.Score.Value);
+                                        }
+                                    }
+                                    float bestGamePlayersReviewsModelsRating = 0;
+                                    float worstGamePlayersReviewsModelsRating = 0;
+
+                                    if (gamePlayersReviewsModelsWithScore != null)
+                                    {
+                                        if (gamePlayersReviewsModelsWithScore.Count() > 0)
+                                        {
+                                            bestGamePlayersReviewsModelsRating = gamePlayersReviewsModelsWithScore.Max(a => a.Score.Value);
+                                            worstGamePlayersReviewsModelsRating = gamePlayersReviewsModelsWithScore.Min(a => a.Score.Value);
+                                        }
+                                    }
+                                    bestRating = Convert.ToInt32(Math.Max(bestGamePlayersReviewsModelsRating, bestGameJournalistsCompanyReviewsModelsRating));
+                                    worstRating = Convert.ToInt32(Math.Max(worstGameJournalistsCompanyReviewsModelsRating, worstGamePlayersReviewsModelsRating));
+
+                                    if (gameJournalistsCompanyReviewsModelsWithScore == null)
+                                    {
+                                        gameJournalistsCompanyReviewsModelsWithScore = Enumerable.Empty<GameJournalistsCompanyReviewModel>();
+                                    }
+                                    if (gamePlayersReviewsModelsWithScore == null)
+                                    {
+                                        gamePlayersReviewsModelsWithScore = Enumerable.Empty<GamePlayerReviewModel>();
+                                    }
+                                    int ratingsCount = gameJournalistsCompanyReviewsModelsWithScore.Count() + gamePlayersReviewsModelsWithScore.Count();
+                                }
+                                <meta itemprop="bestRating" content="@bestRating">
+                                <meta itemprop="worstRating" content="@worstRating">
+                                <meta itemprop="ratingCount" content="@ratingsCount">
+                                <div class="ratings mark-@metaratingForStyles">
                                     <div id="post-ratings-23382" class="post-ratings" data-nonce="2c8e283591">
                                         <div class="rating">
                                             <div class="score" itemprop="ratingValue">
-                                                @(Math.Round(Convert.ToDouble((Model.GameJournalistsCompanyReviewsModels.Average(a => a.Score) + Model.GamePlayersReviewsModels.Average(a => a.Score)) / 2), 1))
+                                                @metarating
                                             </div>
-                                            Оценки: <span>14</span>
+                                            Оценки: <span>@(gameJournalistsCompanyReviewsModelsCount + gamePlayersReviewsModelsWithScoreCount)</span>
                                         </div>
                                         <div class="your-score">
                                             <img id="rating_23382_1" class="rating-on mark-1" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="1" onmouseover="current_rating(23382, 1, '1');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_2" class="rating-on mark-2" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="2" onmouseover="current_rating(23382, 2, '2');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_3" class="rating-on mark-3" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="3" onmouseover="current_rating(23382, 3, '3');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_4" class="rating-on mark-4" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="4" onmouseover="current_rating(23382, 4, '4');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_5" class="rating-on mark-5" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="5" onmouseover="current_rating(23382, 5, '5');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_6" class="rating-on mark-6" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="6" onmouseover="current_rating(23382, 6, '6');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_7" class="rating-on mark-7" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="7" onmouseover="current_rating(23382, 7, '7');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_8" class="rating-on mark-8" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="8" onmouseover="current_rating(23382, 8, '8');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_9" class="rating-on mark-9" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="9" onmouseover="current_rating(23382, 9, '9');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_23382_10" class="rating-on mark-10" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="10" onmouseover="current_rating(23382, 10, '10');" onmouseout="ratings_off(5.1, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /> <span class="post-ratings-text" id="ratings_23382_text">0</span>
@@ -179,10 +240,32 @@
                             </div>
 
                             <div class="featured-game">
-                                <p><span class="label">Разработчик:</span> <a href="/razrabotchiki/slitherine/">@Model.Developer</a>, ...</p>
-                                <p><span class="label">Издатель:</span> <a href="/izdateli/slitherine/">@Model.Publisher</a> </p>
-                                <p><span class="label">Платформы:</span> <a href="https://metarankings.ru/meta/games/pc/">@Model.Platforms.First()</a></p>
-                                <p><span class="label">Жанр:</span> <a href="https://metarankings.ru/genre/strategiya/">@Model.Genres.First()</a></p>
+                                <p>
+                                    @{
+                                        string developer = Model.Developers.Count() > 1 ? "Разработчики" : "Разработчик";
+                                    }
+                                    <span class="label">@developer:</span>
+                                    @foreach (Link developerLink in Model.Developers)
+                                    {
+                                        <a href="@developerLink.Url">@developerLink.Name</a>
+                                    }
+                                </p>
+                                <p><span class="label">Издатель:</span> <a href="@Model.Publisher.Url">@Model.Publisher.Name</a> </p>
+                                <p>
+                                    <span class="label">Платформы:</span> @{
+                                        foreach (Link link in Model.Platforms)
+                                        {
+                                            <a href="@link.Url">@link.Name</a>
+                                        }
+                                    }
+                                </p>
+                                <p>
+                                    <span class="label">Жанр:</span> @{
+                                        foreach (Link link in Model.Genres)
+                                        {
+                                            <a href="@link.Url">@link.Name</a>
+                                        }
+                                    }
                                 <p><span class="label">Локализация:</span> <a href="https://metarankings.ru/igry-na-russkom-yazyke/">@Model.Localization</a></p>
                                 <p><span class="label">Дата выхода:</span> <span class="release-date">@Model.ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("ru-RU"))</span></p>
                             </div>
@@ -225,7 +308,7 @@
                         <div class="post-footer">
                             <h2>Трейлер и скриншоты</h2>
                             <div class="video">
-                                <img class="img-trailer" alt="Трейлер Terminator: Dark Fate &#8212; Defiance" title="Трейлер Terminator: Dark Fate &#8212; Defiance" src="https://img.youtube.com/vi/RtxXcWC_1sw/default.jpg" width="100" height="75">
+                                <img class="img-trailer" alt="Трейлер @Model.GameName" title="Трейлер @Model.GameName" src="https://img.youtube.com/vi/RtxXcWC_1sw/default.jpg" width="100" height="75">
                                 <span class="play"></span>
                             </div>
                             <ul class="gallery">
@@ -254,11 +337,16 @@
                                 <p>Ниже собраны отзывы и оценки разных интернет-изданий с цитатами из обзоров. Мы не учитываем безоценочные рецензии, так как не умеем определять их исходя из написанного текста и не можем додумывать их за автора. Мы пытаемся составить максимально объективный рейтинг на основе реально выставленных оценок.</p>
                                 @foreach (GameJournalistsCompanyReviewModel gameJournalistsCompanyReviewModel in Model.GameJournalistsCompanyReviewsModels)
                                 {
-                                    <div class="critic-text mark-8">
+                                    mark = (gameJournalistsCompanyReviewModel.Score.HasValue ? Convert.ToInt32(Math.Round(gameJournalistsCompanyReviewModel.Score.Value)) : 0).ToString();
+                                    <div class="critic-text mark-@mark">
                                         <div class="review-meta">
-                                            <div class="small-score mark-8">
-                                                <span data-title="Оценка отзыва из 10 баллов" class="tooltip">@gameJournalistsCompanyReviewModel.Score</span>
-                                            </div>
+                                            @if (gameJournalistsCompanyReviewModel.Score != 0)
+                                            {
+                                                <div class="small-score mark-@mark">
+
+                                                    <span data-title="Оценка отзыва из 10 баллов" class="tooltip"> @gameJournalistsCompanyReviewModel.Score</span>
+                                                </div>
+                                            }
                                             <div class="review-author"><p><a href="/critics/cubiq/"><span>@gameJournalistsCompanyReviewModel.JournalistsCompanyName</span></a> Отзыв: @gameJournalistsCompanyReviewModel.AuthorName</p></div>
                                         </div>
                                         <p>@gameJournalistsCompanyReviewModel.Text</p>
@@ -268,7 +356,7 @@
                             </div>
                         </div>
                         <div>
-                            Общий рейтинг критиков = <span>@Math.Round(Model.GameJournalistsCompanyReviewsModels.Average(a => a.Score), 1)</span>
+                            Общий рейтинг критиков = <span>@averageGameJournalistsScore</span>
                         </div>
                         <span class="links-add">Добавить обзор</span>
                     </div>
@@ -630,14 +718,14 @@
                 <a rel="nofollow" href="/click.php?https://vk.com/metarankings_ru" target="_blank"><span class="vko"></span></a>
                 <a rel="nofollow" href="/click.php?https://twitter.com/metarankings" target="_blank"><span class="tw"></span></a>
                 <!--LiveInternet counter--><script>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <!--
-                                               document.write("<img src='https://counter.yadro.ru/hit?t44.6;r" +
-                                                   escape(document.referrer) + ((typeof (screen) == "undefined") ? "" :
-                                                       ";s" + screen.width + "*" + screen.height + "*" + (screen.colorDepth ?
-                                                           screen.colorDepth : screen.pixelDepth)) + ";u" + escape(document.URL) +
-                                                   ";" + Math.random() +
-                                                   "' alt='' title='LiveInternet' " +
-                                                   "border='0' width='31' height='31'>")
+                                               <!--
+                                                   document.write("<img src='https://counter.yadro.ru/hit?t44.6;r" +
+                                                       escape(document.referrer) + ((typeof (screen) == "undefined") ? "" :
+                                                           ";s" + screen.width + "*" + screen.height + "*" + (screen.colorDepth ?
+                                                               screen.colorDepth : screen.pixelDepth)) + ";u" + escape(document.URL) +
+                                                       ";" + Math.random() +
+                                                       "' alt='' title='LiveInternet' " +
+                                                       "border='0' width='31' height='31'>")
                                                //--></script><!--/LiveInternet-->
             </div>
         </div>
