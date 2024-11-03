@@ -1,0 +1,180 @@
+<div class="footer">
+    <script>
+      [].forEach.call(document.querySelectorAll('img[data-src]'), function (img) {
+        img.setAttribute('src', img.getAttribute('data-src'));
+        img.onload = function () {
+          img.removeAttribute('data-src');
+        };
+      });
+    </script>
+    <script>
+      (function ($) {
+        $(function () {
+          $('.menu-icon').on('click', function () {
+            $(this).closest('.header').toggleClass('menu-open');
+          });
+        });
+      })(jQuery);
+    </script>
+    <script>
+      (function ($) {
+        $(function () {
+          $('.rew-menu').on('click', function () {
+            $(this).closest('.rew-menu').toggleClass('open');
+          });
+        });
+      })(jQuery);
+    </script>
+    <script>
+      jQuery(function ($) {
+        $(window).scroll(function () {
+          if ($(this).scrollTop() >= 90) {
+            $('.header-bottom').addClass('sticky');
+          }
+          else {
+            $('.header-bottom').removeClass('sticky');
+          }
+        });
+      });
+    </script>
+    <script>
+      jQuery(document).ready(function ($) {
+        $("#toTop").hide();
+        $(function () {
+          $(window).scroll(function () {
+            if ($(this).scrollTop() > 300) {
+              $('#toTop').fadeIn();
+            } else {
+              $('#toTop').fadeOut();
+            }
+          });
+          $('#toTop').click(function () {
+            $('body,html').animate({
+              scrollTop: 0
+            }, 800);
+            return false;
+          });
+        });
+      });
+    </script>
+    <script type="text/javascript">
+      var isProcessing = false;
+      function alter_ul_post_values(obj, post_id, ul_type) {
+
+        if (isProcessing)
+          return;
+        isProcessing = true;
+
+        jQuery(obj).find("span").html("..");
+        jQuery.ajax({
+          type: "POST",
+          url: "https://metarankings.ru/wp-content/plugins/like-dislike/ajax_counter.php",
+          data: "post_id=" + post_id + "&up_type=" + ul_type,
+          success: function (msg) {
+            jQuery(obj).find("span").html(msg);
+            isProcessing = false;
+          }
+        });
+      }
+    </script>
+    <script type='text/javascript'>
+      /* <![CDATA[ */
+      var ratingsL10n = { "plugin_url": "https:\/\/metarankings.ru\/wp-content\/plugins\/wp-postratings", "ajax_url": "https:\/\/metarankings.ru\/wp-admin\/admin-ajax.php", "text_wait": "Please rate only 1 post at a time.", "image": "squares", "image_ext": "gif", "max": "10", "show_loading": "0", "show_fading": "1", "custom": "0" };
+      var ratings_mouseover_image = new Image(); ratings_mouseover_image.src = ratingsL10n.plugin_url + "/images/" + ratingsL10n.image + "/rating_over." + ratingsL10n.image_ext;;
+      /* ]]> */
+    </script>
+    <script type='text/javascript'
+      src='https://metarankings.ru/wp-content/plugins/wp-postratings/postratings-js.js'></script>
+    <script type='text/javascript'
+      src='https://metarankings.ru/wp-content/themes/metarankings/js/jquery.cycle.all.min.js'></script>
+    <script type='text/javascript' src='https://metarankings.ru/wp-content/themes/metarankings/js/script.js'></script>
+    <script type='text/javascript' src='https://metarankings.ru/wp-content/themes/metarankings/js/comments.js'></script>
+    <!-- Yandex.RTB R-A-201169-27 -->
+    <script>
+      window.yaContextCb.push(() => {
+        Ya.Context.AdvManager.render({
+          "blockId": "R-A-201169-27",
+          "type": "floorAd",
+          "platform": "touch"
+        })
+      })
+    </script>
+
+    <!-- Yandex.RTB R-A-201169-23 -->
+    <script>
+      window.yaContextCb.push(() => {
+        Ya.Context.AdvManager.render({
+          "blockId": "R-A-201169-23",
+          "type": "floorAd",
+          "platform": "desktop"
+        })
+      })
+    </script>
+
+    <script src="https://metarankings.ru/user-ip.php"></script>
+    <script type="text/javascript">
+        (function (m, e, t, r, i, k, a) {
+          m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
+          m[i].l = 1 * new Date();
+          for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+          k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+        })
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+      ym(57119962, "init", {
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true,
+        webvisor: true,
+        params: { 'ip': userip }
+      });
+    </script>
+    <noscript>
+      <div><img src="https://mc.yandex.ru/watch/57119962" style="position:absolute; left:-9999px;" alt="" /></div>
+    </noscript>
+
+    <!-- Rating Mail.ru counter -->
+    <script type="text/javascript">
+      var _tmr = window._tmr || (window._tmr = []);
+      _tmr.push({ id: "2595025", type: "pageView", start: (new Date()).getTime() });
+      (function (d, w, id) {
+        if (d.getElementById(id)) return;
+        var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+        ts.src = "https://top-fwz1.mail.ru/js/code.js";
+        var f = function () { var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s); };
+        if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+      })(document, window, "topmailru-code");
+    </script><noscript>
+      <div>
+        <img src="https://top-fwz1.mail.ru/counter?id=2595025;js=na" style="border:0;position:absolute;left:-9999px;"
+          alt="Top.Mail.Ru" />
+      </div>
+    </noscript>
+    <!-- //Rating Mail.ru counter -->
+    <div class="copyright">&copy; 2014 - 2024 <span data-title="MetaRankings" class="tooltip">MetaRankings</span>
+      <a rel="nofollow" href="/about/" data-title="О сайте" class="tooltip">О нас</a>
+      <a rel="nofollow" href="/contact/" data-title="Форма обратной связи" class="tooltip">Связь</a>
+      <a rel="nofollow" href="/polzovatelskoe-soglashenie/" data-title="Пользовательское соглашение"
+        class="tooltip">Пользовательское соглашение</a>
+      <a rel="nofollow" href="/politika-konfidencialnosti/" data-title="Политика конфиденциальности"
+        class="tooltip">Конфиденциальность</a>
+    </div>
+    <div class="credits">
+      <span class="pegi"><span data-title="Сайт может содержать контент не предназначенный лицам до 18 лет"
+          class="tooltip">18+</span></span>
+      <a href="https://vk.com/metarankings_ru" rel="nofollow noopener" target="_blank" title="VK"><span
+          class="vko"></span></a>
+      <a href="https://twitter.com/metarankings" rel="nofollow noopener" target="_blank" title="Twitter"><span
+          class="tw"></span></a>
+      <!--LiveInternet counter-->
+      <script>
+document.write("<img src='https://counter.yadro.ru/hit?t44.6;r"+
+escape(document.referrer)+((typeof(screen)=="undefined")?"":
+";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+";"+Math.random()+
+"' alt='' title='LiveInternet' "+
+"border='0' width='31' height='31'>")
+//--></script><!--/LiveInternet-->
+    </div>
+  </div>

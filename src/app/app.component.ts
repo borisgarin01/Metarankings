@@ -1,14 +1,31 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { NewGamesComponent } from './new-games/new-games.component';
+import { MoviesDropDownMainPageComponent } from "./movies-drop-down-main-page/movies-drop-down-main-page.component";
+import { GamesDropDownMainPageComponent } from "./games-drop-down-main-page/games-drop-down-main-page.component";
+import { TitleComponent } from "./title/title.component";
+import { HeadererComponent } from "./headerer/headerer.component";
+import { BestInThisMonthSlideshowComponent } from "./best-in-this-month-slideshow/best-in-this-month-slideshow.component";
+import { NewMoviesComponent } from "./new-movies/new-movies.component";
+import { MoviesNewsComponent } from "./movies-news/movies-news.component";
+import { GamesNewsComponent } from "./games-news/games-news.component";
+import { CollectionsComponent } from "./collections/collections.component";
+import { SpecialsComponent } from "./specials/specials.component";
+import { SoonAtMoviesComponent } from "./soon-at-movies/soon-at-movies.component";
+import { GamesReleasesDatesComponent } from "./games-releases-dates/games-releases-dates.component";
+import { LatestReviewsComponent } from "./latest-reviews/latest-reviews.component";
+import { FooterComponent } from "./footer/footer.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, NgFor, RouterOutlet, NewGamesComponent, MoviesDropDownMainPageComponent, GamesDropDownMainPageComponent, TitleComponent, HeadererComponent, BestInThisMonthSlideshowComponent, NewMoviesComponent, MoviesNewsComponent, GamesNewsComponent, CollectionsComponent, SpecialsComponent, SoonAtMoviesComponent, GamesReleasesDatesComponent, LatestReviewsComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
   title = 'Frontend';
+  
+  subtitle = 'Frontend';
 }

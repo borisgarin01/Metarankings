@@ -1,0 +1,16 @@
+<div class="index-games">
+    <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
+    <div *ngFor="let gameReleaseDate of gamesReleasesDates">
+        <a href="{{gameReleaseDate.href}}" title="Игра {{gameReleaseDate.title}}"><img class="post-image"
+            src="{{gameReleaseDate.imageSrc}}"
+            alt="{{gameReleaseDate.title}}"></a>
+            <span class="item-name">
+                <a *ngFor="let platform of gameReleaseDate.platforms" href="{{platform.platformLink}}">{{platform.name}} / </a>
+            </span>
+            <span class="item-name">
+                <a *ngFor="let genre of gameReleaseDate.genres" href="{{genre.genreLink}}">{{genre.name}} / </a>
+            </span>
+        <span class="item-meta">{{gameReleaseDate.toString()}}</span>
+    </div>
+    <a href="https://metarankings.ru/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
+  </div>

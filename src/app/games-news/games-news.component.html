@@ -1,0 +1,9 @@
+<div class="index-games">
+    <h3><a href="https://metarankings.ru/meta/news/igri/">Новости игр</a></h3>
+
+    <div *ngFor="let item of games" class="news-item">
+       <a href="{{item.link}}" title="{{item.title}}"><img class="news-thumb" src="{{item.imageLink}}" alt="{{item.title}}"></a>
+       <span class="news-title"><a
+        href="{{item.link}}">{{item.title}}</a></span>
+    </div>
+  </div>
