@@ -21,7 +21,7 @@ export class GamesReleasesDatesComponent {
       genres: [
         { name: 'Шутер', genreLink: 'https://metarankings.ru/genre/shuter/' }
       ],
-      releaseDate: new Date('August 19, 1975 23:15:30')
+      releaseDate: new Date(2024,1,1)
     },
     {
       href: 'https://metarankings.ru/metro-awakening/',
