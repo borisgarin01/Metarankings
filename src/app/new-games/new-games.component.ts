@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { NgFor } from '@angular/common';
+import { GamesDropDownMainPageComponent } from "../games-drop-down-main-page/games-drop-down-main-page.component";
 
 @Component({
   selector: 'app-new-games',
   standalone: true,
-  imports: [NgFor],
+  imports: [NgFor, GamesDropDownMainPageComponent],
   templateUrl: './new-games.component.html',
   styleUrl: './new-games.component.css'
 })
