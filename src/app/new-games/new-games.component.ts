@@ -61,7 +61,7 @@ export class NewGamesComponent {
       commentsPage: 'https://metarankings.ru/call-of-duty-black-ops-6/#comments',
       commentsCount: 3,
       releaseDate: new Date(2024, 10, 25),
-      description: 'Call of Duty: Black Ops 6 &#8212; новая часть культовой серии шутеров. В игре вас ждут динамичные и разнообразные сражения, развернутые на масштабных...'
+      description: 'Call of Duty: Black Ops 6 — новая часть культовой серии шутеров. В игре вас ждут динамичные и разнообразные сражения, развернутые на масштабных...'
     },
     {
       href: 'https://metarankings.ru/kong-survivor-instinct/',
@@ -79,7 +79,7 @@ export class NewGamesComponent {
       commentsPage: 'https://metarankings.ru/kong-survivor-instinct/#comments',
       commentsCount: 0,
       releaseDate: new Date(2024, 10, 22),
-      description: 'Kong: Survivor Instinct – это 2.5D экшен-приключение, которое сочетает в себе реалистичный платформер, динамичные бои и исследование в стиле &#171;метроидвания&#187;. Вас ждет захватывающий...'
+      description: 'Kong: Survivor Instinct – это 2.5D экшен-приключение, которое сочетает в себе реалистичный платформер, динамичные бои и исследование в стиле \'метроидвания\'. Вас ждет захватывающий...'
     },
     {
       href: 'https://metarankings.ru/unknown-9-awakening/',
@@ -115,7 +115,7 @@ export class NewGamesComponent {
       commentsPage: 'https://metarankings.ru/a-quiet-place-the-road-ahead/#comments',
       commentsCount: 0,
       releaseDate: new Date(2024, 10, 17),
-      description: 'A Quiet Place: The Road Ahead &#8212; это напряженная однопользовательская игра в жанре хоррор, основанная на популярной кинофраншизе «Тихое место». Она рассказывает уникальную...'
+      description: 'A Quiet Place: The Road Ahead — это напряженная однопользовательская игра в жанре хоррор, основанная на популярной кинофраншизе «Тихое место». Она рассказывает уникальную...'
     },
     {
       href: 'https://metarankings.ru/neva/',
@@ -132,7 +132,7 @@ export class NewGamesComponent {
       commentsPage: 'https://metarankings.ru/neva/#comments',
       commentsCount: 0,
       releaseDate: new Date(2024, 10, 15),
-      description: 'Neva &#8212; это трогательное приключение, созданное теми же разработчиками, что подарили нам GRIS &#8212; игру, покорившую сердца критиков и игроков. В центре сюжета...'
+      description: 'Neva — это трогательное приключение, созданное теми же разработчиками, что подарили нам GRIS — игру, покорившую сердца критиков и игроков. В центре сюжета...'
     },
     {
       href: 'https://metarankings.ru/metaphor-refantazio/',
@@ -164,7 +164,7 @@ export class NewGamesComponent {
       commentsPage: 'https://metarankings.ru/starfield-shattered-space/#comments',
       commentsCount: 5,
       releaseDate: new Date(2024, 9, 30),
-      description: 'Это масштабное сюжетное дополнение для Starfield, которое отправляет в город Дазра, расположенном на скрытой родной планете Дома Ва&#8217;Руун. Там бушует таинственная сила и...'
+      description: 'Это масштабное сюжетное дополнение для Starfield, которое отправляет в город Дазра, расположенном на скрытой родной планете Дома Ва’Руун. Там бушует таинственная сила и...'
     },
     {
       href: 'https://metarankings.ru/game-silent-hill-2-remake/',
