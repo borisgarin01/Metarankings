@@ -67,7 +67,7 @@ export class GamesReleasesDatesComponent {
       releaseDate: new Date('2024-1-1')
     },
     {
-      href: 'https://metarankings.ru/mpioner/',
+      href: 'https://metarankings.ru/pioner/',
       title: 'PIONER',
       imageSrc: 'https://metarankings.ru/images/uploads/2024/02/pioner-boxart-cover-50x70.jpg',
       platforms: [
