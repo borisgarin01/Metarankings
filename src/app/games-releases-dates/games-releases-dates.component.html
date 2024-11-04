@@ -1,16 +1,20 @@
 <div class="index-games">
     <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
-    <div *ngFor="let gameReleaseDate of gamesReleasesDates">
-        <a href="{{gameReleaseDate.href}}" title="Игра {{gameReleaseDate.title}}"><img class="post-image"
-            src="{{gameReleaseDate.imageSrc}}"
-            alt="{{gameReleaseDate.title}}"></a>
-            <span class="item-name">
-                <a *ngFor="let platform of gameReleaseDate.platforms" href="{{platform.platformLink}}">{{platform.name}} / </a>
-            </span>
-            <span class="item-name">
-                <a *ngFor="let genre of gameReleaseDate.genres" href="{{genre.genreLink}}">{{genre.name}} / </a>
-            </span>
+    <div *ngFor="let gameReleaseDate of gamesReleasesDates" class="item">
+        <a href="{{gameReleaseDate.href}}" title="Игра {{gameReleaseDate.title}}">
+            <img class="post-image" src="{{gameReleaseDate.imageSrc}}" alt="{{gameReleaseDate.title}}">
+        </a>
+        <span class="item-name">
+            <a href="{{gameReleaseDate.href}}">{{gameReleaseDate.title}}</a>
+        </span>
+        <span class="item-meta">
+            <a *ngFor="let platform of gameReleaseDate.platforms" href="{{platform.platformLink}}">{{platform.name}} /
+            </a>
+        </span>
+        <span class="item-meta">
+            <a *ngFor="let genre of gameReleaseDate.genres" href="{{genre.genreLink}}">{{genre.name}} / </a>
+        </span>
         <span class="item-meta">{{gameReleaseDate.releaseDate}}</span>
     </div>
     <a href="https://metarankings.ru/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
-  </div>
+</div>
