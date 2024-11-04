@@ -6,8 +6,8 @@
       <a href="{{game.href}}" title="Игра {{game.name}}"><img class="post-image" src="{{game.imageSrc}}" alt="{{game.name}}"></a>
     <div class="small-score mark-7"><span data-title="Рейтинг игры" class="tooltip">{{game.rating}}</span></div>
     <span class="item-name"><a href="{{game.href}}">{{game.name}}</a></span>
-    <span class="item-meta"><a *ngFor="let platform of game.platforms" href="{{platform.href}}" >{{platform.name}}</a> / </span>
-    <span class="item-meta"><a rel="nofollow" href="{{game.reviewsPage}}">Рецензии ({{game.reviewsCount}})</a> <a rel="nofollow" href="{{game.commentsPage}}">Отзывы ({{game.commentsCount}})</a></span>
+    <span class="item-meta"><a *ngFor="let platform of game.platforms" href="{{platform.href}}" >{{platform.name}} / </a> </span>
+    <span class="item-meta"><a rel="nofollow" href="{{game.reviewsPage}}">Рецензии ({{game.reviewsCount}})</a> <a rel="nofollow" href="{{game.commentsPage}}"> Отзывы ({{game.commentsCount}})</a></span>
     <span class="item-meta">{{game.releaseDate.toDateString()}}</span>
     <span class="item-description">{{game.description}}</span>
     </div>
