@@ -1,35 +1,10 @@
 <div class="specials-index">
     <h3><a href="https://metarankings.ru/meta/specials/">Спецматериалы</a></h3>
-    <div class="news-item">
-      <a href="https://metarankings.ru/vyjdet-li-god-of-war-ragnarok-na-pk/"
-        title="Выйдет ли God Of War Ragnarok на ПК?"><img class="news-thumb"
-          src="https://metarankings.ru/images/uploads/2022/08/god-of-war-ragnarok1-445x250.jpg"
-          alt="Выйдет ли God Of War Ragnarok на ПК?"></a>
-      <span class="news-title"><a href="https://metarankings.ru/vyjdet-li-god-of-war-ragnarok-na-pk/">Выйдет ли
-          God Of War Ragnarok на ПК?</a></span>
-    </div>
-    <div class="news-item">
-      <a href="https://metarankings.ru/stoit-li-zhdat-overwatch-2/" title="Стоит ли ждать Overwatch 2?"><img
-          class="news-thumb" src="https://metarankings.ru/images/uploads/2022/08/overwatch-2-445x250.jpg"
-          alt="Стоит ли ждать Overwatch 2?"></a>
-      <span class="news-title"><a href="https://metarankings.ru/stoit-li-zhdat-overwatch-2/">Стоит ли ждать
-          Overwatch 2?</a></span>
-    </div>
-    <div class="news-item">
-      <a href="https://metarankings.ru/pyat-prichin-posmotret-serial-dom-drakona/"
-        title="5 причин посмотреть сериал «Дом Дракона»"><img class="news-thumb"
-          src="https://metarankings.ru/images/uploads/2022/08/dom-drakona-445x250.jpg"
-          alt="5 причин посмотреть сериал «Дом Дракона»"></a>
-      <span class="news-title"><a href="https://metarankings.ru/pyat-prichin-posmotret-serial-dom-drakona/">5
-          причин посмотреть сериал «Дом Дракона»</a></span>
-    </div>
-    <div class="news-item">
-      <a href="https://metarankings.ru/evolyuciya-znaka-cheloveka-pauka-za-vsyu-istoriyu-geroya-marvel/"
-        title="Эволюция знака Человека-Паука — Как менялся логотип за всю историю героя Marvel"><img
-          class="news-thumb" src="https://metarankings.ru/images/uploads/2021/10/chelovek-pauk-445x250.jpg"
-          alt="Эволюция знака Человека-Паука — Как менялся логотип за всю историю героя Marvel"></a>
-      <span class="news-title"><a
-          href="https://metarankings.ru/evolyuciya-znaka-cheloveka-pauka-za-vsyu-istoriyu-geroya-marvel/">Эволюция
-          знака Человека-Паука — Как менялся логотип за всю историю героя Marvel</a></span>
+    <div class="news-item" *ngFor="let special of specials">
+      <a href="{{special.href}}"
+        title="{{special.title}}"><img class="news-thumb"
+          src="{{special.imageSrc}}"
+          alt="{{special.title}}"></a>
+      <span class="news-title"><a href="{{special.href}}/">{{special.title}}</a></span>
     </div>
   </div>
