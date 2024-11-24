@@ -7,3 +7,9 @@ HttpServices/obj
 Tests/bin
 Tests/obj
 *.sln
+.vs
+HttpServices/bin
+Domain/bin
+API/bin
+BlazorClient/bin
+Data/bin

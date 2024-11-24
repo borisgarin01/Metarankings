@@ -3192,7 +3192,7 @@ const Default$3 = {
   sanitize: true,
   sanitizeFn: null,
   selector: false,
-  template: '<div class="tooltip" role="tooltip">' + '<div class="tooltip-arrow"></div>' + '<div class="tooltip-inner"></div>' + '</div>',
+  template: '<div ></div>' + '</div>',
   title: '',
   trigger: 'hover focus'
 };
@@ -3668,7 +3668,7 @@ const Default$2 = {
   content: '',
   offset: [0, 8],
   placement: 'right',
-  template: '<div class="popover" role="tooltip">' + '<div class="popover-arrow"></div>' + '<h3 class="popover-header"></h3>' + '<div class="popover-body"></div>' + '</div>',
+  template: '<div ></div>' + '</div>',
   trigger: 'click'
 };
 const DefaultType$2 = {
