@@ -1,0 +1,9 @@
+﻿API/obj
+BlazorClient/obj
+*.user
+Data/obj
+Domain/obj
+HttpServices/obj
+Tests/bin
+Tests/obj
+*.sln
