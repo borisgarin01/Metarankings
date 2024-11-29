@@ -31,6 +31,229 @@
     </div>
 </div>
 
+<style>
+    #slideshow, .slideshow {
+        background: #fff;
+        height: 210px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    #slideshow, .slideshow, .slide, .featured-image {
+        height: 135px;
+    }
+
+    .slide {
+        height: 210px;
+        width: 100%;
+    }
+
+        .slide .post {
+            display: flex;
+        }
+
+    .clear:after {
+        content: ".";
+        display: block;
+        height: 0;
+        clear: both;
+        visibility: hidden;
+    }
+
+    .slide .post {
+        display: flex;
+    }
+
+    .list .post {
+        border-bottom: 1px dotted #d9d9d9;
+        margin: 15px 0;
+        position: relative;
+    }
+
+        .list .post .news-title {
+            color: #000;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .news-item .rubrika a, .list .post .rubrika a {
+            color: #fff;
+        }
+
+        .list .post .news-thumb {
+            float: left;
+            margin: 0 15px 15px 0;
+            width: 200px;
+            height: 112px;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+            .list .post .news-thumb img {
+                width: 100%;
+            }
+
+                .list .post .news-thumb img:hover {
+                    opacity: 0.8;
+                }
+
+        .list .post .thumb {
+            float: left;
+            margin: 0 15px 15px 0;
+            width: 100px;
+            height: 140px;
+        }
+
+            .list .post .thumb img {
+                width: 100%;
+            }
+
+                .list .post .thumb img:hover {
+                    opacity: 0.8;
+                }
+
+        .list .post a {
+            color: #555;
+            text-decoration: none;
+        }
+
+        .list .post .post-category {
+            font-size: 14px;
+            color: #d9d9d9;
+            margin: 8px 0;
+        }
+
+            .list .post .post-category a {
+                text-decoration: none;
+            }
+
+                .list .post .post-category a:hover {
+                    text-decoration: underline;
+                }
+
+        .list .post .name {
+            color: #000;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .list .post .name:hover {
+                color: #0068BF;
+            }
+
+        .list .post .post-meta {
+            font-size: 14px;
+            color: #555;
+            margin: 10px 0;
+        }
+
+            .list .post .post-meta span, .list .post .post-meta a {
+                text-decoration: none;
+                font-style: normal;
+            }
+
+                .list .post .post-meta a:hover {
+                    color: #0068BF;
+                }
+
+            .list .post .post-meta .date {
+                font-size: 14px;
+            }
+
+    .grid .post {
+        width: 100px;
+        height: 140px;
+        background-color: #f5f5f5;
+        padding: 5px;
+        float: left;
+        margin: 0 7px 15px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+        .grid .post .post-category, .grid .post .post-content, .grid .post .post-meta em {
+            display: none;
+        }
+
+        .grid .post h4, .grid .post .post-meta {
+            display: block;
+        }
+
+        .grid .post .thumb {
+            width: 110px;
+            height: 154px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+            .grid .post .thumb img {
+                width: 110px;
+                height: 154px;
+            }
+
+        .grid .post h4, .grid .post h4 a {
+            color: #000;
+            font-size: 12px;
+            font-weight: normal;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .grid .post h4 {
+            margin-bottom: 5px;
+        }
+
+        .grid .post a {
+            text-decoration: none;
+        }
+
+            .grid .post a:hover {
+                color: #999;
+            }
+
+        .grid .post .post-meta {
+            font-size: 10px;
+            font-style: italic;
+            color: #656363;
+        }
+
+            .grid .post .post-meta span, .grid .post .post-meta a {
+                color: #000;
+                font-family: Helvetica, Arial, sans-serif;
+                font-style: normal;
+            }
+
+            .grid .post .post-meta .post-author {
+                text-transform: uppercase;
+            }
+
+        .grid .post .comments_popup_link {
+            position: absolute;
+            bottom: 8px;
+            right: 18px;
+        }
+
+        .grid .post .post-edit-link {
+            position: absolute;
+            bottom: 18px;
+            left: 18px;
+        }
+
+    .entry .post {
+        position: relative;
+    }
+
+    .postid .post {
+        overflow: hidden;
+    }
+
+</style>
 @code {
     public BestInPastMonth[] BestMoviesInPastMonth { get; set; } = new BestInPastMonth[]
     {
