@@ -1,4 +1,7 @@
-﻿<div class="index-movies">
+﻿@using Domain
+@inject HttpClient httpClient
+
+<div class="index-movies">
     <h3><a href="https://metarankings.ru/new-movies/">Новые фильмы</a></h3>
     <div class="item">
         <a href="https://metarankings.ru/dorogoj-santa-2024/" title="Фильм Дорогой Санта"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/dorogoj-santa-2024-cover-art-50x70.jpg" alt="Дорогой Санта"></a>
@@ -109,7 +112,12 @@
 </div>
 
 @code {
-
+    public IEnumerable<IndexMoviesComponentItem> IndexMoviesComponentItems { get; private set; }
+    protected override async Task OnInitializedAsync()
+    {
+        IndexMoviesComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<IndexMoviesComponentItem>>("https://localhost:7148/api/mainpage");
+        var a = IndexMoviesComponentItems;
+    }
 }
 
 <style>
