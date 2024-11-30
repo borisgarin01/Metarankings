@@ -1,98 +1,29 @@
 ﻿@using Domain
+@using System.Globalization
 @inject HttpClient httpClient
 
 <div class="index-movies">
     <h3><a href="https://metarankings.ru/new-movies/">Новые фильмы</a></h3>
-    <div class="item">
-        <a href="https://metarankings.ru/dorogoj-santa-2024/" title="Фильм Дорогой Санта"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/dorogoj-santa-2024-cover-art-50x70.jpg" alt="Дорогой Санта"></a>
-        <div class="small-score mark-6"><span data-title="Рейтинг фильма" class="tooltip">5.6</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/dorogoj-santa-2024/">Дорогой Санта</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/comedy/">Комедии</a> / <a href="https://metarankings.ru/meta/movies/novogodnie/">Новогодние</a> / <a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a> / <a href="https://metarankings.ru/meta/movies/fantasy-movies/">Фэнтези</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/dorogoj-santa-2024/#reviews">Рецензии (8)</a> <a rel="nofollow" href="https://metarankings.ru/dorogoj-santa-2024/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">25 ноября 2024</span>
-        <span class="item-description">Когда юный мальчик отправляет свой рождественский список желаний Санте с одной важной орфографической ошибкой, появляется дьявольский Джек Блэк, чтобы устроить хаос на празднике....</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/priklyucheniya-paddingtona-3/" title="Фильм Приключения Паддингтона 3"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/priklyucheniya-paddingtona-3-cover-art-50x70.jpg" alt="Приключения Паддингтона 3"></a>
-        <div class="small-score mark-6"><span data-title="Рейтинг фильма" class="tooltip">6.3</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/priklyucheniya-paddingtona-3/">Приключения Паддингтона 3</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/comedy/">Комедии</a> / <a href="https://metarankings.ru/meta/movies/semejnye/">Семейные</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/priklyucheniya-paddingtona-3/#reviews">Рецензии (12)</a> <a rel="nofollow" href="https://metarankings.ru/priklyucheniya-paddingtona-3/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">28 ноября 2024</span>
-        <span class="item-description">Фильм продолжает историю знаменитого медвежонка. На этот раз Паддингтон и семья Браунов решают навестить тетю Люси в Перу, но загадочное событие заставляет их...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/perevozchik-dush-2024/" title="Фильм Перевозчик душ"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/perevozchik-dush-2024-cover-art-50x70.jpg" alt="Перевозчик душ"></a>
-        <div class="small-score mark-6"><span data-title="Рейтинг фильма" class="tooltip">5.7</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/perevozchik-dush-2024/">Перевозчик душ</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/thrillers/">Триллеры</a> / <a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/perevozchik-dush-2024/#reviews">Рецензии (3)</a> <a rel="nofollow" href="https://metarankings.ru/perevozchik-dush-2024/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">28 ноября 2024</span>
-        <span class="item-description">После ссоры, Энн и Патрик, едва сдерживая взаимное раздражение, хватают первое попавшееся такси. Водитель, изначально казавшийся добродушным и общительным, вдруг начинает вести себя...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/emmanuel-2024/" title="Фильм Эммануэль"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/emmanuel-2024-cover-art-50x70.jpg" alt="Эммануэль"></a>
-        <div class="small-score mark-5"><span data-title="Рейтинг фильма" class="tooltip">4.9</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/emmanuel-2024/">Эммануэль</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/dramy/">Драмы</a> / <a href="https://metarankings.ru/meta/movies/melodramas/">Мелодрамы</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/emmanuel-2024/#reviews">Рецензии (6)</a> <a rel="nofollow" href="https://metarankings.ru/emmanuel-2024/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">28 ноября 2024</span>
-        <span class="item-description">Роскошный гонконгский отель становится местом, где Эммануэль, находящаяся в деловой поездке, исследует свою сексуальность и переосмысливает понятия близости и свободы, проверяя границы дозволенного....</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/poslednee-zamykanie-konec-sveta-2024/" title="Фильм Последнее замыкание. Конец света"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/poslednee-zamykanie-konec-sveta-cover-art-50x70.jpg" alt="Последнее замыкание. Конец света"></a>
-        <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/poslednee-zamykanie-konec-sveta-2024/">Последнее замыкание. Конец света</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/dramy/">Драмы</a> / <a href="https://metarankings.ru/meta/movies/fantasy/">Фантастика</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/poslednee-zamykanie-konec-sveta-2024/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/poslednee-zamykanie-konec-sveta-2024/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">28 ноября 2024</span>
-        <span class="item-description">В мире будущего, где человечество проиграло климатические войны, выжила, возможно, только Ева. Она живет в лагере, который охраняет робот, не пуская никого без...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/mariya-2024/" title="Фильм Мария"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/mariya-2024-cover-art-50x70.jpg" alt="Мария"></a>
-        <div class="small-score mark-6"><span data-title="Рейтинг фильма" class="tooltip">5.7</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/mariya-2024/">Мария</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/dramy/">Драмы</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/mariya-2024/#reviews">Рецензии (14)</a> <a rel="nofollow" href="https://metarankings.ru/mariya-2024/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">28 ноября 2024</span>
-        <span class="item-description">В своей роскошной парижской квартире, в 1970-х, легендарная Мария Каллас переживает последние годы жизни, сражаясь с внутренними демонами. Сентябрь 1977 года: окружённая пуделями,...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/astral-medium-2024/" title="Фильм Астрал. Медиум"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/astral-medium-2024-cover-art-50x70.jpg" alt="Астрал. Медиум"></a>
-        <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/astral-medium-2024/">Астрал. Медиум</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/astral-medium-2024/#reviews">Рецензии (2)</a> <a rel="nofollow" href="https://metarankings.ru/astral-medium-2024/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">28 ноября 2024</span>
-        <span class="item-description">Слепая медиум Дарси, способная видеть прошлое, приезжает в дом, где год назад была зверски убита ее сестра-близнец Дани. Сейчас в этом доме живет...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/ya-slezhu-za-toboj-2024/" title="Фильм Я слежу за тобой"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/ya-slezhu-za-toboj-2024-cover-art-50x70.jpg" alt="Я слежу за тобой"></a>
-        <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/ya-slezhu-za-toboj-2024/">Я слежу за тобой</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/thrillers/">Триллеры</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/ya-slezhu-za-toboj-2024/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/ya-slezhu-za-toboj-2024/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">28 ноября 2024</span>
-        <span class="item-description">У риелтора Ку Джон-тхэ есть секрет: он тайно проникает в дома клиентов, подглядывая за их жизнью. Однажды, во время очередного вторжения, он находит...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/odin-den-v-stambule-2024/" title="Фильм Один день в Стамбуле"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/odin-den-v-stambule-cover-art-50x70.jpg" alt="Один день в Стамбуле"></a>
-        <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/odin-den-v-stambule-2024/">Один день в Стамбуле</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/comedy/">Комедии</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/odin-den-v-stambule-2024/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/odin-den-v-stambule-2024/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">28 ноября 2024</span>
-        <span class="item-description">Смерть друга Вадима разрушила планы друзей на отдых на яхте в Стамбуле. Однако, они проводят прощальную прогулку по Босфору, делясь воспоминаниями о нём...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/ptica-2024/" title="Фильм Птица"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/ptica-2024-cover-art-50x70.jpg" alt="Птица"></a>
-        <div class="small-score mark-8"><span data-title="Рейтинг фильма" class="tooltip">7.6</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/ptica-2024/">Птица</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/dramy/">Драмы</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/ptica-2024/#reviews">Рецензии (7)</a> <a rel="nofollow" href="https://metarankings.ru/ptica-2024/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">28 ноября 2024</span>
-        <span class="item-description">Бэйли и ее брат Хантер живут в заброшенном доме на севере Кента с отцом, Багом, который воспитывает их один и не всегда может...</span>
-    </div>
+    @foreach (var item in IndexMoviesComponentItems)
+    {
+        <div class="item">
+            <a href="@item.ItemHref" title="@item.Title"><img class="post-image" src="@item.ImageSrc" alt="@item.Title"></a>
+            <div class="small-score mark-@Math.Round(item.Score)"><span data-title="Рейтинг фильма" class="tooltip">@item.Score</span></div>
+            <span class="item-name"><a href="@item.ItemHref">@item.Title</a></span>
+            <span class="item-meta">
+                @foreach (var genre in item.Genres)
+                {
+                    <a href="@genre.Href">@genre.Name</a>
+                }
+            </span>
+            <span class="item-meta"><a rel="nofollow" href="@item.ItemHref#reviews">Рецензии (8)</a> <a rel="nofollow" href="@item.ItemHref#comments">Отзывы (0)</a></span>
+            <span class="item-meta">
+                @item.ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo
+                         ("RU-ru"))
+            </span>
+            <span class="item-description">@item.Description</span>
+        </div>
+    }
     <div class="title-index">
         <div class="dropdown-menu genre">
             <span class="title">Год</span>

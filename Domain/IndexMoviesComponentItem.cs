@@ -9,6 +9,9 @@ public sealed record IndexMoviesComponentItem
     public long Id { get; set; }
     public string ItemHref { get; set; }
     public string Title { get; set; }
+    public float Score { get; set; }
+    public string Description { get; set; }
+    public DateTime ReleaseDate { get; set; }
     public string ImageSrc { get; set; }
     public string ImageAlt { get; set; }
     public Genre[] Genres { get; set; }
