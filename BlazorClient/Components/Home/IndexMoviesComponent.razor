@@ -7,21 +7,21 @@
     @foreach (var item in IndexMoviesComponentItems)
     {
         <div class="item">
-            <a href="@item.ItemHref" title="@item.Title"><img class="post-image" src="@item.ImageSrc" alt="@item.Title"></a>
-            <div class="small-score mark-@Math.Round(item.Score)"><span data-title="Рейтинг фильма" class="tooltip">@item.Score</span></div>
-            <span class="item-name"><a href="@item.ItemHref">@item.Title</a></span>
+            <a href="@item.IndexComponentItem.ItemHref" title="@item.IndexComponentItem.Title"><img class="post-image" src="@item.IndexComponentItem.ImageSrc" alt="@item.IndexComponentItem.Title"></a>
+            <div class="small-score mark-@Math.Round(item.IndexComponentItem.Score)"><span data-title="Рейтинг фильма" class="tooltip">@item.IndexComponentItem.Score</span></div>
+            <span class="item-name"><a href="@item.IndexComponentItem.ItemHref">@item.IndexComponentItem.Title</a></span>
             <span class="item-meta">
                 @foreach (var genre in item.Genres)
                 {
                     <a href="@genre.Href">@genre.Name</a>
                 }
             </span>
-            <span class="item-meta"><a rel="nofollow" href="@item.ItemHref#reviews">Рецензии (8)</a> <a rel="nofollow" href="@item.ItemHref#comments">Отзывы (0)</a></span>
+            <span class="item-meta"><a rel="nofollow" href="@item.IndexComponentItem.ItemHref#reviews">Рецензии (8)</a> <a rel="nofollow" href="@item.IndexComponentItem.ItemHref#comments">Отзывы (0)</a></span>
             <span class="item-meta">
-                @item.ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo
+                @item.IndexComponentItem.ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo
                          ("RU-ru"))
             </span>
-            <span class="item-description">@item.Description</span>
+            <span class="item-description">@item.IndexComponentItem.Description</span>
         </div>
     }
     <div class="title-index">
@@ -43,10 +43,10 @@
 </div>
 
 @code {
-    public IEnumerable<IndexMoviesComponentItem> IndexMoviesComponentItems { get; private set; }
+    public IEnumerable<MoviesIndexComponentItem> IndexMoviesComponentItems { get; private set; }
     protected override async Task OnInitializedAsync()
     {
-        IndexMoviesComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<IndexMoviesComponentItem>>("https://localhost:7148/api/mainpage");
+        IndexMoviesComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<MoviesIndexComponentItem>>("https://localhost:7148/api/mainpage/movies");
         var a = IndexMoviesComponentItems;
     }
 }
