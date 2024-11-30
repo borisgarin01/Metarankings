@@ -1,95 +1,32 @@
-﻿<div class="index-games">
+﻿@using Domain
+@using System.Globalization
+@inject HttpClient httpClient
+
+<div class="index-games">
     <h3><a href="https://metarankings.ru/new-games/">Новые игры</a></h3>
-    <div class="item">
-        <a href="https://metarankings.ru/stalker-2/" title="Игра S.T.A.L.K.E.R. 2: Heart of Chernobyl"><img class="post-image" src="https://metarankings.ru/images/uploads/2022/04/stalker-2-heart-of-chernobyl-cover-art-50x70.jpg" alt="S.T.A.L.K.E.R. 2: Heart of Chernobyl"></a>
-        <div class="small-score mark-6"><span data-title="Рейтинг игры" class="tooltip">6.5</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/stalker-2/">S.T.A.L.K.E.R. 2: Heart of Chernobyl</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/stalker-2/#reviews">Рецензии (8)</a> <a rel="nofollow" href="https://metarankings.ru/stalker-2/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">20 ноября 2024</span>
-        <span class="item-description">Игра S.T.A.L.K.E.R. 2: Heart of Chernobyl — продолжение культовой серии ролевых шутеров с видом от первого лица в открытом мире постапокалиптической зоны отчуждения Чернобыльской...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/lego-horizon-adventures/" title="Игра LEGO Horizon Adventures"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/lego-horizon-adventures-cover-art-50x70.jpg" alt="LEGO Horizon Adventures"></a>
-        <div class="small-score mark-5"><span data-title="Рейтинг игры" class="tooltip">5.1</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/lego-horizon-adventures/">LEGO Horizon Adventures</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/switch/">Switch</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/lego-horizon-adventures/#reviews">Рецензии (11)</a> <a rel="nofollow" href="https://metarankings.ru/lego-horizon-adventures/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">14 ноября 2024</span>
-        <span class="item-description">Присоединяйтесь к Элой, отважной охотнице, и отправляйтесь в захватывающее приключение, чтобы спасти мир от Хелиса, злодея, возглавляющего банду солнцепоклонников, поклоняющихся таинственному Древнему Злу....</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/farming-simulator-25/" title="Игра Farming Simulator 25"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/farming-simulator-25-cover-art-50x70.jpg" alt="Farming Simulator 25"></a>
-        <div class="small-score mark-6"><span data-title="Рейтинг игры" class="tooltip">6.4</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/farming-simulator-25/">Farming Simulator 25</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/farming-simulator-25/#reviews">Рецензии (5)</a> <a rel="nofollow" href="https://metarankings.ru/farming-simulator-25/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">12 ноября 2024</span>
-        <span class="item-description">Погрузитесь в мир увлекательной сельской жизни! Создайте ферму своей мечты в одиночку или вместе с друзьями в кооперативном режиме. Выбирайте из потрясающих локаций:...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/slitterhead/" title="Игра Slitterhead"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/slitterhead-boxart-cover-50x70.jpg" alt="Slitterhead"></a>
-        <div class="small-score mark-6"><span data-title="Рейтинг игры" class="tooltip">5.5</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/slitterhead/">Slitterhead</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps4/">PS4</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-one/">Xbox One</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/slitterhead/#reviews">Рецензии (11)</a> <a rel="nofollow" href="https://metarankings.ru/slitterhead/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">8 ноября 2024</span>
-        <span class="item-description">В этой боевой приключенческой игре вы окажетесь на хаотичных, заваленных мусором улицах Коулонга, где царит атмосфера тайны и опасности. Вы &#8212; Хёки, существо...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/mario-luigi-brothership/" title="Игра Mario &#038; Luigi: Brothership"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/mario-luigi-brothership-boxart-cover-50x70.jpg" alt="Mario &#038; Luigi: Brothership"></a>
-        <div class="small-score mark-7"><span data-title="Рейтинг игры" class="tooltip">7</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/mario-luigi-brothership/">Mario &#038; Luigi: Brothership</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/games/switch/">Switch</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/mario-luigi-brothership/#reviews">Рецензии (7)</a> <a rel="nofollow" href="https://metarankings.ru/mario-luigi-brothership/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">7 ноября 2024</span>
-        <span class="item-description">В Mario &amp; Luigi: Brothership Братья Марио отправляются в новое морское приключение, чтобы спасти мир Конкордии! После того, как Уни-дерево разрушено, мир развалился...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/metro-awakening/" title="Игра Metro Awakening"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/10/metro-awakening-boxart-cover-50x70.jpg" alt="Metro Awakening"></a>
-        <div class="small-score mark-7"><span data-title="Рейтинг игры" class="tooltip">7</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/metro-awakening/">Metro Awakening</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/metro-awakening/#reviews">Рецензии (5)</a> <a rel="nofollow" href="https://metarankings.ru/metro-awakening/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">7 ноября 2024</span>
-        <span class="item-description">Metro Awakening &#8212; это VR-игра во вселенной Metro, которая перенесет вас в 2028 год. Мир после ядерной катастрофы. Выжившие люди прячутся в подземных...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/teenage-mutant-ninja-turtles-splintered-fate/" title="Игра Teenage Mutant Ninja Turtles: Splintered Fate"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/teenage-mutant-ninja-turtles-splintered-fate-cover-art-50x70.jpg" alt="Teenage Mutant Ninja Turtles: Splintered Fate"></a>
-        <div class="small-score mark-7"><span data-title="Рейтинг игры" class="tooltip">6.9</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/teenage-mutant-ninja-turtles-splintered-fate/">Teenage Mutant Ninja Turtles: Splintered Fate</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/switch/">Switch</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/teenage-mutant-ninja-turtles-splintered-fate/#reviews">Рецензии (5)</a> <a rel="nofollow" href="https://metarankings.ru/teenage-mutant-ninja-turtles-splintered-fate/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">6 ноября 2024</span>
-        <span class="item-description">В Teenage Mutant Ninja Turtles: Splintered Fate вас ждут динамичные и захватывающие бои в стиле roguelike, где каждый раз вас ждет новый вызов!...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/metal-slug-tactics/" title="Игра Metal Slug Tactics"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/metal-slug-tactics-boxart-cover-50x70.jpg" alt="Metal Slug Tactics"></a>
-        <div class="small-score mark-7"><span data-title="Рейтинг игры" class="tooltip">6.9</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/metal-slug-tactics/">Metal Slug Tactics</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps4/">PS4</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/switch/">Switch</a> / <a href="https://metarankings.ru/meta/games/xbox-one/">Xbox One</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/metal-slug-tactics/#reviews">Рецензии (9)</a> <a rel="nofollow" href="https://metarankings.ru/metal-slug-tactics/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">5 ноября 2024</span>
-        <span class="item-description">Metal Slug Tactics &#8212; это тактическая игра с пошаговыми боями, которая дает возможность управлять ходом битвы с помощью особых атак. Зарабатывайте опыт, открывайте...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/horizon-zero-dawn-remastered/" title="Игра Horizon Zero Dawn Remastered"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/10/horizon-zero-dawn-remastered-boxart-cover-50x70.jpg" alt="Horizon Zero Dawn Remastered"></a>
-        <div class="small-score mark-6"><span data-title="Рейтинг игры" class="tooltip">6.3</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/horizon-zero-dawn-remastered/">Horizon Zero Dawn Remastered</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/horizon-zero-dawn-remastered/#reviews">Рецензии (3)</a> <a rel="nofollow" href="https://metarankings.ru/horizon-zero-dawn-remastered/#comments">Отзывы (0)</a></span>
-        <span class="item-meta">31 октября 2024</span>
-        <span class="item-description">Horizon Zero Dawn — это приключенческая ролевая игра, завоевавшая множество наград и признание критиков. В версии Remastered, знакомые игрокам дикие земли оживают с...</span>
-    </div>
-    <div class="item">
-        <a href="https://metarankings.ru/dragon-age-the-veilguard/" title="Игра Dragon Age: The Veilguard"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/12/dragon-age-the-veilguard-boxart-cover-50x70.jpg" alt="Dragon Age: The Veilguard"></a>
-        <div class="small-score mark-6"><span data-title="Рейтинг игры" class="tooltip">6.3</span></div>
-        <span class="item-name"><a href="https://metarankings.ru/dragon-age-the-veilguard/">Dragon Age: The Veilguard</a></span>
-        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
-        <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/dragon-age-the-veilguard/#reviews">Рецензии (19)</a> <a rel="nofollow" href="https://metarankings.ru/dragon-age-the-veilguard/#comments">Отзывы (3)</a></span>
-        <span class="item-meta">31 октября 2024</span>
-        <span class="item-description">Ролевая экшен приключенческая игра Dragon Age: The Veilguard отправляет в мир Тедаса, яркую страну суровой дикой природы, коварных лабиринтов и сверкающих городов. Вас...</span>
-    </div>
+    @foreach (var item in GamesIndexComponentItems)
+    {
+        <div class="item">
+            <a href="@item.IndexComponentItem.ItemHref" title="@item.IndexComponentItem.Title"><img class="post-image" src="@item.IndexComponentItem.ImageSrc" alt="@item.IndexComponentItem.Title"></a>
+            <div class="small-score mark-@Math.Round(item.IndexComponentItem.Score)"><span data-title="Рейтинг фильма" class="tooltip">@item.IndexComponentItem.Score</span></div>
+            <span class="item-name"><a href="@item.IndexComponentItem.ItemHref">@item.IndexComponentItem.Title</a></span>
+            <span class="item-meta">
+                @foreach (var platform in item.Platforms)
+                {
+                    <a href="@platform.Href">@platform.Name</a>
+
+                    <text> / </text>
+                }
+            </span>
+            <span class="item-meta"><a rel="nofollow" href="@item.IndexComponentItem.ItemHref#reviews">Рецензии (8)</a> <a rel="nofollow" href="@item.IndexComponentItem.ItemHref#comments">Отзывы (0)</a></span>
+            <span class="item-meta">
+                @item.IndexComponentItem.ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo
+                         ("RU-ru"))
+            </span>
+            <span class="item-description">@item.IndexComponentItem.Description</span>
+        </div>
+    }
+
     <div class="title-index">
         <div class="dropdown-menu genre">
             <span class="title">Год</span>
@@ -108,6 +45,14 @@
     <a class="allreviews" href="https://metarankings.ru/meta/games/">Обзоры на игры</a>
 </div>
 
+@code {
+    public IEnumerable<GamesIndexComponentItem> GamesIndexComponentItems { get; private set; }
+    protected override async Task OnInitializedAsync()
+    {
+        GamesIndexComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<GamesIndexComponentItem>>("https://localhost:7148/api/mainpage/games");
+    }
+}
+
 <style>
     .index-games {
         width: 49.9%;
@@ -124,6 +69,7 @@
         vertical-align: baseline;
         background: transparent;
     }
+
     div {
         display: block;
         unicode-bidi: isolate;

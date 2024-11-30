@@ -42,26 +42,26 @@ public class MainPageController : ControllerBase
                 },
                 IndexComponentItem=new IndexComponentItem
                 {
-                    Score=6.3f,
-                    Title="Приключения Паддингтона 3",
-                    ImageAlt="Приключения Паддингтона 3",
-                    ImageSrc="https://metarankings.ru/images/uploads/2024/11/priklyucheniya-paddingtona-3-cover-art-50x70.jpg",
+                    Score = 6.3f,
+                    Title = "Приключения Паддингтона 3",
+                    ImageAlt = "Приключения Паддингтона 3",
+                    ImageSrc = "https://metarankings.ru/images/uploads/2024/11/priklyucheniya-paddingtona-3-cover-art-50x70.jpg",
                     Id=1,
-                    ItemHref="https://metarankings.ru/priklyucheniya-paddingtona-3/",
-                    Description="Фильм продолжает историю знаменитого медвежонка. На этот раз Паддингтон и семья Браунов решают навестить тетю Люси в Перу, но загадочное событие заставляет их",
-                    ReleaseDate=new DateTime(2024,11,28)
+                    ItemHref = "https://metarankings.ru/priklyucheniya-paddingtona-3/",
+                    Description = "Фильм продолжает историю знаменитого медвежонка. На этот раз Паддингтон и семья Браунов решают навестить тетю Люси в Перу, но загадочное событие заставляет их",
+                    ReleaseDate = new DateTime(2024,11,28)
                 }
             },
             new MoviesIndexComponentItem
             {
-                Genres=new Genre[]
+                Genres = new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/thrillers/", Name="Триллеры" },
                     new Genre { Href="https://metarankings.ru/meta/movies/horror/",Name="Ужасы" }
                 },
-                IndexComponentItem=new IndexComponentItem
+                IndexComponentItem = new IndexComponentItem
                 {
-                    Score=5.7f,
+                    Score =5.7f,
                     Title="Перевозчик душ",
                     ImageAlt="Перевозчик душ",
                     ImageSrc="https://metarankings.ru/images/uploads/2024/11/perevozchik-dush-2024-cover-art-50x70.jpg",
@@ -73,7 +73,7 @@ public class MainPageController : ControllerBase
             },
             new MoviesIndexComponentItem
             {
-                IndexComponentItem= new IndexComponentItem
+                IndexComponentItem = new IndexComponentItem
                 {
 
                     Score = 4.9f,
@@ -189,7 +189,7 @@ public class MainPageController : ControllerBase
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/dramy/", Name="Драмы" }
                 },
-                IndexComponentItem= new IndexComponentItem
+                IndexComponentItem = new IndexComponentItem
                 {
                     Score = 7.6f,
                     Title = "Птица",
@@ -203,5 +203,213 @@ public class MainPageController : ControllerBase
             }
         };
         return Ok(indexMoviesComponentsItemsGenres);
+    }
+
+    [HttpGet("games")]
+    public async Task<ActionResult<IEnumerable<GamesIndexComponentItem>>> GetIndexGamesComponentsItemsGenresAsync()
+    {
+        var indexGamesComponentsItemsGenres = new GamesIndexComponentItem[]
+        {
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
+                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
+                    new Platform { Href="https://metarankings.ru/meta/games/xbox-series-x/",Name="Xbox Series X" }
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=6.5f,
+                    Title="S.T.A.L.K.E.R. 2: Heart of Chernobyl",
+                    ImageAlt="S.T.A.L.K.E.R. 2: Heart of Chernobyl",
+                    ImageSrc="https://metarankings.ru/images/uploads/2022/04/stalker-2-heart-of-chernobyl-cover-art-50x70.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/stalker-2/",
+                    Description="Игра S.T.A.L.K.E.R. 2: Heart of Chernobyl — продолжение культовой серии ролевых шутеров с видом от первого лица в открытом мире постапокалиптической зоны отчуждения Чернобыльской...",
+                    ReleaseDate=new DateTime(2024,11,20)
+                }
+            },
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
+                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
+                    new Platform { Href="https://metarankings.ru/meta/games/ps5/",Name="PS5" },
+                    new Platform { Href="https://metarankings.ru/meta/games/switch/",Name="Switch" }
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=5.1f,
+                    Title="LEGO Horizon Adventures",
+                    ImageAlt="LEGO Horizon Adventures",
+                    ImageSrc="https://metarankings.ru/images/uploads/2024/11/lego-horizon-adventures-cover-art-50x70.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/lego-horizon-adventures/",
+                    Description="Присоединяйтесь к Элой, отважной охотнице, и отправляйтесь в захватывающее приключение, чтобы спасти мир от Хелиса, злодея, возглавляющего банду солнцепоклонников, поклоняющихся таинственному Древнему Злу...",
+                    ReleaseDate=new DateTime(2024,11,14)
+                }
+            },
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
+                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
+                    new Platform { Href="https://metarankings.ru/meta/games/ps5/",Name="PS5" },
+                    new Platform { Href="https://metarankings.ru/meta/games/xbox-series-x/",Name="Xbox Series X" }
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=6.4f,
+                    Title="Farming Simulator 25",
+                    ImageAlt="Farming Simulator 25",
+                    ImageSrc="https://metarankings.ru/images/uploads/2024/11/farming-simulator-25-cover-art-50x70.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/farming-simulator-25/",
+                    Description="Погрузитесь в мир увлекательной сельской жизни! Создайте ферму своей мечты в одиночку или вместе с друзьями в кооперативном режиме. Выбирайте из потрясающих локаций:...",
+                    ReleaseDate=new DateTime(2024,11,12)
+                }
+            },
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
+                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
+                    new Platform { Href="https://metarankings.ru/meta/games/ps4/", Name="PS4" },
+                    new Platform { Href="https://metarankings.ru/meta/games/ps5/",Name="PS5" },
+                    new Platform { Href="https://metarankings.ru/meta/games/xbox-one/",Name="Xbox One" },
+                    new Platform { Href="https://metarankings.ru/meta/games/xbox-series-x/",Name="Xbox Series X" }
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=5.5f,
+                    Title="Slitterhead",
+                    ImageAlt="Slitterhead",
+                    ImageSrc="https://metarankings.ru/images/uploads/2024/11/slitterhead-boxart-cover-50x70.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/slitterhead/",
+                    Description="В этой боевой приключенческой игре вы окажетесь на хаотичных, заваленных мусором улицах Коулонга, где царит атмосфера тайны и опасности. Вы &#8212; Хёки, существо...",
+                    ReleaseDate=new DateTime(2024,11,8)
+                }
+            },
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
+                    new Platform { Href="https://metarankings.ru/meta/games/switch/", Name="Switch" }
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=7f,
+                    Title="Mario &#038; Luigi: Brothership",
+                    ImageAlt="Mario &#038; Luigi: Brothership",
+                    ImageSrc="https://metarankings.ru/images/uploads/2024/11/mario-luigi-brothership-boxart-cover-50x70.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/mario-luigi-brothership/",
+                    Description="В Mario &amp; Luigi: Brothership Братья Марио отправляются в новое морское приключение, чтобы спасти мир Конкордии! После того, как Уни-дерево разрушено, мир развалился...",
+                    ReleaseDate=new DateTime(2024,11,7)
+                }
+            },
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
+                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
+                    new Platform { Href="https://metarankings.ru/meta/games/ps5/", Name="PS5" },
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=7f,
+                    Title="Metro Awakening",
+                    ImageAlt="Metro Awakening",
+                    ImageSrc="https://metarankings.ru/images/uploads/2024/10/metro-awakening-boxart-cover-50x70.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/metro-awakening/",
+                    Description="Metro Awakening &#8212; это VR-игра во вселенной Metro, которая перенесет вас в 2028 год. Мир после ядерной катастрофы. Выжившие люди прячутся в подземных...",
+                    ReleaseDate=new DateTime(2024,11,7)
+                }
+            },
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
+                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
+                    new Platform { Href="https://metarankings.ru/meta/games/switch/", Name="Switch" },
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=7f,
+                    Title="Teenage Mutant Ninja Turtles: Splintered Fate",
+                    ImageAlt="Teenage Mutant Ninja Turtles: Splintered Fate",
+                    ImageSrc="https://metarankings.ru/images/uploads/2024/11/teenage-mutant-ninja-turtles-splintered-fate-cover-art-50x70.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/teenage-mutant-ninja-turtles-splintered-fate/",
+                    Description="В Teenage Mutant Ninja Turtles: Splintered Fate вас ждут динамичные и захватывающие бои в стиле roguelike, где каждый раз вас ждет новый вызов!...",
+                    ReleaseDate=new DateTime(2024,11,6)
+                }
+            },
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
+                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
+                    new Platform { Href="https://metarankings.ru/meta/games/ps4/", Name="PS4" },
+                    new Platform { Href="https://metarankings.ru/meta/games/ps5/", Name="PS5" },
+                    new Platform { Href="https://metarankings.ru/meta/games/switch/", Name="Switch" },
+                    new Platform { Href="https://metarankings.ru/meta/games/xbox-one/", Name="Xbox One" },
+                    new Platform { Href="https://metarankings.ru/meta/games/xbox-series-x/", Name="Xbox Series X" },
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=6.9f,
+                    Title="Metal Slug Tactics",
+                    ImageAlt="Metal Slug Tactics",
+                    ImageSrc="https://metarankings.ru/images/uploads/2024/11/metal-slug-tactics-boxart-cover-50x70.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/metal-slug-tactics/",
+                    Description="Metal Slug Tactics &#8212; это тактическая игра с пошаговыми боями, которая дает возможность управлять ходом битвы с помощью особых атак. Зарабатывайте опыт, открывайте...",
+                    ReleaseDate=new DateTime(2024,11,5)
+                }
+            },
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
+                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
+                    new Platform { Href="https://metarankings.ru/meta/games/ps5/", Name="PS5" }
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=6.3f,
+                    Title="Horizon Zero Dawn Remastered",
+                    ImageAlt="Horizon Zero Dawn Remastered",
+                    ImageSrc="https://metarankings.ru/images/uploads/2024/10/horizon-zero-dawn-remastered-boxart-cover-50x70.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/horizon-zero-dawn-remastered/",
+                    Description="Horizon Zero Dawn — это приключенческая ролевая игра, завоевавшая множество наград и признание критиков. В версии Remastered, знакомые игрокам дикие земли оживают с...",
+                    ReleaseDate=new DateTime(2024,10,31)
+                }
+            },
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
+                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
+                    new Platform { Href="https://metarankings.ru/meta/games/ps5/", Name="PS5" },
+                    new Platform { Href="https://metarankings.ru/meta/games/xbox-series-x/", Name="Xbox Series X" }
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=6.3f,
+                    Title="Dragon Age: The Veilguard",
+                    ImageAlt="Dragon Age: The Veilguard",
+                    ImageSrc="https://metarankings.ru/images/uploads/2024/12/dragon-age-the-veilguard-boxart-cover-50x70.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/dragon-age-the-veilguard/",
+                    Description="Ролевая экшен приключенческая игра Dragon Age: The Veilguard отправляет в мир Тедаса, яркую страну суровой дикой природы, коварных лабиринтов и сверкающих городов. Вас...",
+                    ReleaseDate=new DateTime(2024,10,31)
+                }
+            },
+        };
+        return Ok(indexGamesComponentsItemsGenres);
     }
 }

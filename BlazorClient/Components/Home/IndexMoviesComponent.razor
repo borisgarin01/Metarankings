@@ -14,6 +14,8 @@
                 @foreach (var genre in item.Genres)
                 {
                     <a href="@genre.Href">@genre.Name</a>
+
+                    <text> / </text>
                 }
             </span>
             <span class="item-meta"><a rel="nofollow" href="@item.IndexComponentItem.ItemHref#reviews">Рецензии (8)</a> <a rel="nofollow" href="@item.IndexComponentItem.ItemHref#comments">Отзывы (0)</a></span>
