@@ -481,4 +481,35 @@ public class MainPageController : ControllerBase
         };
         return Ok(collectionsComponentsItems);
     }
+
+    [HttpGet("gamesNewsComponentsItems")]
+    public async Task<ActionResult<IEnumerable<GamesNewsComponentItem>>> GetGamesNewsComponentsItems()
+    {
+        var gamesNewsComponentsItems = new GamesNewsComponentItem[]
+        {
+            new GamesNewsComponentItem
+            {
+                ImageAlt="Sony объявила системные требования God of War Ragnarök для PC",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg",
+                LinkHref="https://metarankings.ru/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/",
+                LinkTitle="Sony объявила системные требования God of War Ragnarök для PC"
+            },
+            new GamesNewsComponentItem
+            {
+                ImageAlt="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/08/kinematograficheskij-trejler-zombi-rezhima-v-call-of-duty-black-ops-6-445x250.jpg",
+                LinkHref="https://metarankings.ru/activision-predstavila-kinematograficheskij-trejler-zombi-rezhima-call-of-duty-black-ops-6/",
+                LinkTitle="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6"
+            },
+            new GamesNewsComponentItem
+            {
+                ImageAlt="Nintendo показала Metroid Prime 4: Beyond для Switch",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/06/metroid-prime-4-beyond-445x250.jpg",
+                LinkHref="https://metarankings.ru/nintendo-pokazala-metroid-prime-4-beyond-dlya-switch/",
+                LinkTitle="Nintendo показала Metroid Prime 4: Beyond для Switch"
+            },
+        };
+
+        return Ok(gamesNewsComponentsItems);
+    }
 }
