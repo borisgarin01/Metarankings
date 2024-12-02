@@ -46,10 +46,10 @@
 
 @code {
     public IEnumerable<MoviesIndexComponentItem> IndexMoviesComponentItems { get; private set; }
+
     protected override async Task OnInitializedAsync()
     {
         IndexMoviesComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<MoviesIndexComponentItem>>("https://localhost:7148/api/mainpage/movies");
-        var a = IndexMoviesComponentItems;
     }
 }
 

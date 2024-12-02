@@ -13,11 +13,11 @@
 </div>
 
 @code {
-    public IEnumerable<GamesNewsComponentItem> GamesNewsComponentsItems { get; private set; }
+    public IEnumerable<NewsComponentItem> GamesNewsComponentsItems { get; private set; }
 
     protected override async Task OnInitializedAsync()
     {
-        GamesNewsComponentsItems = await httpClient.GetFromJsonAsync<IEnumerable<GamesNewsComponentItem>>("https://localhost:7148/api/mainpage/gamesNewsComponentsItems");
+        GamesNewsComponentsItems = await httpClient.GetFromJsonAsync<IEnumerable<NewsComponentItem>>("https://localhost:7148/api/mainpage/gamesNewsComponentsItems");
     }
 }
 <style>

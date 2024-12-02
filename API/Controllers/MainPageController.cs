@@ -484,25 +484,25 @@ public class MainPageController : ControllerBase
     }
 
     [HttpGet("gamesNewsComponentsItems")]
-    public async Task<ActionResult<IEnumerable<GamesNewsComponentItem>>> GetGamesNewsComponentsItems()
+    public async Task<ActionResult<IEnumerable<NewsComponentItem>>> GetGamesNewsComponentsItemsAsync()
     {
-        var gamesNewsComponentsItems = new GamesNewsComponentItem[]
+        var gamesNewsComponentsItems = new NewsComponentItem[]
         {
-            new GamesNewsComponentItem
+            new NewsComponentItem
             {
                 ImageAlt="Sony объявила системные требования God of War Ragnarök для PC",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg",
                 LinkHref="https://metarankings.ru/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/",
                 LinkTitle="Sony объявила системные требования God of War Ragnarök для PC"
             },
-            new GamesNewsComponentItem
+            new NewsComponentItem
             {
                 ImageAlt="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/08/kinematograficheskij-trejler-zombi-rezhima-v-call-of-duty-black-ops-6-445x250.jpg",
                 LinkHref="https://metarankings.ru/activision-predstavila-kinematograficheskij-trejler-zombi-rezhima-call-of-duty-black-ops-6/",
                 LinkTitle="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6"
             },
-            new GamesNewsComponentItem
+            new NewsComponentItem
             {
                 ImageAlt="Nintendo показала Metroid Prime 4: Beyond для Switch",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/06/metroid-prime-4-beyond-445x250.jpg",
@@ -679,7 +679,7 @@ public class MainPageController : ControllerBase
     }
 
     [HttpGet("lastMoviesReviews")]
-    public async Task<ActionResult<IEnumerable<LastReviewsComponentItem>>> GetLastMoviesReviewsComponentsItemsAsyc()
+    public async Task<ActionResult<IEnumerable<LastReviewsComponentItem>>> GetLastMoviesReviewsComponentsItemsAsync()
     {
         var lastMoviesReviewsComponentsItems = new LastReviewsComponentItem[]
         {
@@ -738,7 +738,7 @@ public class MainPageController : ControllerBase
     }
 
     [HttpGet("lastGamesReviews")]
-    public async Task<ActionResult<IEnumerable<LastReviewsComponentItem>>> GetLastGamesReviewsComponentsItemsAsyc()
+    public async Task<ActionResult<IEnumerable<LastReviewsComponentItem>>> GetLastGamesReviewsComponentsItemsAsync()
     {
         var lastGamesReviewsComponentsItems = new LastReviewsComponentItem[]
         {
@@ -794,5 +794,36 @@ public class MainPageController : ControllerBase
             },
         };
         return Ok(lastGamesReviewsComponentsItems);
+    }
+
+    [HttpGet("moviesNews")]
+    public async Task<ActionResult<IEnumerable<NewsComponentItem>>> GetMoviesNewsComponentsItemsAsync()
+    {
+        var moviesNewsComponentItems = new NewsComponentItem[]
+        {
+            new NewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/ridli-skott-predstavil-trejler-gladiator-2-s-pedro-paskal-i-denzelem-vashingtonom/",
+                LinkTitle="Ридли Скотт представил трейлер «Гладиатор 2» с  Педро Паскаль и Дензелем Вашингтоном",
+                ImageAlt="Ридли Скотт представил трейлер «Гладиатор 2» с  Педро Паскаль и Дензелем Вашингтоном",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/07/gladiator-2-445x250.jpg"
+            },
+            new NewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/tom-xardi-uxodit-ot-pogoni-v-trejlere-venom-3-poslednij-tanec/",
+                LinkTitle="Том Харди уходит от погони в трейлере «Веном 3: Последний танец»",
+                ImageAlt="Том Харди уходит от погони в трейлере «Веном 3: Последний танец»",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/06/venom-3-poslednij-tanec-445x250.jpg"
+            },
+            new NewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/dzhenna-ortega-uillem-defo-moniki-belluchchi-i-drugie-v-trejlere-bitldzhus-bitldzhus/",
+                LinkTitle="Дженна Ортега, Уиллем Дефо, Моники Беллуччи и другие в трейлере «Битлджус Битлджус»",
+                ImageAlt="Дженна Ортега, Уиллем Дефо, Моники Беллуччи и другие в трейлере «Битлджус Битлджус»",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/05/bitldzhus-bitldzhus-445x250.jpg"
+            },
+        };
+
+        return Ok(moviesNewsComponentItems);
     }
 }

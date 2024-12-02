@@ -1,5 +1,5 @@
 ﻿namespace Domain;
-public sealed record GamesNewsComponentItem
+public sealed record NewsComponentItem
 {
     public string LinkHref { get; set; }
     public string LinkTitle { get; set; }
