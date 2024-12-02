@@ -1,5 +1,6 @@
 ﻿using Domain;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 
 namespace API.Controllers;
 
@@ -414,7 +415,7 @@ public class MainPageController : ControllerBase
     }
 
     [HttpGet("collections")]
-    public async Task<ActionResult<IEnumerable<CollectionsComponentItem>>> GetCollectionsComponentItems()
+    public async Task<ActionResult<IEnumerable<CollectionsComponentItem>>> GetCollectionsComponentItemsAsync()
     {
         var collectionsComponentsItems = new CollectionsComponentItem[]
         {
@@ -511,5 +512,169 @@ public class MainPageController : ControllerBase
         };
 
         return Ok(gamesNewsComponentsItems);
+    }
+
+    [HttpGet("gamesReleasesDates")]
+    public async Task<ActionResult<IEnumerable<GamesReleasesDatesComponentItem>>> GetGamesReleasesDatesAsync()
+    {
+        var gamesReleasesDatesComponentsItems = new GamesReleasesDatesComponentItem[]
+        {
+            new GamesReleasesDatesComponentItem
+            {
+                Href="https://metarankings.ru/indiana-jones-and-the-great-circle/",
+                Title="Indiana Jones and the Great Circle",
+                ImageAlt="Indiana Jones and the Great Circle",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/02/indiana-jones-and-the-great-circle-cover-art-50x70.jpg",
+                Platforms=
+                [
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/pc/",
+                        Name="PC"
+                    },
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/xbox-series-x/",
+                        Name="Xbox Series X"
+                    }
+                ],
+                Genres=
+                [
+                    new Genre
+                    {
+                        Href = "https://metarankings.ru/genre/priklyuchenie/",
+                        Name = "Приключение"
+                    },
+                    new Genre
+                    {
+                        Href="https://metarankings.ru/genre/ekshen/",
+                        Name="Экшен"
+                    }
+                ],
+                ReleaseDate=new DateTime(2024,12,9)
+            },
+            new GamesReleasesDatesComponentItem
+            {
+                Href="https://metarankings.ru/alien-rogue-incursion/",
+                Title="Alien: Rogue Incursion",
+                ImageAlt="Alien: Rogue Incursion",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg",
+                Platforms=
+                [
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/pc/",
+                        Name="PC"
+                    },
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/ps5/",
+                        Name="PS5"
+                    }
+                ],
+                Genres=
+                [
+                    new Genre
+                    {
+                        Href = "https://metarankings.ru/genre/xorror/",
+                        Name = "Хоррор"
+                    }
+                ],
+                ReleaseDate=new DateTime(2024,12,19)
+            },
+            new GamesReleasesDatesComponentItem
+            {
+                Href="https://metarankings.ru/alien-rogue-incursion/",
+                Title="Sid Meier's Civilization 7",
+                ImageAlt="Sid Meier's Civilization 7",
+                ImageSrc="https://metarankings.ru/images/uploads/2025/02/sid-meiers-civilization-7-boxart-cover-50x70.jpg",
+                Platforms=
+                [
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/pc/",
+                        Name="PC"
+                    }
+                ],
+                Genres=
+                [
+                    new Genre
+                    {
+                        Href = "https://metarankings.ru/genre/strategiya/",
+                        Name = "Стратегия"
+                    }
+                ],
+                ReleaseDate=new DateTime(2025,2,6)
+            },
+            new GamesReleasesDatesComponentItem
+            {
+                Href="https://metarankings.ru/kingdom-come-deliverance-2/",
+                Title="Kingdom Come: Deliverance 2",
+                ImageAlt="Kingdom Come: Deliverance 2",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/06/kingdom-come-deliverance-2-boxart-cover-50x70.jpg",
+                Platforms=
+                [
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/pc/",
+                        Name="PC"
+                    },
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/ps5/",
+                        Name="PS5"
+                    },
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/xbox-series-x/",
+                        Name="Xbox Series X"
+                    }
+                ],
+                Genres=
+                [
+                    new Genre
+                    {
+                        Href = "https://metarankings.ru/genre/rpg/",
+                        Name = "РПГ"
+                    }
+                ],
+                ReleaseDate=new DateTime(2025,2,11)
+            },
+            new GamesReleasesDatesComponentItem
+            {
+                Href="https://metarankings.ru/assassins-creed-shadows/",
+                Title="Assassin’s Creed Shadows",
+                ImageAlt="Assassin’s Creed Shadows",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/11/assassins-creed-shadows-boxart-cover-50x70.jpg",
+                Platforms=
+                [
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/pc/",
+                        Name="PC"
+                    },
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/ps5/",
+                        Name="PS5"
+                    },
+                    new Platform
+                    {
+                        Href="https://metarankings.ru/meta/games/xbox-series-x/",
+                        Name="Xbox Series X"
+                    }
+                ],
+                Genres=
+                [
+                    new Genre
+                    {
+                        Href = "https://metarankings.ru/genre/ekshen/",
+                        Name = "Экшен"
+                    }
+                ],
+                ReleaseDate=new DateTime(2025,2,14)
+            }
+        };
+        return Ok(gamesReleasesDatesComponentsItems);
     }
 }
