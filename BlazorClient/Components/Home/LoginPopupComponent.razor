@@ -1,4 +1,6 @@
-﻿<div class="popup_block">
+﻿<link href="~/css/app.css" rel="stylesheet" />
+
+<div class="popup_block">
     <form id="loginForm" method="post">
         <div class="field">
             <label>Имя пользователя</label>
@@ -17,26 +19,3 @@
         </div>
     </form>
 </div>
-
-<style>
-    .popup_block {
-        width: 350px;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        margin: 200px auto;
-        position: fixed;
-        z-index: 99999;
-        display: none;
-    }
-
-    *html .popup_block {
-        position: absolute;
-    }
-
-    .popup_block, .window {
-        margin: 120px auto;
-    }
-
-</style>

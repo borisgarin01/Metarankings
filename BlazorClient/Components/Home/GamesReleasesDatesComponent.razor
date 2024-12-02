@@ -2,6 +2,8 @@
 @using Domain
 @using System.Globalization
 
+<link href="~/css/app.css" rel="stylesheet" />
+
 <div class="index-games">
     <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
     @foreach (var gameReleaseDateComponentItem in GamesReleasesDatesComponentsItems)
@@ -30,90 +32,6 @@
     }
     <a href="https://metarankings.ru/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
 </div>
-
-<style>
-    .index-games {
-        width: 49.9%;
-        float: right;
-        margin: 15px 0;
-    }
-
-    #search_form-result .index-games .item, #search_form-result .index-movies .item {
-        padding: 10px 0;
-        border-right: none;
-    }
-
-    #search_form-result .item-name {
-        font-weight: 500;
-    }
-
-    #search_form-result .item:hover .item-description, #search_form-result .news-item .rubrika {
-        display: none;
-    }
-
-    #search_form-result .index-games .item img, #search_form-result .index-movies .item img, #search_form-result .index-games .item .item-meta, #search_form-result .index-movies .item .item-meta {
-        display: none;
-    }
-
-    #search_form-result .index-games .item, #search_form-result .index-movies .item {
-        padding: 10px 0;
-        border-right: none;
-    }
-
-    #search_form-result .item-name {
-        font-weight: 500;
-    }
-
-    #search_form-result .item:hover .item-description, #search_form-result .news-item .rubrika {
-        display: none;
-    }
-
-    #search_form-result .index-games .item img, #search_form-result .index-movies .item img, #search_form-result .index-games .item .item-meta, #search_form-result .index-movies .item .item-meta {
-        display: none;
-    }
-
-    #search_form-result .index-games .item, #search_form-result .index-movies .item {
-        padding: 10px 0;
-        border-right: none;
-    }
-
-    #search_form-result .item-name {
-        font-weight: 500;
-    }
-
-    #search_form-result .item:hover .item-description, #search_form-result .news-item .rubrika {
-        display: none;
-    }
-
-    #search_form-result .index-games .item img, #search_form-result .index-movies .item img, #search_form-result .index-games .item .item-meta, #search_form-result .index-movies .item .item-meta {
-        display: none;
-    }
-
-    .item.mark-10, .item.mark-9, .item.mark-8 {
-        background: #defbd1;
-    }
-
-    .item.mark-7, .item.mark-6, .item.mark-5 {
-        background: #f8fdc9;
-    }
-
-    .item.mark-4, .item.mark-3, .item.mark-2, .item.mark-1 {
-        background: #f3e4e1;
-    }
-
-    .item.mark-0 {
-        background: #ebebeb;
-    }
-
-    .item:hover .item-description, .tooltip:hover:after {
-        display: none;
-    }
-
-    .item-name {
-        font-size: 16px;
-    }
-
-</style>
 
 @code {
     public IEnumerable<GamesReleasesDatesComponentItem> GamesReleasesDatesComponentsItems { get; private set; }

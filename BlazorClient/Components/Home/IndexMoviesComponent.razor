@@ -2,6 +2,8 @@
 @using System.Globalization
 @inject HttpClient httpClient
 
+<link href="~/css/app.css" rel="stylesheet" />
+
 <div class="index-movies">
     <h3><a href="https://metarankings.ru/new-movies/">Новые фильмы</a></h3>
     @foreach (var item in IndexMoviesComponentItems)
@@ -52,33 +54,3 @@
         IndexMoviesComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<MoviesIndexComponentItem>>("https://localhost:7148/api/mainpage/movies");
     }
 }
-
-<style>
-    .index-movies {
-        width: 49.9%;
-        float: left;
-        margin: 15px 0;
-    }
-
-    html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
-        margin: 0;
-        padding: 0;
-        border: 0;
-        outline: 0;
-        font-size: 100%;
-        vertical-align: baseline;
-        background: transparent;
-    }
-
-    div {
-        display: block;
-        unicode-bidi: isolate;
-    }
-
-    body {
-        background: #fff;
-        font-family: 'Segoe UI', Helvetica, Arial, 'Sans-Serif', fontello;
-        line-height: 1;
-        text-align: left;
-    }
-</style>

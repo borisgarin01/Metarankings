@@ -1,6 +1,8 @@
 ﻿@using Domain
 @inject HttpClient httpClient
 
+<link href="~/css/app.css" rel="stylesheet" />
+
 <div class="specials-index">
     <h3><a href="https://metarankings.ru/meta/collections/">Подборки</a></h3>
     @foreach (CollectionsComponentItem item in CollectionsComponentItems)
@@ -20,108 +22,3 @@
         CollectionsComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<CollectionsComponentItem>>("https://localhost:7148/api/mainpage/collections");
     }
 }
-
-<style>
-    .specials-index a {
-        color: #000;
-        text-decoration: none;
-    }
-
-        .specials-index a:hover, .news-item .news-title a:hover {
-            color: #0068BF;
-        }
-
-    .specials-index .news-item {
-        width: 49.6%;
-        display: inline-block;
-    }
-
-    .specials-index {
-        margin-top: 20px;
-    }
-
-    #search_form-result .index-games, #search_form-result .index-movies, #search_form-result .specials-index .news-item {
-        float: none;
-        display: block;
-        width: 100%;
-    }
-
-    #search_form-result .item:hover .item-description, #search_form-result .news-item .rubrika {
-        display: none;
-    }
-
-    #search_form-result .news-item .news-title {
-        height: auto;
-    }
-
-    .news-item .rubrika {
-        left: 10px;
-        top: 10px;
-    }
-
-        .news-item .rubrika a, .list .post .rubrika a {
-            color: #fff;
-        }
-
-    index-movies .news-item {
-        margin-right: 2px;
-    }
-
-    .index-games .news-item {
-        margin-left: 2px;
-    }
-
-    .news-item {
-        overflow: hidden;
-        position: relative;
-        border-radius: 4px;
-        margin-bottom: 20px;
-    }
-
-        .news-item a {
-            text-decoration: none;
-        }
-
-        .news-item img {
-            width: 100%;
-            height: auto;
-        }
-
-        .news-item .news-title {
-            color: #000;
-            display: block;
-            bottom: 0;
-            padding: 5px;
-            right: 0;
-            left: 0;
-            height: 60px;
-            overflow: hidden;
-            line-height: 1.2;
-        }
-
-            .news-item .news-title a {
-                color: #000;
-                white-space: normal;
-                line-height: 1.2;
-                text-decoration: none;
-            }
-
-    .news-module .news-item {
-        width: 49.5%;
-        display: inline-block;
-    }
-
-        .news-module .news-item:hover {
-            opacity: 0.7;
-        }
-
-    .specials-index a:hover, .news-item .news-title a:hover {
-        color: #0068BF;
-    }
-
-    .specials-index .news-item {
-        width: 49.6%;
-        display: inline-block;
-    }
-
-</style>
