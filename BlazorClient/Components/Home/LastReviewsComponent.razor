@@ -1,110 +1,29 @@
-﻿<div class="sidebar rcol">
+﻿@using Domain
+@inject HttpClient httpClient
+
+<div class="sidebar rcol">
     <div class="widget last-reviews">
         <h3>Последние отзывы</h3>
         <div class="widget-body">
             <ul>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/konklav-2024/">Конклав</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/gladiator-2/">Гладиатор 2</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/eretik-2024/">Еретик</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/lyubov-sovetskogo-soyuza-2024/">Любовь Советского Союза</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/vozvrashhenie-popugaya-keshi-2024/">Возвращение попугая Кеши</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/venom-3-poslednij-tanec-2024/">Веном 3: Последний танец</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/dzhoker-bezumie-na-dvoix/">Джокер: Безумие на двоих</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/xellboj-proklyatie-gorbuna-2024/">Хеллбой: Проклятие Горбуна</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/ekzorcizm-2024/">Экзорцизм</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/bitldzhus-bitldzhus/">Битлджус Битлджус</a></span>
-                    </div>
-                </li>
+                @foreach (var lastMovieReview in LastMoviesReviews)
+                {
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="@lastMovieReview.LinkHref">@lastMovieReview.LinkTitle</a></span>
+                        </div>
+                    </li>
+                }
             </ul>
             <ul>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/stalker-2/">S.T.A.L.K.E.R. 2: Heart of Chernobyl</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/dragon-age-the-veilguard/">Dragon Age: The Veilguard</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/call-of-duty-black-ops-6/">Call of Duty: Black Ops 6</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/game-silent-hill-2-remake/">Silent Hill 2</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/the-legend-of-zelda-echoes-of-wisdom/">The Legend of Zelda: Echoes of Wisdom</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/astro-bot/">Astro Bot</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/star-wars-outlaws/">Star Wars Outlaws</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/black-myth-wukong/">Black Myth: WuKong</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/senuas-saga-hellblade-2/">Senua’s Saga: Hellblade 2</a></span>
-                    </div>
-                </li>
-                <li class="recent-reviews">
-                    <div class="ureview-text">
-                        <span class="title-reviews"><a href="https://metarankings.ru/stellar-blade/">Stellar Blade</a></span>
-                    </div>
-                </li>
+                @foreach (var lastGameReview in LastGamesReviews)
+                {
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="@lastGameReview.LinkHref">@lastGameReview.LinkTitle</a></span>
+                        </div>
+                    </li>
+                }
             </ul>
         </div>
     </div>
@@ -332,5 +251,13 @@
 </style>
 
 @code {
+    public IEnumerable<LastReviewsComponentItem> LastMoviesReviews { get; private set; }
+    public IEnumerable<LastReviewsComponentItem> LastGamesReviews { get; private set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        LastMoviesReviews = await httpClient.GetFromJsonAsync<IEnumerable<LastReviewsComponentItem>>("https://localhost:7148/api/mainpage/lastMoviesReviews");
+
+        LastGamesReviews = await httpClient.GetFromJsonAsync<IEnumerable<LastReviewsComponentItem>>("https://localhost:7148/api/mainpage/lastGamesReviews");
+    }
 }

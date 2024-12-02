@@ -677,4 +677,122 @@ public class MainPageController : ControllerBase
         };
         return Ok(gamesReleasesDatesComponentsItems);
     }
+
+    [HttpGet("lastMoviesReviews")]
+    public async Task<ActionResult<IEnumerable<LastReviewsComponentItem>>> GetLastMoviesReviewsComponentsItemsAsyc()
+    {
+        var lastMoviesReviewsComponentsItems = new LastReviewsComponentItem[]
+        {
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/konklav-2024/",
+                LinkTitle="Конклав"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/gladiator-2/",
+                LinkTitle="Гладиатор 2"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/eretik-2024/",
+                LinkTitle="Еретик"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/lyubov-sovetskogo-soyuza-2024/",
+                LinkTitle="Любовь Советского Союза"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/vozvrashhenie-popugaya-keshi-2024/",
+                LinkTitle="Возвращение попугая Кеши"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/venom-3-poslednij-tanec-2024/",
+                LinkTitle="Веном 3: Последний танец"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/dzhoker-bezumie-na-dvoix/",
+                LinkTitle="Джокер: Безумие на двоих"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/xellboj-proklyatie-gorbuna-2024/",
+                LinkTitle="Хеллбой: Проклятие Горбуна"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/ekzorcizm-2024/",
+                LinkTitle="Экзорцизм"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/bitldzhus-bitldzhus/",
+                LinkTitle="Битлджус Битлджус"
+            },
+        };
+        return Ok(lastMoviesReviewsComponentsItems);
+    }
+
+    [HttpGet("lastGamesReviews")]
+    public async Task<ActionResult<IEnumerable<LastReviewsComponentItem>>> GetLastGamesReviewsComponentsItemsAsyc()
+    {
+        var lastGamesReviewsComponentsItems = new LastReviewsComponentItem[]
+        {
+            new LastReviewsComponentItem
+            {
+                LinkHref = "https://metarankings.ru/stalker-2/",
+                LinkTitle = "S.T.A.L.K.E.R. 2: Heart of Chernobyl"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref = "https://metarankings.ru/dragon-age-the-veilguard/",
+                LinkTitle = "Dragon Age: The Veilguard"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref = "https://metarankings.ru/call-of-duty-black-ops-6/",
+                LinkTitle = "Call of Duty: Black Ops 6"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref = "https://metarankings.ru/game-silent-hill-2-remake/",
+                LinkTitle = "Silent Hill 2"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/the-legend-of-zelda-echoes-of-wisdom/",
+                LinkTitle="The Legend of Zelda: Echoes of Wisdom"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/astro-bot/",
+                LinkTitle="Astro Bot"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/star-wars-outlaws/",
+                LinkTitle="Star Wars Outlaws"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/black-myth-wukong/",
+                LinkTitle="Black Myth: WuKong"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/senuas-saga-hellblade-2/",
+                LinkTitle="Senua’s Saga: Hellblade 2"
+            },
+            new LastReviewsComponentItem
+            {
+                LinkHref="https://metarankings.ru/stellar-blade/",
+                LinkTitle="Stellar Blade"
+            },
+        };
+        return Ok(lastGamesReviewsComponentsItems);
+    }
 }
