@@ -828,7 +828,7 @@ public class MainPageController : ControllerBase
     }
 
     [HttpGet("soonAtMovies")]
-    public async Task<ActionResult<IEnumerable<SoonAtMoviesComponentItem>>> GetSonnAtMoviesComponentItems()
+    public async Task<ActionResult<IEnumerable<SoonAtMoviesComponentItem>>> GetSoonAtMoviesComponentItems()
     {
         var soonAtMoviesComponentItems = new SoonAtMoviesComponentItem[]
         {
@@ -930,5 +930,43 @@ public class MainPageController : ControllerBase
         };
 
         return Ok(soonAtMoviesComponentItems);
+    }
+
+    [HttpGet("specials")]
+    public async Task<ActionResult<IEnumerable<SpecialsComponentItem>>> GetSpecialsAsync()
+    {
+        var specialsComponentItems = new SpecialsComponentItem[]
+        {
+            new SpecialsComponentItem
+            {
+                ImageAlt="Выйдет ли God Of War Ragnarok на ПК?",
+                ImageSrc="https://metarankings.ru/images/uploads/2022/08/god-of-war-ragnarok1-445x250.jpg",
+                LinkHref="https://metarankings.ru/vyjdet-li-god-of-war-ragnarok-na-pk/",
+                LinkTitle="Выйдет ли God Of War Ragnarok на ПК?"
+            },
+            new SpecialsComponentItem
+            {
+                ImageAlt="Стоит ли ждать Overwatch 2?",
+                ImageSrc="https://metarankings.ru/images/uploads/2022/08/overwatch-2-445x250.jpg",
+                LinkHref="https://metarankings.ru/stoit-li-zhdat-overwatch-2/",
+                LinkTitle="Стоит ли ждать Overwatch 2?"
+            },
+            new SpecialsComponentItem
+            {
+                ImageAlt="5 причин посмотреть сериал «Дом Дракона»",
+                ImageSrc="https://metarankings.ru/images/uploads/2022/08/dom-drakona-445x250.jpg",
+                LinkHref="https://metarankings.ru/pyat-prichin-posmotret-serial-dom-drakona/",
+                LinkTitle="5 причин посмотреть сериал «Дом Дракона»"
+            },
+            new SpecialsComponentItem
+            {
+                ImageAlt="Эволюция знака Человека-Паука &#8212; Как менялся логотип за всю историю героя Marvel",
+                ImageSrc="https://metarankings.ru/images/uploads/2021/10/chelovek-pauk-445x250.jpg",
+                LinkHref="https://metarankings.ru/evolyuciya-znaka-cheloveka-pauka-za-vsyu-istoriyu-geroya-marvel/",
+                LinkTitle="Эволюция знака Человека-Паука &#8212; Как менялся логотип за всю историю героя Marvel"
+            }
+        };
+
+        return Ok(specialsComponentItems);
     }
 }
