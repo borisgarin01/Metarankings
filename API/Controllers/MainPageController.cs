@@ -969,4 +969,111 @@ public class MainPageController : ControllerBase
 
         return Ok(specialsComponentItems);
     }
+
+    [HttpGet("bestGamesInPastMonth")]
+    public async Task<ActionResult<IEnumerable<BestInPastMonth>>> GetBestGamesInPastMonth()
+    {
+        var bestGamesInPastMonth = new BestInPastMonth[]
+        {
+            new BestInPastMonth
+            {
+                Name = "The Legend of Zelda. Echoes of Wisdom",
+                Href = "https://metarankings.ru/the-legend-of-zelda-echoes-of-wisdom/",
+                ImageSrc = "https://metarankings.ru/images/uploads/2024/10/the-legend-of-zelda-echoes-of-wisdom-boxart-cover-200x281.jpg",
+                Score = 8.1f
+            },
+            new BestInPastMonth
+            {
+                Name = "Silent Hill 2: Remake",
+                Href = "https://metarankings.ru/game-silent-hill-2-remake/",
+                ImageSrc = "https://metarankings.ru/images/uploads/2023/03/silent-hill-2-remake-boxart-cover-196x281.jpg",
+                Score = 8.1f
+            },
+            new BestInPastMonth
+            {
+                Name = "Metaphor. Refantazio",
+                Href = "https://metarankings.ru/metaphor-refantazio/",
+                ImageSrc = "https://metarankings.ru/images/uploads/2023/06/metaphor-refantazio-boxart-cover-200x268.jpg",
+                Score = 7.8f
+            },
+            new BestInPastMonth
+            {
+                Name = "Call of Duty: Black Ops 6",
+                Href = "https://metarankings.ru/call-of-duty-black-ops-6/",
+                ImageSrc = "https://metarankings.ru/images/uploads/2024/09/call-of-duty-black-ops-6-boxart-cover-196x281.jpg",
+                Score = 7.4f
+            },
+            new BestInPastMonth
+            {
+                Name = "Dragon Age: The Veilguard",
+                Href = "https://metarankings.ru/dragon-age-the-veilguard/",
+                ImageSrc = "https://metarankings.ru/images/uploads/2024/12/dragon-age-the-veilguard-boxart-cover-196x281.jpg",
+                Score = 6.3f
+            },
+            new BestInPastMonth
+            {
+                Name = "Horizon: Zero Dawn. Remastered",
+                Href = "https://metarankings.ru/horizon-zero-dawn-remastered/",
+                ImageSrc = "https://metarankings.ru/images/uploads/2024/10/horizon-zero-dawn-remastered-boxart-cover-196x281.jpg",
+                Score = 6.3f
+            }
+        };
+        return Ok(bestGamesInPastMonth);
+    }
+
+    [HttpGet("bestMoviesInPastMonth")]
+    public async Task<ActionResult<IEnumerable<BestInPastMonth>>> GetBestMoviesInPastMonth()
+    {
+        var bestMoviesInPastMonth = new BestInPastMonth[]
+        {
+            new BestInPastMonth
+            {
+                Name="Крик. Сезон призраков",
+                Href="https://metarankings.ru/krik-sezon-prizrakov-2024/",
+                Score=6.8f,
+                ImageSrc="https://metarankings.ru/images/uploads/2024/10/krik-sezon-prizrakov-2024-cover-art-190x281.jpg"
+            },
+
+            new BestInPastMonth
+            {
+                Name="Свидание с монстром",
+                Href="https://metarankings.ru/svidanie-s-monstrom-2024/",
+                Score=6.6f,
+                ImageSrc="https://metarankings.ru/images/uploads/2024/10/svidanie-s-monstrom-cover-art-196x281.jpg"
+            },
+
+            new BestInPastMonth
+            {
+                Name="Вечная зима",
+                Href="https://metarankings.ru/vechnaya-zima-2024/",
+                Score=6.5f,
+                ImageSrc="https://metarankings.ru/images/uploads/2024/10/vechnaya-zima-cover-art-196x281.jpg"
+            },
+
+        new BestInPastMonth
+        {
+            Name="Подземная бездна",
+            Href="https://metarankings.ru/podzemnaya-bezdna-2024/",
+            Score=6.2f,
+            ImageSrc="https://metarankings.ru/images/uploads/2024/10/drugoj-chelovek-cover-art-197x281.jpg"
+        },
+
+            new BestInPastMonth
+            {
+                Name="Другой человек",
+                Href="https://metarankings.ru/drugoj-chelovek-2024/",
+                Score=6.2f,
+                ImageSrc="https://metarankings.ru/images/uploads/2024/10//drugoj-chelovek-cover-art-197x281.jpg"
+            },
+
+            new BestInPastMonth
+            {
+                Name="Ужасающий 3",
+                Href="https://metarankings.ru/uzhasayushhij-3/",
+                Score=6.2f,
+                ImageSrc="https://metarankings.ru/images/uploads/2024/06/uzhasayushhij-3-cover-art-197x281.jpg"
+            }
+        };
+        return Ok(bestMoviesInPastMonth);
+    }
 }
