@@ -11,7 +11,7 @@ public sealed record IndexComponentItem
     public string Title { get; set; }
     public float Score { get; set; }
     public string Description { get; set; }
-    public DateTime ReleaseDate { get; set; }
+    public DateOnly ReleaseDate { get; set; }
     public string ImageSrc { get; set; }
     public string ImageAlt { get; set; }
 }

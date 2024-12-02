@@ -31,7 +31,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/dorogoj-santa-2024/",
                     Description="Когда юный мальчик отправляет свой рождественский список желаний Санте с одной важной орфографической ошибкой, появляется дьявольский Джек Блэк, чтобы устроить хаос на празднике",
-                    ReleaseDate=new DateTime(2024,11,25)
+                    ReleaseDate=new DateOnly(2024,11,25)
                 }
             },
             new MoviesIndexComponentItem
@@ -50,7 +50,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref = "https://metarankings.ru/priklyucheniya-paddingtona-3/",
                     Description = "Фильм продолжает историю знаменитого медвежонка. На этот раз Паддингтон и семья Браунов решают навестить тетю Люси в Перу, но загадочное событие заставляет их",
-                    ReleaseDate = new DateTime(2024,11,28)
+                    ReleaseDate = new DateOnly(2024,11,28)
                 }
             },
             new MoviesIndexComponentItem
@@ -69,7 +69,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/perevozchik-dush-2024/",
                     Description="После ссоры, Энн и Патрик, едва сдерживая взаимное раздражение, хватают первое попавшееся такси. Водитель, изначально казавшийся добродушным и общительным, вдруг начинает вести себя...",
-                    ReleaseDate=new DateTime(2024,11,25)
+                    ReleaseDate=new DateOnly(2024,11,25)
                 }
             },
             new MoviesIndexComponentItem
@@ -84,7 +84,7 @@ public class MainPageController : ControllerBase
                     Id = 1,
                     ItemHref = "https://metarankings.ru/emmanuel-2024/",
                     Description = "Роскошный гонконгский отель становится местом, где Эммануэль, находящаяся в деловой поездке, исследует свою сексуальность и переосмысливает понятия близости и свободы, проверяя границы дозволенного...",
-                    ReleaseDate = new DateTime(2024, 11, 28)
+                    ReleaseDate = new DateOnly(2024, 11, 28)
                 },
                 Genres = new Genre[]
                 {
@@ -103,7 +103,7 @@ public class MainPageController : ControllerBase
                     Id = 1,
                     ItemHref = "https://metarankings.ru/poslednee-zamykanie-konec-sveta-2024/",
                     Description = "В мире будущего, где человечество проиграло климатические войны, выжила, возможно, только Ева. Она живет в лагере, который охраняет робот, не пуская никого без...",
-                    ReleaseDate = new DateTime(2024, 11, 28)
+                    ReleaseDate = new DateOnly(2024, 11, 28)
                 },
                 Genres = new Genre[]
                 {
@@ -123,7 +123,7 @@ public class MainPageController : ControllerBase
                     Id = 1,
                     ItemHref = "https://metarankings.ru/mariya-2024/",
                     Description = "В своей роскошной парижской квартире, в 1970-х, легендарная Мария Каллас переживает последние годы жизни, сражаясь с внутренними демонами. Сентябрь 1977 года: окружённая пуделями,...",
-                    ReleaseDate = new DateTime(2024, 11, 28)
+                    ReleaseDate = new DateOnly(2024, 11, 28)
                 },
                 Genres = new Genre[]
                 {
@@ -141,7 +141,7 @@ public class MainPageController : ControllerBase
                     Id = 1,
                     ItemHref = "https://metarankings.ru/astral-medium-2024/",
                     Description = "Слепая медиум Дарси, способная видеть прошлое, приезжает в дом, где год назад была зверски убита ее сестра-близнец Дани. Сейчас в этом доме живет...",
-                    ReleaseDate = new DateTime(2024, 11, 28)
+                    ReleaseDate = new DateOnly(2024, 11, 28)
                 },
                 Genres = new Genre[]
                 {
@@ -163,7 +163,7 @@ public class MainPageController : ControllerBase
                     Id = 1,
                     ItemHref = "https://metarankings.ru/ya-slezhu-za-toboj-2024/",
                     Description = "У риелтора Ку Джон-тхэ есть секрет: он тайно проникает в дома клиентов, подглядывая за их жизнью. Однажды, во время очередного вторжения, он находит...",
-                    ReleaseDate = new DateTime(2024, 11, 28)
+                    ReleaseDate = new DateOnly(2024, 11, 28)
                 }
             },
             new MoviesIndexComponentItem
@@ -181,7 +181,7 @@ public class MainPageController : ControllerBase
                     Id = 1,
                     ItemHref = "https://metarankings.ru/odin-den-v-stambule-2024/",
                     Description = "Смерть друга Вадима разрушила планы друзей на отдых на яхте в Стамбуле. Однако, они проводят прощальную прогулку по Босфору, делясь воспоминаниями о нём...",
-                    ReleaseDate = new DateTime(2024, 11, 28)
+                    ReleaseDate = new DateOnly(2024, 11, 28)
                 }
             },
             new MoviesIndexComponentItem
@@ -199,7 +199,7 @@ public class MainPageController : ControllerBase
                     Id = 1,
                     ItemHref = "https://metarankings.ru/ptica-2024/",
                     Description = "Бэйли и ее брат Хантер живут в заброшенном доме на севере Кента с отцом, Багом, который воспитывает их один и не всегда может...",
-                    ReleaseDate = new DateTime(2024, 11, 28)
+                    ReleaseDate = new DateOnly(2024, 11, 28)
                 }
             }
         };
@@ -227,7 +227,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/stalker-2/",
                     Description="Игра S.T.A.L.K.E.R. 2: Heart of Chernobyl — продолжение культовой серии ролевых шутеров с видом от первого лица в открытом мире постапокалиптической зоны отчуждения Чернобыльской...",
-                    ReleaseDate=new DateTime(2024,11,20)
+                    ReleaseDate=new DateOnly(2024,11,20)
                 }
             },
             new GamesIndexComponentItem
@@ -247,7 +247,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/lego-horizon-adventures/",
                     Description="Присоединяйтесь к Элой, отважной охотнице, и отправляйтесь в захватывающее приключение, чтобы спасти мир от Хелиса, злодея, возглавляющего банду солнцепоклонников, поклоняющихся таинственному Древнему Злу...",
-                    ReleaseDate=new DateTime(2024,11,14)
+                    ReleaseDate=new DateOnly(2024,11,14)
                 }
             },
             new GamesIndexComponentItem
@@ -267,7 +267,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/farming-simulator-25/",
                     Description="Погрузитесь в мир увлекательной сельской жизни! Создайте ферму своей мечты в одиночку или вместе с друзьями в кооперативном режиме. Выбирайте из потрясающих локаций:...",
-                    ReleaseDate=new DateTime(2024,11,12)
+                    ReleaseDate=new DateOnly(2024,11,12)
                 }
             },
             new GamesIndexComponentItem
@@ -289,7 +289,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/slitterhead/",
                     Description="В этой боевой приключенческой игре вы окажетесь на хаотичных, заваленных мусором улицах Коулонга, где царит атмосфера тайны и опасности. Вы &#8212; Хёки, существо...",
-                    ReleaseDate=new DateTime(2024,11,8)
+                    ReleaseDate=new DateOnly(2024,11,8)
                 }
             },
             new GamesIndexComponentItem
@@ -307,7 +307,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/mario-luigi-brothership/",
                     Description="В Mario &amp; Luigi: Brothership Братья Марио отправляются в новое морское приключение, чтобы спасти мир Конкордии! После того, как Уни-дерево разрушено, мир развалился...",
-                    ReleaseDate=new DateTime(2024,11,7)
+                    ReleaseDate=new DateOnly(2024,11,7)
                 }
             },
             new GamesIndexComponentItem
@@ -326,7 +326,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/metro-awakening/",
                     Description="Metro Awakening &#8212; это VR-игра во вселенной Metro, которая перенесет вас в 2028 год. Мир после ядерной катастрофы. Выжившие люди прячутся в подземных...",
-                    ReleaseDate=new DateTime(2024,11,7)
+                    ReleaseDate=new DateOnly(2024,11,7)
                 }
             },
             new GamesIndexComponentItem
@@ -345,7 +345,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/teenage-mutant-ninja-turtles-splintered-fate/",
                     Description="В Teenage Mutant Ninja Turtles: Splintered Fate вас ждут динамичные и захватывающие бои в стиле roguelike, где каждый раз вас ждет новый вызов!...",
-                    ReleaseDate=new DateTime(2024,11,6)
+                    ReleaseDate=new DateOnly(2024,11,6)
                 }
             },
             new GamesIndexComponentItem
@@ -368,7 +368,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/metal-slug-tactics/",
                     Description="Metal Slug Tactics &#8212; это тактическая игра с пошаговыми боями, которая дает возможность управлять ходом битвы с помощью особых атак. Зарабатывайте опыт, открывайте...",
-                    ReleaseDate=new DateTime(2024,11,5)
+                    ReleaseDate=new DateOnly(2024,11,5)
                 }
             },
             new GamesIndexComponentItem
@@ -387,7 +387,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/horizon-zero-dawn-remastered/",
                     Description="Horizon Zero Dawn — это приключенческая ролевая игра, завоевавшая множество наград и признание критиков. В версии Remastered, знакомые игрокам дикие земли оживают с...",
-                    ReleaseDate=new DateTime(2024,10,31)
+                    ReleaseDate=new DateOnly(2024,10,31)
                 }
             },
             new GamesIndexComponentItem
@@ -407,7 +407,7 @@ public class MainPageController : ControllerBase
                     Id=1,
                     ItemHref="https://metarankings.ru/dragon-age-the-veilguard/",
                     Description="Ролевая экшен приключенческая игра Dragon Age: The Veilguard отправляет в мир Тедаса, яркую страну суровой дикой природы, коварных лабиринтов и сверкающих городов. Вас...",
-                    ReleaseDate=new DateTime(2024,10,31)
+                    ReleaseDate=new DateOnly(2024,10,31)
                 }
             },
         };
@@ -551,7 +551,7 @@ public class MainPageController : ControllerBase
                         Name="Экшен"
                     }
                 ],
-                ReleaseDate=new DateTime(2024,12,9)
+                ReleaseDate=new DateOnly(2024,12,9)
             },
             new GamesReleasesDatesComponentItem
             {
@@ -580,7 +580,7 @@ public class MainPageController : ControllerBase
                         Name = "Хоррор"
                     }
                 ],
-                ReleaseDate=new DateTime(2024,12,19)
+                ReleaseDate=new DateOnly(2024,12,19)
             },
             new GamesReleasesDatesComponentItem
             {
@@ -604,7 +604,7 @@ public class MainPageController : ControllerBase
                         Name = "Стратегия"
                     }
                 ],
-                ReleaseDate=new DateTime(2025,2,6)
+                ReleaseDate=new DateOnly(2025,2,6)
             },
             new GamesReleasesDatesComponentItem
             {
@@ -638,7 +638,7 @@ public class MainPageController : ControllerBase
                         Name = "РПГ"
                     }
                 ],
-                ReleaseDate=new DateTime(2025,2,11)
+                ReleaseDate=new DateOnly(2025,2,11)
             },
             new GamesReleasesDatesComponentItem
             {
@@ -672,7 +672,7 @@ public class MainPageController : ControllerBase
                         Name = "Экшен"
                     }
                 ],
-                ReleaseDate=new DateTime(2025,2,14)
+                ReleaseDate=new DateOnly(2025,2,14)
             }
         };
         return Ok(gamesReleasesDatesComponentsItems);
@@ -825,5 +825,110 @@ public class MainPageController : ControllerBase
         };
 
         return Ok(moviesNewsComponentItems);
+    }
+
+    [HttpGet("soonAtMovies")]
+    public async Task<ActionResult<IEnumerable<SoonAtMoviesComponentItem>>> GetSonnAtMoviesComponentItems()
+    {
+        var soonAtMoviesComponentItems = new SoonAtMoviesComponentItem[]
+        {
+            new SoonAtMoviesComponentItem
+            {
+                LinkTitle="Моана 2",
+                LinkHref="https://metarankings.ru/moana-2/",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/11/moana-2-cover-art1-50x70.jpg",
+                ImageAlt="Моана 2",
+                Genres=
+                [
+                    new Genre
+                    {
+                        Name="Мультфильмы",
+                        Href="https://metarankings.ru/meta/movies/cartoons/"
+                    }
+                ],
+                OriginalName="Moana 2",
+                ReleaseDate=new DateOnly(2024,11,27)
+            },
+            new SoonAtMoviesComponentItem
+            {
+                LinkTitle="Сиджинн. Книга крови",
+                LinkHref="https://metarankings.ru/sidzhinn-kniga-krovi-2024/",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/11/sidzhinn-kniga-krovi-cover-art-50x70.jpg",
+                ImageAlt="Сиджинн. Книга крови",
+                Genres=
+                [
+                    new Genre
+                    {
+                        Name="Ужасы",
+                        Href="https://metarankings.ru/meta/movies/horror/"
+                    }
+                ],
+                OriginalName="Sijjin",
+                ReleaseDate=new DateOnly(2024,11,28)
+            },
+            new SoonAtMoviesComponentItem
+            {
+                LinkTitle="Астрал. Медиум",
+                LinkHref="https://metarankings.ru/astral-medium-2024/",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/11/astral-medium-2024-cover-art-50x70.jpg",
+                ImageAlt="Астрал. Медиум",
+                Genres=
+                [
+                    new Genre
+                    {
+                        Name="Ужасы",
+                        Href="https://metarankings.ru/meta/movies/horror/"
+                    }
+                ],
+                OriginalName="Oddity",
+                ReleaseDate=new DateOnly(2024,11,28)
+            },
+            new SoonAtMoviesComponentItem
+            {
+                LinkTitle="Последнее замыкание. Конец света",
+                LinkHref="https://metarankings.ru/poslednee-zamykanie-konec-sveta-2024/",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/11/poslednee-zamykanie-konec-sveta-cover-art-50x70.jpg",
+                ImageAlt="Последнее замыкание. Конец света",
+                Genres=
+                [
+                    new Genre
+                    {
+                        Name="Драмы",
+                        Href="https://metarankings.ru/meta/movies/dramy/"
+                    },
+                    new Genre
+                    {
+                        Name="Фантастика",
+                        Href="https://metarankings.ru/meta/movies/fantasy/"
+                    }
+                ],
+                OriginalName="W nich cala nadzieja",
+                ReleaseDate=new DateOnly(2024,11,28)
+            },
+            new SoonAtMoviesComponentItem
+            {
+                LinkTitle="Перевозчик душ",
+                LinkHref="https://metarankings.ru/perevozchik-dush-2024/",
+                ImageSrc="https://metarankings.ru/images/uploads/2024/11/perevozchik-dush-2024-cover-art-50x70.jpg",
+                ImageAlt="Перевозчик душ",
+                Genres=
+                [
+                    new Genre
+                    {
+                        Name="Триллеры",
+                        Href="https://metarankings.ru/meta/movies/thrillers/"
+                    },
+                    new Genre
+                    {
+                        Name="Ужасы",
+                        Href="https://metarankings.ru/meta/movies/horror/"
+                    }
+                ],
+                OriginalName="Black Cab",
+                ReleaseDate=new DateOnly(2024,11,28)
+            }
+        };
+
+        return Ok(soonAtMoviesComponentItems);
     }
 }

@@ -7,5 +7,5 @@ public sealed record GamesReleasesDatesComponentItem
     public string ImageAlt { get; set; }
     public Platform[] Platforms { get; set; }
     public Genre[] Genres { get; set; }
-    public DateTime? ReleaseDate { get; set; }
+    public DateOnly? ReleaseDate { get; set; }
 }

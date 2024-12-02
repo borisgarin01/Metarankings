@@ -478,7 +478,7 @@ select:disabled {
   opacity: 1;
 }
 
-[list]:not([type=date]):not([type=datetime-local]):not([type=month]):not([type=week]):not([type=time])::-webkit-calendar-picker-indicator {
+[list]:not([type=date]):not([type=DateOnly-local]):not([type=month]):not([type=week]):not([type=time])::-webkit-calendar-picker-indicator {
   display: none !important;
 }
 
@@ -528,13 +528,13 @@ legend + * {
   clear: left;
 }
 
-::-webkit-datetime-edit-fields-wrapper,
-::-webkit-datetime-edit-text,
-::-webkit-datetime-edit-minute,
-::-webkit-datetime-edit-hour-field,
-::-webkit-datetime-edit-day-field,
-::-webkit-datetime-edit-month-field,
-::-webkit-datetime-edit-year-field {
+::-webkit-DateOnly-edit-fields-wrapper,
+::-webkit-DateOnly-edit-text,
+::-webkit-DateOnly-edit-minute,
+::-webkit-DateOnly-edit-hour-field,
+::-webkit-DateOnly-edit-day-field,
+::-webkit-DateOnly-edit-month-field,
+::-webkit-DateOnly-edit-year-field {
   padding: 0;
 }
 
