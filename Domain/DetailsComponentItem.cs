@@ -1,6 +1,4 @@
-﻿using Domain;
-
-namespace API.Controllers;
+﻿namespace Domain;
 
 public sealed record DetailsComponentItem
 {
@@ -15,5 +13,6 @@ public sealed record DetailsComponentItem
     public string Description { get; set; }
     public Actor[] Actors { get; set; }
     public Trailer[] Trailers { get; set; }
-    public Screenshot[] Screenshots  { get; set; }
+    public Screenshot[] Screenshots { get; set; }
+    
 }
