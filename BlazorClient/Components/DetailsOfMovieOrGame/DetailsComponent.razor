@@ -1,4 +1,5 @@
 ﻿@page "/details/{Title}"
+@using Domain
 
 <link rel="stylesheet" href="~/css/app.css" />
 
@@ -471,6 +472,14 @@
 <div id="toTop" class="toTop">↑</div>
 
 @code {
+
+    public DetailsComponentItem DetailsComponentItem { get; set; }
+
     [Parameter]
     public string Title { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var a = Title;
+    }
 }
