@@ -1,0 +1,476 @@
+﻿@page "/details/{Title}"
+
+<link rel="stylesheet" href="~/css/app.css" />
+
+<BlazorClient.Components.Home.TopHomeNavigationComponent />
+
+<div class="wrapper">
+
+    <MovieMenu />
+
+    <div id="container" class="clear">
+        <div class="sidebar">
+
+            <div class="widget">
+                <div class="widget-body">
+                    <div class="graph">
+                        <h3>Рейтинг <a href="#critics">критиков</a></h3>
+                        <div class="graph-body"><div class="rating-graph mark-5" style="width:46%"><span class="score-graph">4.6</span></div></div>
+                        <h3>Рейтинг <a href="#users">зрителей</a></h3>
+                        <div class="graph-body"><div class="rating-graph mark-6" style="width:60%"><span class="score-graph">6</span></div></div>
+                        <span>Метарейтинг</span> <span class="metaranking">?</span>
+                        <div class="graph-body"><div class="rating-graph mark-5" style="width:52%"><span class="score-graph">5.2</span></div></div>
+                        <div class="wait-stat">Ожидания: 2%</div>
+                        <div class="graph-body"><div class="rating-wait mark-0" style="width:2%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="content" class="lcol">
+            <div class="entry" itemscope itemtype="http://schema.org/Movie">
+                <div class="post single clear movie" id="post_24958">
+                    <div class="post-meta">
+                        <h1><span itemprop="name">Дорогой Санта</span></h1>
+                        <meta itemprop="dateCreated" content="2024">
+                    </div>
+                    <div class="post-content">
+                        <div class="thumb">
+                            <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/dorogoj-santa-2024-cover-art.jpg" alt="Фильм Дорогой Санта" title="Фильм Дорогой Санта" itemprop="image">
+                            <div class="watch-trailer">
+                                <h3><span class="twatch"><span class="p-twatch">Смотреть трейлер</span></span></h3>
+                            </div>
+                        </div>
+                        <div id="ratings">
+                            <div class="ratings mark-6">
+                                <div id="post-ratings-24958" class="post-ratings" data-nonce="1a02a63a13">
+                                    <div class="rating">
+                                        <div class="score">
+                                            6.0
+                                        </div>
+                                        Оценки: <span>4</span>
+                                    </div>
+                                    <div class="your-score">
+                                        <img id="rating_24958_1" class="rating-on mark-1" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="1" onmouseover="current_rating(24958, 1, '1');" onmouseout="ratings_off(6, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_24958_2" class="rating-on mark-2" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="2" onmouseover="current_rating(24958, 2, '2');" onmouseout="ratings_off(6, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_24958_3" class="rating-on mark-3" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="3" onmouseover="current_rating(24958, 3, '3');" onmouseout="ratings_off(6, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_24958_4" class="rating-on mark-4" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="4" onmouseover="current_rating(24958, 4, '4');" onmouseout="ratings_off(6, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_24958_5" class="rating-on mark-5" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="5" onmouseover="current_rating(24958, 5, '5');" onmouseout="ratings_off(6, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_24958_6" class="rating-on mark-6" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="6" onmouseover="current_rating(24958, 6, '6');" onmouseout="ratings_off(6, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_24958_7" class="rating-on mark-7" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="7" onmouseover="current_rating(24958, 7, '7');" onmouseout="ratings_off(6, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_24958_8" class="rating-on mark-8" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="8" onmouseover="current_rating(24958, 8, '8');" onmouseout="ratings_off(6, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_24958_9" class="rating-on mark-9" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="9" onmouseover="current_rating(24958, 9, '9');" onmouseout="ratings_off(6, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_24958_10" class="rating-on mark-10" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="10" onmouseover="current_rating(24958, 10, '10');" onmouseout="ratings_off(6, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /> <span class="post-ratings-text" id="ratings_24958_text">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="featured-movie">
+                            <p><span class="label">Оригинальное название:</span> <span>Dear Santa</span></p>
+                            <p><span class="label">Жанр:</span> <a href="https://metarankings.ru/meta/movies/comedy/">Комедии</a>, <a href="https://metarankings.ru/meta/movies/novogodnie/">Новогодние</a>, <a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a>, <a href="https://metarankings.ru/meta/movies/fantasy-movies/">Фэнтези</a></p>
+                            <p><span class="label">Студия:</span> <span itemprop="productionCompany">Conundrum Entertainment</span></p>
+                            <p><span class="label">Режиссер:</span> <a itemprop="director" href="/rezhissery/бобби_фаррелли/">Бобби Фаррелли</a>, ...</p>
+                            <p><span class="label">Дата премьеры:</span> <span>25 ноября 2024</span></p>
+                        </div>
+                        <div class="description">
+                            <h3>Описание</h3>
+                            <div itemprop="description">
+                                <p>Когда юный мальчик отправляет свой рождественский список желаний Санте с одной важной орфографической ошибкой, появляется дьявольский Джек Блэк, чтобы устроить хаос на празднике. От гениальных создателей «<a class="mark-link" href="https://metarankings.ru/tupoj-i-eshhe-tupee-2/">Тупого и ещё тупее</a>» Рождество вот-вот вспыхнет пламенем.</p>
+                            </div>
+
+                            <h2>Актеры</h2>
+                            <p><a itemprop="actor" href="/aktery/джек_блэк/">Джек Блэк</a>, <a itemprop="actor" href="/aktery/кигэн-майкл_ки/">Кигэн-Майкл Ки</a>, <a itemprop="actor" href="/aktery/брианна_хоуи/">Брианна Хоуи</a>, <a itemprop="actor" href="/aktery/хэйз_макартур/">Хэйз МакАртур</a>, <a itemprop="actor" href="/aktery/п.дж._бирн/">П.Дж. Бирн</a>, <a itemprop="actor" href="/aktery/кейт_фридман/">Кейт Фридман</a>, <a itemprop="actor" href="/aktery/гэвин_мунн/">Гэвин Мунн</a>, <a itemprop="actor" href="/aktery/кайл_гэсс/">Кайл Гэсс</a>, <a itemprop="actor" href="/aktery/майя_моран/">Майя Моран</a>, ...</p>
+
+                        </div>
+
+                        <div class="podborki">
+                            <p>
+                                <a href="https://metarankings.ru/best-movies-2024/">Фильмы 2024</a>
+                                <a class="mark-link" href="https://metarankings.ru/best-comedy/">Топ комедий</a> <a class="mark-link" href="https://metarankings.ru/best-comedy/2024/">Комедии 2024</a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="ads-horizont hor-1">
+                        <!-- Yandex.RTB R-A-201169-7 -->
+                        <div id="yandex_rtb_R-A-201169-7-1"></div>
+                    </div>
+                    <div class="post-footer">
+                        <h3>Трейлер и кадры</h3>
+                        <div id="tcontent">
+                            <div class="video-content">
+                                <div id="content-trailer">
+                                    <iframe title="Трейлер Дорогой Санта" height="240" width="670" src="https://rutube.ru/play/embed/1baab0b4806a1adead8ac292e987651a" frameBorder="0" allow="clipboard-write; autoplay" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="gallery">
+                            <li><img class="attachment-screenshot" src="https://metarankings.ru/images/uploads/2024/11/dorogoj-santa-2024-cover-art-100x75.jpg" data-original="https://metarankings.ru/images/uploads/2024/11/dorogoj-santa-2024-cover-art.jpg" alt="Фото из фильма Дорогой Санта" title="Дорогой Санта" width="100" height="75"></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="reviews">
+                    <div id="reviews">
+                        <h2 id="critics"><span>Рецензии и оценки</span> Критики</h2>
+                        <span class="countnum">9</span>
+                        <p><a href="/user-reviews/">Оценки и отзывы</a> критиков из рецензий от разных интернет-изданий.</p>
+
+                        <div class="reviews_list">
+                            <div id="review-1" class="critic-text mark-6">
+                                <div class="review-meta">
+                                    <div class="small-score mark-6">
+                                        <span data-title="Оценка из 10 баллов" class="tooltip">6</span>
+                                    </div>
+                                    <div class="review-author"><p><a href="/critics/film/"><span>Film</span></a> Константин Мышкин</p></div>
+                                </div>
+                                <blockquote><p class="quote">Фильм легкий и воздушный, даже и близко не задирает нос. Если вы ищете праздничного компаньона по ту сторону экрана, то Джек Блэк будет не самым плохим вариантом.</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://www.film.ru/articles/mne-skuchno-bes-recenziya-na-rozhdestvenskuyu-komediyu-dorogoy-santa-s-dzhekom-blekom">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://www.film.ru/articles/mne-skuchno-bes-recenziya-na-rozhdestvenskuyu-komediyu-dorogoy-santa-s-dzhekom-blekom" rel="nofollow noopener" target="_blank">Читать рецензию полностью</a>
+                            </div>
+                            <div id="review-2" class="critic-text mark-6">
+                                <div class="review-meta">
+                                    <div class="small-score mark-6">
+                                        <span data-title="Оценка из 10 баллов" class="tooltip">6</span>
+                                    </div>
+                                    <div class="review-author"><p><a href="/critics/screen_rant/"><span>Screen Rant</span></a> Мэй Абдулбаки</p></div>
+                                </div>
+                                <blockquote><p class="quote">Фильм, конечно, не идеален. Некоторая серьёзность, связанная со смертью брата Лиама годом ранее, не получает достаточного развития, а концовка полностью подрывает её эмоциональную силу. Тем не менее, для безобидного праздничного развлечения...</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://screenrant.com/dear-santa-movie-review-2024/">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://screenrant.com/dear-santa-movie-review-2024/" rel="nofollow noopener" target="_blank">Читать рецензию полностью</a>
+                            </div>
+                            <div id="review-3" class="critic-text mark-4">
+                                <div class="review-meta">
+                                    <div class="small-score mark-4">
+                                        <span data-title="Оценка из 10 баллов" class="tooltip">4</span>
+                                    </div>
+                                    <div class="review-author"><p><a href="/critics/guardian/"><span>Guardian</span></a> Бенджамин Ли</p></div>
+                                </div>
+                                <blockquote><p class="quote">Для проекта, скорее, сделанного ради заработка, чем из страсти, энергия Блэка удивительно высока, хотя и немного утомительна. Его пантомимные выходки, возможно, больше понравятся более юной аудитории</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://www.theguardian.com/film/2024/nov/25/dear-santa-movie-review-jack-black">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://www.theguardian.com/film/2024/nov/25/dear-santa-movie-review-jack-black" rel="nofollow noopener" target="_blank">Читать рецензию полностью</a>
+                            </div>
+                            <div id="review-4" class="critic-text mark-4">
+                                <div class="review-meta">
+                                    <div class="small-score mark-4">
+                                        <span data-title="Оценка из 10 баллов" class="tooltip">4</span>
+                                    </div>
+                                    <div class="review-author"><p><a href="/critics/ign/"><span>IGN</span></a> Джесси Хассенгер</p></div>
+                                </div>
+                                <blockquote><p class="quote">Джек Блэк достаточно привлекателен, чтобы заманить как детей, так и родителей на рождественскую комедию. Но он не может вытянуть всё сам, и в итоге его затмевают некоторые весьма сомнительные сюжетные решения.</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://www.ign.com/articles/dear-santa-review">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://www.ign.com/articles/dear-santa-review" rel="nofollow noopener" target="_blank">Читать рецензию полностью</a>
+                            </div>
+                            <div id="review-5" class="critic-text mark-3">
+                                <div class="review-meta">
+                                    <div class="small-score mark-3">
+                                        <span data-title="Оценка из 10 баллов" class="tooltip">3</span>
+                                    </div>
+                                    <div class="review-author"><p><a href="/critics/fandomwire/"><span>FandomWire</span></a> М.Н. Миллер</p></div>
+                                </div>
+                                <blockquote><p class="quote">Дело в том, что большая часть трогательности, которая отличала предыдущие фильмы братьев Фаррелли, исчезла, уступив место изрядной дозе пошлого юмора, который большей частью проваливается.</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://fandomwire.com/dear-santa-review-black-stars-in-a-holiday-misfire/">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://fandomwire.com/dear-santa-review-black-stars-in-a-holiday-misfire/" rel="nofollow noopener" target="_blank">Читать рецензию полностью</a>
+                            </div>
+                            <div class="critic-text">
+                                <div class="review-meta">
+                                    <div class="review-author"><p><span>Screen Zealots</span> Луиза Мур</p></div>
+                                </div>
+                                <blockquote><p class="quote">Хотя я не совсем уверен, для кого предназначен этот странноватый рождественский фильм, завязка смешная, Джек Блэк великолепен, а едкие шутки заставили меня смеяться. На самом деле, он не так уж плох, несмотря...</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://screenzealots.com/2024/11/28/dear-santa/">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://screenzealots.com/2024/11/28/dear-santa/" rel="nofollow noopener" target="_blank">Читать рецензию полностью</a>
+                            </div>
+                            <div class="critic-text">
+                                <div class="review-meta">
+                                    <div class="review-author"><p><span>Blu-ray</span> Брайан Орндорф</p></div>
+                                </div>
+                                <blockquote><p class="quote">Фаррелли пытаются использовать свой прошлый успех, но их приём устарел и не срабатывает должным образом, оставляя зрителей с фильмом, который не является ни трогательным, ни смешным. Это ещё одно напоминание о том,...</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://www.blu-ray.com/Dear-Santa/1912747/#Review">Сообщить о проблеме</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://www.blu-ray.com/Dear-Santa/1912747/#Review" rel="nofollow noopener" target="_blank">Читать рецензию полностью</a>
+                            </div>
+                            <div class="critic-text">
+                                <div class="review-meta">
+                                    <div class="review-author"><p><span>AV Club</span> Мэтью Джексон</p></div>
+                                </div>
+                                <blockquote><p class="quote">Рождественские фильмы хоть и не всегда удачные, но часто служат приятным развлечением. Данный фильм таким не является. Это провальный фильм, который не оправдал и той затеи, с которой началось его создание.</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://www.avclub.com/dear-santa-review">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://www.avclub.com/dear-santa-review" rel="nofollow noopener" target="_blank">Читать рецензию полностью</a>
+                            </div>
+                            <div class="critic-text">
+                                <div class="review-meta">
+                                    <div class="review-author"><p><span>The Hollywood Reporter</span> Фрэнк Шек</p></div>
+                                </div>
+                                <blockquote><p class="quote">Неудивительно, что старательная комедийная игра Блэка — единственное светлое пятно фильма.</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://www.hollywoodreporter.com/movies/movie-reviews/dear-santa-review-jack-black-farrelly-brothers-paramount-plus-1236070646/">Сообщить о проблеме</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://www.hollywoodreporter.com/movies/movie-reviews/dear-santa-review-jack-black-farrelly-brothers-paramount-plus-1236070646/" rel="nofollow noopener" target="_blank">Читать рецензию полностью</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div itemprop="aggregateRating" itemscope="" itemtype="http://schema.org/AggregateRating">
+                        <meta itemprop="reviewCount" content="5">
+                        <meta itemprop="ratingCount" content="5">
+                        <meta itemprop="bestRating" content="10">
+                        <meta itemprop="worstRating" content="1">
+                        Общий рейтинг критиков = <span itemprop="ratingValue">4.6</span>
+                    </div>
+                    <span class="links-add">Добавить рецензию</span>
+                </div>
+                <div class="ads-horizont hor-1">
+                    <!-- Yandex.RTB R-A-201169-5 -->
+                    <div id="yandex_rtb_R-A-201169-5_2"></div>
+                    <script>
+                        window.yaContextCb.push(()=>{
+                          Ya.Context.AdvManager.render({
+                            renderTo: "yandex_rtb_R-A-201169-5_2",
+                            blockId: "R-A-201169-5"
+                          })
+                        })</script>
+                </div>
+                <div class="user-reviews comments">
+                    <div id="comments">
+                        <h2 id="users"><span>Отзывы и оценки</span> Зрители</h2>
+                        <span class="countnum">0</span>
+                        <p>Если вы уже посмотрели фильм, расскажите, что вы о нем думаете. Расскажите о его сильных и слабых сторонах, о его плюсах и минусах. Ваш <a href="/user-reviews/">отзыв</a> поможет тем, кто хочет его посмотреть.</p><div class="reviews-none"><p><a href="/user-reviews/">Отзывов от зрителей</a> пока нет.</p></div>
+                    </div>
+                    <div id="respond" class="comment-respond">
+                        <h3 id="reply-title" class="comment-reply-title"> <small><a rel="nofollow" id="cancel-comment-reply-link" href="/dorogoj-santa-2024/#respond" style="display:none;">Отменить ответ</a></small></h3>
+                        <form action="https://metarankings.ru/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
+                            <div class="commform-author"><p>Ваше имя <span>Обязательно!</span></p><div><input type="text" name="metarankings-name" id="author" tabindex="2" /></div></div>
+                            <div class="commform-textarea"><div><div class="count"><span id="count">0</span> (60 символов - минимум)</div><label for="comment"><h2>Ваш отзыв</h2> <span>(не менее 60 символов, без мата, оскорблений, капса и без ссылок на сторонние ресурсы)</span></label><textarea name="metarankings-comm" id="comment" cols="50" rows="7" tabindex="1"></textarea></div></div>												<p class="form-submit">
+                                <input name="submit" type="submit" id="submit" value="Отправить" />
+                                <input type='hidden' name='comment_post_ID' value='24958' id='comment_post_ID' />
+                                <input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+                            </p>
+                        </form>
+                    </div><!-- #respond -->
+                    <script type="text/javascript">
+                        setInterval(ShowCount, 390); function ShowCount(){var Count = document.getElementById('comment').value.length; document.getElementById('count').innerHTML = Count;}
+                    </script>
+                </div>
+            </div>
+            <div class="ads-horizont hor-1">
+                <div id="yandex_rtb_R-A-201169-26"></div>
+                <script>
+                    window.yaContextCb.push(()=>{
+                        Ya.Context.AdvManager.render({
+                            "blockId": "R-A-201169-26",
+                            "renderTo": "yandex_rtb_R-A-201169-26"
+                        })
+                    })
+                </script>
+            </div>
+
+            <div class="list clear similar">
+                <h2>Похожие на фильм Дорогой Санта</h2>
+                <a href="https://metarankings.ru/supersanta-2024/" title="Суперсанта">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/supersanta-2024-cover-art-197x281.jpg" alt="Суперсанта">
+                        <div class="small-score mark-0">0</div>
+                        <span>Суперсанта</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/tajnyj-santa-2022/" title="Тайный Санта">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2022/12/tajnyj-santa-cover-art-197x281.jpg" alt="Тайный Санта">
+                        <div class="small-score mark-6">5.9</div>
+                        <span>Тайный Санта</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/priklyucheniya-paddingtona-3/" title="Приключения Паддингтона 3">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/priklyucheniya-paddingtona-3-cover-art-197x281.jpg" alt="Приключения Паддингтона 3">
+                        <div class="small-score mark-6">6.2</div>
+                        <span>Приключения Паддингтона 3</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/perevozchik-dush-2024/" title="Перевозчик душ">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/perevozchik-dush-2024-cover-art-187x281.jpg" alt="Перевозчик душ">
+                        <div class="small-score mark-5">5.4</div>
+                        <span>Перевозчик душ</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/astral-medium-2024/" title="Астрал. Медиум">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/astral-medium-2024-cover-art-187x281.jpg" alt="Астрал. Медиум">
+                        <div class="small-score mark-6">5.7</div>
+                        <span>Астрал. Медиум</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/odin-den-v-stambule-2024/" title="Один день в Стамбуле">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/odin-den-v-stambule-cover-art-197x281.jpg" alt="Один день в Стамбуле">
+                        <div class="small-score mark-0">0</div>
+                        <span>Один день в Стамбуле</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/sidzhinn-kniga-krovi-2024/" title="Сиджинн. Книга крови">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/sidzhinn-kniga-krovi-cover-art-197x281.jpg" alt="Сиджинн. Книга крови">
+                        <div class="small-score mark-5">4.9</div>
+                        <span>Сиджинн. Книга крови</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/zlaya-skazka-o-vedme-zapada-2024/" title="Злая: Сказка о ведьме Запада">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/zlaya-skazka-o-vedme-zapada-boxart-cover-196x281.jpg" alt="Злая: Сказка о ведьме Запада">
+                        <div class="small-score mark-7">7.1</div>
+                        <span>Злая: Сказка о ведьме Запада</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="sidebar rcol">
+            <div class="widget">
+                <div class="widget-body">
+                    <ul>
+
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/priklyucheniya-paddingtona-3/">Приключения Паддингтона 3</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/moana-2/">Моана 2</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/konklav-2024/">Конклав</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/gladiator-2/">Гладиатор 2</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/eretik-2024/">Еретик</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/lyubov-sovetskogo-soyuza-2024/">Любовь Советского Союза</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/vozvrashhenie-popugaya-keshi-2024/">Возвращение попугая Кеши</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/venom-3-poslednij-tanec-2024/">Веном 3: Последний танец</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/dzhoker-bezumie-na-dvoix/">Джокер: Безумие на двоих</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/xellboj-proklyatie-gorbuna-2024/">Хеллбой: Проклятие Горбуна</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="/user-reviews/">Последние отзывы</a></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="footer">
+
+        <!-- Yandex.RTB R-A-201169-23 -->
+        <a rel="nofollow" href="/about/" data-title="О сайте" class="tooltip">О нас</a>
+        <a rel="nofollow" href="/contact/" data-title="Форма обратной связи" class="tooltip">Связь</a>
+        <a rel="nofollow" href="/polzovatelskoe-soglashenie/" data-title="Пользовательское соглашение" class="tooltip">Пользовательское соглашение</a>
+        <a rel="nofollow" href="/politika-konfidencialnosti/" data-title="Политика конфиденциальности" class="tooltip">Конфиденциальность</a>
+    </div>
+    <div class="credits">
+        <span class="pegi"><span data-title="Сайт может содержать контент не предназначенный лицам до 18 лет" class="tooltip">18+</span></span>
+        <a href="https://vk.com/metarankings_ru" rel="nofollow noopener" target="_blank" title="VK"><span class="vko"></span></a>
+        <a href="https://twitter.com/metarankings" rel="nofollow noopener" target="_blank" title="Twitter"><span class="tw"></span></a>
+    </div>
+</div>
+<div class="wbody" onclick="show('none')"></div>
+<div class="window">
+</div>
+<div class="popup_block">
+    <form action="https://metarankings.ru/login.php?redirect_to=https%3A%2F%2Fmetarankings.ru%2Fdorogoj-santa-2024%2F" id="loginForm" method="post">
+        <div class="field">
+            <label>Имя пользователя</label>
+            <div class="input">
+                <input type="text" name="log" value="" id="login" />
+            </div>
+        </div>
+        <div class="field">
+            <a rel="nofollow" href="https://metarankings.ru/login.php?action=lostpassword" id="forgot">Забыли?</a>
+            <label>Пароль</label>
+            <div class="input">
+                <input type="password" name="pwd" value="" id="pass" />
+            </div>
+        </div>
+        <div class="submit">
+            <button name="submit" type="submit">Войти</button>
+            <div class="registr"><a rel="nofollow" href="https://metarankings.ru/login.php?action=register">Регистрация</a></div>
+        </div>
+    </form>
+</div>
+<div class="window-image">
+    <div class="modal-image-wrap">
+        <div class="modal-image">
+            <div class="modal-left"></div>
+            <div class="modal-right"></div>
+        </div>
+        <img src="" alt="">
+    </div>
+</div>
+<div id="toTop" class="toTop">↑</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+}

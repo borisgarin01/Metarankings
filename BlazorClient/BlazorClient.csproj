@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Components\DetailsOfMovieOrGame\" />
     <Folder Include="wwwroot\css\home\" />
   </ItemGroup>
 
