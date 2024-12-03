@@ -10,7 +10,11 @@
     {
         <div class="item">
             <a href="@item.IndexComponentItem.ItemHref" title="@item.IndexComponentItem.Title"><img class="post-image" src="@item.IndexComponentItem.ImageSrc" alt="@item.IndexComponentItem.Title"></a>
-            <div class="small-score mark-@Math.Round(item.IndexComponentItem.Score)"><span data-title="Рейтинг фильма" class="tooltip">@item.IndexComponentItem.Score</span></div>
+            <div class="small-score mark-@Math.Round(item.IndexComponentItem.Score)">
+                <span>
+                    @item.IndexComponentItem.Score
+                </span>
+            </div>
             <span class="item-name"><a href="@item.IndexComponentItem.ItemHref">@item.IndexComponentItem.Title</a></span>
             <span class="item-meta">
                 @foreach (var genre in item.Genres)
