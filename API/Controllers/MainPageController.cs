@@ -5,7 +5,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class MainPageController : ControllerBase
+public sealed class MainPageController : ControllerBase
 {
     [HttpGet("movies")]
     public async Task<ActionResult<IEnumerable<MoviesIndexComponentItem>>> GetIndexMoviesComponentsItemsGenresAsync()

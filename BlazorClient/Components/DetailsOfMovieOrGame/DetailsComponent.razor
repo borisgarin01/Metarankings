@@ -1,5 +1,7 @@
-﻿@page "/details/{Title}"
+﻿@page "/games/details/{Title}"
 @using Domain
+
+@inject HttpClient HttpClient
 
 <link rel="stylesheet" href="~/css/app.css" />
 
@@ -472,7 +474,6 @@
 <div id="toTop" class="toTop">↑</div>
 
 @code {
-
     public DetailsComponentItem DetailsComponentItem { get; set; }
 
     [Parameter]
@@ -480,6 +481,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var a = Title;
+        DetailsComponentItem = await HttpClient.GetFromJsonAsync<DetailsComponentItem>($"https://localhost:7148/api/GamesDetailsPage/{Title}");
     }
 }

@@ -9,13 +9,15 @@
     @foreach (var item in GamesIndexComponentItems)
     {
         <div class="item">
-            <a href="details/@item.IndexComponentItem.Title" title="@item.IndexComponentItem.Title"><img class="post-image" src="@item.IndexComponentItem.ImageSrc" alt="@item.IndexComponentItem.Title"></a>
+            <a href="/games/details/@item.IndexComponentItem.Title" title="@item.IndexComponentItem.Title"><img class="post-image" src="@item.IndexComponentItem.ImageSrc" alt="@item.IndexComponentItem.Title"></a>
             <div class="small-score mark-@Math.Round(item.IndexComponentItem.Score)">
                 <span>
                     @item.IndexComponentItem.Score
                 </span>
             </div>
-            <span class="item-name"><a href="/details/@item.IndexComponentItem.Title">@item.IndexComponentItem.Title</a></span>
+            <span class="item-name">
+                <a href="/games/details/@item.IndexComponentItem.Title">@item.IndexComponentItem.Title</a>
+            </span>
             <span class="item-meta">
                 @foreach (var platform in item.Platforms)
                 {
