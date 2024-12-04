@@ -1,3 +1,7 @@
+using Data.Migrations;
+using FluentMigrator.Runner;
+using Microsoft.Extensions.DependencyInjection;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +19,19 @@ builder.Services.AddCors(options =>
                       });
 });
 
+builder.Services.AddFluentMigratorCore()
+    .ConfigureRunner(rb => rb
+                    // Add SQLite support to FluentMigrator
+                    .AddSqlServer()
+                    // Set the connection string
+                    .WithGlobalConnectionString(builder.Configuration.GetConnectionString("DefaultConnection"))
+                    // Define the assembly containing the migrations
+                    .ScanIn(typeof(InitialMigration).Assembly).For.Migrations())
+                // Enable logging to console in the FluentMigrator way
+                .AddLogging(lb => lb.AddFluentMigratorConsole())
+                // Build the service provider
+                .BuildServiceProvider(false);
+
 builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen();
@@ -27,6 +44,13 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var runner = scope.ServiceProvider.GetService<IMigrationRunner>();
+    runner.ListMigrations();
+    runner.MigrateUp();
 }
 
 app.MapControllers();

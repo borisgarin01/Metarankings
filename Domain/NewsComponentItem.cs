@@ -2,8 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain;
-
-public sealed record Platform
+public sealed record NewsComponentItem
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -12,10 +11,20 @@ public sealed record Platform
     [Required]
     [MaxLength(255)]
     [MinLength(1)]
-    public string Href { get; set; }
+    public string LinkHref { get; set; }
 
     [Required]
     [MaxLength(255)]
     [MinLength(1)]
-    public string Name { get; set; }
+    public string LinkTitle { get; set; }
+
+    [Required]
+    [MaxLength(255)]
+    [MinLength(1)]
+    public string ImageSrc { get; set; }
+
+    [Required]
+    [MaxLength(255)]
+    [MinLength(1)]
+    public string ImageAlt { get; set; }
 }
