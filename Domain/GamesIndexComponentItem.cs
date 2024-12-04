@@ -3,5 +3,5 @@
 public sealed record GamesIndexComponentItem
 {
     public IndexComponentItem IndexComponentItem { get; set; }
-    public Platform[] Platforms { get; set; }
+    public IEnumerable<GamePlatform> Platforms { get; set; }
 }

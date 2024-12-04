@@ -22,13 +22,13 @@ public sealed class MoviesGenresRepository : RepositoryBase<Genre>, IMoviesGenre
 
     public async Task<IEnumerable<Genre>> GetAllAsync()
     {
-        IEnumerable<Genre> MoviesGenres;
+        IEnumerable<Genre> moviesGenres;
 
         using (var connection = new SqlConnection(ConnectionString))
         {
-            MoviesGenres = await connection.QueryAsync<Genre>("SELECT Id, Name, Href from MoviesGenres");
+            moviesGenres = await connection.QueryAsync<Genre>("SELECT Id, Name, Href from MoviesGenres");
         }
 
-        return MoviesGenres;
+        return moviesGenres;
     }
 }

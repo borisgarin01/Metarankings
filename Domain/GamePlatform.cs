@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Domain;
 
-public sealed record Platform
+public sealed record GamePlatform
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

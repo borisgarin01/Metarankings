@@ -12,7 +12,7 @@
             <a href="@gameReleaseDateComponentItem.Href" title="Игра @gameReleaseDateComponentItem.Title"><img class="post-image" src="@gameReleaseDateComponentItem.ImageSrc" alt="@gameReleaseDateComponentItem.ImageAlt"></a>
             <span class="item-name"><a href="@gameReleaseDateComponentItem.Href">@gameReleaseDateComponentItem.Title</a></span>
             <span class="item-meta">
-                @foreach (Platform platform in gameReleaseDateComponentItem.Platforms)
+                @foreach (GamePlatform platform in gameReleaseDateComponentItem.Platforms)
                 {
                     <a href="@platform.Href">@platform.Name</a>
 

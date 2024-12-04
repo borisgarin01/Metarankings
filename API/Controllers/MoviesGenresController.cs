@@ -28,7 +28,7 @@ public class MoviesGenresController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Genre>>> MoviesGenres()
+    public async Task<ActionResult<IEnumerable<Genre>>> GetMoviesGenresAsync()
     {
         var moviesGenres = await moviesGenresRepository.GetAllAsync();
         return Ok(moviesGenres);

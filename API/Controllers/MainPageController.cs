@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Data.Repositories.Interfaces;
+using Domain;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,15 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public sealed class MainPageController : ControllerBase
 {
+    private readonly IMoviesGenresRepository moviesGenresRepository;
+    private readonly IGamesPlatformsRepository gamesPlatformsRepository;
+
+    public MainPageController(IMoviesGenresRepository moviesGenresRepository, IGamesPlatformsRepository gamesPlatformsRepository)
+    {
+        this.moviesGenresRepository = moviesGenresRepository;
+        this.gamesPlatformsRepository = gamesPlatformsRepository;
+    }
+
     [HttpGet("movies")]
     public async Task<ActionResult<IEnumerable<MoviesIndexComponentItem>>> GetIndexMoviesComponentsItemsGenresAsync()
     {
@@ -17,13 +27,7 @@ public sealed class MainPageController : ControllerBase
         {
             new MoviesIndexComponentItem
             {
-                MoviesGenres=new Genre[]
-                {
-                    new Genre { Href="https://metarankings.ru/meta/movies/comedy/", Name="Комедии" },
-                    new Genre { Href="https://metarankings.ru/meta/movies/novogodnie/",Name="Новогодние" },
-                    new Genre { Href="https://metarankings.ru/meta/movies/horror/", Name="Ужасы" },
-                    new Genre { Href="https://metarankings.ru/meta/movies/fantasy-movies/", Name="Фэнтези" }
-                },
+                MoviesGenres=await moviesGenresRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=5.6f,
@@ -38,11 +42,7 @@ public sealed class MainPageController : ControllerBase
             },
             new MoviesIndexComponentItem
             {
-                MoviesGenres=new Genre[]
-                {
-                    new Genre { Href="https://metarankings.ru/meta/movies/comedy/", Name="Комедии" },
-                    new Genre { Href="https://metarankings.ru/meta/movies/semejnye/",Name="Семейные" }
-                },
+                MoviesGenres=await moviesGenresRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score = 6.3f,
@@ -57,11 +57,7 @@ public sealed class MainPageController : ControllerBase
             },
             new MoviesIndexComponentItem
             {
-                MoviesGenres = new Genre[]
-                {
-                    new Genre { Href="https://metarankings.ru/meta/movies/thrillers/", Name="Триллеры" },
-                    new Genre { Href="https://metarankings.ru/meta/movies/horror/",Name="Ужасы" }
-                },
+                MoviesGenres=await moviesGenresRepository.GetAllAsync(),
                 IndexComponentItem = new IndexComponentItem
                 {
                     Score =5.7f,
@@ -88,11 +84,7 @@ public sealed class MainPageController : ControllerBase
                     Description = "Роскошный гонконгский отель становится местом, где Эммануэль, находящаяся в деловой поездке, исследует свою сексуальность и переосмысливает понятия близости и свободы, проверяя границы дозволенного...",
                     ReleaseDate = new DateOnly(2024, 11, 28)
                 },
-                MoviesGenres = new Genre[]
-                {
-                    new Genre { Href="https://metarankings.ru/meta/movies/dramy/", Name="Драмы" },
-                    new Genre { Href="https://metarankings.ru/meta/movies/melodramas/",Name="Мелодрамы" }
-                }
+                MoviesGenres=await moviesGenresRepository.GetAllAsync(),
             },
             new MoviesIndexComponentItem
             {
@@ -107,11 +99,7 @@ public sealed class MainPageController : ControllerBase
                     Description = "В мире будущего, где человечество проиграло климатические войны, выжила, возможно, только Ева. Она живет в лагере, который охраняет робот, не пуская никого без...",
                     ReleaseDate = new DateOnly(2024, 11, 28)
                 },
-                MoviesGenres = new Genre[]
-                {
-                    new Genre { Href="https://metarankings.ru/meta/movies/dramy/", Name="Драмы" },
-                    new Genre { Href="https://metarankings.ru/meta/movies/fantasy/",Name="Фантастика" }
-                }
+                MoviesGenres=await moviesGenresRepository.GetAllAsync(),
             },
             new MoviesIndexComponentItem
             {
@@ -127,10 +115,7 @@ public sealed class MainPageController : ControllerBase
                     Description = "В своей роскошной парижской квартире, в 1970-х, легендарная Мария Каллас переживает последние годы жизни, сражаясь с внутренними демонами. Сентябрь 1977 года: окружённая пуделями,...",
                     ReleaseDate = new DateOnly(2024, 11, 28)
                 },
-                MoviesGenres = new Genre[]
-                {
-                    new Genre { Href="https://metarankings.ru/meta/movies/dramy/", Name="Драмы" }
-                }
+                MoviesGenres=await moviesGenresRepository.GetAllAsync(),
             },
             new MoviesIndexComponentItem
             {
@@ -145,10 +130,7 @@ public sealed class MainPageController : ControllerBase
                     Description = "Слепая медиум Дарси, способная видеть прошлое, приезжает в дом, где год назад была зверски убита ее сестра-близнец Дани. Сейчас в этом доме живет...",
                     ReleaseDate = new DateOnly(2024, 11, 28)
                 },
-                MoviesGenres = new Genre[]
-                {
-                    new Genre { Href="https://metarankings.ru/meta/movies/horror/", Name="Ужасы" }
-                }
+                MoviesGenres=await moviesGenresRepository.GetAllAsync(),
             },
             new MoviesIndexComponentItem
             {
@@ -170,10 +152,7 @@ public sealed class MainPageController : ControllerBase
             },
             new MoviesIndexComponentItem
             {
-                MoviesGenres = new Genre[]
-                {
-                    new Genre { Href="https://metarankings.ru/meta/movies/comedy/", Name="Комедии" }
-                },
+                MoviesGenres=await moviesGenresRepository.GetAllAsync(),
                 IndexComponentItem=  new IndexComponentItem
                 {
                     Score = 0f,
@@ -188,10 +167,7 @@ public sealed class MainPageController : ControllerBase
             },
             new MoviesIndexComponentItem
             {
-                MoviesGenres = new Genre[]
-                {
-                    new Genre { Href="https://metarankings.ru/meta/movies/dramy/", Name="Драмы" }
-                },
+                MoviesGenres=await moviesGenresRepository.GetAllAsync(),
                 IndexComponentItem = new IndexComponentItem
                 {
                     Score = 7.6f,
@@ -215,11 +191,7 @@ public sealed class MainPageController : ControllerBase
         {
             new GamesIndexComponentItem
             {
-                Platforms=new Platform[]
-                {
-                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
-                    new Platform { Href="https://metarankings.ru/meta/games/xbox-series-x/",Name="Xbox Series X" }
-                },
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=6.5f,
@@ -234,12 +206,7 @@ public sealed class MainPageController : ControllerBase
             },
             new GamesIndexComponentItem
             {
-                Platforms=new Platform[]
-                {
-                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
-                    new Platform { Href="https://metarankings.ru/meta/games/ps5/",Name="PS5" },
-                    new Platform { Href="https://metarankings.ru/meta/games/switch/",Name="Switch" }
-                },
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=5.1f,
@@ -254,12 +221,7 @@ public sealed class MainPageController : ControllerBase
             },
             new GamesIndexComponentItem
             {
-                Platforms=new Platform[]
-                {
-                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
-                    new Platform { Href="https://metarankings.ru/meta/games/ps5/",Name="PS5" },
-                    new Platform { Href="https://metarankings.ru/meta/games/xbox-series-x/",Name="Xbox Series X" }
-                },
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=6.4f,
@@ -274,14 +236,7 @@ public sealed class MainPageController : ControllerBase
             },
             new GamesIndexComponentItem
             {
-                Platforms=new Platform[]
-                {
-                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
-                    new Platform { Href="https://metarankings.ru/meta/games/ps4/", Name="PS4" },
-                    new Platform { Href="https://metarankings.ru/meta/games/ps5/",Name="PS5" },
-                    new Platform { Href="https://metarankings.ru/meta/games/xbox-one/",Name="Xbox One" },
-                    new Platform { Href="https://metarankings.ru/meta/games/xbox-series-x/",Name="Xbox Series X" }
-                },
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=5.5f,
@@ -296,10 +251,7 @@ public sealed class MainPageController : ControllerBase
             },
             new GamesIndexComponentItem
             {
-                Platforms=new Platform[]
-                {
-                    new Platform { Href="https://metarankings.ru/meta/games/switch/", Name="Switch" }
-                },
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=7f,
@@ -314,11 +266,7 @@ public sealed class MainPageController : ControllerBase
             },
             new GamesIndexComponentItem
             {
-                Platforms=new Platform[]
-                {
-                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
-                    new Platform { Href="https://metarankings.ru/meta/games/ps5/", Name="PS5" },
-                },
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=7f,
@@ -333,11 +281,7 @@ public sealed class MainPageController : ControllerBase
             },
             new GamesIndexComponentItem
             {
-                Platforms=new Platform[]
-                {
-                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
-                    new Platform { Href="https://metarankings.ru/meta/games/switch/", Name="Switch" },
-                },
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=7f,
@@ -352,15 +296,7 @@ public sealed class MainPageController : ControllerBase
             },
             new GamesIndexComponentItem
             {
-                Platforms=new Platform[]
-                {
-                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
-                    new Platform { Href="https://metarankings.ru/meta/games/ps4/", Name="PS4" },
-                    new Platform { Href="https://metarankings.ru/meta/games/ps5/", Name="PS5" },
-                    new Platform { Href="https://metarankings.ru/meta/games/switch/", Name="Switch" },
-                    new Platform { Href="https://metarankings.ru/meta/games/xbox-one/", Name="Xbox One" },
-                    new Platform { Href="https://metarankings.ru/meta/games/xbox-series-x/", Name="Xbox Series X" },
-                },
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=6.9f,
@@ -375,11 +311,7 @@ public sealed class MainPageController : ControllerBase
             },
             new GamesIndexComponentItem
             {
-                Platforms=new Platform[]
-                {
-                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
-                    new Platform { Href="https://metarankings.ru/meta/games/ps5/", Name="PS5" }
-                },
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=6.3f,
@@ -394,12 +326,7 @@ public sealed class MainPageController : ControllerBase
             },
             new GamesIndexComponentItem
             {
-                Platforms=new Platform[]
-                {
-                    new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
-                    new Platform { Href="https://metarankings.ru/meta/games/ps5/", Name="PS5" },
-                    new Platform { Href="https://metarankings.ru/meta/games/xbox-series-x/", Name="Xbox Series X" }
-                },
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 IndexComponentItem=new IndexComponentItem
                 {
                     Score=6.3f,
@@ -527,19 +454,7 @@ public sealed class MainPageController : ControllerBase
                 Title="Indiana Jones and the Great Circle",
                 ImageAlt="Indiana Jones and the Great Circle",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/02/indiana-jones-and-the-great-circle-cover-art-50x70.jpg",
-                Platforms=
-                [
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/pc/",
-                        Name="PC"
-                    },
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/xbox-series-x/",
-                        Name="Xbox Series X"
-                    }
-                ],
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 GameGenres=
                 [
                     new Genre
@@ -561,19 +476,7 @@ public sealed class MainPageController : ControllerBase
                 Title="Alien: Rogue Incursion",
                 ImageAlt="Alien: Rogue Incursion",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg",
-                Platforms=
-                [
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/pc/",
-                        Name="PC"
-                    },
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/ps5/",
-                        Name="PS5"
-                    }
-                ],
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 GameGenres=
                 [
                     new Genre
@@ -590,14 +493,7 @@ public sealed class MainPageController : ControllerBase
                 Title="Sid Meier's Civilization 7",
                 ImageAlt="Sid Meier's Civilization 7",
                 ImageSrc="https://metarankings.ru/images/uploads/2025/02/sid-meiers-civilization-7-boxart-cover-50x70.jpg",
-                Platforms=
-                [
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/pc/",
-                        Name="PC"
-                    }
-                ],
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 GameGenres=
                 [
                     new Genre
@@ -614,24 +510,7 @@ public sealed class MainPageController : ControllerBase
                 Title="Kingdom Come: Deliverance 2",
                 ImageAlt="Kingdom Come: Deliverance 2",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/06/kingdom-come-deliverance-2-boxart-cover-50x70.jpg",
-                Platforms=
-                [
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/pc/",
-                        Name="PC"
-                    },
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/ps5/",
-                        Name="PS5"
-                    },
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/xbox-series-x/",
-                        Name="Xbox Series X"
-                    }
-                ],
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 GameGenres=
                 [
                     new Genre
@@ -648,24 +527,7 @@ public sealed class MainPageController : ControllerBase
                 Title="Assassin’s Creed Shadows",
                 ImageAlt="Assassin’s Creed Shadows",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/11/assassins-creed-shadows-boxart-cover-50x70.jpg",
-                Platforms=
-                [
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/pc/",
-                        Name="PC"
-                    },
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/ps5/",
-                        Name="PS5"
-                    },
-                    new Platform
-                    {
-                        Href="https://metarankings.ru/meta/games/xbox-series-x/",
-                        Name="Xbox Series X"
-                    }
-                ],
+                Platforms=await gamesPlatformsRepository.GetAllAsync(),
                 GameGenres=
                 [
                     new Genre
