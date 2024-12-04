@@ -17,6 +17,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddScoped<IMoviesGenresRepository, MoviesGenresRepository>(instance => new MoviesGenresRepository(connectionString));
 builder.Services.AddScoped<IGamesPlatformsRepository, GamesPlatformsRepository>(instance => new GamesPlatformsRepository(connectionString));
+builder.Services.AddScoped<ICollectionsComponentsItemsRepository, CollectionsComponentsItemsRepository>(instance => new CollectionsComponentsItemsRepository(connectionString));
 
 builder.Services.AddCors(options =>
 {

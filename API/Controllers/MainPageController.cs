@@ -13,11 +13,13 @@ public sealed class MainPageController : ControllerBase
 {
     private readonly IMoviesGenresRepository moviesGenresRepository;
     private readonly IGamesPlatformsRepository gamesPlatformsRepository;
+    private readonly ICollectionsComponentsItemsRepository collectionsComponentsItemsRepository;
 
-    public MainPageController(IMoviesGenresRepository moviesGenresRepository, IGamesPlatformsRepository gamesPlatformsRepository)
+    public MainPageController(IMoviesGenresRepository moviesGenresRepository, IGamesPlatformsRepository gamesPlatformsRepository, ICollectionsComponentsItemsRepository collectionsComponentsItemsRepository)
     {
         this.moviesGenresRepository = moviesGenresRepository;
         this.gamesPlatformsRepository = gamesPlatformsRepository;
+        this.collectionsComponentsItemsRepository = collectionsComponentsItemsRepository;
     }
 
     [HttpGet("movies")]
@@ -346,69 +348,8 @@ public sealed class MainPageController : ControllerBase
     [HttpGet("collections")]
     public async Task<ActionResult<IEnumerable<CollectionsComponentItem>>> GetCollectionsComponentItemsAsync()
     {
-        var collectionsComponentsItems = new CollectionsComponentItem[]
-        {
-            new CollectionsComponentItem
-            {
-                CategoryHref="https://metarankings.ru/meta/collections/films-games/",
-                CategoryTitle="Контент",
-                ImageAlt="Самые сложные игры",
-                ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg",
-                ItemHref="https://metarankings.ru/samye-slozhnye-igry/",
-                Title="Самые сложные игры",
-                Id=1
-            },
-            new CollectionsComponentItem
-            {
-                CategoryHref="https://metarankings.ru/meta/collections/films-games/",
-                CategoryTitle="Контент",
-                ImageAlt="Лучшие фильмы про женщин",
-                ImageSrc="https://metarankings.ru/images/uploads/2023/06/films-pro-zhenshhin-445x250.jpg",
-                ItemHref="https://metarankings.ru/best-films-pro-zhenshhin/",
-                Title="Лучшие фильмы про женщин",
-                Id=2
-            },
-            new CollectionsComponentItem
-            {
-                CategoryHref="https://metarankings.ru/meta/collections/films-games/",
-                CategoryTitle="Контент",
-                ImageAlt="Фильмы про реальные события",
-                ImageSrc="https://metarankings.ru/images/uploads/2023/06/pro-realnye-sobytiya-445x250.jpg",
-                ItemHref="https://metarankings.ru/filmy-pro-realnye-sobytiya/",
-                Title="Фильмы про реальные события",
-                Id=3
-            },
-            new CollectionsComponentItem
-            {
-                CategoryHref="https://metarankings.ru/meta/collections/films-games/",
-                CategoryTitle="Контент",
-                ImageAlt="Лучшие фильмы про монстров",
-                ImageSrc="https://metarankings.ru/images/uploads/2023/06/filmy-pro-monstrov-445x250.jpg",
-                ItemHref="https://metarankings.ru/luchshie-filmy-pro-monstrov/",
-                Title="Лучшие фильмы про монстров",
-                Id=4
-            },
-            new CollectionsComponentItem
-            {
-                CategoryHref="https://metarankings.ru/meta/collections/films-games/",
-                CategoryTitle="Контент",
-                ImageAlt="Самые страшные игры",
-                ImageSrc="https://metarankings.ru/images/uploads/2023/06/strashnye-igry-445x250.jpg",
-                ItemHref="https://metarankings.ru/meta/collections/films-games/",
-                Title="Самые страшные игры",
-                Id=5
-            },
-            new CollectionsComponentItem
-            {
-                CategoryHref="https://metarankings.ru/meta/collections/films-games/",
-                CategoryTitle="Контент",
-                ImageAlt="Лучшие игры с открытым миром",
-                ImageSrc="https://metarankings.ru/images/uploads/2023/06/best-igry-s-otkrytym-mirom-445x250.jpg",
-                ItemHref="https://metarankings.ru/best-games-open-world/",
-                Title="Лучшие игры с открытым миром",
-                Id=6
-            }
-        };
+        var collectionsComponentsItems = await collectionsComponentsItemsRepository.GetAllAsync();
+
         return Ok(collectionsComponentsItems);
     }
 
