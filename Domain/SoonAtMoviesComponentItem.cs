@@ -7,5 +7,5 @@ public sealed record SoonAtMoviesComponentItem
     public string ImageAlt { get; set; }
     public string OriginalName { get; set; }
     public DateOnly ReleaseDate { get; set; }
-    public Genre[] Genres { get; set; }
+    public Genre[] MoviesGenres { get; set; }
 }

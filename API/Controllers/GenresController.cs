@@ -9,28 +9,28 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class GenresController : ControllerBase
+public class MoviesGenresController : ControllerBase
 {
     private readonly IConfiguration configuration;
-    private readonly IGenresRepository genresRepository;
+    private readonly IMoviesGenresRepository moviesGenresRepository;
 
-    public GenresController(IConfiguration configuration, IGenresRepository genresRepository)
+    public MoviesGenresController(IConfiguration configuration, IMoviesGenresRepository moviesGenresRepository)
     {
         this.configuration = configuration;
-        this.genresRepository = genresRepository;
+        this.moviesGenresRepository = moviesGenresRepository;
     }
 
     [HttpPost]
     public async Task<ActionResult> AddGenreAsync(Genre genre)
     {
-        await genresRepository.AddAsync(genre);
+        await moviesGenresRepository.AddAsync(genre);
         return Ok();
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Genre>>> Genres()
+    public async Task<ActionResult<IEnumerable<Genre>>> MoviesGenres()
     {
-        var genres = await genresRepository.GetAllAsync();
-        return Ok(genres);
+        var moviesGenres = await moviesGenresRepository.GetAllAsync();
+        return Ok(moviesGenres);
     }
 }

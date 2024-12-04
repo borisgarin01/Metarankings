@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Data.Repositories.Classes.Concrete;
-public sealed class GenresRepository : RepositoryBase<Genre>, IGenresRepository
+public sealed class MoviesGenresRepository : RepositoryBase<Genre>, IMoviesGenresRepository
 {
-    public GenresRepository(string connectionString) : base(connectionString)
+    public MoviesGenresRepository(string connectionString) : base(connectionString)
     {
     }
 
@@ -16,19 +16,19 @@ public sealed class GenresRepository : RepositoryBase<Genre>, IGenresRepository
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            await connection.ExecuteAsync("INSERT INTO Genres (Name, Href) values (@Name, @Href);", new { genre.Name, genre.Href });
+            await connection.ExecuteAsync("INSERT INTO MoviesGenres (Name, Href) values (@Name, @Href);", new { genre.Name, genre.Href });
         }
     }
 
     public async Task<IEnumerable<Genre>> GetAllAsync()
     {
-        IEnumerable<Genre> genres;
+        IEnumerable<Genre> MoviesGenres;
 
         using (var connection = new SqlConnection(ConnectionString))
         {
-            genres = await connection.QueryAsync<Genre>("SELECT Id, Name, Href from Genres");
+            MoviesGenres = await connection.QueryAsync<Genre>("SELECT Id, Name, Href from MoviesGenres");
         }
 
-        return genres;
+        return MoviesGenres;
     }
 }

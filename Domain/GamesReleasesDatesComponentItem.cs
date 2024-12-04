@@ -6,6 +6,6 @@ public sealed record GamesReleasesDatesComponentItem
     public string ImageSrc { get; set; }
     public string ImageAlt { get; set; }
     public Platform[] Platforms { get; set; }
-    public Genre[] Genres { get; set; }
+    public Genre[] GameGenres { get; set; }
     public DateOnly? ReleaseDate { get; set; }
 }

@@ -11,7 +11,7 @@ public sealed class InitialMigration : Migration
 DROP TABLE BestInPastMonths;
 DROP TABLE CollectionsComponentItems;
 DROP TABLE NewsComponentsItems;
-DROP TABLE Genres;
+DROP TABLE MoviesGenres;
 DROP TABLE IndexComponentsItems;
 DROP TABLE LastReviewsComponentsItems;
 DROP TABLE Platforms;
@@ -46,7 +46,7 @@ LinkTitle nvarchar(255) not null,
 ImageSrc nvarchar(255) not null,
 ImageAlt nvarchar(255) not null);
 
-CREATE TABLE Genres
+CREATE TABLE MoviesGenres
 (Id bigint not null primary key identity(1,1),
 Name nvarchar(255) not null unique,
 Href nvarchar(255) not null);

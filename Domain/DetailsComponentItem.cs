@@ -11,7 +11,7 @@ public sealed record DetailsComponentItem
     public int MarksCount { get; set; }
     public string OriginalName { get; set; }
     public Studio Studio { get; set; }
-    public Genre[] Genres { get; set; }
+    public Genre[] MoviesGenres { get; set; }
     public Director Director { get; set; }
     public DateOnly PremiereDate { get; set; }
     public string Description { get; set; }

@@ -12,7 +12,7 @@
             <a href="@item.LinkHref" title="Фильм @item.LinkTitle"><img class="post-image" src="@item.ImageSrc" alt="@item.LinkTitle"></a>
             <span class="item-name"><a href="@item.LinkHref">@item.LinkTitle</a></span>
             <span class="item-meta">
-                @foreach (var genre in item.Genres)
+                @foreach (var genre in item.MoviesGenres)
                 {
                     <a href="@genre.Href">@genre.Name</a>
 

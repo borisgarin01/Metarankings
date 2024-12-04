@@ -17,7 +17,7 @@ public sealed class MainPageController : ControllerBase
         {
             new MoviesIndexComponentItem
             {
-                Genres=new Genre[]
+                MoviesGenres=new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/comedy/", Name="Комедии" },
                     new Genre { Href="https://metarankings.ru/meta/movies/novogodnie/",Name="Новогодние" },
@@ -38,7 +38,7 @@ public sealed class MainPageController : ControllerBase
             },
             new MoviesIndexComponentItem
             {
-                Genres=new Genre[]
+                MoviesGenres=new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/comedy/", Name="Комедии" },
                     new Genre { Href="https://metarankings.ru/meta/movies/semejnye/",Name="Семейные" }
@@ -57,7 +57,7 @@ public sealed class MainPageController : ControllerBase
             },
             new MoviesIndexComponentItem
             {
-                Genres = new Genre[]
+                MoviesGenres = new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/thrillers/", Name="Триллеры" },
                     new Genre { Href="https://metarankings.ru/meta/movies/horror/",Name="Ужасы" }
@@ -88,7 +88,7 @@ public sealed class MainPageController : ControllerBase
                     Description = "Роскошный гонконгский отель становится местом, где Эммануэль, находящаяся в деловой поездке, исследует свою сексуальность и переосмысливает понятия близости и свободы, проверяя границы дозволенного...",
                     ReleaseDate = new DateOnly(2024, 11, 28)
                 },
-                Genres = new Genre[]
+                MoviesGenres = new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/dramy/", Name="Драмы" },
                     new Genre { Href="https://metarankings.ru/meta/movies/melodramas/",Name="Мелодрамы" }
@@ -107,7 +107,7 @@ public sealed class MainPageController : ControllerBase
                     Description = "В мире будущего, где человечество проиграло климатические войны, выжила, возможно, только Ева. Она живет в лагере, который охраняет робот, не пуская никого без...",
                     ReleaseDate = new DateOnly(2024, 11, 28)
                 },
-                Genres = new Genre[]
+                MoviesGenres = new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/dramy/", Name="Драмы" },
                     new Genre { Href="https://metarankings.ru/meta/movies/fantasy/",Name="Фантастика" }
@@ -127,7 +127,7 @@ public sealed class MainPageController : ControllerBase
                     Description = "В своей роскошной парижской квартире, в 1970-х, легендарная Мария Каллас переживает последние годы жизни, сражаясь с внутренними демонами. Сентябрь 1977 года: окружённая пуделями,...",
                     ReleaseDate = new DateOnly(2024, 11, 28)
                 },
-                Genres = new Genre[]
+                MoviesGenres = new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/dramy/", Name="Драмы" }
                 }
@@ -145,14 +145,14 @@ public sealed class MainPageController : ControllerBase
                     Description = "Слепая медиум Дарси, способная видеть прошлое, приезжает в дом, где год назад была зверски убита ее сестра-близнец Дани. Сейчас в этом доме живет...",
                     ReleaseDate = new DateOnly(2024, 11, 28)
                 },
-                Genres = new Genre[]
+                MoviesGenres = new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/horror/", Name="Ужасы" }
                 }
             },
             new MoviesIndexComponentItem
             {
-                Genres = new Genre[]
+                MoviesGenres = new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/thrillers/", Name="Триллеры" }
                 },
@@ -170,7 +170,7 @@ public sealed class MainPageController : ControllerBase
             },
             new MoviesIndexComponentItem
             {
-                Genres = new Genre[]
+                MoviesGenres = new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/comedy/", Name="Комедии" }
                 },
@@ -188,7 +188,7 @@ public sealed class MainPageController : ControllerBase
             },
             new MoviesIndexComponentItem
             {
-                Genres = new Genre[]
+                MoviesGenres = new Genre[]
                 {
                     new Genre { Href="https://metarankings.ru/meta/movies/dramy/", Name="Драмы" }
                 },
@@ -540,7 +540,7 @@ public sealed class MainPageController : ControllerBase
                         Name="Xbox Series X"
                     }
                 ],
-                Genres=
+                GameGenres=
                 [
                     new Genre
                     {
@@ -574,7 +574,7 @@ public sealed class MainPageController : ControllerBase
                         Name="PS5"
                     }
                 ],
-                Genres=
+                GameGenres=
                 [
                     new Genre
                     {
@@ -598,7 +598,7 @@ public sealed class MainPageController : ControllerBase
                         Name="PC"
                     }
                 ],
-                Genres=
+                GameGenres=
                 [
                     new Genre
                     {
@@ -632,7 +632,7 @@ public sealed class MainPageController : ControllerBase
                         Name="Xbox Series X"
                     }
                 ],
-                Genres=
+                GameGenres=
                 [
                     new Genre
                     {
@@ -666,7 +666,7 @@ public sealed class MainPageController : ControllerBase
                         Name="Xbox Series X"
                     }
                 ],
-                Genres=
+                GameGenres=
                 [
                     new Genre
                     {
@@ -840,7 +840,7 @@ public sealed class MainPageController : ControllerBase
                 LinkHref="https://metarankings.ru/moana-2/",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/11/moana-2-cover-art1-50x70.jpg",
                 ImageAlt="Моана 2",
-                Genres=
+                MoviesGenres=
                 [
                     new Genre
                     {
@@ -857,7 +857,7 @@ public sealed class MainPageController : ControllerBase
                 LinkHref="https://metarankings.ru/sidzhinn-kniga-krovi-2024/",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/11/sidzhinn-kniga-krovi-cover-art-50x70.jpg",
                 ImageAlt="Сиджинн. Книга крови",
-                Genres=
+                MoviesGenres=
                 [
                     new Genre
                     {
@@ -874,7 +874,7 @@ public sealed class MainPageController : ControllerBase
                 LinkHref="https://metarankings.ru/astral-medium-2024/",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/11/astral-medium-2024-cover-art-50x70.jpg",
                 ImageAlt="Астрал. Медиум",
-                Genres=
+                MoviesGenres=
                 [
                     new Genre
                     {
@@ -891,7 +891,7 @@ public sealed class MainPageController : ControllerBase
                 LinkHref="https://metarankings.ru/poslednee-zamykanie-konec-sveta-2024/",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/11/poslednee-zamykanie-konec-sveta-cover-art-50x70.jpg",
                 ImageAlt="Последнее замыкание. Конец света",
-                Genres=
+                MoviesGenres=
                 [
                     new Genre
                     {
@@ -913,7 +913,7 @@ public sealed class MainPageController : ControllerBase
                 LinkHref="https://metarankings.ru/perevozchik-dush-2024/",
                 ImageSrc="https://metarankings.ru/images/uploads/2024/11/perevozchik-dush-2024-cover-art-50x70.jpg",
                 ImageAlt="Перевозчик душ",
-                Genres=
+                MoviesGenres=
                 [
                     new Genre
                     {
