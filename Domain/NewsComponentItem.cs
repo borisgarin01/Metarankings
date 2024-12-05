@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Domain;
-public sealed record SpecialsComponentItem
+public sealed record NewsComponentItem
 {
     public long Id { get; set; }
 
@@ -14,10 +14,6 @@ public sealed record SpecialsComponentItem
     [MaxLength(255)]
     [MinLength(1)]
     public string LinkTitle { get; set; }
-
-    [MinLength(1)]
     public string ImageSrc { get; set; }
-
-    [MinLength(1)]
     public string ImageAlt { get; set; }
 }
