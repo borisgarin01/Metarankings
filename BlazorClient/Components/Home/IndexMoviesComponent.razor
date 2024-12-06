@@ -55,6 +55,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        IndexMoviesComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<MoviesIndexComponentItem>>("https://localhost:7148/api/mainpage/movies");
+        IndexMoviesComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<MoviesIndexComponentItem>>("https://192.168.1.102:5001/api/mainpage/movies");
     }
 }

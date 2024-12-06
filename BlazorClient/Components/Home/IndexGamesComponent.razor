@@ -29,7 +29,7 @@
             <span class="item-meta"><a rel="nofollow" href="@item.IndexComponentItem.ItemHref#reviews">Рецензии (8)</a> <a rel="nofollow" href="@item.IndexComponentItem.ItemHref#comments">Отзывы (0)</a></span>
             <span class="item-meta">
                 @item.IndexComponentItem.ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo
-                         ("ru-RU"))
+                                  ("ru-RU"))
             </span>
             <span class="item-description">@item.IndexComponentItem.Description</span>
         </div>
@@ -57,6 +57,6 @@
     public IEnumerable<GamesIndexComponentItem> GamesIndexComponentItems { get; private set; }
     protected override async Task OnInitializedAsync()
     {
-        GamesIndexComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<GamesIndexComponentItem>>("https://localhost:7148/api/mainpage/games");
+        GamesIndexComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<GamesIndexComponentItem>>("https://192.168.1.102:5001/api/mainpage/games");
     }
 }

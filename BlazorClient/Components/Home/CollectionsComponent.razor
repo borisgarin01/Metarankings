@@ -19,6 +19,6 @@
     public IEnumerable<CollectionsComponentItem> CollectionsComponentItems { get; private set; }
     protected override async Task OnInitializedAsync()
     {
-        CollectionsComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<CollectionsComponentItem>>("https://localhost:7148/api/mainpage/collections");
+        CollectionsComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<CollectionsComponentItem>>("https://192.168.1.102:5001/api/mainpage/collections");
     }
 }
