@@ -481,6 +481,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        DetailsComponentItem = await HttpClient.GetFromJsonAsync<DetailsComponentItem>("https://192.168.1.102:5001/api/GamesDetailsPage/{Title}");
+        DetailsComponentItem = await HttpClient.GetFromJsonAsync<DetailsComponentItem>("api/GamesDetailsPage/{Title}");
     }
 }

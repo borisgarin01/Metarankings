@@ -44,8 +44,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var a = await HttpClient.GetStringAsync("api/mainpage/bestMoviesInPastMonth");
-
         BestMoviesInPastMonth = await HttpClient.GetFromJsonAsync<IEnumerable<BestInPastMonth>>("api/mainpage/bestMoviesInPastMonth");
 
         BestGamesInPastMonth = await HttpClient.GetFromJsonAsync<IEnumerable<BestInPastMonth>>("api/mainpage/bestGamesInPastMonth");

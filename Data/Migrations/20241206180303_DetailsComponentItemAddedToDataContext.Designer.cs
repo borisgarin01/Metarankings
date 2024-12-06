@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241206180303_DetailsComponentItemAddedToDataContext")]
+    partial class DetailsComponentItemAddedToDataContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,7 +142,12 @@ namespace Data.Migrations
                     b.Property<DateOnly>("PremiereDate")
                         .HasColumnType("date");
 
+                    b.Property<long>("StudioId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("StudioId");
 
                     b.ToTable("DetailsComponentsItems");
                 });
@@ -333,6 +341,17 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Studios");
+                });
+
+            modelBuilder.Entity("Domain.DetailsComponentItem", b =>
+                {
+                    b.HasOne("Domain.Studio", "Studio")
+                        .WithMany()
+                        .HasForeignKey("StudioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Studio");
                 });
 #pragma warning restore 612, 618
         }

@@ -17,4 +17,5 @@ public class DataContext : DbContext
     public DbSet<Platform> Platforms { get; set; }
     public DbSet<SpecialsComponentItem> SpecialsComponentItems { get; set; }
     public DbSet<Studio> Studios { get; set; }
+    public DbSet<DetailsComponentItem> DetailsComponentsItems { get; set; }
 }
