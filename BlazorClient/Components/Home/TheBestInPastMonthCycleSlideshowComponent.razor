@@ -44,10 +44,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var a = await HttpClient.GetStringAsync("https://192.168.1.102:5001/api/mainpage/bestMoviesInPastMonth");
+        var a = await HttpClient.GetStringAsync("api/mainpage/bestMoviesInPastMonth");
 
-        BestMoviesInPastMonth = await HttpClient.GetFromJsonAsync<IEnumerable<BestInPastMonth>>("https://192.168.1.102:5001/api/mainpage/bestMoviesInPastMonth");
+        BestMoviesInPastMonth = await HttpClient.GetFromJsonAsync<IEnumerable<BestInPastMonth>>("api/mainpage/bestMoviesInPastMonth");
 
-        BestGamesInPastMonth = await HttpClient.GetFromJsonAsync<IEnumerable<BestInPastMonth>>("https://192.168.1.102:5001/api/mainpage/bestGamesInPastMonth");
+        BestGamesInPastMonth = await HttpClient.GetFromJsonAsync<IEnumerable<BestInPastMonth>>("api/mainpage/bestGamesInPastMonth");
     }
 }

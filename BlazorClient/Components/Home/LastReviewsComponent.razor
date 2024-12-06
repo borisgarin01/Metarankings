@@ -37,8 +37,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        LastMoviesReviews = await httpClient.GetFromJsonAsync<IEnumerable<LastReviewsComponentItem>>("https://192.168.1.102:5001/api/mainpage/lastMoviesReviews");
+        LastMoviesReviews = await httpClient.GetFromJsonAsync<IEnumerable<LastReviewsComponentItem>>("api/mainpage/lastMoviesReviews");
 
-        LastGamesReviews = await httpClient.GetFromJsonAsync<IEnumerable<LastReviewsComponentItem>>("https://192.168.1.102:5001/api/mainpage/lastGamesReviews");
+        LastGamesReviews = await httpClient.GetFromJsonAsync<IEnumerable<LastReviewsComponentItem>>("api/mainpage/lastGamesReviews");
     }
 }

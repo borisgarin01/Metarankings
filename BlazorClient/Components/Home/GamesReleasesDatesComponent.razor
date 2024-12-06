@@ -38,6 +38,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        GamesReleasesDatesComponentsItems = await httpClient.GetFromJsonAsync<IEnumerable<GamesReleasesDatesComponentItem>>("https://192.168.1.102:5001/api/mainpage/gamesReleasesDates");
+        GamesReleasesDatesComponentsItems = await httpClient.GetFromJsonAsync<IEnumerable<GamesReleasesDatesComponentItem>>("api/mainpage/gamesReleasesDates");
     }
 }

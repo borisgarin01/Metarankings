@@ -19,6 +19,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        NewsComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<NewsComponentItem>>("https://192.168.1.102:5001/api/mainpage/moviesNews");
+        NewsComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<NewsComponentItem>>("api/mainpage/moviesNews");
     }
 }
