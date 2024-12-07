@@ -233,6 +233,24 @@ public sealed class MainPageController : ControllerBase
             {
                 Platforms=new Platform[]
                 {
+                    new Platform { Href="https://metarankings.ru/meta/games/ps3/", Name="PS3" },
+                },
+                IndexComponentItem=new IndexComponentItem
+                {
+                    Score=8.9f,
+                    Title="The Last of Us",
+                    ImageAlt="The Last of Us",
+                    ImageSrc="https://metarankings.ru/images/uploads/2013/06/the-last-of-us-boxart-cover.jpg",
+                    Id=1,
+                    ItemHref="https://metarankings.ru/the-last-of-us/",
+                    Description="The Last of Us — приключенческая экшн игра от создателей серии Uncharted, студии Naughty Dog...",
+                    ReleaseDate=new DateOnly(2013,6,14)
+                }
+            },
+            new GamesIndexComponentItem
+            {
+                Platforms=new Platform[]
+                {
                     new Platform { Href="https://metarankings.ru/meta/games/pc/", Name="PC" },
                     new Platform { Href="https://metarankings.ru/meta/games/ps5/",Name="PS5" },
                     new Platform { Href="https://metarankings.ru/meta/games/switch/",Name="Switch" }
