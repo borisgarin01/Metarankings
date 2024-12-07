@@ -32,13 +32,15 @@ public sealed record DetailsComponentItem
     [MaxLength(511)]
     [MinLength(1)]
     public string OriginalName { get; set; }
-    //public Studio Studio { get; set; }
-    //public Genre[] Genres { get; set; }
-    //public Director Director { get; set; }
     public DateOnly PremiereDate { get; set; }
     public string Description { get; set; }
     //public Actor[] Actors { get; set; }
     //public Trailer[] Trailers { get; set; }
     //public Screenshot[] Screenshots { get; set; }
 
+    public IEnumerable<Developer> Developers { get; set; }
+    public IEnumerable<Publisher> Publishers { get; set; }
+    public IEnumerable<Platform> Platforms { get; set; }
+    public IEnumerable<Genre> Genres { get; set; }
+    public string Localization { get; set; }
 }

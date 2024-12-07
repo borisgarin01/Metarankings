@@ -18,4 +18,6 @@ public class DataContext : DbContext
     public DbSet<SpecialsComponentItem> SpecialsComponentItems { get; set; }
     public DbSet<Studio> Studios { get; set; }
     public DbSet<DetailsComponentItem> DetailsComponentsItems { get; set; }
+    public DbSet<Developer> Developers { get; set; }
+    public DbSet<Developer> Publishers { get; set; }
 }
