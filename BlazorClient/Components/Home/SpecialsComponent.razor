@@ -5,20 +5,9 @@
 
 <div class="specials-index">
     <h3><a href="https://metarankings.ru/meta/specials/">Спецматериалы</a></h3>
-    @foreach (var item in SpecialsComponentItems)
-    {
-        <div class="news-item">
-            <a href="@item.LinkHref" title="@item.LinkTitle"><img class="news-thumb" src="@item.ImageSrc" alt="@item.ImageAlt"></a>
-            <span class="news-title"><a href="@item.LinkHref">@item.LinkTitle</a></span>
-        </div>
-    }
+    
 </div>
 
 @code {
-    IEnumerable<SpecialsComponentItem> SpecialsComponentItems;
-
-    protected override async Task OnInitializedAsync()
-    {
-        SpecialsComponentItems = await HttpClient.GetFromJsonAsync<IEnumerable<SpecialsComponentItem>>("api/mainpage/specials");
-    }
+    
 }

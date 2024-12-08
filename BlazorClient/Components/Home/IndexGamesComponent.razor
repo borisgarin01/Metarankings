@@ -6,34 +6,7 @@
 
 <div class="index-games">
     <h3><a href="https://metarankings.ru/new-games/">Новые игры</a></h3>
-    @foreach (var item in GamesIndexComponentItems)
-    {
-        <div class="item">
-            <a href="/games/details/@item.IndexComponentItem.Title" title="@item.IndexComponentItem.Title"><img class="post-image" src="@item.IndexComponentItem.ImageSrc" alt="@item.IndexComponentItem.Title"></a>
-            <div class="small-score mark-@Math.Round(item.IndexComponentItem.Score)">
-                <span>
-                    @item.IndexComponentItem.Score
-                </span>
-            </div>
-            <span class="item-name">
-                <a href="/games/details/@item.IndexComponentItem.Title">@item.IndexComponentItem.Title</a>
-            </span>
-            <span class="item-meta">
-                @foreach (var platform in item.Platforms)
-                {
-                    <a href="@platform.Href">@platform.Name</a>
-
-                    <text> / </text>
-                }
-            </span>
-            <span class="item-meta"><a rel="nofollow" href="@item.IndexComponentItem.ItemHref#reviews">Рецензии (8)</a> <a rel="nofollow" href="@item.IndexComponentItem.ItemHref#comments">Отзывы (0)</a></span>
-            <span class="item-meta">
-                @item.IndexComponentItem.ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo
-                                  ("ru-RU"))
-            </span>
-            <span class="item-description">@item.IndexComponentItem.Description</span>
-        </div>
-    }
+    
 
     <div class="title-index">
         <div class="dropdown-menu genre">
@@ -54,9 +27,5 @@
 </div>
 
 @code {
-    public IEnumerable<GamesIndexComponentItem> GamesIndexComponentItems { get; private set; }
-    protected override async Task OnInitializedAsync()
-    {
-        GamesIndexComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<GamesIndexComponentItem>>("api/mainpage/games");
-    }
+    
 }

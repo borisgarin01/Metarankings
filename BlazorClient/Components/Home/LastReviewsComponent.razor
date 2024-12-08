@@ -8,37 +8,15 @@
         <h3>Последние отзывы</h3>
         <div class="widget-body">
             <ul>
-                @foreach (var lastMovieReview in LastMoviesReviews)
-                {
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="@lastMovieReview.LinkHref">@lastMovieReview.LinkTitle</a></span>
-                        </div>
-                    </li>
-                }
+                
             </ul>
             <ul>
-                @foreach (var lastGameReview in LastGamesReviews)
-                {
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="@lastGameReview.LinkHref">@lastGameReview.LinkTitle</a></span>
-                        </div>
-                    </li>
-                }
+                
             </ul>
         </div>
     </div>
 </div>
 
 @code {
-    public IEnumerable<LastReviewsComponentItem> LastMoviesReviews { get; private set; }
-    public IEnumerable<LastReviewsComponentItem> LastGamesReviews { get; private set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        LastMoviesReviews = await httpClient.GetFromJsonAsync<IEnumerable<LastReviewsComponentItem>>("api/mainpage/lastMoviesReviews");
-
-        LastGamesReviews = await httpClient.GetFromJsonAsync<IEnumerable<LastReviewsComponentItem>>("api/mainpage/lastGamesReviews");
-    }
+    
 }

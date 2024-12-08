@@ -5,20 +5,9 @@
 
 <div class="index-movies">
     <h3><a href="https://metarankings.ru/meta/news/kino/">Новости кино</a></h3>
-    @foreach (var newsComponentItem in NewsComponentItems)
-    {
-        <div class="news-item">
-            <a href="@newsComponentItem.LinkHref" title="@newsComponentItem.LinkTitle"><img class="news-thumb" src="@newsComponentItem.ImageSrc" alt="@newsComponentItem.ImageAlt"></a>
-            <span class="news-title"><a href="@newsComponentItem.LinkHref">@newsComponentItem.LinkTitle</a></span>
-        </div>
-    }
+    
 </div>
 
 @code {
-    public IEnumerable<NewsComponentItem> NewsComponentItems { get; private set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        NewsComponentItems = await httpClient.GetFromJsonAsync<IEnumerable<NewsComponentItem>>("api/mainpage/moviesNews");
-    }
+    
 }

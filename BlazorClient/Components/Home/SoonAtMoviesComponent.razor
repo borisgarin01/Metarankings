@@ -6,31 +6,10 @@
 
 <div class="index-movies">
     <h3><a href="https://metarankings.ru/coming-soon/">Скоро в кино</a></h3>
-    @foreach (var item in SoonAtMoviesComponentItems)
-    {
-        <div class="item">
-            <a href="@item.LinkHref" title="Фильм @item.LinkTitle"><img class="post-image" src="@item.ImageSrc" alt="@item.LinkTitle"></a>
-            <span class="item-name"><a href="@item.LinkHref">@item.LinkTitle</a></span>
-            <span class="item-meta">
-                @foreach (var genre in item.Genres)
-                {
-                    <a href="@genre.Href">@genre.Name</a>
-
-                    <text> / </text>
-                }
-            </span>
-            <span class="item-meta">@item.LinkTitle</span>
-            <span class="item-meta">@item.ReleaseDate.ToString("dd MMMM yyyy", new CultureInfo("RU-ru"))</span>
-        </div>
-    }
+    
     <a href="https://metarankings.ru/most-waiting-films/" class="allreviews">Самые ожидаемые фильмы</a>
 </div>
 
 @code {
-    public IEnumerable<SoonAtMoviesComponentItem> SoonAtMoviesComponentItems { get; private set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        SoonAtMoviesComponentItems = await HttpClient.GetFromJsonAsync<IEnumerable<SoonAtMoviesComponentItem>>("api/mainpage/soonAtMovies");
-    }
+    
 }

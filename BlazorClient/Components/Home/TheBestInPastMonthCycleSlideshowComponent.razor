@@ -8,44 +8,17 @@
     <div id="slideshow" class="cycle-slideshow" data-cycle-fx="scrollHorz" data-cycle-timeout="7000" data-cycle-slides="> div" data-cycle-pager=".pager">
         <div class="slide clear" data-cycle-pager-template="<span>Фильмы</span>">
             <div class="post">
-                @foreach (var movie in BestMoviesInPastMonth)
-                {
-                    <a href="@movie.Href" title="@movie.Name">
-                        <div class="featured-image">
-                            <img class="post-image" src="@movie.ImageSrc" alt="@movie.Name">
-                            <div class="@movie.ScoreStyle">@movie.Score</div>
-                            <span>@movie.Name</span>
-                        </div>
-                    </a>
-                }
+                
             </div>
         </div>
         <div class="slide clear" data-cycle-pager-template="<span>Игры</span>">
             <div class="post">
-                @foreach (var game in BestGamesInPastMonth)
-                {
-                    <a href="@game.Href" title="@game.Name">
-                        <div class="featured-image">
-                            <img class="post-image" src="@game.ImageSrc" alt="@game.Name">
-                            <div class="@game.ScoreStyle">@game.Score</div>
-                            <span>@game.Name</span>
-                        </div>
-                    </a>
-                }
+                
             </div>
         </div>
     </div>
 </div>
 
 @code {
-    public IEnumerable<BestInPastMonth> BestMoviesInPastMonth { get; set; }
-
-    public IEnumerable<BestInPastMonth> BestGamesInPastMonth { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        BestMoviesInPastMonth = await HttpClient.GetFromJsonAsync<IEnumerable<BestInPastMonth>>("api/mainpage/bestMoviesInPastMonth");
-
-        BestGamesInPastMonth = await HttpClient.GetFromJsonAsync<IEnumerable<BestInPastMonth>>("api/mainpage/bestGamesInPastMonth");
-    }
+    
 }

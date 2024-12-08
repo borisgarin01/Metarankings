@@ -8,16 +8,14 @@ public class DataContext : DbContext
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
     }
-    public DbSet<BestInPastMonth> BestInPastMonth { get; set; }
-    public DbSet<CollectionsComponentItem> CollectionsComponentItems { get; set; }
-    public DbSet<Genre> Genres { get; set; }
-    public DbSet<IndexComponentItem> IndexComponentItems { get; set; }
-    public DbSet<LastReviewsComponentItem> LastReviewsComponentItems { get; set; }
-    public DbSet<NewsComponentItem> NewsComponentsItems { get; set; }
-    public DbSet<Platform> Platforms { get; set; }
-    public DbSet<SpecialsComponentItem> SpecialsComponentItems { get; set; }
-    public DbSet<Studio> Studios { get; set; }
-    public DbSet<DetailsComponentItem> DetailsComponentsItems { get; set; }
-    public DbSet<Developer> Developers { get; set; }
-    public DbSet<Developer> Publishers { get; set; }
+    public DbSet<Critic> Critics { get; set; }
+    public DbSet<Game> Games { get; set; }
+    public DbSet<GameCriticReview> GamesCriticsReviews { get; set; }
+    public DbSet<GameDeveloper> GamesDevelopers { get; set; }
+    public DbSet<GameGenre> GamesGenres { get; set; }
+    public DbSet<GameLocalization> GamesLocalizations { get; set; }
+    public DbSet<GamePlatform> GamesPlatforms { get; set; }
+    public DbSet<GamePublisher> GamesPublishers { get; set; }
+    public DbSet<Gamer> Gamers { get; set; }
+    public DbSet<GameTag> GamesTags { get; set; }
 }

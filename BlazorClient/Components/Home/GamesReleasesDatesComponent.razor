@@ -6,38 +6,10 @@
 
 <div class="index-games">
     <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
-    @foreach (var gameReleaseDateComponentItem in GamesReleasesDatesComponentsItems)
-    {
-        <div class="item">
-            <a href="@gameReleaseDateComponentItem.Href" title="Игра @gameReleaseDateComponentItem.Title"><img class="post-image" src="@gameReleaseDateComponentItem.ImageSrc" alt="@gameReleaseDateComponentItem.ImageAlt"></a>
-            <span class="item-name"><a href="@gameReleaseDateComponentItem.Href">@gameReleaseDateComponentItem.Title</a></span>
-            <span class="item-meta">
-                @foreach (Platform platform in gameReleaseDateComponentItem.Platforms)
-                {
-                    <a href="@platform.Href">@platform.Name</a>
-
-                    <text> / </text>
-                }
-            </span>
-            <span class="item-meta">
-                @foreach (Genre genre in gameReleaseDateComponentItem.Genres)
-                {
-                    <a href="@genre.Href">@genre.Name</a>
-
-                    <text> / </text>
-                }
-            </span>
-            <span class="item-meta">@gameReleaseDateComponentItem.ReleaseDate.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))</span>
-        </div>
-    }
+   
     <a href="https://metarankings.ru/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
 </div>
 
 @code {
-    public IEnumerable<GamesReleasesDatesComponentItem> GamesReleasesDatesComponentsItems { get; private set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        GamesReleasesDatesComponentsItems = await httpClient.GetFromJsonAsync<IEnumerable<GamesReleasesDatesComponentItem>>("api/mainpage/gamesReleasesDates");
-    }
+    
 }
