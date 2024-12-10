@@ -1,0 +1,11 @@
+﻿<div class="ureview-text">
+    <span class="title-reviews"><a href="@LinkHref">@LinkTitle</a></span>
+</div>
+
+@code {
+    [Parameter]
+    public string LinkHref { get; set; }
+
+    [Parameter]
+    public string LinkTitle { get; set; }
+}
