@@ -1,0 +1,21 @@
+﻿<a href="@Url" title="@Title">
+    <div class="featured-image">
+        <img class="post-image" src="@ImageSource" alt="@Title">
+        <div class="small-score mark-7">@Score</div>
+        <span>@Title</span>
+    </div>
+</a>
+
+@code {
+    [Parameter]
+    public string Url { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string ImageSource { get; set; }
+
+    [Parameter]
+    public float Score { get; set; }
+}

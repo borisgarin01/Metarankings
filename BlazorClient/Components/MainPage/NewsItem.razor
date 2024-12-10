@@ -1,0 +1,15 @@
+﻿<div class="news-item">
+    <a href="@Href" title="@Title"><img class="news-thumb" src="@ImageSrc" alt="@Title"></a>
+    <span class="news-title"><a href="@Href">@Title</a></span>
+</div>
+
+@code {
+    [Parameter]
+    public string Href { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string ImageSrc { get; set; }
+}

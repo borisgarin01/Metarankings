@@ -1,49 +1,439 @@
 ﻿@page "/"
 
-<BlazorClient.Components.Home.TopHomeNavigationComponent />
-
+<div class="headerer">
+    <div class="header-bottom">
+        <div class="header clear nav-menu">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="logo">
+                <a href="https://metarankings.ru"><span>Meta</span>Rankings</a>
+            </div>
+            <div class="nav">
+                <ul>
+                    <li>
+                        <span onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-movies/">Фильмы</a></span>
+                        <div class="movie-drop">
+                            <a href="https://metarankings.ru/new-movies/">Новинки</a>
+                            <a href="https://metarankings.ru/coming-soon/">Скоро</a>
+                            <a href="https://metarankings.ru/most-waiting-films/">Ожидаемые</a>
+                            <a href="https://metarankings.ru/meta/movies/">Обзоры</a>
+                            <a href="https://metarankings.ru/best-movies/">Топ фильмов</a>
+                            <a href="https://metarankings.ru/best-movies-2024/">Фильмы 2024</a>
+                            <a href="https://metarankings.ru/best-boeviki/2024/">Боевики 2024</a>
+                            <a href="https://metarankings.ru/best-horror/2024/">Ужасы 2024</a>
+                            <a href="https://metarankings.ru/best-comedy/2024/">Комедии 2024</a>
+                            <a href="https://metarankings.ru/best-thrillers/2024/">Триллеры 2024</a>
+                            <a href="https://metarankings.ru/best-fantasy/2024/">Фантастика 2024</a>
+                            <a href="https://metarankings.ru/best-fentezi/2024/">Фэнтези 2024</a>
+                            <a href="https://metarankings.ru/best-dramy/2024/">Драмы 2024</a>
+                            <a href="https://metarankings.ru/best-melodramas/2024/">Мелодрамы 2024</a>
+                            <a href="https://metarankings.ru/best-cartoons/2024/">Мультфильмы 2024</a>
+                            <a href="https://metarankings.ru/best-serials/">Сериалы</a>
+                        </div>
+                    </li>
+                    <li>
+                        <span onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-games/">Игры</a></span>
+                        <div class="game-drop">
+                            <a href="https://metarankings.ru/new-games/">Новинки</a>
+                            <a href="https://metarankings.ru/release-date/">Дата выхода</a>
+                            <a href="https://metarankings.ru/most-waiting-games/">Ожидаемые</a>
+                            <a href="https://metarankings.ru/meta/games/">Обзоры</a>
+                            <a href="https://metarankings.ru/best-games/">Топ игр</a>
+                            <a href="https://metarankings.ru/best-games-2024/">Игры 2024</a>
+                            <a href="https://metarankings.ru/best-pc-games/">ПК</a>
+                            <a href="https://metarankings.ru/best-ps4-games/">PS4</a>
+                            <a href="https://metarankings.ru/best-xboxone-games/">Xbox One</a>
+                            <a href="https://metarankings.ru/best-switch-games/">Switch</a>
+                            <a href="https://metarankings.ru/top-action-games/">Экшены</a>
+                            <a href="https://metarankings.ru/top-shooters/">Шутеры</a>
+                            <a href="https://metarankings.ru/top-horrors/">Хорроры</a>
+                            <a href="https://metarankings.ru/top-igry-priklyucheniya/">Приключения</a>
+                            <a href="https://metarankings.ru/top-rpg-games/">РПГ</a>
+                            <a href="https://metarankings.ru/best-strategii/">Стратегии</a>
+                            <a href="https://metarankings.ru/best-gonki/">Гонки</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="https://metarankings.ru/meta/collections/">Подборки</a>
+                    </li>
+                    <li>
+                        <a href="https://metarankings.ru/user-reviews/">Отзывы</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="nav_login">
+                <ul>
+                    <li><span class="user-login popauthor" title="Войти на сайт"></span></li>
+                </ul>
+            </div><div class="search_form">
+                <form method="get" id="searchform" action="https://metarankings.ru/search/">
+                    <fieldset>
+                        <input name="text" type="search" id="search" placeholder="Название игры или фильма..." autocomplete="off" />
+                        <button type="submit"></button>
+                    </fieldset>
+                </form>
+                <div id="search_form-result"></div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="wrapper">
     <div class="pager">Лучшие в прошлом месяце </div>
     <div class="progress"></div>
-    <BlazorClient.Components.Home.TheBestInPastMonthCycleSlideshowComponent />
+    <div class="slideshow">
+        <div id="slideshow" class="cycle-slideshow" data-cycle-fx="scrollHorz" data-cycle-timeout="7000" data-cycle-slides="> div" data-cycle-pager=".pager">
+            <div class="slide clear" data-cycle-pager-template="<span>Фильмы</span>">
+                <div class="post">
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/eretik-2024/" ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg" Score="7.3f" Title="Еретик" />
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/kanikuly-2024/" ImageSource="https://metarankings.ru/images/uploads/2024/11/kanikuly-2024-cover-art-196x281.jpg" Score="7.2f" Title="Каникулы" />
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/zlaya-skazka-o-vedme-zapada-2024/" ImageSource="https://metarankings.ru/images/uploads/2024/11/zlaya-skazka-o-vedme-zapada-boxart-cover-196x281.jpg" Score="7.1f" Title="Злая: Сказка о ведьме Запада" />
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/vampiry-lyogkogo-povedeniya-2024/" ImageSource="https://metarankings.ru/images/uploads/2024/11/vampiry-lyogkogo-povedeniya-cover-art-196x281.jpg" Score="7f" Title="Вампиры лёгкого поведения" />
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/moana-2/" ImageSource="https://metarankings.ru/images/uploads/2024/11/moana-2-cover-art1-196x281.jpg" Score="7f" Title="Моана 2" />
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/ptica-2024/" ImageSource="https://metarankings.ru/images/uploads/2024/11/ptica-2024-cover-art-197x281.jpg" Score="6.7f" Title="Птица" />
+                </div>
+            </div>
+            <div class="slide clear" data-cycle-pager-template="<span>Игры</span>">
+                <div class="post">
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/dragon-quest-iii-hd-2d-remake/" ImageSource="https://metarankings.ru/images/uploads/2024/11/dragon-quest-iii-hd-2d-remake-boxart-cover-196x281.jpg" Score="7.5f" Title="Dragon Quest III HD-2D Remake" />
+
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/stalker-2/" ImageSource="https://metarankings.ru/images/uploads/2022/04/stalker-2-heart-of-chernobyl-cover-art-200x278.jpg" Score="7.2f" Title="S.T.A.L.K.E.R. 2: Heart of Chernobyl" />
+
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/metro-awakening/" ImageSource="https://metarankings.ru/images/uploads/2024/10/metro-awakening-boxart-cover-196x281.jpg" Score="7f" Title="Metro Awakening" />
+
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/teenage-mutant-ninja-turtles-splintered-fate/" ImageSource="https://metarankings.ru/images/uploads/2024/11/teenage-mutant-ninja-turtles-splintered-fate-cover-art-196x281.jpg" Score="6.8f" Title="Teenage Mutant Ninja Turtles: Splintered Fate" />
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/sorry-were-closed/" ImageSource="https://metarankings.ru/images/uploads/2024/11/sorry-were-closed-boxart-cover-196x281.jpg" Score="6.7f" Title="Sorry We&#8217;re Closed" />
+
+                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/mario-luigi-brothership/" ImageSource="https://metarankings.ru/images/uploads/2024/11/mario-luigi-brothership-boxart-cover-196x281.jpg" Score="6.6f" Title="Mario &#038; Luigi: Brothership" />
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="container" class="clear">
         <div class="sidebar">
         </div>
         <div id="content" class="lcol">
             <div id="loop" class="list clear">
-                <BlazorClient.Components.Home.IndexMoviesComponent />
+                <div class="index-movies">
+                    <h3><a href="https://metarankings.ru/new-movies/">Новые фильмы</a></h3>
+                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
+                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
+                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
+                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
+                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
+                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
+                    <div class="title-index">
+                        <div class="dropdown-menu genre">
+                            <span class="title">Год</span>
+                            <ul>
+                                <li><a href="/best-movies-2024/">Фильмы 2024</a></li>
+                                <li><a href="/best-movies-2023/">Фильмы 2023</a></li>
+                                <li><a href="/best-movies-2022/">Фильмы 2022</a></li>
+                                <li><a href="/best-movies-2021/">Фильмы 2021</a></li>
+                                <li><a href="/best-movies-2020/">Фильмы 2020</a></li>
+                                <li><a href="/best-movies-2019/">Фильмы 2019</a></li>
+                                <li><a href="/best-movies-2018/">Фильмы 2018</a></li>
+                                <li><a href="/best-movies-2017/">Фильмы 2017</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a class="allreviews" href="https://metarankings.ru/meta/movies/">Обзоры на фильмы</a><br>
+                </div>
 
-                <BlazorClient.Components.Home.IndexGamesComponent />
-
+                <div class="index-games">
+                    <h3><a href="https://metarankings.ru/new-games/">Новые игры</a></h3>
+                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
+                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
+                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
+                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
+                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
+                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
+                    <div class="title-index">
+                        <div class="dropdown-menu genre">
+                            <span class="title">Год</span>
+                            <ul>
+                                <li><a href="/best-games-2024/">Игры 2024</a></li>
+                                <li><a href="/best-games-2023/">Игры 2023</a></li>
+                                <li><a href="/best-games-2022/">Игры 2022</a></li>
+                                <li><a href="/best-games-2021/">Игры 2021</a></li>
+                                <li><a href="/best-games-2020/">Игры 2020</a></li>
+                                <li><a href="/best-games-2019/">Игры 2019</a></li>
+                                <li><a href="/best-games-2018/">Игры 2018</a></li>
+                                <li><a href="/best-games-2017/">Игры 2017</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a class="allreviews" href="https://metarankings.ru/meta/games/">Обзоры на игры</a>
+                </div>
                 <div class="ads-horizont hor-1">
                     <!-- Yandex.RTB R-A-201169-5 -->
                     <div id="yandex_rtb_R-A-201169-5"></div>
-
                 </div>
 
+                <div class="index-movies">
+                    <h3><a href="https://metarankings.ru/meta/news/kino/">Новости кино</a></h3>
+                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/ridli-skott-predstavil-trejler-gladiator-2-s-pedro-paskal-i-denzelem-vashingtonom/" Title="Ридли Скотт представил трейлер «Гладиатор 2» с  Педро Паскаль и Дензелем Вашингтоном" ImageSrc="https://metarankings.ru/images/uploads/2024/07/gladiator-2-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/tom-xardi-uxodit-ot-pogoni-v-trejlere-venom-3-poslednij-tanec/" Title="Том Харди уходит от погони в трейлере «Веном 3: Последний танец»" ImageSrc="https://metarankings.ru/images/uploads/2024/06/venom-3-poslednij-tanec-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/dzhenna-ortega-uillem-defo-moniki-belluchchi-i-drugie-v-trejlere-bitldzhus-bitldzhus/" Title="Дженна Ортега, Уиллем Дефо, Моники Беллуччи и другие в трейлере «Битлджус Битлджус»" ImageSrc="https://metarankings.ru/images/uploads/2024/05/bitldzhus-bitldzhus-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/dzhenna-ortega-uillem-defo-moniki-belluchchi-i-drugie-v-trejlere-bitldzhus-bitldzhus/" Title="Дженна Ортега, Уиллем Дефо, Моники Беллуччи и другие в трейлере «Битлджус Битлджус»" ImageSrc="https://metarankings.ru/images/uploads/2024/05/bitldzhus-bitldzhus-445x250.jpg" />
+                </div>
 
-                <BlazorClient.Components.Home.MoviesNewsComponent />
-
-                <BlazorClient.Components.Home.GamesNewsComponent />
-
-                <BlazorClient.Components.Home.CollectionsComponent />
-
-                <BlazorClient.Components.Home.SpecialsComponent />
-
-                <BlazorClient.Components.Home.SoonAtMoviesComponent />
-
-                <BlazorClient.Components.Home.GamesReleasesDatesComponent />
+                <div class="index-games">
+                    <h3><a href="https://metarankings.ru/meta/news/igri/">Новости игр</a></h3>
+                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/" Title="Sony объявила системные требования God of War Ragnarök для PC" ImageSrc="https://metarankings.ru/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/activision-predstavila-kinematograficheskij-trejler-zombi-rezhima-call-of-duty-black-ops-6/" Title="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6" ImageSrc="https://metarankings.ru/images/uploads/2024/08/kinematograficheskij-trejler-zombi-rezhima-v-call-of-duty-black-ops-6-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/activision-predstavila-kinematograficheskij-trejler-zombi-rezhima-call-of-duty-black-ops-6/" Title="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6" ImageSrc="https://metarankings.ru/images/uploads/2024/08/kinematograficheskij-trejler-zombi-rezhima-v-call-of-duty-black-ops-6-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/nintendo-pokazala-metroid-prime-4-beyond-dlya-switch/" Title="Nintendo показала Metroid Prime 4: Beyond для Switch" ImageSrc="https://metarankings.ru/images/uploads/2024/06/metroid-prime-4-beyond-445x250.jpg" />
+                </div>
+                <div class="specials-index">
+                    <h3><a href="https://metarankings.ru/meta/collections/">Подборки</a></h3>
+                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
+                </div>
+                <div class="specials-index">
+                    <h3><a href="https://metarankings.ru/meta/specials/">Спецматериалы</a></h3>
+                    <BlazorClient.Components.MainPage.SpecialsItem Href="https://metarankings.ru/vyjdet-li-god-of-war-ragnarok-na-pk/" Title="Выйдет ли God Of War Ragnarok на ПК?" ImageAlt="Выйдет ли God Of War Ragnarok на ПК?" ImageSrc="https://metarankings.ru/images/uploads/2022/08/god-of-war-ragnarok1-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.SpecialsItem Href="https://metarankings.ru/stoit-li-zhdat-overwatch-2/" Title="Стоит ли ждать Overwatch 2?" ImageAlt="Стоит ли ждать Overwatch 2?" ImageSrc="https://metarankings.ru/images/uploads/2022/08/overwatch-2-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.SpecialsItem Href="https://metarankings.ru/pyat-prichin-posmotret-serial-dom-drakona/" Title="5 причин посмотреть сериал «Дом Дракона»" ImageAlt="5 причин посмотреть сериал «Дом Дракона»" ImageSrc="https://metarankings.ru/images/uploads/2022/08/dom-drakona-445x250.jpg" />
+                    <BlazorClient.Components.MainPage.SpecialsItem Href="https://metarankings.ru/evolyuciya-znaka-cheloveka-pauka-za-vsyu-istoriyu-geroya-marvel/" Title="Эволюция знака Человека-Паука &#8212; Как менялся логотип за всю историю героя Marvel" ImageAlt="Эволюция знака Человека-Паука &#8212; Как менялся логотип за всю историю героя Marvel" ImageSrc="https://metarankings.ru/images/uploads/2021/10/chelovek-pauk-445x250.jpg" />
+                </div>
+                <div class="index-movies">
+                    <h3><a href="https://metarankings.ru/coming-soon/">Скоро в кино</a></h3>
+                    <div class="item">
+                        <a href="https://metarankings.ru/krejven-oxotnik-2023/" title="Фильм Крэйвен-охотник"><img class="post-image" src="https://metarankings.ru/images/uploads/2023/06/krejven-oxotnik-box-art-cover-50x70.jpg" alt="Крэйвен-охотник"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/krejven-oxotnik-2023/">Крэйвен-охотник</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/boeviki/">Боевики</a> / <a href="https://metarankings.ru/meta/movies/fantasy/">Фантастика</a> / <a href="https://metarankings.ru/meta/movies/fantasy-movies/">Фэнтези</a></span>
+                        <span class="item-meta">Kraven the Hunter</span>
+                        <span class="item-meta">11 декабря 2024</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/bell-lejk-ozero-demonov-2024/" title="Фильм Белл-Лейк. Озеро демонов"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/12/bell-lejk-ozero-demonov-cover-art-50x70.jpg" alt="Белл-Лейк. Озеро демонов"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/bell-lejk-ozero-demonov-2024/">Белл-Лейк. Озеро демонов</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
+                        <span class="item-meta">The Bell Keeper</span>
+                        <span class="item-meta">12 декабря 2024</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/moj-sosed-monstr-2024/" title="Фильм Мой сосед — монстр"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/12/moj-sosed-monstr-cover-art-50x70.jpg" alt="Мой сосед — монстр"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/moj-sosed-monstr-2024/">Мой сосед — монстр</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/comedy/">Комедии</a> / <a href="https://metarankings.ru/meta/movies/melodramas/">Мелодрамы</a> / <a href="https://metarankings.ru/meta/movies/fantasy-movies/">Фэнтези</a></span>
+                        <span class="item-meta">Your Monster</span>
+                        <span class="item-meta">12 декабря 2024</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/pyatnica-13-e-novaya-glava/" title="Фильм Пятница 13-е. Новая глава"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/12/pyatnica-13-e-novaya-glava-coverart-50x70.jpg" alt="Пятница 13-е. Новая глава"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/pyatnica-13-e-novaya-glava/">Пятница 13-е. Новая глава</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
+                        <span class="item-meta">The Hangman</span>
+                        <span class="item-meta">12 декабря 2024</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/tri-kota-zimnie-kanikuly-2024/" title="Фильм Три кота. Зимние каникулы"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/tri-kota-zimnie-kanikuly-cover-art-50x70.jpg" alt="Три кота. Зимние каникулы"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/tri-kota-zimnie-kanikuly-2024/">Три кота. Зимние каникулы</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/cartoons/">Мультфильмы</a></span>
+                        <span class="item-meta">Три кота. Зимние каникулы</span>
+                        <span class="item-meta">12 декабря 2024</span>
+                    </div>
+                    <a href="https://metarankings.ru/most-waiting-films/" class="allreviews">Самые ожидаемые фильмы</a>
+                </div>
+                <div class="index-games">
+                    <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
+                    <div class="item">
+                        <a href="https://metarankings.ru/alien-rogue-incursion/" title="Игра Alien: Rogue Incursion"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg" alt="Alien: Rogue Incursion"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/alien-rogue-incursion/">Alien: Rogue Incursion</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/genre/xorror/">Хоррор</a></span>
+                        <span class="item-meta">19 декабря 2024</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/hollywood-animal/" title="Игра Hollywood Animal"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/01/hollywood-animal-boxart-cover-50x70.jpg" alt="Hollywood Animal"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/hollywood-animal/">Hollywood Animal</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/genre/strategiya/">Стратегия</a></span>
+                        <span class="item-meta">16 января 2025</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/sid-meiers-civilization-7/" title="Игра Sid Meier&#8217;s Civilization 7"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/02/sid-meiers-civilization-7-boxart-cover-50x70.jpg" alt="Sid Meier&#8217;s Civilization 7"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/sid-meiers-civilization-7/">Sid Meier&#8217;s Civilization 7</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/genre/strategiya/">Стратегия</a></span>
+                        <span class="item-meta">6 февраля 2025</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/kingdom-come-deliverance-2/" title="Игра Kingdom Come: Deliverance 2"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/02/kingdom-come-deliverance-2-cover-art-50x70.jpg" alt="Kingdom Come: Deliverance 2"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/kingdom-come-deliverance-2/">Kingdom Come: Deliverance 2</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/genre/rpg/">РПГ</a></span>
+                        <span class="item-meta">11 февраля 2025</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/assassins-creed-shadows/" title="Игра Assassin’s Creed Shadows"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/assassins-creed-shadows-boxart-cover-50x70.jpg" alt="Assassin’s Creed Shadows"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/assassins-creed-shadows/">Assassin’s Creed Shadows</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/genre/ekshen/">Экшен</a></span>
+                        <span class="item-meta">14 феврая 2025</span>
+                    </div>
+                    <a href="https://metarankings.ru/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
+                </div>
             </div>
         </div>
-        <BlazorClient.Components.Home.LastReviewsComponent />
+        <div class="sidebar rcol">
+            <div class="widget last-reviews">
+                <h3>Последние отзывы</h3>
+                <div class="widget-body">
+                    <ul>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/pyatyj-bitl-2024/">Пятый битл</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/priklyucheniya-paddingtona-3/">Приключения Паддингтона 3</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/moana-2/">Моана 2</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/konklav-2024/">Конклав</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/gladiator-2/">Гладиатор 2</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/eretik-2024/">Еретик</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/lyubov-sovetskogo-soyuza-2024/">Любовь Советского Союза</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/vozvrashhenie-popugaya-keshi-2024/">Возвращение попугая Кеши</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/venom-3-poslednij-tanec-2024/">Веном 3: Последний танец</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/dzhoker-bezumie-na-dvoix/">Джокер: Безумие на двоих</a></span>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/indiana-jones-and-the-great-circle/">Indiana Jones and the Great Circle</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/stalker-2/">S.T.A.L.K.E.R. 2: Heart of Chernobyl</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/dragon-age-the-veilguard/">Dragon Age: The Veilguard</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/call-of-duty-black-ops-6/">Call of Duty: Black Ops 6</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/game-silent-hill-2-remake/">Silent Hill 2</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/the-legend-of-zelda-echoes-of-wisdom/">The Legend of Zelda: Echoes of Wisdom</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/astro-bot/">Astro Bot</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/star-wars-outlaws/">Star Wars Outlaws</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/black-myth-wukong/">Black Myth: WuKong</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/senuas-saga-hellblade-2/">Senua’s Saga: Hellblade 2</a></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="footer">
-        <BlazorClient.Components.Home.CopyrightComponent />
-        <BlazorClient.Components.Home.CreditsComponent />
+
+        <!-- //Rating Mail.ru counter --><div class="copyright">
+            &copy; 2014 - 2024 <span data-title="MetaRankings" class="tooltip">MetaRankings</span>
+            <a rel="nofollow" href="/about/" data-title="О сайте" class="tooltip">О нас</a>
+            <a rel="nofollow" href="/contact/" data-title="Форма обратной связи" class="tooltip">Связь</a>
+            <a rel="nofollow" href="/polzovatelskoe-soglashenie/" data-title="Пользовательское соглашение" class="tooltip">Пользовательское соглашение</a>
+            <a rel="nofollow" href="/politika-konfidencialnosti/" data-title="Политика конфиденциальности" class="tooltip">Конфиденциальность</a>
+        </div>
+        <div class="credits">
+            <span class="pegi"><span data-title="Сайт может содержать контент не предназначенный лицам до 18 лет" class="tooltip">18+</span></span>
+            <a href="https://vk.com/metarankings_ru" rel="nofollow noopener" target="_blank" title="VK"><span class="vko"></span></a>
+            <a href="https://twitter.com/metarankings" rel="nofollow noopener" target="_blank" title="Twitter"><span class="tw"></span></a>
+        </div>
     </div>
 </div>
 <div class="wbody" onclick="show('none')"></div>
 <div class="window">
 </div>
-<BlazorClient.Components.Home.LoginPopupComponent />
+<div class="popup_block">
+    <form action="https://metarankings.ru/login.php?redirect_to=https%3A%2F%2Fmetarankings.ru%2Flegacy-of-kain-soul-reaver-12-remastered%2F" id="loginForm" method="post">
+        <div class="field">
+            <label>Имя пользователя</label>
+            <div class="input">
+                <input type="text" name="log" value="" id="login" />
+            </div>
+        </div>
+        <div class="field">
+            <a rel="nofollow" href="https://metarankings.ru/login.php?action=lostpassword" id="forgot">Забыли?</a>
+            <label>Пароль</label>
+            <div class="input">
+                <input type="password" name="pwd" value="" id="pass" />
+            </div>
+        </div>
+        <div class="submit">
+            <button name="submit" type="submit">Войти</button>
+            <div class="registr"><a rel="nofollow" href="https://metarankings.ru/login.php?action=register">Регистрация</a></div>
+        </div>
+    </form>
+</div>
 <div id="toTop" class="toTop">↑</div>

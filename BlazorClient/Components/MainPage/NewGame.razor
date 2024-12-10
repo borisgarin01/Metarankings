@@ -1,0 +1,33 @@
+﻿@using System.Globalization
+<div class="item">
+    <a href="@Href" title="Игра @Name"><img class="post-image" src="@ImageSrc" alt="@ImageAlt"></a>
+    <div class="small-score mark-@Math.Round(Score)"><span data-title="Рейтинг игры" class="tooltip">@Score</span></div>
+    <span class="item-name"><a href="@Href">@Name</a></span>
+    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps4/">PS4</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/switch/">Switch</a> / <a href="https://metarankings.ru/meta/games/xbox-one/">Xbox One</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/#reviews">Рецензии (3)</a> <a rel="nofollow" href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/#comments">Отзывы (0)</a></span>
+    <span class="item-meta">@ReleaseDate.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span>
+    <span class="item-description">@Description</span>
+</div>
+
+@code {
+    [Parameter]
+    public string Href { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public string ImageSrc { get; set; }
+
+    [Parameter]
+    public float Score { get; set; }
+
+    [Parameter]
+    public string ImageAlt { get; set; }
+
+    [Parameter]
+    public DateTime ReleaseDate { get; set; }
+
+    [Parameter]
+    public string Description { get; set; }
+}
