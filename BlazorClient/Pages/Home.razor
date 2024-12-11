@@ -89,18 +89,10 @@
                 </div>
                 <div class="specials-index">
                     <h3><a href="https://metarankings.ru/meta/collections/">Подборки</a></h3>
-
-                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.CollectionItem Href="https://metarankings.ru/samye-slozhnye-igry/" Title="Самые сложные игры" ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" />
+                    @foreach (CollectionItem collectionItem in CollectionItems)
+                    {
+                        <BlazorClient.Components.MainPage.CollectionItem Href="@collectionItem.Href" Title="@collectionItem.Title" ImageSrc="@collectionItem.ImageSrc" />
+                    }
                 </div>
                 <div class="specials-index">
                     <h3><a href="https://metarankings.ru/meta/specials/">Спецматериалы</a></h3>
@@ -423,6 +415,46 @@
             Href="https://metarankings.ru/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/",
             Title="Sony объявила системные требования God of War Ragnarök для PC",
             ImageSrc="https://metarankings.ru/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg"
+        }
+    };
+
+    public CollectionItem[] CollectionItems { get; set; } = new CollectionItem[]
+    {
+        new CollectionItem
+        {
+            Href="https://metarankings.ru/samye-slozhnye-igry/",
+            Title="Самые сложные игры",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg"
+        },
+        new CollectionItem
+        {
+            Href="https://metarankings.ru/samye-slozhnye-igry/",
+            Title="Самые сложные игры",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg"
+        },
+        new CollectionItem
+        {
+            Href="https://metarankings.ru/samye-slozhnye-igry/",
+            Title="Самые сложные игры",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg"
+        },
+        new CollectionItem
+        {
+            Href="https://metarankings.ru/samye-slozhnye-igry/",
+            Title="Самые сложные игры",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg"
+        },
+        new CollectionItem
+        {
+            Href="https://metarankings.ru/samye-slozhnye-igry/",
+            Title="Самые сложные игры",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg"
+        },
+        new CollectionItem
+        {
+            Href="https://metarankings.ru/samye-slozhnye-igry/",
+            Title="Самые сложные игры",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg"
         }
     };
 }
