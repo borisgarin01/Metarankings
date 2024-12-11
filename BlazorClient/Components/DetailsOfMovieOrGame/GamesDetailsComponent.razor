@@ -1,4 +1,4 @@
-﻿@page "/games/details/{Title}"
+﻿@page "/games/details/alex"
 @using Domain
 @using System.Globalization
 
@@ -9,27 +9,7 @@
 <BlazorClient.Components.Home.TopHomeNavigationComponent />
 
 <div class="wrapper">
-    <div class="game-menu">
-        <div class="platform-menu">
-            <ul>
-                <li>
-                    <a class="bst" href="https://metarankings.ru/best-games-2024/">Лучшие игры 2024</a>
-                </li>
-                <li>
-                    <a class="bst" href="https://metarankings.ru/best-games-2023/">2023</a>
-                </li>
-                <li>
-                    <a class="mnew" href="https://metarankings.ru/new-games/">Новые игры</a>
-                </li>
-                <li>
-                    <a href="https://metarankings.ru/release-date/">Дата выхода игр</a>
-                </li>
-                <li>
-                    <a href="https://metarankings.ru/most-waiting-games/">Самые ожидаемые игры</a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <GameMenu />
     <div id="container" class="clear">
         <div class="sidebar">
         </div>
@@ -38,12 +18,44 @@
                 <div class="post single clear game" id="post_25216">
 
                     <div class="featured-game">
-                        <p><span class="label">Разработчик:</span> <a href="/razrabotchiki/nightdive_studios/">Nightdive Studios</a>, ...</p>
-                        <p><span class="label">Издатель:</span> <a itemprop="publisher" href="/izdateli/nightdive_studios/">Nightdive Studios</a> </p>
-                        <p><span class="label">Платформы:</span> <span itemprop="gamePlatform"><a href="https://metarankings.ru/meta/games/pc/">PC</a>, <a href="https://metarankings.ru/meta/games/ps4/">PS4</a>, <a href="https://metarankings.ru/meta/games/ps5/">PS5</a>, <a href="https://metarankings.ru/meta/games/switch/">Switch</a>, <a href="https://metarankings.ru/meta/games/xbox-one/">Xbox One</a>, <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span></p>
-                        <p><span class="label">Жанр:</span> <span itemprop="genre"><a href="https://metarankings.ru/genre/xorror/">Хоррор</a></span></p>
-                        <p><span class="label">Локализация:</span> <span itemprop="inLanguage">Английский</span> (<a href="https://metarankings.ru/igry-bez-russkogo-yazyka/">без русского языка</a>)</p>
-                        <p><span class="label">Дата выхода:</span> </p>
+                        <p>
+                            <span class="label">Разработчик:</span> @foreach (var developer in FeaturedGame.Developers)
+                            {
+                                <a href="@developer.Link">@developer.Name</a>
+
+                                <text>, </text>
+                            }
+                        </p>
+                        <p>
+                            <span class="label">Издатель:</span> @foreach (var publisher in FeaturedGame.Publishers)
+                            {
+                                <a href="@publisher.Link">@publisher.Name</a>
+
+                                <text>, </text>
+                            }
+                        </p>
+                        <p>
+                            <span class="label">Платформы:</span> <span itemprop="gamePlatform">
+                                @foreach (var platform in FeaturedGame.Platforms)
+                                {
+                                    <a href="@platform.Link">@platform.Name</a>
+                                    <text>, </text>
+                                }
+                            </span>
+                        </p>
+                        <p>
+                            <span class="label">Жанр:</span> <span itemprop="genre">
+                                @foreach (var genre in FeaturedGame.Genres)
+                                {
+                                    <a href="@genre.Link">@genre.Name</a>
+                                }
+                            </span>
+                        </p>
+                        <p><span class="label">Локализация:</span> <span itemprop="inLanguage"></span> (<a href="@FeaturedGame.Localization.Link">@FeaturedGame.Localization.Name</a>)</p>
+                        @if (FeaturedGame.ReleaseDate != default(DateTime))
+                        {
+                            <p><span class="label">Дата выхода:</span> @FeaturedGame.ReleaseDate.ToString("dd MM yyyy", new CultureInfo("RU-ru"))</p>
+                        }
                     </div>
 
                     <div class="description">
@@ -297,6 +309,46 @@
     </div>
 </div>
 
-@code {
-
+@code
+{
+    public FeaturedGame FeaturedGame { get; set; } = new FeaturedGame
+        {
+            Developers = new Developer[]
+                                                    {
+                new Developer
+                {
+                    Name = "Nightdive Studios",
+                    Link = "/razrabotchiki/nightdive_studios/"
+                }
+                                                    },
+            Localization = new Localization
+            {
+                Link = "https://metarankings.ru/igry-bez-russkogo-yazyka/",
+                Name = "Английский (без русского языка)"
+            },
+            Platforms = new Platform[]
+                                                    {
+                new Platform
+                {
+                    Link = "https://metarankings.ru/meta/games/pc/",
+                    Name = "PC"
+                }
+                                                    },
+            Publishers = new Publisher[]
+                                                    {
+                new Publisher
+                {
+                    Name = "Nightdive Studios",
+                    Link = "/razrabotchiki/nightdive_studios/"
+                }
+                                                    },
+            Genres = new Genre[]
+                                                {
+                new Genre
+            {
+                Name = "Хоррор",
+                Link = "https://metarankings.ru/genre/xorror/"
+            }
+                                            }
+        };
 }
