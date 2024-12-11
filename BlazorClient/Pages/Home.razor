@@ -10,7 +10,7 @@
         <div id="slideshow" class="cycle-slideshow" data-cycle-fx="scrollHorz" data-cycle-timeout="7000" data-cycle-slides="> div" data-cycle-pager=".pager">
             <div class="slide clear" data-cycle-pager-template="<span>Фильмы</span>">
                 <div class="post">
-                    @foreach (var scoredItemImagedLink in ScoredImagedLinkedTitledMovies)
+                    @foreach (ScoredImagedLinkedTitledItem scoredItemImagedLink in ScoredImagedLinkedTitledMovies)
                     {
                         <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="@scoredItemImagedLink.Url" ImageSource="@scoredItemImagedLink.ImageSource" Score="@scoredItemImagedLink.Score" Title="@scoredItemImagedLink.Title" />
                     }
@@ -18,7 +18,7 @@
             </div>
             <div class="slide clear" data-cycle-pager-template="<span>Игры</span>">
                 <div class="post">
-                    @foreach (var scoredItemImagedLink in ScoredImagedLinkedTitledGames)
+                    @foreach (ScoredImagedLinkedTitledItem scoredItemImagedLink in ScoredImagedLinkedTitledGames)
                     {
                         <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="@scoredItemImagedLink.Url" ImageSource="@scoredItemImagedLink.ImageSource" Score="@scoredItemImagedLink.Score" Title="@scoredItemImagedLink.Title" />
                     }
@@ -34,7 +34,7 @@
                 <div class="index-movies">
                     <h3><a href="https://metarankings.ru/new-movies/">Новые фильмы</a></h3>
 
-                    @foreach (var newMovie in NewMovies)
+                    @foreach (NewMovie newMovie in NewMovies)
                     {
                         <BlazorClient.Components.MainPage.NewMovie Description="@newMovie.Description" ImageHref="@newMovie.ImageHref" Link="@newMovie.Link" ReleaseDate="@newMovie.ReleaseDate" Score="@newMovie.Score" Title="@newMovie.Title" />
                     }
@@ -59,17 +59,10 @@
 
                 <div class="index-games">
                     <h3><a href="https://metarankings.ru/new-games/">Новые игры</a></h3>
-                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
-
-                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
-
-                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
-
-                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
-
-                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
-
-                    <BlazorClient.Components.MainPage.NewGame Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/" Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди..." ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg" Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered" ReleaseDate="new DateTime(2024,12,10)" />
+                    @foreach (NewGame newGame in NewGames)
+                    {
+                        <BlazorClient.Components.MainPage.NewGame Href="@newGame.Href" Description="@newGame.Description" ImageAlt="@newGame.ImageAlt" ImageSrc="@newGame.ImageSrc" Name="@newGame.Name" ReleaseDate="@newGame.ReleaseDate" />
+                    }
 
                     <BlazorClient.Components.SelectGameYearComponent />
                     <a class="allreviews" href="https://metarankings.ru/meta/games/">Обзоры на игры</a>
@@ -322,6 +315,64 @@
             ReleaseDate=new DateTime(2024,12,5),
             Score=7.8f,
             Title="Фильм Ариэтти из страны лилипутов"
+        }
+    };
+
+    public NewGame[] NewGames { get; set; } = new NewGame[]
+    {
+        new NewGame
+        {
+            Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/",
+            Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди...",
+            ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg",
+            Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ReleaseDate=new DateTime(2024,12,10)
+        },
+        new NewGame
+        {
+            Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/",
+            Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди...",
+            ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg",
+            Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ReleaseDate=new DateTime(2024,12,10)
+        },
+        new NewGame
+        {
+            Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/",
+            Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди...",
+            ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg",
+            Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ReleaseDate=new DateTime(2024,12,10)
+        },
+        new NewGame
+        {
+            Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/",
+            Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди...",
+            ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg",
+            Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ReleaseDate=new DateTime(2024,12,10)
+        },
+        new NewGame
+        {
+            Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/",
+            Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди...",
+            ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg",
+            Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ReleaseDate=new DateTime(2024,12,10)
+        },
+        new NewGame
+        {
+            Href="https://metarankings.ru/legacy-of-kain-soul-reaver-12-remastered/",
+            Description="Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди...",
+            ImageAlt="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg",
+            Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
+            ReleaseDate=new DateTime(2024,12,10)
         }
     };
 }
