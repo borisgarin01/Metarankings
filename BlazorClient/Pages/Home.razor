@@ -10,31 +10,18 @@
         <div id="slideshow" class="cycle-slideshow" data-cycle-fx="scrollHorz" data-cycle-timeout="7000" data-cycle-slides="> div" data-cycle-pager=".pager">
             <div class="slide clear" data-cycle-pager-template="<span>Фильмы</span>">
                 <div class="post">
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/eretik-2024/" ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg" Score="7.3f" Title="Еретик" />
-
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/kanikuly-2024/" ImageSource="https://metarankings.ru/images/uploads/2024/11/kanikuly-2024-cover-art-196x281.jpg" Score="7.2f" Title="Каникулы" />
-
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/zlaya-skazka-o-vedme-zapada-2024/" ImageSource="https://metarankings.ru/images/uploads/2024/11/zlaya-skazka-o-vedme-zapada-boxart-cover-196x281.jpg" Score="7.1f" Title="Злая: Сказка о ведьме Запада" />
-
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/vampiry-lyogkogo-povedeniya-2024/" ImageSource="https://metarankings.ru/images/uploads/2024/11/vampiry-lyogkogo-povedeniya-cover-art-196x281.jpg" Score="7f" Title="Вампиры лёгкого поведения" />
-
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/moana-2/" ImageSource="https://metarankings.ru/images/uploads/2024/11/moana-2-cover-art1-196x281.jpg" Score="7f" Title="Моана 2" />
-
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/ptica-2024/" ImageSource="https://metarankings.ru/images/uploads/2024/11/ptica-2024-cover-art-197x281.jpg" Score="6.7f" Title="Птица" />
+                    @foreach (var scoredItemImagedLink in ScoredImagedLinkedTitledMovies)
+                    {
+                        <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="@scoredItemImagedLink.Url" ImageSource="@scoredItemImagedLink.ImageSource" Score="@scoredItemImagedLink.Score" Title="@scoredItemImagedLink.Title" />
+                    }
                 </div>
             </div>
             <div class="slide clear" data-cycle-pager-template="<span>Игры</span>">
                 <div class="post">
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/dragon-quest-iii-hd-2d-remake/" ImageSource="https://metarankings.ru/images/uploads/2024/11/dragon-quest-iii-hd-2d-remake-boxart-cover-196x281.jpg" Score="7.5f" Title="Dragon Quest III HD-2D Remake" />
-
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/stalker-2/" ImageSource="https://metarankings.ru/images/uploads/2022/04/stalker-2-heart-of-chernobyl-cover-art-200x278.jpg" Score="7.2f" Title="S.T.A.L.K.E.R. 2: Heart of Chernobyl" />
-
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/metro-awakening/" ImageSource="https://metarankings.ru/images/uploads/2024/10/metro-awakening-boxart-cover-196x281.jpg" Score="7f" Title="Metro Awakening" />
-
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/teenage-mutant-ninja-turtles-splintered-fate/" ImageSource="https://metarankings.ru/images/uploads/2024/11/teenage-mutant-ninja-turtles-splintered-fate-cover-art-196x281.jpg" Score="6.8f" Title="Teenage Mutant Ninja Turtles: Splintered Fate" />
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/sorry-were-closed/" ImageSource="https://metarankings.ru/images/uploads/2024/11/sorry-were-closed-boxart-cover-196x281.jpg" Score="6.7f" Title="Sorry We&#8217;re Closed" />
-
-                    <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="https://metarankings.ru/mario-luigi-brothership/" ImageSource="https://metarankings.ru/images/uploads/2024/11/mario-luigi-brothership-boxart-cover-196x281.jpg" Score="6.6f" Title="Mario &#038; Luigi: Brothership" />
+                    @foreach (var scoredItemImagedLink in ScoredImagedLinkedTitledGames)
+                    {
+                        <BlazorClient.Components.MainPage.ScoredItemImagedLink Url="@scoredItemImagedLink.Url" ImageSource="@scoredItemImagedLink.ImageSource" Score="@scoredItemImagedLink.Score" Title="@scoredItemImagedLink.Title" />
+                    }
                 </div>
             </div>
         </div>
@@ -194,4 +181,95 @@
 <div id="toTop" class="toTop">↑</div>
 
 @code {
+    ScoredImagedLinkedTitledItem[] ScoredImagedLinkedTitledMovies { get; set; } = new ScoredImagedLinkedTitledItem[]
+        {
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            }
+    };
+
+    ScoredImagedLinkedTitledItem[] ScoredImagedLinkedTitledGames { get; set; } = new ScoredImagedLinkedTitledItem[]
+        {
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            }
+    };
 }
