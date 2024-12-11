@@ -74,24 +74,18 @@
 
                 <div class="index-movies">
                     <h3><a href="https://metarankings.ru/meta/news/kino/">Новости кино</a></h3>
-                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/ridli-skott-predstavil-trejler-gladiator-2-s-pedro-paskal-i-denzelem-vashingtonom/" Title="Ридли Скотт представил трейлер «Гладиатор 2» с  Педро Паскаль и Дензелем Вашингтоном" ImageSrc="https://metarankings.ru/images/uploads/2024/07/gladiator-2-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/tom-xardi-uxodit-ot-pogoni-v-trejlere-venom-3-poslednij-tanec/" Title="Том Харди уходит от погони в трейлере «Веном 3: Последний танец»" ImageSrc="https://metarankings.ru/images/uploads/2024/06/venom-3-poslednij-tanec-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/dzhenna-ortega-uillem-defo-moniki-belluchchi-i-drugie-v-trejlere-bitldzhus-bitldzhus/" Title="Дженна Ортега, Уиллем Дефо, Моники Беллуччи и другие в трейлере «Битлджус Битлджус»" ImageSrc="https://metarankings.ru/images/uploads/2024/05/bitldzhus-bitldzhus-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/dzhenna-ortega-uillem-defo-moniki-belluchchi-i-drugie-v-trejlere-bitldzhus-bitldzhus/" Title="Дженна Ортега, Уиллем Дефо, Моники Беллуччи и другие в трейлере «Битлджус Битлджус»" ImageSrc="https://metarankings.ru/images/uploads/2024/05/bitldzhus-bitldzhus-445x250.jpg" />
+                    @foreach (News news in MoviesNews)
+                    {
+                        <BlazorClient.Components.MainPage.NewsItem Href="@news.Href" Title="@news.Title" ImageSrc="@news.ImageSrc" />
+                    }
                 </div>
 
                 <div class="index-games">
                     <h3><a href="https://metarankings.ru/meta/news/igri/">Новости игр</a></h3>
-                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/" Title="Sony объявила системные требования God of War Ragnarök для PC" ImageSrc="https://metarankings.ru/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/activision-predstavila-kinematograficheskij-trejler-zombi-rezhima-call-of-duty-black-ops-6/" Title="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6" ImageSrc="https://metarankings.ru/images/uploads/2024/08/kinematograficheskij-trejler-zombi-rezhima-v-call-of-duty-black-ops-6-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/activision-predstavila-kinematograficheskij-trejler-zombi-rezhima-call-of-duty-black-ops-6/" Title="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6" ImageSrc="https://metarankings.ru/images/uploads/2024/08/kinematograficheskij-trejler-zombi-rezhima-v-call-of-duty-black-ops-6-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.NewsItem Href="https://metarankings.ru/nintendo-pokazala-metroid-prime-4-beyond-dlya-switch/" Title="Nintendo показала Metroid Prime 4: Beyond для Switch" ImageSrc="https://metarankings.ru/images/uploads/2024/06/metroid-prime-4-beyond-445x250.jpg" />
+                    @foreach (News news in GamesNews)
+                    {
+                        <BlazorClient.Components.MainPage.NewsItem Href="@news.Href" Title="@news.Title" ImageSrc="@news.ImageSrc" />
+                    }
                 </div>
                 <div class="specials-index">
                     <h3><a href="https://metarankings.ru/meta/collections/">Подборки</a></h3>
@@ -373,6 +367,62 @@
             ImageSrc="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-50x70.jpg",
             Name="Legacy of Kain Soul Reaver 1&#038;2 Remastered",
             ReleaseDate=new DateTime(2024,12,10)
+        }
+    };
+
+    public News[] MoviesNews { get; set; } = new News[]
+    {
+        new News
+        {
+            Href="https://metarankings.ru/ridli-skott-predstavil-trejler-gladiator-2-s-pedro-paskal-i-denzelem-vashingtonom/",
+            Title="Ридли Скотт представил трейлер «Гладиатор 2» с  Педро Паскаль и Дензелем Вашингтоном",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/07/gladiator-2-445x250.jpg"
+        },
+        new News
+        {
+            Href="https://metarankings.ru/ridli-skott-predstavil-trejler-gladiator-2-s-pedro-paskal-i-denzelem-vashingtonom/",
+            Title="Ридли Скотт представил трейлер «Гладиатор 2» с  Педро Паскаль и Дензелем Вашингтоном",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/07/gladiator-2-445x250.jpg"
+        },
+        new News
+        {
+            Href="https://metarankings.ru/ridli-skott-predstavil-trejler-gladiator-2-s-pedro-paskal-i-denzelem-vashingtonom/",
+            Title="Ридли Скотт представил трейлер «Гладиатор 2» с  Педро Паскаль и Дензелем Вашингтоном",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/07/gladiator-2-445x250.jpg"
+        },
+        new News
+        {
+            Href="https://metarankings.ru/ridli-skott-predstavil-trejler-gladiator-2-s-pedro-paskal-i-denzelem-vashingtonom/",
+            Title="Ридли Скотт представил трейлер «Гладиатор 2» с  Педро Паскаль и Дензелем Вашингтоном",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/07/gladiator-2-445x250.jpg"
+        }
+    };
+
+    public News[] GamesNews { get; set; } = new News[]
+    {
+        new News
+        {
+            Href="https://metarankings.ru/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/",
+            Title="Sony объявила системные требования God of War Ragnarök для PC",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg"
+        },
+        new News
+        {
+            Href="https://metarankings.ru/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/",
+            Title="Sony объявила системные требования God of War Ragnarök для PC",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg"
+        },
+        new News
+        {
+            Href="https://metarankings.ru/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/",
+            Title="Sony объявила системные требования God of War Ragnarök для PC",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg"
+        },
+        new News
+        {
+            Href="https://metarankings.ru/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/",
+            Title="Sony объявила системные требования God of War Ragnarök для PC",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg"
         }
     };
 }
