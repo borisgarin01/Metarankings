@@ -113,16 +113,10 @@
                 <!--11.12.2024 17:19 TODO: continue here-->
                 <div class="index-games">
                     <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
-
-                    <BlazorClient.Components.MainPage.GameReleaseDate Href="https://metarankings.ru/alien-rogue-incursion/" ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg" Name="Alien: Rogue Incursion" ReleaseDate="new DateTime(2024,12,19)" />
-
-                    <BlazorClient.Components.MainPage.GameReleaseDate Href="https://metarankings.ru/alien-rogue-incursion/" ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg" Name="Alien: Rogue Incursion" ReleaseDate="new DateTime(2024,12,19)" />
-
-                    <BlazorClient.Components.MainPage.GameReleaseDate Href="https://metarankings.ru/alien-rogue-incursion/" ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg" Name="Alien: Rogue Incursion" ReleaseDate="new DateTime(2024,12,19)" />
-
-                    <BlazorClient.Components.MainPage.GameReleaseDate Href="https://metarankings.ru/alien-rogue-incursion/" ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg" Name="Alien: Rogue Incursion" ReleaseDate="new DateTime(2024,12,19)" />
-
-                    <BlazorClient.Components.MainPage.GameReleaseDate Href="https://metarankings.ru/alien-rogue-incursion/" ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg" Name="Alien: Rogue Incursion" ReleaseDate="new DateTime(2024,12,19)" />
+                    @foreach (GameReleaseDate gameReleaseDate in GamesReleasesDates)
+                    {
+                        <BlazorClient.Components.MainPage.GameReleaseDate Href="@gameReleaseDate.Href" ImageSrc="@gameReleaseDate.ImageSrc" Name="@gameReleaseDate.Name" ReleaseDate=@gameReleaseDate.ReleaseDate />
+                    }
                     <a href="https://metarankings.ru/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
                 </div>
             </div>
@@ -523,6 +517,45 @@
             Name="Крэйвен-охотник",
             OriginalName="Kraven the Hunter",
             ReleaseDate=new DateTime(2024,12,11)
+        }
+    };
+
+    public GameReleaseDate[] GamesReleasesDates { get; set; } = new GameReleaseDate[]
+    {
+        new GameReleaseDate
+        {
+            Href="https://metarankings.ru/alien-rogue-incursion/",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg",
+            Name="Alien: Rogue Incursion",
+            ReleaseDate=new DateTime(2024,12,19)
+        },
+        new GameReleaseDate
+        {
+            Href="https://metarankings.ru/alien-rogue-incursion/",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg",
+            Name="Alien: Rogue Incursion",
+            ReleaseDate=new DateTime(2024,12,19)
+        },
+        new GameReleaseDate
+        {
+            Href="https://metarankings.ru/alien-rogue-incursion/",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg",
+            Name="Alien: Rogue Incursion",
+            ReleaseDate=new DateTime(2024,12,19)
+        },
+        new GameReleaseDate
+        {
+            Href="https://metarankings.ru/alien-rogue-incursion/",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg",
+            Name="Alien: Rogue Incursion",
+            ReleaseDate=new DateTime(2024,12,19)
+        },
+        new GameReleaseDate
+        {
+            Href="https://metarankings.ru/alien-rogue-incursion/",
+            ImageSrc="https://metarankings.ru/images/uploads/2024/12/alien-rogue-incursion-boxart-cover-50x70.jpg",
+            Name="Alien: Rogue Incursion",
+            ReleaseDate=new DateTime(2024,12,19)
         }
     };
 }
