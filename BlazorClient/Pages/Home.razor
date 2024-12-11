@@ -104,18 +104,13 @@
                 </div>
                 <div class="index-movies">
                     <h3><a href="https://metarankings.ru/coming-soon/">Скоро в кино</a></h3>
-
-                    <BlazorClient.Components.MainPage.SoonAtCinemasComponentItem Href="https://metarankings.ru/krejven-oxotnik-2023/" ImageSrc="https://metarankings.ru/images/uploads/2023/06/krejven-oxotnik-box-art-cover-50x70.jpg" Name="Крэйвен-охотник" OriginalName="Kraven the Hunter" ReleaseDate="new DateTime(2024,12,11)" />
-
-                    <BlazorClient.Components.MainPage.SoonAtCinemasComponentItem Href="https://metarankings.ru/bell-lejk-ozero-demonov-2024/" ImageSrc="https://metarankings.ru/images/uploads/2024/12/bell-lejk-ozero-demonov-cover-art-50x70.jpg" Name="Белл-Лейк. Озеро демонов" OriginalName="The Bell Keeper" ReleaseDate="new DateTime(2024,12,12)" />
-
-                    <BlazorClient.Components.MainPage.SoonAtCinemasComponentItem Href="https://metarankings.ru/moj-sosed-monstr-2024/" ImageSrc="https://metarankings.ru/images/uploads/2024/12/moj-sosed-monstr-cover-art-50x70.jpg" Name="Мой сосед — монстр" OriginalName="Your Monster" ReleaseDate="new DateTime(2024,12,12)" />
-
-                    <BlazorClient.Components.MainPage.SoonAtCinemasComponentItem Href="https://metarankings.ru/pyatnica-13-e-novaya-glava/" ImageSrc="https://metarankings.ru/images/uploads/2024/12/pyatnica-13-e-novaya-glava-coverart-50x70.jpg" Name="Пятница 13-е. Новая глава" OriginalName="The Hangman" ReleaseDate="new DateTime(2024,12,12)" />
-
-                    <BlazorClient.Components.MainPage.SoonAtCinemasComponentItem Href="https://metarankings.ru/tri-kota-zimnie-kanikuly-2024/" ImageSrc="https://metarankings.ru/images/uploads/2024/11/tri-kota-zimnie-kanikuly-cover-art-50x70.jpg" Name="Три кота. Зимние каникулы" OriginalName="Три кота. Зимние каникулы" ReleaseDate="new DateTime(2024,12,12)" />
+                    @foreach (SoonAtCinemasComponentItem soonAtCinemasComponentItem in SoonAtCinemasComponentItems)
+                    {
+                        <BlazorClient.Components.MainPage.SoonAtCinemasComponentItem Href="@soonAtCinemasComponentItem.Href" ImageSrc="@soonAtCinemasComponentItem.ImageSrc" Name="@soonAtCinemasComponentItem.Name" OriginalName="@soonAtCinemasComponentItem.OriginalName" ReleaseDate=@soonAtCinemasComponentItem.ReleaseDate />
+                    }
                     <a href="https://metarankings.ru/most-waiting-films/" class="allreviews">Самые ожидаемые фильмы</a>
                 </div>
+                <!--11.12.2024 17:19 TODO: continue here-->
                 <div class="index-games">
                     <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
 
@@ -484,6 +479,50 @@
             ImageAlt="Выйдет ли God Of War Ragnarok на ПК?",
             ImageSrc="https://metarankings.ru/images/uploads/2022/08/god-of-war-ragnarok1-445x250.jpg",
             Title="Выйдет ли God Of War Ragnarok на ПК?"
+        }
+    };
+
+    public SoonAtCinemasComponentItem[] SoonAtCinemasComponentItems { get; set; } = new SoonAtCinemasComponentItem[]
+    {
+        new SoonAtCinemasComponentItem
+        {
+            Href="https://metarankings.ru/krejven-oxotnik-2023/",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/krejven-oxotnik-box-art-cover-50x70.jpg",
+            Name="Крэйвен-охотник",
+            OriginalName="Kraven the Hunter",
+            ReleaseDate=new DateTime(2024,12,11)
+        },
+        new SoonAtCinemasComponentItem
+        {
+            Href="https://metarankings.ru/krejven-oxotnik-2023/",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/krejven-oxotnik-box-art-cover-50x70.jpg",
+            Name="Крэйвен-охотник",
+            OriginalName="Kraven the Hunter",
+            ReleaseDate=new DateTime(2024,12,11)
+        },
+        new SoonAtCinemasComponentItem
+        {
+            Href="https://metarankings.ru/krejven-oxotnik-2023/",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/krejven-oxotnik-box-art-cover-50x70.jpg",
+            Name="Крэйвен-охотник",
+            OriginalName="Kraven the Hunter",
+            ReleaseDate=new DateTime(2024,12,11)
+        },
+        new SoonAtCinemasComponentItem
+        {
+            Href="https://metarankings.ru/krejven-oxotnik-2023/",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/krejven-oxotnik-box-art-cover-50x70.jpg",
+            Name="Крэйвен-охотник",
+            OriginalName="Kraven the Hunter",
+            ReleaseDate=new DateTime(2024,12,11)
+        },
+        new SoonAtCinemasComponentItem
+        {
+            Href="https://metarankings.ru/krejven-oxotnik-2023/",
+            ImageSrc="https://metarankings.ru/images/uploads/2023/06/krejven-oxotnik-box-art-cover-50x70.jpg",
+            Name="Крэйвен-охотник",
+            OriginalName="Kraven the Hunter",
+            ReleaseDate=new DateTime(2024,12,11)
         }
     };
 }
