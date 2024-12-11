@@ -1,4 +1,6 @@
-﻿<div class="headerer">
+﻿<link href="~/css/app.css" rel="stylesheet" />
+
+<div class="headerer">
     <div class="header-bottom">
         <div class="header clear nav-menu">
             <div class="menu-icon">
@@ -67,10 +69,11 @@
                 <ul>
                     <li><span class="user-login popauthor" title="Войти на сайт"></span></li>
                 </ul>
-            </div><div class="search_form">
+            </div>
+            <div class="search_form">
                 <form method="get" id="searchform" action="https://metarankings.ru/search/">
                     <fieldset>
-                        <input name="text" type="search" id="search" placeholder="Название игры или фильма..." autocomplete="off" />
+                        <input @bind-value="@gameNameToSearch" name="text" type="search" id="search" placeholder="Название игры или фильма..." autocomplete="off" />
                         <button type="submit"></button>
                     </fieldset>
                 </form>
@@ -79,3 +82,7 @@
         </div>
     </div>
 </div>
+
+@code {
+    string gameNameToSearch = string.Empty;
+}
