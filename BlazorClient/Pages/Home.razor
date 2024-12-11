@@ -97,13 +97,10 @@
                 <div class="specials-index">
                     <h3><a href="https://metarankings.ru/meta/specials/">Спецматериалы</a></h3>
 
-                    <BlazorClient.Components.MainPage.SpecialsItem Href="https://metarankings.ru/vyjdet-li-god-of-war-ragnarok-na-pk/" Title="Выйдет ли God Of War Ragnarok на ПК?" ImageAlt="Выйдет ли God Of War Ragnarok на ПК?" ImageSrc="https://metarankings.ru/images/uploads/2022/08/god-of-war-ragnarok1-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.SpecialsItem Href="https://metarankings.ru/stoit-li-zhdat-overwatch-2/" Title="Стоит ли ждать Overwatch 2?" ImageAlt="Стоит ли ждать Overwatch 2?" ImageSrc="https://metarankings.ru/images/uploads/2022/08/overwatch-2-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.SpecialsItem Href="https://metarankings.ru/pyat-prichin-posmotret-serial-dom-drakona/" Title="5 причин посмотреть сериал «Дом Дракона»" ImageAlt="5 причин посмотреть сериал «Дом Дракона»" ImageSrc="https://metarankings.ru/images/uploads/2022/08/dom-drakona-445x250.jpg" />
-
-                    <BlazorClient.Components.MainPage.SpecialsItem Href="https://metarankings.ru/evolyuciya-znaka-cheloveka-pauka-za-vsyu-istoriyu-geroya-marvel/" Title="Эволюция знака Человека-Паука &#8212; Как менялся логотип за всю историю героя Marvel" ImageAlt="Эволюция знака Человека-Паука &#8212; Как менялся логотип за всю историю героя Marvel" ImageSrc="https://metarankings.ru/images/uploads/2021/10/chelovek-pauk-445x250.jpg" />
+                    @foreach (SpecialItem specialItem in SpecialItems)
+                    {
+                        <BlazorClient.Components.MainPage.SpecialsItem Href="@specialItem.Href" Title="@specialItem.Title" ImageAlt="@specialItem.ImageAlt" ImageSrc="@specialItem.ImageSrc" />
+                    }
                 </div>
                 <div class="index-movies">
                     <h3><a href="https://metarankings.ru/coming-soon/">Скоро в кино</a></h3>
@@ -455,6 +452,38 @@
             Href="https://metarankings.ru/samye-slozhnye-igry/",
             Title="Самые сложные игры",
             ImageSrc="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg"
+        }
+    };
+
+    public SpecialItem[] SpecialItems { get; set; } = new SpecialItem[]
+    {
+        new SpecialItem
+        {
+            Href="https://metarankings.ru/vyjdet-li-god-of-war-ragnarok-na-pk/",
+            ImageAlt="Выйдет ли God Of War Ragnarok на ПК?",
+            ImageSrc="https://metarankings.ru/images/uploads/2022/08/god-of-war-ragnarok1-445x250.jpg",
+            Title="Выйдет ли God Of War Ragnarok на ПК?"
+        },
+        new SpecialItem
+        {
+            Href="https://metarankings.ru/vyjdet-li-god-of-war-ragnarok-na-pk/",
+            ImageAlt="Выйдет ли God Of War Ragnarok на ПК?",
+            ImageSrc="https://metarankings.ru/images/uploads/2022/08/god-of-war-ragnarok1-445x250.jpg",
+            Title="Выйдет ли God Of War Ragnarok на ПК?"
+        },
+        new SpecialItem
+        {
+            Href="https://metarankings.ru/vyjdet-li-god-of-war-ragnarok-na-pk/",
+            ImageAlt="Выйдет ли God Of War Ragnarok на ПК?",
+            ImageSrc="https://metarankings.ru/images/uploads/2022/08/god-of-war-ragnarok1-445x250.jpg",
+            Title="Выйдет ли God Of War Ragnarok на ПК?"
+        },
+        new SpecialItem
+        {
+            Href="https://metarankings.ru/vyjdet-li-god-of-war-ragnarok-na-pk/",
+            ImageAlt="Выйдет ли God Of War Ragnarok на ПК?",
+            ImageSrc="https://metarankings.ru/images/uploads/2022/08/god-of-war-ragnarok1-445x250.jpg",
+            Title="Выйдет ли God Of War Ragnarok на ПК?"
         }
     };
 }
