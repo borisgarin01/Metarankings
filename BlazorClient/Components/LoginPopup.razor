@@ -3,14 +3,14 @@
         <div class="field">
             <label>Имя пользователя</label>
             <div class="input">
-                <input type="text" name="log" value="" id="login" />
+                <input data-bind="@Login" type="text" />
             </div>
         </div>
         <div class="field">
             <a rel="nofollow" href="https://metarankings.ru/login.php?action=lostpassword" id="forgot">Забыли?</a>
             <label>Пароль</label>
             <div class="input">
-                <input type="password" name="pwd" value="" id="pass" />
+                <input data-bind="@Password" type="password" />
             </div>
         </div>
         <div class="submit">
@@ -19,3 +19,9 @@
         </div>
     </form>
 </div>
+
+@code
+{
+    public string Login { get; set; }
+    public string Password { get; set; }
+}
