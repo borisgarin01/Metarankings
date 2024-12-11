@@ -33,17 +33,11 @@
             <div id="loop" class="list clear">
                 <div class="index-movies">
                     <h3><a href="https://metarankings.ru/new-movies/">Новые фильмы</a></h3>
-                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
 
-                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
-
-                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
-
-                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
-
-                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
-
-                    <BlazorClient.Components.MainPage.NewMovie Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная..." ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg" Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/" ReleaseDate="new DateTime(2024,12,5)" Score="7.8f" Title="Фильм Ариэтти из страны лилипутов" />
+                    @foreach (var newMovie in NewMovies)
+                    {
+                        <BlazorClient.Components.MainPage.NewMovie Description="@newMovie.Description" ImageHref="@newMovie.ImageHref" Link="@newMovie.Link" ReleaseDate="@newMovie.ReleaseDate" Score="@newMovie.Score" Title="@newMovie.Title" />
+                    }
 
                     <div class="title-index">
                         <div class="dropdown-menu genre">
@@ -181,7 +175,53 @@
 <div id="toTop" class="toTop">↑</div>
 
 @code {
-    ScoredImagedLinkedTitledItem[] ScoredImagedLinkedTitledMovies { get; set; } = new ScoredImagedLinkedTitledItem[]
+    public ScoredImagedLinkedTitledItem[] ScoredImagedLinkedTitledMovies { get; set; } = new ScoredImagedLinkedTitledItem[]
+    {
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            },
+            new ScoredImagedLinkedTitledItem
+            {
+                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
+                Score=7.3f,
+                Title="Еретик",
+                Url="https://metarankings.ru/eretik-2024/"
+            }
+    };
+
+    public ScoredImagedLinkedTitledItem[] ScoredImagedLinkedTitledGames { get; set; } = new ScoredImagedLinkedTitledItem[]
         {
             new ScoredImagedLinkedTitledItem
             {
@@ -227,49 +267,61 @@
             }
     };
 
-    ScoredImagedLinkedTitledItem[] ScoredImagedLinkedTitledGames { get; set; } = new ScoredImagedLinkedTitledItem[]
+    public NewMovie[] NewMovies { get; set; } = new NewMovie[]
+    {
+        new NewMovie
         {
-            new ScoredImagedLinkedTitledItem
-            {
-                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
-                Score=7.3f,
-                Title="Еретик",
-                Url="https://metarankings.ru/eretik-2024/"
-            },
-            new ScoredImagedLinkedTitledItem
-            {
-                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
-                Score=7.3f,
-                Title="Еретик",
-                Url="https://metarankings.ru/eretik-2024/"
-            },
-            new ScoredImagedLinkedTitledItem
-            {
-                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
-                Score=7.3f,
-                Title="Еретик",
-                Url="https://metarankings.ru/eretik-2024/"
-            },
-            new ScoredImagedLinkedTitledItem
-            {
-                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
-                Score=7.3f,
-                Title="Еретик",
-                Url="https://metarankings.ru/eretik-2024/"
-            },
-            new ScoredImagedLinkedTitledItem
-            {
-                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
-                Score=7.3f,
-                Title="Еретик",
-                Url="https://metarankings.ru/eretik-2024/"
-            },
-            new ScoredImagedLinkedTitledItem
-            {
-                ImageSource="https://metarankings.ru/images/uploads/2024/11/eretik-2024-cover-art-187x281.jpg",
-                Score=7.3f,
-                Title="Еретик",
-                Url="https://metarankings.ru/eretik-2024/"
-            }
+            Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная...",
+            ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg",
+            Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/",
+            ReleaseDate=new DateTime(2024,12,5),
+            Score=7.8f,
+            Title="Фильм Ариэтти из страны лилипутов"
+        },
+        new NewMovie
+        {
+            Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная...",
+            ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg",
+            Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/",
+            ReleaseDate=new DateTime(2024,12,5),
+            Score=7.8f,
+            Title="Фильм Ариэтти из страны лилипутов"
+        },
+        new NewMovie
+        {
+            Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная...",
+            ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg",
+            Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/",
+            ReleaseDate=new DateTime(2024,12,5),
+            Score=7.8f,
+            Title="Фильм Ариэтти из страны лилипутов"
+        },
+        new NewMovie
+        {
+            Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная...",
+            ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg",
+            Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/",
+            ReleaseDate=new DateTime(2024,12,5),
+            Score=7.8f,
+            Title="Фильм Ариэтти из страны лилипутов"
+        },
+        new NewMovie
+        {
+            Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная...",
+            ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg",
+            Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/",
+            ReleaseDate=new DateTime(2024,12,5),
+            Score=7.8f,
+            Title="Фильм Ариэтти из страны лилипутов"
+        },
+        new NewMovie
+        {
+            Description="Это история о крошечных существах, которые обитают рядом с людьми, незаметно одалживая у них вещи. Их существование скрыто от человеческих глаз, но юная...",
+            ImageHref="https://metarankings.ru/images/uploads/2024/12/arietti-iz-strany-liliputov-cover-art-50x70.jpg",
+            Link="https://metarankings.ru/arietti-iz-strany-liliputov-2024/",
+            ReleaseDate=new DateTime(2024,12,5),
+            Score=7.8f,
+            Title="Фильм Ариэтти из страны лилипутов"
+        }
     };
 }
