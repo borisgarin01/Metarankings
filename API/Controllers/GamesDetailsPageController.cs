@@ -1,8 +1,5 @@
 ﻿using Data;
-using Domain;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace API.Controllers;
 
@@ -17,5 +14,5 @@ public sealed class GamesDetailsPageController : ControllerBase
         this.dataContext = dataContext;
     }
 
-    
+
 }

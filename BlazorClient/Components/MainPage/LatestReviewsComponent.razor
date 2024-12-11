@@ -1,36 +1,15 @@
-﻿<ul>
-    <li class="recent-reviews">
-        <LatestReviewsComponentItem LinkHref="https://metarankings.ru/pyatyj-bitl-2024/" LinkTitle="Пятый битл" />
-    </li>
-    <li class="recent-reviews">
-        <LatestReviewsComponentItem LinkHref="https://metarankings.ru/pyatyj-bitl-2024/" LinkTitle="Пятый битл" />
-    </li>
-    <li class="recent-reviews">
-        <LatestReviewsComponentItem LinkHref="https://metarankings.ru/pyatyj-bitl-2024/" LinkTitle="Пятый битл" />
-    </li>
-    <li class="recent-reviews">
-        <LatestReviewsComponentItem LinkHref="https://metarankings.ru/pyatyj-bitl-2024/" LinkTitle="Пятый битл" />
-    </li>
-    <li class="recent-reviews">
-        <LatestReviewsComponentItem LinkHref="https://metarankings.ru/pyatyj-bitl-2024/" LinkTitle="Пятый битл" />
-    </li>
-    <li class="recent-reviews">
-        <LatestReviewsComponentItem LinkHref="https://metarankings.ru/pyatyj-bitl-2024/" LinkTitle="Пятый битл" />
-    </li>
-    <li class="recent-reviews">
-        <LatestReviewsComponentItem LinkHref="https://metarankings.ru/pyatyj-bitl-2024/" LinkTitle="Пятый битл" />
-    </li>
-    <li class="recent-reviews">
-        <LatestReviewsComponentItem LinkHref="https://metarankings.ru/pyatyj-bitl-2024/" LinkTitle="Пятый битл" />
-    </li>
-    <li class="recent-reviews">
-        <LatestReviewsComponentItem LinkHref="https://metarankings.ru/pyatyj-bitl-2024/" LinkTitle="Пятый битл" />
-    </li>
-    <li class="recent-reviews">
-        <LatestReviewsComponentItem LinkHref="https://metarankings.ru/pyatyj-bitl-2024/" LinkTitle="Пятый битл" />
-    </li>
+﻿@using Domain
+<ul>
+    @foreach (Link link in Links)
+    {
+        <li class="recent-reviews">
+            <LatestReviewsComponentItem LinkHref="@link.Href" LinkTitle="@link.Title" />
+        </li>
+    }
 </ul>
 
 @code {
-
+    [Parameter]
+    [EditorRequired]
+    public Link[] Links { get; set; }
 }
