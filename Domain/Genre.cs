@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 
 namespace Domain;
+
 public sealed record Genre
 {
     [Parameter]

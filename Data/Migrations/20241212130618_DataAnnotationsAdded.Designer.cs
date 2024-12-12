@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241212130618_DataAnnotationsAdded")]
+    partial class DataAnnotationsAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,9 +39,6 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Collections");
                 });
@@ -73,15 +73,6 @@ namespace Data.Migrations
 
                     b.HasIndex("CollectionId");
 
-                    b.HasIndex("Href")
-                        .IsUnique();
-
-                    b.HasIndex("ImageSrc")
-                        .IsUnique();
-
-                    b.HasIndex("Title")
-                        .IsUnique();
-
                     b.ToTable("CollectionItems");
                 });
 
@@ -105,12 +96,6 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Url")
-                        .IsUnique();
-
                     b.ToTable("Critics");
                 });
 
@@ -124,7 +109,7 @@ namespace Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("LocalizationId")
                         .HasColumnType("bigint");
@@ -142,13 +127,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Description")
-                        .IsUnique();
-
                     b.HasIndex("LocalizationId");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Games");
                 });
@@ -175,7 +154,7 @@ namespace Data.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -187,12 +166,6 @@ namespace Data.Migrations
                     b.HasIndex("CriticId");
 
                     b.HasIndex("GameId");
-
-                    b.HasIndex("Text")
-                        .IsUnique();
-
-                    b.HasIndex("Url")
-                        .IsUnique();
 
                     b.ToTable("GamesCriticsReviews");
                 });
@@ -216,12 +189,6 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Url")
-                        .IsUnique();
 
                     b.ToTable("GamesDevelopers");
                 });
@@ -248,23 +215,17 @@ namespace Data.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GameId");
 
                     b.HasIndex("GamerId");
-
-                    b.HasIndex("Text")
-                        .IsUnique();
-
-                    b.HasIndex("Url")
-                        .IsUnique();
 
                     b.ToTable("GameGamerReview");
                 });
@@ -289,12 +250,6 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Url")
-                        .IsUnique();
-
                     b.ToTable("GamesGenres");
                 });
 
@@ -317,12 +272,6 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Title")
-                        .IsUnique();
-
-                    b.HasIndex("Url")
-                        .IsUnique();
 
                     b.ToTable("GamesLocalizations");
                 });
@@ -347,12 +296,6 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Url")
-                        .IsUnique();
-
                     b.ToTable("GamesPlatforms");
                 });
 
@@ -375,12 +318,6 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Url")
-                        .IsUnique();
 
                     b.ToTable("GamesPublishers");
                 });
@@ -405,12 +342,6 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Title")
-                        .IsUnique();
-
-                    b.HasIndex("Url")
-                        .IsUnique();
-
                     b.ToTable("GamesTags");
                 });
 
@@ -433,12 +364,6 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountName")
-                        .IsUnique();
-
-                    b.HasIndex("Url")
-                        .IsUnique();
 
                     b.ToTable("Gamers");
                 });

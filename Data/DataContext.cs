@@ -18,4 +18,6 @@ public class DataContext : DbContext
     public DbSet<GamePublisher> GamesPublishers { get; set; }
     public DbSet<Gamer> Gamers { get; set; }
     public DbSet<GameTag> GamesTags { get; set; }
+    public DbSet<Collection> Collections { get; set; }
+    public DbSet<CollectionItem> CollectionItems { get; set; }
 }

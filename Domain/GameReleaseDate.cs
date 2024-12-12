@@ -1,4 +1,5 @@
 ﻿namespace Domain;
+
 public sealed record GameReleaseDate
 {
     public string Href { get; set; }

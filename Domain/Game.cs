@@ -1,9 +1,23 @@
-﻿namespace Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
+namespace Domain;
+
+[Index(nameof(Name), IsUnique = true)]
+[Index(nameof(Description), IsUnique = true)]
 public sealed record Game
 {
     public long Id { get; set; }
+
+    [MaxLength(255)]
+    [MinLength(1)]
+    [Required]
     public string Name { get; set; }
-    public float Score { get; set; }
+
+    [Range(0, 10)]
+    [Required]
+    public float? Score { get; set; }
+
     public string Description { get; set; }
     public GameLocalization Localization { get; set; }
     public long LocalizationId { get; set; }
