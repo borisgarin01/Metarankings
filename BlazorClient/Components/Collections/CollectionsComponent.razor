@@ -1,7 +1,344 @@
 ﻿@page "/collections"
+@using Domain
 
-<h3>CollectionsComponent</h3>
+<BlazorClient.Components.Headerer />
 
-@code {
+<div class="wrapper">
+    <div id="container" class="clear">
+        <div class="sidebar">
+        </div>
+        <div id="content" class="lcol">
+            <div class="content-title">
+                <h1>Подборки MetaRankings</h1>
+            </div>
+            <div class="title-index">
+                <div class="dropdown-menu genre">
+                    <span class="title">Фильмы</span>
+                    <ul>
+                        <li><a href="/best-movies-2024/">2024</a></li>
+                        <li><a href="/best-movies-2023/">2023</a></li>
+                        <li><a href="/best-movies-2022/">2022</a></li>
+                        <li><a href="/best-movies-2021/">2021</a></li>
+                        <li><a href="/best-movies-2020/">2020</a></li>
+                        <li><a href="/best-movies-2019/">2019</a></li>
+                        <li><a href="/best-movies-2018/">2018</a></li>
+                        <li><a href="/best-movies-2017/">2017</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown-menu genre">
+                    <span class="title">Мультфильмы</span>
+                    <ul>
+                        <li><a href="/best-cartoons/2024/">2024</a></li>
+                        <li><a href="/best-cartoons/2023/">2023</a></li>
+                        <li><a href="/best-cartoons/2022/">2022</a></li>
+                        <li><a href="/best-cartoons/2021/">2021</a></li>
+                        <li><a href="/best-cartoons/2020/">2020</a></li>
+                        <li><a href="/best-cartoons/2019/">2019</a></li>
+                        <li><a href="/best-cartoons/2018/">2018</a></li>
+                        <li><a href="/best-cartoons/2017/">2017</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown-menu genre">
+                    <span class="title">Игры</span>
+                    <ul>
+                        <li><a href="/best-games-2024/">2024</a></li>
+                        <li><a href="/best-games-2023/">2023</a></li>
+                        <li><a href="/best-games-2022/">2022</a></li>
+                        <li><a href="/best-games-2021/">2021</a></li>
+                        <li><a href="/best-games-2020/">2020</a></li>
+                        <li><a href="/best-games-2019/">2019</a></li>
+                        <li><a href="/best-games-2018/">2018</a></li>
+                        <li><a href="/best-games-2017/">2017</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="loop" class="news list">
+                <div class="post clear">
+                    <a href="https://metarankings.ru/samye-slozhnye-igry/" title="Самые сложные игры" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" alt="Самые сложные игры"></a>
 
-}
+                    <a class="news-title" href="https://metarankings.ru/samye-slozhnye-igry/">Самые сложные игры</a>
+                    <div class="post-content">Самые сложные игры всех жанров для PC и игровых консолей за последнее время, рейтинг которых...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/best-films-pro-zhenshhin/" title="Лучшие фильмы про женщин" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/films-pro-zhenshhin-445x250.jpg" alt="Лучшие фильмы про женщин"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/best-films-pro-zhenshhin/">Лучшие фильмы про женщин</a>
+                    <div class="post-content">Лучшие фильмы про женщин всех жанров, рейтинг которых составлялся по данным оценок критиков и проголосовавших...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/filmy-pro-realnye-sobytiya/" title="Фильмы про реальные события" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/pro-realnye-sobytiya-445x250.jpg" alt="Фильмы про реальные события"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/filmy-pro-realnye-sobytiya/">Фильмы про реальные события</a>
+                    <div class="post-content">Фильмы про реальные события всех жанров, рейтинг которых составлялся по данным оценок критиков и проголосовавших...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="ads-horizont hor-1">
+                    <!-- Yandex.RTB R-A-201169-5 -->
+                    <div id="yandex_rtb_R-A-201169-5"></div>
+                    <script>
+                        window.yaContextCb.push(()=>{
+                          Ya.Context.AdvManager.render({
+                            renderTo: 'yandex_rtb_R-A-201169-5',
+                            blockId: 'R-A-201169-5'
+                          })
+                        })</script>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/luchshie-filmy-pro-monstrov/" title="Лучшие фильмы про монстров" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/filmy-pro-monstrov-445x250.jpg" alt="Лучшие фильмы про монстров"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/luchshie-filmy-pro-monstrov/">Лучшие фильмы про монстров</a>
+                    <div class="post-content">Лучшие фильмы про монстров всех жанров, рейтинг которых составлялся по данным оценок критиков и проголосовавших...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/samye-strashnye-igry/" title="Самые страшные игры" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/strashnye-igry-445x250.jpg" alt="Самые страшные игры"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/samye-strashnye-igry/">Самые страшные игры</a>
+                    <div class="post-content">Самые страшные игры для PC и игровых консолей за последнее время, рейтинг которых составлялся по...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/best-games-open-world/" title="Лучшие игры с открытым миром" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/best-igry-s-otkrytym-mirom-445x250.jpg" alt="Лучшие игры с открытым миром"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/best-games-open-world/">Лучшие игры с открытым миром</a>
+                    <div class="post-content">Лучшие игры с открытым миром всех жанров для PC и игровых консолей за последнее время,...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/filmy-pro-paranormalnye-yavleniya/" title="Фильмы про паранормальные явления" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/05/pro-paranormalnye-yavleniya-445x250.jpg" alt="Фильмы про паранормальные явления"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/filmy-pro-paranormalnye-yavleniya/">Фильмы про паранормальные явления</a>
+                    <div class="post-content">Лучшие фильмы про паранормальные явления, рейтинг которых составлялся по данным оценок критиков и проголосовавших пользователей....</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/luchshie-filmy-pro-shpionov-i-tajnyx-agentov/" title="Лучшие фильмы про шпионов и тайных агентов" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/05/filmy-pro-shpionov-i-tajnyx-agentov-445x250.jpg" alt="Лучшие фильмы про шпионов и тайных агентов"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/luchshie-filmy-pro-shpionov-i-tajnyx-agentov/">Лучшие фильмы про шпионов и тайных агентов</a>
+                    <div class="post-content">Здесь собраны лучшие фильмы про шпионов и тайных агентов, рейтинг которых составлялся по данным оценок...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/best-filmy-pro-inoplanetyan/" title="Лучшие фильмы про инопланетян" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/05/filmy-pro-inoplanetyan-445x250.jpg" alt="Лучшие фильмы про инопланетян"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/best-filmy-pro-inoplanetyan/">Лучшие фильмы про инопланетян</a>
+                    <div class="post-content">Здесь собраны лучшие фильмы про инопланетян, рейтинг которых составлялся по данным оценок критиков и проголосовавших...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/samye-krasivye-igry-dlya-pc-i-konsolej/" title="Самые красивые игры" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/05/krasivye-igry-445x250.jpg" alt="Самые красивые игры"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/samye-krasivye-igry-dlya-pc-i-konsolej/">Самые красивые игры</a>
+                    <div class="post-content">Здесь собраны самые красивые игры для PC и консолей за последнее время, рейтинг которых составлялся...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+
+                <div class="post clear">
+                    <a href="https://metarankings.ru/best-samye-krasivye-filmy/" title="Самые красивые фильмы" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/05/krasivye-filmy-445x250.jpg" alt="Самые красивые фильмы"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/best-samye-krasivye-filmy/">Самые красивые фильмы</a>
+                    <div class="post-content">Здесь собраны самые красивые фильмы, рейтинг которых составлялся по данным оценок критиков и проголосовавших пользователей....</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/best-ostrosyuzhetnye-filmy/" title="Остросюжетные фильмы" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/05/ostrosyuzhetnye-filmy-445x250.jpg" alt="Остросюжетные фильмы"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/best-ostrosyuzhetnye-filmy/">Остросюжетные фильмы</a>
+                    <div class="post-content">Здесь собраны лучшие остросюжетные фильмы, рейтинг которых составлялся по данным оценок критиков и проголосовавших пользователей....</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/best-filmy-pro-sverxsposobnosti/" title="Фильмы про сверхспособности" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/05/filmy-pro-sverxsposobnosti-445x250.jpg" alt="Фильмы про сверхспособности"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/best-filmy-pro-sverxsposobnosti/">Фильмы про сверхспособности</a>
+                    <div class="post-content">Здесь собраны лучшие Фильмы про сверхспособности, рейтинг которых составлялся по данным оценок критиков и проголосовавших...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/best-igry-pro-robotov/" title="Лучшие игры про роботов" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/05/igry-pro-robotov-445x250.jpg" alt="Лучшие игры про роботов"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/best-igry-pro-robotov/">Лучшие игры про роботов</a>
+                    <div class="post-content">Здесь собраны лучшие игры про роботов (андроидов и киборгов) для PC и консолей за последнее...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="post clear">
+                    <a href="https://metarankings.ru/luchshie-filmy-pro-robotov/" title="Лучшие фильмы про роботов" class="news-thumb"><img class="news-image" src="https://metarankings.ru/images/uploads/2023/05/filmy-pro-robotov-445x250.jpg" alt="Лучшие фильмы про роботов"></a>
+
+                    <a class="news-title" href="https://metarankings.ru/luchshie-filmy-pro-robotov/">Лучшие фильмы про роботов</a>
+                    <div class="post-content">Здесь собраны лучшие фильмы про роботов (андроидов и киборгов) за последнее время, рейтинг которых составлялся...</div>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+            </div>
+            <div class="pagination">
+                <div class="navi">
+                    <span class='page-numbers current'>1</span>
+                    <a class='page-numbers' href='https://metarankings.ru/meta/collections/page/2/'>2</a>
+                    <a class='page-numbers' href='https://metarankings.ru/meta/collections/page/3/'>3</a>
+                    <a class='page-numbers' href='https://metarankings.ru/meta/collections/page/4/'>4</a>
+                    <a class="next page-numbers" href="https://metarankings.ru/meta/collections/page/2/">Показать еще</a>
+                </div>
+            </div>
+            <div id="yandex_rtb_R-A-201169-26"></div>
+            <script>
+                window.yaContextCb.push(()=>{
+                    Ya.Context.AdvManager.render({
+                        "blockId": "R-A-201169-26",
+                        "renderTo": "yandex_rtb_R-A-201169-26"
+                    })
+                })
+            </script>
+        </div>
+        <div class="sidebar rcol">
+            <div class="widget last-reviews">
+                <h3>Последние отзывы</h3>
+                <div class="widget-body">
+                    <ul>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/pyatyj-bitl-2024/">Пятый битл</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/priklyucheniya-paddingtona-3/">Приключения Паддингтона 3</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/moana-2/">Моана 2</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/konklav-2024/">Конклав</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/gladiator-2/">Гладиатор 2</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/eretik-2024/">Еретик</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/lyubov-sovetskogo-soyuza-2024/">Любовь Советского Союза</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/vozvrashhenie-popugaya-keshi-2024/">Возвращение попугая Кеши</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/venom-3-poslednij-tanec-2024/">Веном 3: Последний танец</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/dzhoker-bezumie-na-dvoix/">Джокер: Безумие на двоих</a></span>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/indiana-jones-and-the-great-circle/">Indiana Jones and the Great Circle</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/stalker-2/">S.T.A.L.K.E.R. 2: Heart of Chernobyl</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/dragon-age-the-veilguard/">Dragon Age: The Veilguard</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/call-of-duty-black-ops-6/">Call of Duty: Black Ops 6</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/game-silent-hill-2-remake/">Silent Hill 2</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/the-legend-of-zelda-echoes-of-wisdom/">The Legend of Zelda: Echoes of Wisdom</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/astro-bot/">Astro Bot</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/star-wars-outlaws/">Star Wars Outlaws</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/black-myth-wukong/">Black Myth: WuKong</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/senuas-saga-hellblade-2/">Senua’s Saga: Hellblade 2</a></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="copyright">
+            &copy; 2014 - 2024 <span data-title="MetaRankings" class="tooltip">MetaRankings</span>
+            <a rel="nofollow" href="/about/" data-title="О сайте" class="tooltip">О нас</a>
+            <a rel="nofollow" href="/contact/" data-title="Форма обратной связи" class="tooltip">Связь</a>
+            <a rel="nofollow" href="/polzovatelskoe-soglashenie/" data-title="Пользовательское соглашение" class="tooltip">Пользовательское соглашение</a>
+            <a rel="nofollow" href="/politika-konfidencialnosti/" data-title="Политика конфиденциальности" class="tooltip">Конфиденциальность</a>
+        </div>
+        <div class="credits">
+            <span class="pegi"><span data-title="Сайт может содержать контент не предназначенный лицам до 18 лет" class="tooltip">18+</span></span>
+            <a href="https://vk.com/metarankings_ru" rel="nofollow noopener" target="_blank" title="VK"><span class="vko"></span></a>
+            <a href="https://twitter.com/metarankings" rel="nofollow noopener" target="_blank" title="Twitter"><span class="tw"></span></a>
+        </div>
+    </div>
+</div>
+<div class="wbody" onclick="show('none')"></div>
+<div class="window">
+</div>
+<div class="popup_block">
+    <form action="https://metarankings.ru/login.php?redirect_to=https%3A%2F%2Fmetarankings.ru%2Fsamye-slozhnye-igry%2F" id="loginForm" method="post">
+        <div class="field">
+            <label>Имя пользователя</label>
+            <div class="input">
+                <input type="text" name="log" value="" id="login" />
+            </div>
+        </div>
+        <div class="field">
+            <a rel="nofollow" href="https://metarankings.ru/login.php?action=lostpassword" id="forgot">Забыли?</a>
+            <label>Пароль</label>
+            <div class="input">
+                <input type="password" name="pwd" value="" id="pass" />
+            </div>
+        </div>
+        <div class="submit">
+            <button name="submit" type="submit">Войти</button>
+            <div class="registr"><a rel="nofollow" href="https://metarankings.ru/login.php?action=register">Регистрация</a></div>
+        </div>
+    </form>
+</div>
+<div id="toTop" class="toTop">↑</div>
