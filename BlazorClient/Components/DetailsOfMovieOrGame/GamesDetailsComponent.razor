@@ -1,4 +1,4 @@
-﻿@page "/games/details/alex"
+﻿@page "/games/details/{Name}"
 @using Domain
 @using System.Globalization
 
@@ -311,44 +311,47 @@
 
 @code
 {
+    [Parameter]
+    public string Name { get; set; }
+
     public FeaturedGame FeaturedGame { get; set; } = new FeaturedGame
         {
             Developers = new Developer[]
-                                                            {
+                                                                    {
                 new Developer
                 {
                     Name = "Nightdive Studios",
                     Link = "/razrabotchiki/nightdive_studios/"
                 }
-                                                            },
+                                                                    },
             Localization = new Localization
             {
                 Link = "https://metarankings.ru/igry-bez-russkogo-yazyka/",
                 Name = "Английский (без русского языка)"
             },
             Platforms = new Platform[]
-                                                            {
+                                                                    {
                 new Platform
                 {
                     Link = "https://metarankings.ru/meta/games/pc/",
                     Name = "PC"
                 }
-                                                            },
+                                                                    },
             Publishers = new Publisher[]
-                                                            {
+                                                                    {
                 new Publisher
                 {
                     Name = "Nightdive Studios",
                     Link = "/razrabotchiki/nightdive_studios/"
                 }
-                                                            },
+                                                                    },
             Genres = new Genre[]
-                                                        {
+                                                                {
                 new Genre
             {
                 Name = "Хоррор",
                 Link = "https://metarankings.ru/genre/xorror/"
             }
-                                                    }
+                                                            }
         };
 }
