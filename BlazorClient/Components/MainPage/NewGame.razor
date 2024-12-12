@@ -1,10 +1,10 @@
 ﻿@using System.Globalization
 <div class="item">
-    <NavLink class="my-nav-link" href="/games/details/boris">Игра @Name</NavLink>
-    <div class="small-score mark-@Math.Round(Score)"><span data-title="Рейтинг игры" class="tooltip">@Score</span></div>
-    <span class="item-name"><NavLink class="my-nav-link" href="/games/details/boris">@Name</NavLink></span>
-    <span class="item-meta"><NavLink class="my-nav-link" href="/games/details/boris">Xbox Series X</NavLink></span>
-    <span class="item-meta"><NavLink rel="nofollow" href="/games/details/boris">Отзывы (0)</NavLink></span>
+    <a class="my-nav-link" href="/games/details/@Name">Игра @Name</a>
+    <div class="small-score @(Score>8f?"score-green":(Score>6f?"score-yellow":(Score>4f?"score-orange":(Score>2f?"score-red":"score-grey")))))"><span data-title="Рейтинг игры" class="tooltip">@Score</span></div>
+    <span class="item-name"><a class="my-nav-link" href="/games/details/boris">@Name</a></span>
+    <span class="item-meta"><a class="my-nav-link" href="/games/details/boris">Xbox Series X</a></span>
+    <span class="item-meta"><a rel="nofollow" href="/games/details/boris">Отзывы (0)</a></span>
     <span class="item-meta">@ReleaseDate.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span>
     <span class="item-description">@Description</span>
 </div>
