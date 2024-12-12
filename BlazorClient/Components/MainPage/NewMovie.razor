@@ -1,10 +1,10 @@
 ﻿@using System.Globalization
 <div class="item">
-    <a href="@Link" title="Фильм @Title"><img class="post-image" src="@ImageHref" alt="@Title"></a>
+    <NavLink class="my-nav-link" href="/games/details/alex">Фильм @Title</NavLink>
     <div class="small-score mark-8"><span data-title="Рейтинг фильма" class="tooltip">@Score</span></div>
-    <span class="item-name"><a href="@Link">@Title</a></span>
-    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/cartoons/">Мультфильмы</a></span>
-    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/arietti-iz-strany-liliputov-2024/#reviews">Рецензии (8)</a> <a rel="nofollow" href="https://metarankings.ru/arietti-iz-strany-liliputov-2024/#comments">Отзывы (0)</a></span>
+    <span class="item-name"><NavLink class="my-nav-link" href="/games/details/alex">@Title</NavLink></span>
+    <span class="item-meta"><NavLink class="my-nav-link" href="/games/details/alex">Мультфильмы</NavLink></span>
+    <span class="item-meta"><NavLink rel="nofollow" href="/games/details/alex">Отзывы (0)</NavLink></span>
     <span class="item-meta">@ReleaseDate.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span>
     <span class="item-description">@Description</span>
 </div>

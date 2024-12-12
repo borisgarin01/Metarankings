@@ -1,10 +1,18 @@
 ﻿@using System.Globalization
-<div class="item">
-    <a href="@Href" title="Фильм @Name"><img class="post-image" src="@ImageSrc" alt="@Name"></a>
-    <span class="item-name"><a href="@Href">@Name</a></span>
-    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/boeviki/">Боевики</a> / <a href="https://metarankings.ru/meta/movies/fantasy/">Фантастика</a> / <a href="https://metarankings.ru/meta/movies/fantasy-movies/">Фэнтези</a></span>
+<div class="row">
+    <NavLink class="my-nav-link" href="/games/details/alex">Фильм @Name</NavLink>
+</div>
+<div class="row">
+    <span class="item-name"><NavLink class="my-nav-link" href="/games/details/alex">@Name</NavLink></span>
+</div>
+<div class="row">
+    <span class="item-meta"><NavLink class="my-nav-link" href="/games/details/alex">Фэнтези</NavLink></span>
+</div>
+<div class="row">
     <span class="item-meta">@OriginalName</span>
-    <span class="item-meta">@ReleaseDate.ToString("dd MM yyyy", new CultureInfo("ru-RU"))</span>
+</div>
+<div class="row">
+    @ReleaseDate.ToString("dd MM yyyy", new CultureInfo("ru-RU"))
 </div>
 
 @code {

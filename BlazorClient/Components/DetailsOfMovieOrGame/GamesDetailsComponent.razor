@@ -21,7 +21,7 @@
                         <p>
                             <span class="label">Разработчик:</span> @foreach (var developer in FeaturedGame.Developers)
                             {
-                                <a href="@developer.Link">@developer.Name</a>
+                                <NavLink class="my-nav-link" href="/games/details/alex">@developer.Name</NavLink>
 
                                 <text>, </text>
                             }
@@ -29,7 +29,7 @@
                         <p>
                             <span class="label">Издатель:</span> @foreach (var publisher in FeaturedGame.Publishers)
                             {
-                                <a href="@publisher.Link">@publisher.Name</a>
+                                <NavLink class="my-nav-link" href="/games/details/alex">@publisher.Name</NavLink>
 
                                 <text>, </text>
                             }
@@ -38,7 +38,7 @@
                             <span class="label">Платформы:</span> <span itemprop="gamePlatform">
                                 @foreach (var platform in FeaturedGame.Platforms)
                                 {
-                                    <a href="@platform.Link">@platform.Name</a>
+                                    <NavLink class="my-nav-link" href="/games/details/alex">@platform.Name</NavLink>
                                     <text>, </text>
                                 }
                             </span>
@@ -47,11 +47,11 @@
                             <span class="label">Жанр:</span> <span itemprop="genre">
                                 @foreach (var genre in FeaturedGame.Genres)
                                 {
-                                    <a href="@genre.Link">@genre.Name</a>
+                                    <NavLink class="my-nav-link" href="/games/details/alex">@genre.Name</NavLink>
                                 }
                             </span>
                         </p>
-                        <p><span class="label">Локализация:</span> <span itemprop="inLanguage"></span> (<a href="@FeaturedGame.Localization.Link">@FeaturedGame.Localization.Name</a>)</p>
+                        <p><span class="label">Локализация:</span> <span itemprop="inLanguage"></span> (<NavLink class="my-nav-link" href="/games/details/alex">@FeaturedGame.Localization.Name</NavLink>)</p>
                         @if (FeaturedGame.ReleaseDate != default(DateTime))
                         {
                             <p><span class="label">Дата выхода:</span> @FeaturedGame.ReleaseDate.ToString("dd MM yyyy", new CultureInfo("RU-ru"))</p>
@@ -65,9 +65,9 @@
 
                     <div class="podborki">
                         <p>
-                            <a href="https://metarankings.ru/best-games-2024/">Игры 2024</a>
-                            <a class="mark-link" href="https://metarankings.ru/best-pc-games/">Топ игр на ПК</a>
-                            <a class="mark-link" href="https://metarankings.ru/top-horrors/">хорроры</a>
+                            <NavLink class="my-nav-link" href="/games/details/alex">Игры 2024</NavLink>
+                            <NavLink class="mark-link" href="/games/details/alex">Топ игр на ПК</NavLink>
+                            <NavLink class="mark-link" href="/games/details/alex">хорроры</NavLink>
                         </p>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                 <div id="reviews">
                     <h2 id="critics"><span>Обзоры и оценки</span> Критики</h2>
                     <span class="countnum">4</span>
-                    <p><a href="/user-reviews/">Оценки и отзывы</a> критиков из обзоров от разных интернет-изданий.</p>
+                    <p><NavLink class="my-nav-link" href="/games/details/alex">Оценки и отзывы</NavLink> критиков из обзоров от разных интернет-изданий.</p>
 
                     <div class="reviews_list">
                         <div id="review-1" class="critic-text mark-8">
@@ -101,64 +101,64 @@
                                 <div class="small-score mark-8">
                                     <span data-title="Оценка из 10 баллов" class="tooltip">8</span>
                                 </div>
-                                <div class="review-author"><p><a href="/critics/shacknews/"><span>Shacknews</span></a> Ти Джей Дензер</p></div>
+                                <div class="review-author"><p><NavLink class="my-nav-link" href="/games/details/alex"><span>Shacknews</span></NavLink> Ти Джей Дензер</p></div>
                             </div>
                             <blockquote><p class="quote">По своей концепции и механике The Thing вполне заслуживает внимания любителей и энтузиастов. На самом деле, ничего подобного не существует, и, возможно, это потому, что это было бы трудно сделать хорошо.</p></blockquote>
                             <div class="rew-menu">
                                 <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
                                 <ul>
-                                    <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://www.shacknews.com/article/142422/the-thing-remastered-review-score">Пожаловаться на отзыв</a></li>
+                                    <li><NavLink class="complain" rel="nofollow" href="/games/details/alex">Пожаловаться на отзыв</NavLink></li>
                                 </ul>
                             </div>
-                            <a class="allreviews" href="/click/?site=https://www.shacknews.com/article/142422/the-thing-remastered-review-score" rel="nofollow noopener" target="_blank">Читать обзор полностью</a>
+                            <NavLink class="allreviews" href="/games/details/alex">Читать обзор полностью</NavLink>
                         </div>
                         <div id="review-2" class="critic-text mark-7">
                             <div class="review-meta">
                                 <div class="small-score mark-7">
                                     <span data-title="Оценка из 10 баллов" class="tooltip">7</span>
                                 </div>
-                                <div class="review-author"><p><a href="/critics/techraptor/"><span>TechRaptor</span></a> Остин Сатер</p></div>
+                                <div class="review-author"><p><NavLink class="my-nav-link" href="/games/details/alex"><span>TechRaptor</span></NavLink> Остин Сатер</p></div>
                             </div>
                             <blockquote><p class="quote">Выглядит фантастически и обладает всеми достоинствами, которые только можно ожидать от ремастера. В продолжении культового фильма 1982 года сюжет мне не очень понравился, а геймплей, в основном за счет компаньонов с искусственным...</p></blockquote>
                             <div class="rew-menu">
                                 <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
                                 <ul>
-                                    <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://techraptor.net/gaming/reviews/thing-remastered-review-macready-to-rumble">Пожаловаться на отзыв</a></li>
+                                    <li><NavLink class="complain" rel="nofollow" href="/games/details/alex">Пожаловаться на отзыв</NavLink></li>
                                 </ul>
                             </div>
-                            <a class="allreviews" href="/click/?site=https://techraptor.net/gaming/reviews/thing-remastered-review-macready-to-rumble" rel="nofollow noopener" target="_blank">Читать обзор полностью</a>
+                            <NavLink class="allreviews" href="/games/details/alex">Читать обзор полностью</NavLink>
                         </div>
                         <div id="review-3" class="critic-text mark-6">
                             <div class="review-meta">
                                 <div class="small-score mark-6">
                                     <span data-title="Оценка из 10 баллов" class="tooltip">6</span>
                                 </div>
-                                <div class="review-author"><p><a href="/critics/gamespot/"><span>GameSpot</span></a> Ричард Вейкелинг</p></div>
+                                <div class="review-author"><p><NavLink class="my-nav-link" href="/games/details/alex"><span>GameSpot</span></NavLink> Ричард Вейкелинг</p></div>
                             </div>
                             <blockquote><p class="quote">Заново представляет собой несовершенную, но увлекательную игру, с обновленными визуальными эффектами и рядом важнейших улучшений...</p></blockquote>
                             <div class="rew-menu">
                                 <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
                                 <ul>
-                                    <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://www.gamespot.com/reviews/the-thing-remastered-review-cold-fear/1900-6418323/?ftag=CAD-01-10abi2f">Пожаловаться на отзыв</a></li>
+                                    <li><NavLink class="complain" rel="nofollow" href="/games/details/alex">Пожаловаться на отзыв</NavLink></li>
                                 </ul>
                             </div>
-                            <a class="allreviews" href="/click/?site=https://www.gamespot.com/reviews/the-thing-remastered-review-cold-fear/1900-6418323/?ftag=CAD-01-10abi2f" rel="nofollow noopener" target="_blank">Читать обзор полностью</a>
+                            <NavLink class="allreviews" href="/games/details/alex">Читать обзор полностью</NavLink>
                         </div>
                         <div id="review-4" class="critic-text mark-6">
                             <div class="review-meta">
                                 <div class="small-score mark-6">
                                     <span data-title="Оценка из 10 баллов" class="tooltip">5.5</span>
                                 </div>
-                                <div class="review-author"><p><a href="/critics/destructoid/"><span>Destructoid</span></a> Зои Хэндли </p></div>
+                                <div class="review-author"><p><NavLink class="my-nav-link" href="/games/details/alex"><span>Destructoid</span></NavLink> Зои Хэндли </p></div>
                             </div>
                             <blockquote><p class="quote">Это завораживающее скопление ошибок и совершенно неубедительная копия исходного материала. Но от него трудно отвести взгляд, когда он переворачивается наизнанку.</p></blockquote>
                             <div class="rew-menu">
                                 <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
                                 <ul>
-                                    <li><a class="complain" rel="nofollow" href="/zhaloba/?c=destructoid">Сообщить о проблеме</a></li>
+                                    <li><NavLink class="complain" rel="nofollow" href="/games/details/alex">Сообщить о проблеме</NavLink></li>
                                 </ul>
                             </div>
-                            <a class="allreviews" href="/click/?site=destructoid" rel="nofollow noopener" target="_blank">Читать обзор полностью</a>
+                            <NavLink class="allreviews" href="/games/details/alex">Читать обзор полностью</NavLink>
                         </div>
                     </div>
                 </div>
@@ -179,132 +179,132 @@
                 <div id="comments">
                     <h2 id="users"><span>Отзывы и оценки</span> Игроки</h2>
                     <span class="countnum">0</span>
-                    <p>Если вы уже поиграли в игру, расскажите, что вы о ней думаете. Расскажите о ее сильных и слабых сторонах, о ее плюсах и минусах. Ваш <a href="/user-reviews/">отзыв</a> поможет тем, кто хочет в нее поиграть.</p><div class="reviews-none"><p><a href="/user-reviews/">Отзывов от игроков</a> пока нет.</p></div>
+                    <p>Если вы уже поиграли в игру, расскажите, что вы о ней думаете. Расскажите о ее сильных и слабых сторонах, о ее плюсах и минусах. Ваш <NavLink class="my-nav-link" href="/games/details/alex">Отзывов от игроков</NavLink> пока нет.</p>
                 </div>
-                <div id="respond" class="comment-respond">
-                    <h3 id="reply-title" class="comment-reply-title"> <small><a rel="nofollow" id="cancel-comment-reply-link" href="/the-thing-remastered/#respond" style="display:none;">Отменить ответ</a></small></h3>
-                    <form action="https://metarankings.ru/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
-                        <div class="commform-author"><p>Ваше имя <span>Обязательно!</span></p><div><input type="text" name="metarankings-name" id="author" tabindex="2" /></div></div>
-                        <div class="commform-textarea"><div><div class="count"><span id="count">0</span> (60 символов - минимум)</div><label for="comment"><h2>Ваш отзыв</h2> <span>(не менее 60 символов, без мата, оскорблений, капса и без ссылок на сторонние ресурсы)</span></label><textarea name="metarankings-comm" id="comment" cols="50" rows="7" tabindex="1"></textarea></div></div>												<p class="form-submit">
-                            <input name="submit" type="submit" id="submit" value="Отправить" />
-                            <input type='hidden' name='comment_post_ID' value='25216' id='comment_post_ID' />
-                            <input type='hidden' name='comment_parent' id='comment_parent' value='0' />
-                        </p>
-                    </form>
-                </div><!-- #respond -->
             </div>
-        </div>
-        <div class="ads-horizont hor-1">
-            <div id="yandex_rtb_R-A-201169-26"></div>
-        </div>
-        <div class="list clear similar">
-            <h2>Похожие игры на The Thing: Remastered</h2>
-            <a href="https://metarankings.ru/sorry-were-closed/" title="Sorry We&#8217;re Closed">
-                <div class="featured-image">
-                    <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/sorry-were-closed-boxart-cover-196x281.jpg" alt="Sorry We&#8217;re Closed">
-                    <div class="small-score mark-7">6.7</div>
-                    <span>Sorry We&#8217;re Closed</span>
-                </div>
-            </a>
-            <a href="https://metarankings.ru/slitterhead/" title="Slitterhead">
-                <div class="featured-image">
-                    <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/slitterhead-boxart-cover-196x281.jpg" alt="Slitterhead">
-                    <div class="small-score mark-6">5.7</div>
-                    <span>Slitterhead</span>
-                </div>
-            </a>
-            <a href="https://metarankings.ru/a-quiet-place-the-road-ahead/" title="A Quiet Place: The Road Ahead">
-                <div class="featured-image">
-                    <img class="post-image" src="https://metarankings.ru/images/uploads/2024/10/a-quiet-place-the-road-ahead-boxart-cover-196x281.jpg" alt="A Quiet Place: The Road Ahead">
-                    <div class="small-score mark-6">6.2</div>
-                    <span>A Quiet Place: The Road Ahead</span>
-                </div>
-            </a>
-            <a href="https://metarankings.ru/game-silent-hill-2-remake/" title="Silent Hill 2">
-                <div class="featured-image">
-                    <img class="post-image" src="https://metarankings.ru/images/uploads/2023/03/silent-hill-2-remake-boxart-cover-196x281.jpg" alt="Silent Hill 2">
-                    <div class="small-score mark-8">8.1</div>
-                    <span>Silent Hill 2</span>
-                </div>
-            </a>
-            <a href="https://metarankings.ru/the-casting-of-frank-stone/" title="The Casting of Frank Stone">
-                <div class="featured-image">
-                    <img class="post-image" src="https://metarankings.ru/images/uploads/2024/09/the-casting-of-frank-stone-boxart-cover-196x281.jpg" alt="The Casting of Frank Stone">
-                    <div class="small-score mark-6">6.5</div>
-                    <span>The Casting of Frank Stone</span>
-                </div>
-            </a>
-            <a href="https://metarankings.ru/sylvio-black-waters/" title="Sylvio: Black Waters">
-                <div class="featured-image">
-                    <img class="post-image" src="https://metarankings.ru/images/uploads/2024/07/sylvio-black-waters-boxart-cover-196x281.jpg" alt="Sylvio: Black Waters">
-                    <div class="small-score mark-0">0</div>
-                    <span>Sylvio: Black Waters</span>
-                </div>
-            </a>
+            <div id="respond" class="comment-respond">
+                <h3 id="reply-title" class="comment-reply-title"> <small><NavLink rel="nofollow" id="cancel-comment-reply-link" href="/games/details/alex">Отменить ответ</NavLink></small></h3>
+                <form action="https://metarankings.ru/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
+                    <div class="commform-author"><p>Ваше имя <span>Обязательно!</span></p><div><input type="text" name="metarankings-name" id="author" tabindex="2" /></div></div>
+                    <div class="commform-textarea"><div><div class="count"><span id="count">0</span> (60 символов - минимум)</div><label for="comment"><h2>Ваш отзыв</h2> <span>(не менее 60 символов, без мата, оскорблений, капса и без ссылок на сторонние ресурсы)</span></label><textarea name="metarankings-comm" id="comment" cols="50" rows="7" tabindex="1"></textarea></div></div>												<p class="form-submit">
+                        <input name="submit" type="submit" id="submit" value="Отправить" />
+                        <input type='hidden' name='comment_post_ID' value='25216' id='comment_post_ID' />
+                        <input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+                    </p>
+                </form>
+            </div><!-- #respond -->
         </div>
     </div>
-    <div class="sidebar rcol">
-        <div class="widget">
-            <div class="widget-body">
-                <ul>
-
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="https://metarankings.ru/indiana-jones-and-the-great-circle/">Indiana Jones and the Great Circle</a></span>
-                        </div>
-                    </li>
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="https://metarankings.ru/stalker-2/">S.T.A.L.K.E.R. 2: Heart of Chernobyl</a></span>
-                        </div>
-                    </li>
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="https://metarankings.ru/dragon-age-the-veilguard/">Dragon Age: The Veilguard</a></span>
-                        </div>
-                    </li>
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="https://metarankings.ru/call-of-duty-black-ops-6/">Call of Duty: Black Ops 6</a></span>
-                        </div>
-                    </li>
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="https://metarankings.ru/game-silent-hill-2-remake/">Silent Hill 2</a></span>
-                        </div>
-                    </li>
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="https://metarankings.ru/the-legend-of-zelda-echoes-of-wisdom/">The Legend of Zelda: Echoes of Wisdom</a></span>
-                        </div>
-                    </li>
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="https://metarankings.ru/astro-bot/">Astro Bot</a></span>
-                        </div>
-                    </li>
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="https://metarankings.ru/star-wars-outlaws/">Star Wars Outlaws</a></span>
-                        </div>
-                    </li>
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="https://metarankings.ru/black-myth-wukong/">Black Myth: WuKong</a></span>
-                        </div>
-                    </li>
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="https://metarankings.ru/senuas-saga-hellblade-2/">Senua’s Saga: Hellblade 2</a></span>
-                        </div>
-                    </li>
-                    <li class="recent-reviews">
-                        <div class="ureview-text">
-                            <span class="title-reviews"><a href="/user-reviews/">Последние отзывы</a></span>
-                        </div>
-                    </li>
-                </ul>
+    <div class="ads-horizont hor-1">
+        <div id="yandex_rtb_R-A-201169-26"></div>
+    </div>
+    <div class="list clear similar">
+        <h2>Похожие игры на The Thing: Remastered</h2>
+        <NavLink class="my-nav-link" href="/games/details/alex">
+            <div class="featured-image">
+                <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/sorry-were-closed-boxart-cover-196x281.jpg" alt="Sorry We&#8217;re Closed">
+                <div class="small-score mark-7">6.7</div>
+                <span>Sorry We&#8217;re Closed</span>
             </div>
+        </NavLink>
+        <NavLink class="my-nav-link" href="/games/details/alex">
+            <div class="featured-image">
+                <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/slitterhead-boxart-cover-196x281.jpg" alt="Slitterhead">
+                <div class="small-score mark-6">5.7</div>
+                <span>Slitterhead</span>
+            </div>
+        </NavLink>
+        <NavLink class="my-nav-link" href="/games/details/alex">
+            <div class="featured-image">
+                <img class="post-image" src="https://metarankings.ru/images/uploads/2024/10/a-quiet-place-the-road-ahead-boxart-cover-196x281.jpg" alt="A Quiet Place: The Road Ahead">
+                <div class="small-score mark-6">6.2</div>
+                <span>A Quiet Place: The Road Ahead</span>
+            </div>
+        </NavLink>
+        <NavLink class="my-nav-link" href="/games/details/alex">
+            <div class="featured-image">
+                <img class="post-image" src="https://metarankings.ru/images/uploads/2023/03/silent-hill-2-remake-boxart-cover-196x281.jpg" alt="Silent Hill 2">
+                <div class="small-score mark-8">8.1</div>
+                <span>Silent Hill 2</span>
+            </div>
+        </NavLink>
+        <NavLink class="my-nav-link" href="/games/details/alex">
+            <div class="featured-image">
+                <img class="post-image" src="https://metarankings.ru/images/uploads/2024/09/the-casting-of-frank-stone-boxart-cover-196x281.jpg" alt="The Casting of Frank Stone">
+                <div class="small-score mark-6">6.5</div>
+                <span>The Casting of Frank Stone</span>
+            </div>
+        </NavLink>
+        <NavLink class="my-nav-link" href="/games/details/alex">
+            <div class="featured-image">
+                <img class="post-image" src="https://metarankings.ru/images/uploads/2024/07/sylvio-black-waters-boxart-cover-196x281.jpg" alt="Sylvio: Black Waters">
+                <div class="small-score mark-0">0</div>
+                <span>Sylvio: Black Waters</span>
+            </div>
+        </NavLink>
+    </div>
+</div>
+<div class="sidebar rcol">
+    <div class="widget">
+        <div class="widget-body">
+            <ul>
+
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">Indiana Jones and the Great Circle</NavLink></span>
+                    </div>
+                </li>
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">S.T.A.L.K.E.R. 2: Heart of Chernobyl</NavLink></span>
+                    </div>
+                </li>
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">Dragon Age: The Veilguard</NavLink></span>
+                    </div>
+                </li>
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">Call of Duty: Black Ops 6</NavLink></span>
+                    </div>
+                </li>
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">Silent Hill 2</NavLink></span>
+                    </div>
+                </li>
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">The Legend of Zelda: Echoes of Wisdom</NavLink></span>
+                    </div>
+                </li>
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">Astro Bot</NavLink></span>
+                    </div>
+                </li>
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">Star Wars Outlaws</NavLink></span>
+                    </div>
+                </li>
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">Black Myth: WuKong</NavLink></span>
+                    </div>
+                </li>
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">Senua’s Saga: Hellblade 2</NavLink></span>
+                    </div>
+                </li>
+                <li class="recent-reviews">
+                    <div class="ureview-text">
+                        <span class="title-reviews"><NavLink class="my-nav-link" href="/games/details/alex">Последние отзывы</NavLink></span>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
@@ -314,41 +314,41 @@
     public FeaturedGame FeaturedGame { get; set; } = new FeaturedGame
         {
             Developers = new Developer[]
-                                                    {
+                                                            {
                 new Developer
                 {
                     Name = "Nightdive Studios",
                     Link = "/razrabotchiki/nightdive_studios/"
                 }
-                                                    },
+                                                            },
             Localization = new Localization
             {
                 Link = "https://metarankings.ru/igry-bez-russkogo-yazyka/",
                 Name = "Английский (без русского языка)"
             },
             Platforms = new Platform[]
-                                                    {
+                                                            {
                 new Platform
                 {
                     Link = "https://metarankings.ru/meta/games/pc/",
                     Name = "PC"
                 }
-                                                    },
+                                                            },
             Publishers = new Publisher[]
-                                                    {
+                                                            {
                 new Publisher
                 {
                     Name = "Nightdive Studios",
                     Link = "/razrabotchiki/nightdive_studios/"
                 }
-                                                    },
+                                                            },
             Genres = new Genre[]
-                                                {
+                                                        {
                 new Genre
             {
                 Name = "Хоррор",
                 Link = "https://metarankings.ru/genre/xorror/"
             }
-                                            }
+                                                    }
         };
 }
