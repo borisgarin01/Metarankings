@@ -1,0 +1,13 @@
+﻿@page "/collections/{Name}"
+
+<h1>@Name</h1>
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+}

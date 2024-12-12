@@ -7,3 +7,9 @@
     text-decoration: none;
     color: grey
 }
+
+img:hover {
+    transform: scale(1.1);
+    filter: brightness(150%);
+    border-radius: 10px;
+}
