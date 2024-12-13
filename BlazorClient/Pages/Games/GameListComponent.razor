@@ -11,37 +11,25 @@ else
     <div>
         @foreach (var game in Games)
         {
-            <div>
-                <a href="@game.Name" title="Игра @game.Name"><img src="@game.ImageSource" alt="Игра @game.Name"></a>
-                <div>
-                    <div></div>
-                    <span>&#9733;</span>
-                </div>
-                <h3><a href="@game.Name">@game.Name</a></h3>
-                <div>
-                    @foreach (var publisher in game.Publishers)
+            <div class="post clear">
+                <a href="#" title="Игра @game.Name" class="thumb"><img class="post-image" src="@game.ImageSource" alt="@game.Name"></a>
+                <a class="name" href="#">@game.Name</a>
+                <div class="post-meta"><p>@string.Join(", ", game.Developers)</p></div>
+                <div class="post-meta"><p>@string.Join(", ", game.Publishers)</p></div>
+                <div class="post-content"><p>@game.Description</p></div>
+                @{
+                    var trailer = game.Trailers?.FirstOrDefault();
+                    if (trailer != null && !string.IsNullOrWhiteSpace(trailer.Url))
                     {
-                        <p>@publisher.Name</p>
-                    }
-                </div>
-                <div>
-                    @foreach (var platform in game.Platforms)
-                    {
-                        <p>@platform.Name</p>
-                    }
-                </div>
-                <div><p>@string.Join(", ", game.Genres.Select(g => g.Name))</p></div>
-                <div>
-                    @foreach (var trailer in game.Trailers)
-                    {
-                        <iframe class="embed-responsive-item" src=@("https://www.youtube.com/embed/@trailer.Url?autoplay=0&mute=1".Replace("@trailer.Url",trailer.Url))>
+                        <iframe src=@("https://www.youtube.com/embed/@trailer.Url?autoplay=0&mute=1".Replace("@trailer.Url",trailer.Url))>
                         </iframe>
                     }
-                </div>
+                }
+                <div class="trailer" data-video="@(game.Trailers?.FirstOrDefault()!=null?game.Trailers.First().Url:"")">Трейлер</div>
                 <div class="ratings-graph">
                     <div class="graph">
-                        <div>@game.Score</div>
-                        <div><div></div></div>
+                        <div class="small-score mark-@(game.Score.HasValue ? Math.Round(game.Score.Value) : 0)">@(game.Score.HasValue ? game.Score.Value : 0)</div>
+                        <div class="graph-body"><div style="width:@(game.Score.HasValue?game.Score.Value*10:100)%" class="rating-graph mark-@(game.Score.HasValue ? game.Score.Value : 0)"></div></div>
                     </div>
                 </div>
             </div>
