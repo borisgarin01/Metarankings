@@ -1,9 +1,9 @@
 ﻿@using System.Globalization
 <div class="item">
-    <a class="my-nav-link" href="/games/details/@Name">Игра @Name</a>
+    <a class="link-dark my-nav-link"href="/games/details/@Name">Игра @Name</a>
     <div class="small-score @(Score>8f?"score-green":(Score>6f?"score-yellow":(Score>4f?"score-orange":(Score>2f?"score-red":"score-grey")))))"><span data-title="Рейтинг игры" class="tooltip">@Score</span></div>
-    <span class="item-name"><a class="my-nav-link" href="/games/details/boris">@Name</a></span>
-    <span class="item-meta"><a class="my-nav-link" href="/games/details/boris">Xbox Series X</a></span>
+    <span class="item-name"><a class="link-dark my-nav-link"href="/games/details/boris">@Name</a></span>
+    <span class="item-meta"><a class="link-dark my-nav-link"href="/games/details/boris">Xbox Series X</a></span>
     <span class="item-meta"><a rel="nofollow" href="/games/details/boris">Отзывы (0)</a></span>
     <span class="item-meta">@ReleaseDate.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span>
     <span class="item-description">@Description</span>

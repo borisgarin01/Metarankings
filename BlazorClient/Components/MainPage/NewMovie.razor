@@ -1,9 +1,9 @@
 ﻿@using System.Globalization
 <div class="item">
-    <a class="my-nav-link" href="/movies/details/@Title">Фильм @Title</a>
+    <a class="link-dark my-nav-link"href="/movies/details/@Title">Фильм @Title</a>
     <div class="small-score mark-@Math.Round(Score)"><span data-title="Рейтинг фильма" class="tooltip">@Score</span></div>
-    <span class="item-name"><a class="my-nav-link" href="/games/details/@Title">@Title</a></span>
-    <span class="item-meta"><a class="my-nav-link" href="/games/details/alex">Мультфильмы</a></span>
+    <span class="item-name"><a class="link-dark my-nav-link"href="/games/details/@Title">@Title</a></span>
+    <span class="item-meta"><a class="link-dark my-nav-link"href="/games/details/alex">Мультфильмы</a></span>
     <span class="item-meta"><a rel="nofollow" href="/games/details/alex">Отзывы (0)</a></span>
     <span class="item-meta">@ReleaseDate.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span>
     <span class="item-description">@Description</span>
