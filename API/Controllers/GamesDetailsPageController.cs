@@ -19,7 +19,7 @@ public sealed class GamesDetailsPageController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Game>>> GetAllGamesAsync()
     {
-        var games = await dataContext.Games.Include(g => g.Genres).Include(g => g.CriticsReviews).Include(g => g.Developers).Include(g => g.Platforms).Include(g => g.Tags).Include(g => g.UsersReviews).ToArrayAsync();
+        var games = await dataContext.Games.Include(g => g.Genres).Include(g => g.CriticsReviews).Include(g => g.Developers).Include(g => g.Platforms).Include(g => g.Localization).Include(g => g.Tags).Include(g => g.Publishers).Include(g => g.UsersReviews).ToArrayAsync();
         return Ok(games);
     }
 }

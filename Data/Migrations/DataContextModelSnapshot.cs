@@ -40,7 +40,7 @@ namespace Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Collections");
+                    b.ToTable("Collections", (string)null);
                 });
 
             modelBuilder.Entity("Domain.CollectionItem", b =>
@@ -82,7 +82,7 @@ namespace Data.Migrations
                     b.HasIndex("Title")
                         .IsUnique();
 
-                    b.ToTable("CollectionItems");
+                    b.ToTable("CollectionItems", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Critic", b =>
@@ -111,7 +111,7 @@ namespace Data.Migrations
                     b.HasIndex("Url")
                         .IsUnique();
 
-                    b.ToTable("Critics");
+                    b.ToTable("Critics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Game", b =>
@@ -155,7 +155,7 @@ namespace Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GameCriticReview", b =>
@@ -199,7 +199,7 @@ namespace Data.Migrations
                     b.HasIndex("Url")
                         .IsUnique();
 
-                    b.ToTable("GamesCriticsReviews");
+                    b.ToTable("GamesCriticsReviews", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GameDeveloper", b =>
@@ -228,7 +228,7 @@ namespace Data.Migrations
                     b.HasIndex("Url")
                         .IsUnique();
 
-                    b.ToTable("GamesDevelopers");
+                    b.ToTable("GamesDevelopers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GameGamerReview", b =>
@@ -271,7 +271,7 @@ namespace Data.Migrations
                     b.HasIndex("Url")
                         .IsUnique();
 
-                    b.ToTable("GameGamerReview");
+                    b.ToTable("GameGamerReview", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GameGenre", b =>
@@ -300,7 +300,7 @@ namespace Data.Migrations
                     b.HasIndex("Url")
                         .IsUnique();
 
-                    b.ToTable("GamesGenres");
+                    b.ToTable("GamesGenres", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GameLocalization", b =>
@@ -329,7 +329,7 @@ namespace Data.Migrations
                     b.HasIndex("Url")
                         .IsUnique();
 
-                    b.ToTable("GamesLocalizations");
+                    b.ToTable("GamesLocalizations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GamePlatform", b =>
@@ -358,7 +358,7 @@ namespace Data.Migrations
                     b.HasIndex("Url")
                         .IsUnique();
 
-                    b.ToTable("GamesPlatforms");
+                    b.ToTable("GamesPlatforms", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GamePublisher", b =>
@@ -387,7 +387,7 @@ namespace Data.Migrations
                     b.HasIndex("Url")
                         .IsUnique();
 
-                    b.ToTable("GamesPublishers");
+                    b.ToTable("GamesPublishers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GameTag", b =>
@@ -416,7 +416,7 @@ namespace Data.Migrations
                     b.HasIndex("Url")
                         .IsUnique();
 
-                    b.ToTable("GamesTags");
+                    b.ToTable("GamesTags", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Gamer", b =>
@@ -445,7 +445,7 @@ namespace Data.Migrations
                     b.HasIndex("Url")
                         .IsUnique();
 
-                    b.ToTable("Gamers");
+                    b.ToTable("Gamers", (string)null);
                 });
 
             modelBuilder.Entity("GameGameDeveloper", b =>
@@ -460,7 +460,7 @@ namespace Data.Migrations
 
                     b.HasIndex("GamesId");
 
-                    b.ToTable("GameGameDeveloper");
+                    b.ToTable("GameGameDeveloper", (string)null);
                 });
 
             modelBuilder.Entity("GameGameGenre", b =>
@@ -475,7 +475,7 @@ namespace Data.Migrations
 
                     b.HasIndex("GenresId");
 
-                    b.ToTable("GameGameGenre");
+                    b.ToTable("GameGameGenre", (string)null);
                 });
 
             modelBuilder.Entity("GameGamePlatform", b =>
@@ -490,7 +490,7 @@ namespace Data.Migrations
 
                     b.HasIndex("PlatformsId");
 
-                    b.ToTable("GameGamePlatform");
+                    b.ToTable("GameGamePlatform", (string)null);
                 });
 
             modelBuilder.Entity("GameGamePublisher", b =>
@@ -505,7 +505,7 @@ namespace Data.Migrations
 
                     b.HasIndex("PublishersId");
 
-                    b.ToTable("GameGamePublisher");
+                    b.ToTable("GameGamePublisher", (string)null);
                 });
 
             modelBuilder.Entity("GameGameTag", b =>
@@ -520,7 +520,7 @@ namespace Data.Migrations
 
                     b.HasIndex("TagsId");
 
-                    b.ToTable("GameGameTag");
+                    b.ToTable("GameGameTag", (string)null);
                 });
 
             modelBuilder.Entity("Domain.CollectionItem", b =>
