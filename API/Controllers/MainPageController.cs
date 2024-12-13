@@ -17,9 +17,9 @@ public sealed class MainPageController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<GamePlatform>> GetAll()
+    public async Task<ActionResult<Game>> GetAll()
     {
-        var gamesWithPlatforms = dataContext.GamesPlatforms.Include(g => g.Games).ToArray();
+        var gamesWithPlatforms = dataContext.Games.Include(g => g.Platforms).ToArray();
         return Ok(gamesWithPlatforms);
     }
 }
