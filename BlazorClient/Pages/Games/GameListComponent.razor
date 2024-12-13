@@ -7,29 +7,29 @@
 }
 else
 {
-    <div class="list-group">
+    <div>
         @foreach (var game in Games)
         {
-            <div class="list-group-item">
-                <a href="@game.Name" title="Игра @game.Name" class="card-title"><img class="card-img" src="@game.ImageSource" alt="Игра @game.Name"></a>
-                <div class="figure-caption">
-                    <div class="counter">1</div>
-                    <span class="star">&#9733;</span>
+            <div>
+                <a href="@game.Name" title="Игра @game.Name"><img src="@game.ImageSource" alt="Игра @game.Name"></a>
+                <div>
+                    <div>1</div>
+                    <span>&#9733;</span>
                 </div>
-                <h3><a class="name" href="@game.Name">@game.Name</a></h3>
-                <div class="text-info">
+                <h3><a href="@game.Name">@game.Name</a></h3>
+                <div>
                     @foreach (var publisher in game.Publishers)
                     {
                         <p>@publisher.Name</p>
                     }
                 </div>
-                <div class="text-info">
+                <div>
                     @foreach (var platform in game.Platforms)
                     {
                         <p>@platform.Name</p>
                     }
                 </div>
-                <div class="text-info">
+                <div>
                     @foreach (var genre in game.Genres)
                     {
                         <p>@genre.Name</p>
@@ -37,14 +37,16 @@ else
                 </div>
                 <div>
                     <div>
-                        <div class="small-score mark-@(game.Score.HasValue ? Math.Round(game.Score.Value) : 0)">@(game.Score.HasValue ? game.Score.Value : 0)</div>
-                        <div class="graph-body"><div style="width:@(game.Score.HasValue ? Math.Round(game.Score.Value):0)%" class="rating-graph mark-@(game.Score.HasValue ? Math.Round(game.Score.Value) : 0)"></div></div>
+                        <div>@(game.Score.HasValue ? game.Score.Value : 0)</div>
+                        <div><div></div></div>
                     </div>
                 </div>
                 <div>
-                    <iframe width="420" height="315"
-                            src="https://www.youtube.com/embed/OQpdSVF_k_w?autoplay=0&mute=1">
-                    </iframe>
+                    @foreach (var trailer in game.Trailers)
+                    {
+                        <iframe src=@("https://www.youtube.com/embed/@trailer.Url?autoplay=0&mute=1".Replace("@trailer.Url",trailer.Url))>
+                        </iframe>
+                    }
                 </div>
             </div>
         }

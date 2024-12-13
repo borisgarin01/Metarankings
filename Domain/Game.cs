@@ -32,4 +32,5 @@ public sealed record Game
     public IEnumerable<GameTag> Tags { get; set; }
     public IEnumerable<GameCriticReview> CriticsReviews { get; set; }
     public IEnumerable<GameGamerReview> UsersReviews { get; set; }
+    public IEnumerable<Trailer> Trailers { get; set; }
 }
