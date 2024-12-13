@@ -7,40 +7,44 @@
 }
 else
 {
-    <div class="list clear best">
+    <div class="list-group">
         @foreach (var game in Games)
         {
-            <div class="post clear">
-                <a href="@game.Name" title="Игра @game.Name" class="thumb"><img class="post-image" src="@game.ImageSource" alt="Игра @game.Name"></a>
-                <div class="best-prod">
+            <div class="list-group-item">
+                <a href="@game.Name" title="Игра @game.Name" class="card-title"><img class="card-img" src="@game.ImageSource" alt="Игра @game.Name"></a>
+                <div class="figure-caption">
                     <div class="counter">1</div>
                     <span class="star">&#9733;</span>
                 </div>
                 <h3><a class="name" href="@game.Name">@game.Name</a></h3>
-                <div class="post-meta">
+                <div class="text-info">
                     @foreach (var publisher in game.Publishers)
                     {
                         <p>@publisher.Name</p>
                     }
                 </div>
-                <div class="post-meta">
+                <div class="text-info">
                     @foreach (var platform in game.Platforms)
                     {
                         <p>@platform.Name</p>
                     }
                 </div>
-                <div class="post-meta">
+                <div class="text-info">
                     @foreach (var genre in game.Genres)
                     {
                         <p>@genre.Name</p>
                     }
                 </div>
-                <div class="trailer" data-video="@game.Name/#content-trailer"></div>
-                <div class="ratings-graph">
-                    <div class="graph">
+                <div>
+                    <div>
                         <div class="small-score mark-@(game.Score.HasValue ? Math.Round(game.Score.Value) : 0)">@(game.Score.HasValue ? game.Score.Value : 0)</div>
                         <div class="graph-body"><div style="width:@(game.Score.HasValue ? Math.Round(game.Score.Value):0)%" class="rating-graph mark-@(game.Score.HasValue ? Math.Round(game.Score.Value) : 0)"></div></div>
                     </div>
+                </div>
+                <div>
+                    <iframe width="420" height="315"
+                            src="https://www.youtube.com/embed/OQpdSVF_k_w?autoplay=0&mute=1">
+                    </iframe>
                 </div>
             </div>
         }
