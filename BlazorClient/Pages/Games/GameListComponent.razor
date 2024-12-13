@@ -44,8 +44,10 @@ else
                 <div>
                     @foreach (var trailer in game.Trailers)
                     {
-                        <iframe src=@("https://www.youtube.com/embed/@trailer.Url?autoplay=0&mute=1".Replace("@trailer.Url",trailer.Url))>
-                        </iframe>
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <iframe class="embed-responsive-item" src=@("https://www.youtube.com/embed/@trailer.Url?autoplay=0&mute=1".Replace("@trailer.Url",trailer.Url))>
+                            </iframe>
+                        </div>
                     }
                 </div>
             </div>
