@@ -34,14 +34,14 @@
                 <BlazorClient.Components.Home.NewMoviesComponent NewMovies="NewMovies" />
 
                 <div class="index-games">
-                    <h3><NavLink class="my-nav-link" href="/games/new">Новые игры</NavLink></h3>
+                    <h3><a class="my-nav-link" href="/games/new">Новые игры</a></h3>
                     @foreach (NewGame newGame in NewGames)
                     {
                         <BlazorClient.Components.MainPage.NewGame Href="@newGame.Href" Description="@newGame.Description" ImageAlt="@newGame.ImageAlt" ImageSrc="@newGame.ImageSrc" Name="@newGame.Name" ReleaseDate="@newGame.ReleaseDate" />
                     }
 
                     <BlazorClient.Components.SelectGameYearComponent />
-                    <NavLink class="allreviews" href="/games/reviews">Обзоры на игры</NavLink>
+                    <a class="allreviews" href="/games/reviews">Обзоры на игры</a>
                 </div>
                 <div class="ads-horizont hor-1">
                     <!-- Yandex.RTB R-A-201169-5 -->
@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="index-movies">
-                    <h3><NavLink class="my-nav-link" href="/news/movies">Новости кино</NavLink></h3>
+                    <h3><a class="my-nav-link" href="/news/movies">Новости кино</a></h3>
                     @foreach (News news in MoviesNews)
                     {
                         <BlazorClient.Components.MainPage.NewsItem Href="@news.Href" Title="@news.Title" ImageSrc="@news.ImageSrc" />
@@ -57,21 +57,21 @@
                 </div>
 
                 <div class="index-games">
-                    <h3><NavLink class="my-nav-link" href="/news/games">Новости игр</NavLink></h3>
+                    <h3><a class="my-nav-link" href="/news/games">Новости игр</a></h3>
                     @foreach (News news in GamesNews)
                     {
                         <BlazorClient.Components.MainPage.NewsItem Href="@news.Href" Title="@news.Title" ImageSrc="@news.ImageSrc" />
                     }
                 </div>
                 <div class="specials-index">
-                    <h3><NavLink class="my-nav-link" href="/collections">Подборки</NavLink></h3>
+                    <h3><a class="my-nav-link" href="/collections">Подборки</a></h3>
                     @foreach (CollectionItem collectionItem in CollectionItems)
                     {
                         <BlazorClient.Components.MainPage.CollectionItem Href="@collectionItem.Href" Title="@collectionItem.Title" ImageSrc="@collectionItem.ImageSrc" />
                     }
                 </div>
                 <div class="specials-index">
-                    <h3><NavLink class="my-nav-link" href="/specials">Спецматериалы</NavLink></h3>
+                    <h3><a class="my-nav-link" href="/specials">Спецматериалы</a></h3>
 
                     @foreach (SpecialItem specialItem in SpecialItems)
                     {
@@ -79,21 +79,21 @@
                     }
                 </div>
                 <div class="index-movies">
-                    <h3><NavLink class="my-nav-link" href="/soon-at-cinemas">Скоро в кино</NavLink></h3>
+                    <h3><a class="my-nav-link" href="/soon-at-cinemas">Скоро в кино</a></h3>
                     @foreach (SoonAtCinemasComponentItem soonAtCinemasComponentItem in SoonAtCinemasComponentItems)
                     {
                         <BlazorClient.Components.MainPage.SoonAtCinemasComponentItem Href="@soonAtCinemasComponentItem.Href" ImageSrc="@soonAtCinemasComponentItem.ImageSrc" Name="@soonAtCinemasComponentItem.Name" OriginalName="@soonAtCinemasComponentItem.OriginalName" ReleaseDate=@soonAtCinemasComponentItem.ReleaseDate />
                     }
-                    <NavLink class="my-nav-link" href="/most-expected-movies">Самые ожидаемые фильмы</NavLink>
+                    <a class="my-nav-link" href="/most-expected-movies">Самые ожидаемые фильмы</a>
                 </div>
                 <!--11.12.2024 17:19 TODO: continue here-->
                 <div class="index-games">
-                    <h3><NavLink class="my-nav-link" href="/games-releases-dates">Дата выхода игр</NavLink></h3>
+                    <h3><a class="my-nav-link" href="/games-releases-dates">Дата выхода игр</a></h3>
                     @foreach (GameReleaseDate gameReleaseDate in GamesReleasesDates)
                     {
                         <BlazorClient.Components.MainPage.GameReleaseDate Href="@gameReleaseDate.Href" ImageSrc="@gameReleaseDate.ImageSrc" Name="@gameReleaseDate.Name" ReleaseDate=@gameReleaseDate.ReleaseDate />
                     }
-                    <NavLink class="my-nav-link" href="/most-expected-games">Самые ожидаемые игры</NavLink>
+                    <a class="my-nav-link" href="/most-expected-games">Самые ожидаемые игры</a>
                 </div>
             </div>
         </div>

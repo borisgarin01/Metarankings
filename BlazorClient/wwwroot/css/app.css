@@ -42,3 +42,8 @@ div.score-grey {
 .title {
     font-size: 2em
 }
+
+div.news-item:hover {
+    transform: scale(1.1);
+    filter: brightness(150%);
+}
