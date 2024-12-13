@@ -11,26 +11,23 @@ else
     <div>
         @foreach (var game in Games)
         {
-            <div class="post clear">
-                <a href="#" title="Игра @game.Name" class="thumb"><img class="post-image" src="@game.ImageSource" alt="@game.Name"></a>
-                <a class="name" href="#">@game.Name</a>
-                <div class="post-meta"><p>@string.Join(", ", game.Developers)</p></div>
-                <div class="post-meta"><p>@string.Join(", ", game.Publishers)</p></div>
-                <div class="post-content"><p>@game.Description</p></div>
+            <div class="panel panel-default">
+                <a href="#" title="Игра @game.Name" class="thumb"><img class="img-fluid" src="@game.ImageSource" alt="@game.Name"></a>
+                <a class="nav-link" href="#">@game.Name</a>
+                <p class="text-info">@string.Join(", ", game.Developers)</p>
+                <p class="text-info">@string.Join(", ", game.Publishers)</p>
+                <p class="text-info">@game.Description</p>
                 @{
                     var trailer = game.Trailers?.FirstOrDefault();
                     if (trailer != null && !string.IsNullOrWhiteSpace(trailer.Url))
                     {
-                        <iframe src=@("https://www.youtube.com/embed/@trailer.Url?autoplay=0&mute=1".Replace("@trailer.Url",trailer.Url))>
-                        </iframe>
+                        <iframe class="panel panel-default" src=@("https://www.youtube.com/embed/@trailer.Url?autoplay=0&mute=1".Replace("@trailer.Url",trailer.Url)) />
                     }
                 }
-                <div class="trailer" data-video="@(game.Trailers?.FirstOrDefault()!=null?game.Trailers.First().Url:"")">Трейлер</div>
-                <div class="ratings-graph">
-                    <div class="graph">
-                        <div class="small-score mark-@(game.Score.HasValue ? Math.Round(game.Score.Value) : 0)">@(game.Score.HasValue ? game.Score.Value : 0)</div>
-                        <div class="graph-body"><div style="width:@(game.Score.HasValue?game.Score.Value*10:100)%" class="rating-graph mark-@(game.Score.HasValue ? game.Score.Value : 0)"></div></div>
-                    </div>
+                <iframe class="panel panel-default" src="@(game.Trailers?.FirstOrDefault() != null ? game.Trailers.First().Url : "")" />
+                <div class="panel panel-default">
+                    <div class="panel panel-default">@(game.Score.HasValue ? game.Score.Value : 0)</div>
+                    <div class="panel panel-default">@(game.Score.HasValue ? game.Score.Value : 0)></div>
                 </div>
             </div>
         }
