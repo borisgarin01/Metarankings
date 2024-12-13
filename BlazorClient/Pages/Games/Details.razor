@@ -1,0 +1,690 @@
+﻿@page "/games/details/{Name}"
+
+
+<div class="headerer">
+    <div class="header-bottom">
+        <div class="header clear nav-menu">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="logo">
+                <a href="https://metarankings.ru"><span>Meta</span>Rankings</a>
+            </div>
+            <div class="nav">
+                <ul>
+                    <li>
+                        <span onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-movies/">Фильмы</a></span>
+                        <div class="movie-drop">
+                            <a href="https://metarankings.ru/new-movies/">Новинки</a>
+                            <a href="https://metarankings.ru/coming-soon/">Скоро</a>
+                            <a href="https://metarankings.ru/most-waiting-films/">Ожидаемые</a>
+                            <a href="https://metarankings.ru/meta/movies/">Обзоры</a>
+                            <a href="https://metarankings.ru/best-movies/">Топ фильмов</a>
+                            <a href="https://metarankings.ru/best-movies-2024/">Фильмы 2024</a>
+                            <a href="https://metarankings.ru/best-boeviki/2024/">Боевики </a>
+                            <a href="https://metarankings.ru/best-horror/2024/">Ужасы </a>
+                            <a href="https://metarankings.ru/best-comedy/2024/">Комедии </a>
+                            <a href="https://metarankings.ru/best-thrillers/2024/">Триллеры </a>
+                            <a href="https://metarankings.ru/best-fantasy/2024/">Фантастика </a>
+                            <a href="https://metarankings.ru/best-fentezi/2024/">Фэнтези </a>
+                            <a href="https://metarankings.ru/best-dramy/2024/">Драмы </a>
+                            <a href="https://metarankings.ru/best-melodramas/2024/">Мелодрамы </a>
+                            <a href="https://metarankings.ru/best-cartoons/2024/">Мультфильмы </a>
+                            <a href="https://metarankings.ru/best-serials/">Сериалы</a>
+                        </div>
+                    </li>
+                    <li class="active">
+                        <span onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"><a href="https://metarankings.ru/best-games/">Игры</a></span>
+                        <div class="game-drop">
+                            <a href="https://metarankings.ru/new-games/">Новинки</a>
+                            <a href="https://metarankings.ru/release-date/">Дата выхода</a>
+                            <a href="https://metarankings.ru/most-waiting-games/">Ожидаемые</a>
+                            <a href="https://metarankings.ru/meta/games/">Обзоры</a>
+                            <a href="https://metarankings.ru/best-games/">Топ игр</a>
+                            <a href="https://metarankings.ru/best-games-2024/">Игры 2024</a>
+                            <a href="https://metarankings.ru/best-pc-games/">ПК</a>
+                            <a href="https://metarankings.ru/best-ps4-games/">PS4</a>
+                            <a href="https://metarankings.ru/best-xboxone-games/">Xbox One</a>
+                            <a href="https://metarankings.ru/best-switch-games/">Switch</a>
+                            <a href="https://metarankings.ru/top-action-games/">Экшены</a>
+                            <a href="https://metarankings.ru/top-shooters/">Шутеры</a>
+                            <a href="https://metarankings.ru/top-horrors/">Хорроры</a>
+                            <a href="https://metarankings.ru/top-igry-priklyucheniya/">Приключения</a>
+                            <a href="https://metarankings.ru/top-rpg-games/">РПГ</a>
+                            <a href="https://metarankings.ru/best-strategii/">Стратегии</a>
+                            <a href="https://metarankings.ru/best-gonki/">Гонки</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="https://metarankings.ru/meta/collections/">Подборки</a>
+                    </li>
+                    <li>
+                        <a href="https://metarankings.ru/user-reviews/">Отзывы</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="nav_login">
+                <ul>
+                    <li><span class="user-login popauthor" title="Войти на сайт"></span></li>
+                </ul>
+            </div><div class="search_form">
+                <form method="get" id="searchform" action="https://metarankings.ru/search/">
+                    <fieldset>
+                        <input name="text" type="search" id="search" placeholder="Название игры или фильма..." autocomplete="off" />
+                        <button type="submit"></button>
+                    </fieldset>
+                </form>
+                <div id="search_form-result"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="wrapper">
+    <div>
+        <div class="platform-menu">
+            <ul>
+                <li>
+                    <a class="bst" href="https://metarankings.ru/best-games-2024/">Лучшие игры 2024</a>
+                </li>
+                <li>
+                    <a class="bst" href="https://metarankings.ru/best-games-2023/">2023</a>
+                </li>
+                <li>
+                    <a class="mnew" href="https://metarankings.ru/new-games/">Новые игры</a>
+                </li>
+                <li>
+                    <a href="https://metarankings.ru/release-date/">Дата выхода игр</a>
+                </li>
+                <li>
+                    <a href="https://metarankings.ru/most-waiting-games/">Самые ожидаемые игры</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="container" class="clear">
+        <div class="sidebar">
+
+            <div class="widget">
+                <div class="widget-body">
+                    <div class="graph">
+                        <h3>Рейтинг <a href="#critics">критиков</a></h3>
+                        <div class="graph-body"><div class="rating-graph mark-7" style="width:67%"><span class="score-graph">6.7</span></div></div>
+                        <h3>Рейтинг <a href="#users">игроков</a></h3>
+                        <div class="graph-body"><div class="rating-graph mark-0" style="width:00%"><span class="score-graph">0</span></div></div>
+                        <span>Метарейтинг</span> <span class="metaranking">?</span>
+                        <div class="graph-body"><div class="rating-graph mark-7" style="width:66%"><span class="score-graph">6.6</span></div></div>
+                        <div class="wait-stat">Ожидания: 2%</div>
+                        <div class="graph-body"><div class="rating-wait mark-0" style="width:2%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="content" class="lcol">
+            <div class="entry" itemscope itemtype="http://schema.org/VideoGame">
+                <div class="post single clear game" id="post_25233">
+                    <div class="post-meta">
+                        <h1><span itemprop="name">Legacy of Kain Soul Reaver 1&#038;2 Remastered</span></h1>
+                        <meta itemprop="dateCreated" content="2024">
+                    </div>
+                    <div class="post-content">
+                        <div class="thumb">
+                            <img class="post-image" src="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover.jpg" alt="Игра Legacy of Kain Soul Reaver 1&#038;2 Remastered" title="Игра Legacy of Kain Soul Reaver 1&#038;2 Remastered" itemprop="image">
+                            <div class="watch-trailer">
+                                <h3><span class="twatch"><span class="p-twatch">Смотреть трейлер</span></span></h3>
+                            </div>
+                        </div>
+                        <div id="ratings">
+                            <div class="ratings mark-0">
+                                <div id="post-ratings-25233" class="post-ratings" data-nonce="44bf05419a">
+                                    <div class="rating">
+                                        <div class="score">
+                                            0.0
+                                        </div>
+                                        Оценки: <span>0</span>
+                                    </div>
+                                    <div class="your-score">
+                                        <img id="rating_25233_1" class="rating-on mark-1" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="1" onmouseover="current_rating(25233, 1, '1');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_25233_2" class="rating-on mark-2" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="2" onmouseover="current_rating(25233, 2, '2');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_25233_3" class="rating-on mark-3" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="3" onmouseover="current_rating(25233, 3, '3');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_25233_4" class="rating-on mark-4" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="4" onmouseover="current_rating(25233, 4, '4');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_25233_5" class="rating-on mark-5" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="5" onmouseover="current_rating(25233, 5, '5');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_25233_6" class="rating-on mark-6" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="6" onmouseover="current_rating(25233, 6, '6');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_25233_7" class="rating-on mark-7" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="7" onmouseover="current_rating(25233, 7, '7');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_25233_8" class="rating-on mark-8" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="8" onmouseover="current_rating(25233, 8, '8');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_25233_9" class="rating-on mark-9" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="9" onmouseover="current_rating(25233, 9, '9');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /><img id="rating_25233_10" class="rating-on mark-10" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="10" onmouseover="current_rating(25233, 10, '10');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;" /> <span class="post-ratings-text" id="ratings_25233_text">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="featured-game">
+                            <p><span class="label">Разработчик:</span> <a href="/razrabotchiki/aspyr/">Aspyr</a>, <a href="/razrabotchiki/crystal_dynamics/">Crystal Dynamics</a>, ...</p>
+                            <p><span class="label">Издатель:</span> <a itemprop="publisher" href="/izdateli/aspyr/">Aspyr</a> </p>
+                            <p><span class="label">Платформы:</span> <span itemprop="gamePlatform"><a href="https://metarankings.ru/meta/games/pc/">PC</a>, <a href="https://metarankings.ru/meta/games/ps4/">PS4</a>, <a href="https://metarankings.ru/meta/games/ps5/">PS5</a>, <a href="https://metarankings.ru/meta/games/switch/">Switch</a>, <a href="https://metarankings.ru/meta/games/xbox-one/">Xbox One</a>, <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span></p>
+                            <p><span class="label">Жанр:</span> <span itemprop="genre"><a href="https://metarankings.ru/genre/priklyuchenie/">Приключение</a>, <a href="https://metarankings.ru/genre/ekshen/">Экшен</a></span></p>
+                            <p><span class="label">Локализация:</span> <span itemprop="inLanguage">Полностью <a href="https://metarankings.ru/igry-na-russkom-yazyke/">на русском языке</a></span></p>
+                            <p><span class="label">Дата выхода:</span> <span>10 декабря 2024</span></p>
+                        </div>
+
+                        <div class="description">
+                            <h3>Описание</h3>
+                            <div itemprop="description">
+                                <p>Это захватывающая история мести, в роли возродившегося после векового предательства Каина, который жаждет кровавого возмездия. В вашем распоряжении уникальный арсенал разнообразных способностей, среди которых мастерское владение когтями, телекинез и могущественный Призрачный клинок, который уничтожая бывших собратьев, поглощает души врагов, чтобы стать еще сильнее. Вас ждет незабываемое путешествие между мирами. Используйте дар Старейшего Бога, чтобы перемещаться между миром живых и потусторонним, исследуя обширные локации, решая сложные головоломки и сражаясь с самыми разными могущественными врагами, которые не уступают вам в силе, а также способностях.</p>
+                            </div>
+
+                        </div>
+                        <div class="systems">
+                            <h2 onclick="jQuery( document ).ready(function($){$('.system-info').slideToggle('fast')});">Системные требования</h2>
+                            <div class="system-info">
+                                <p>Минимальные:</p>
+                                <ul>
+                                    <li>ОС: Windows 10</li>
+                                    <li>Процессор: Intel i3 или AMD FX-4100</li>
+                                    <li>Оперативная память: 4 GB ОЗУ</li>
+                                    <li>Видеокарта: GeForce GT 620 1gb или Radeon HD 8670D</li>
+                                    <li>Место на диске: 2 GB</li>
+                                </ul>
+                                <p>Рекомендованные:</p>
+                                <ul>
+                                    <li>ОС: Windows 10</li>
+                                    <li>Процессор: Intel i7 или AMD Ryzen 7 5800</li>
+                                    <li>Оперативная память: 16 GB ОЗУ</li>
+                                    <li>Видеокарта: NVIDA RTX 2080 или Radeon RX 6750</li>
+                                    <li>Место на диске: 2 GB</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="podborki">
+                            <p>
+                                <a href="https://metarankings.ru/best-games-2024/">Игры 2024</a>
+                                <a class="mark-link" href="https://metarankings.ru/best-pc-games/">Топ игр на ПК</a>
+                                <a class="mark-link" href="https://metarankings.ru/top-igry-priklyucheniya/">приключения</a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="ads-horizont hor-1">
+                        <!-- Yandex.RTB R-A-201169-7 -->
+                        <div id="yandex_rtb_R-A-201169-7-1"></div>
+                        <script>
+                            window.yaContextCb.push(()=>{
+                              Ya.Context.AdvManager.render({
+                                renderTo: 'yandex_rtb_R-A-201169-7-1',
+                                blockId: 'R-A-201169-7'
+                              })
+                            })</script>
+                    </div>
+                    <div class="post-footer">
+                        <h3>Трейлер и скриншоты</h3>
+                        <div id="tcontent">
+                            <div class="video-content">
+                                <div id="content-trailer">
+                                    <iframe title="Трейлер Legacy of Kain Soul Reaver 1&#038;2 Remastered" height="240" width="670" src="https://rutube.ru/play/embed/0b4dc751cef59c0d34fb1b69afbd59a1" frameBorder="0" allow="clipboard-write; autoplay" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="gallery">
+                            <li><img class="attachment-screenshot" src="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover-100x75.jpg" data-original="https://metarankings.ru/images/uploads/2024/12/legacy-of-kain-soul-reaver-12-remastered-boxart-cover.jpg" alt="Скриншоты Legacy of Kain Soul Reaver 1&#038;2 Remastered" title="Legacy of Kain Soul Reaver 1&#038;2 Remastered" width="100" height="75"></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="reviews">
+                    <div id="reviews">
+                        <h2 id="critics"><span>Обзоры и оценки</span> Критики</h2>
+                        <span class="countnum">5</span>
+                        <p><a href="/user-reviews/">Оценки и отзывы</a> критиков из обзоров от разных интернет-изданий.</p>
+
+                        <div class="reviews_list">
+                            <div id="review-1" class="critic-text mark-8">
+                                <div class="review-meta">
+                                    <div class="small-score mark-8">
+                                        <span data-title="Оценка из 10 баллов" class="tooltip">8</span>
+                                    </div>
+                                    <div class="review-author"><p><a href="/critics/cubiq/"><span>Cubiq</span></a> AXXID</p></div>
+                                </div>
+                                <blockquote><p class="quote">Это путешествие в прошлое, наполненное ностальгией и челленджами. Для тех, кто знаком с серией, это шанс вновь пережить моменты, которые оставили глубокий след в игровой индустрии и в нашей, скорее всего еще...</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://cubiq.ru/legacy-of-kain-soul-reaver-remastered-review/">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://cubiq.ru/legacy-of-kain-soul-reaver-remastered-review/" rel="nofollow noopener" target="_blank">Читать обзор полностью</a>
+                            </div>
+                            <div id="review-2" class="critic-text mark-7">
+                                <div class="review-meta">
+                                    <div class="small-score mark-7">
+                                        <span data-title="Оценка из 10 баллов" class="tooltip">7</span>
+                                    </div>
+                                    <div class="review-author"><p><a href="/critics/gamemag/"><span>GameMag</span></a> Азамат Тегаев</p></div>
+                                </div>
+                                <blockquote><p class="quote">Изучать мир Носгота и разбираться в хитросплетениях сюжета действительно интересно и увлекательно до сих пор. Поэтому данный сборник сейчас — самый лучший вариант как для первого ознакомления, так и для очередного ностальгического...</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://gamemag.ru/reviews/legacy-of-kain-soul-reaver-1-2-remastered-review-ps5">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://gamemag.ru/reviews/legacy-of-kain-soul-reaver-1-2-remastered-review-ps5" rel="nofollow noopener" target="_blank">Читать обзор полностью</a>
+                            </div>
+                            <div id="review-3" class="critic-text mark-5">
+                                <div class="review-meta">
+                                    <div class="small-score mark-5">
+                                        <span data-title="Оценка из 10 баллов" class="tooltip">5</span>
+                                    </div>
+                                    <div class="review-author"><p><a href="/critics/xboxera/"><span>XboxEra</span></a> Джесси Норрис</p></div>
+                                </div>
+                                <blockquote><p class="quote">Ремастер кажется урезанным. Вы получаете игры с несколькими новыми «наворотами», и больше ничего. Это очень разочаровывает, учитывая, что игре больше требовался полноценный ремейк геймплея, а не просто улучшенная графика. Учитывая множество отличных...</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://xboxera.com/2024/12/09/legacy-of-kain-soul-reaver-1-2-remastered-review/">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://xboxera.com/2024/12/09/legacy-of-kain-soul-reaver-1-2-remastered-review/" rel="nofollow noopener" target="_blank">Читать обзор полностью</a>
+                            </div>
+                            <div class="critic-text">
+                                <div class="review-meta">
+                                    <div class="review-author"><p><span>Gamer Guides</span> Бен Чард</p></div>
+                                </div>
+                                <blockquote><p class="quote">Серия Legacy of Kain давно отсутствовала, и возможность вернуться к ней на современных системах просто фантастична. К сожалению, многие игровые механики кажутся устаревшими, а несколько багов немного снижают уровень этой коллекции.</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://www.gamerguides.com/legacy-of-kain-soul-reaver-1-2-remastered/review">Пожаловаться на отзыв</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://www.gamerguides.com/legacy-of-kain-soul-reaver-1-2-remastered/review" rel="nofollow noopener" target="_blank">Читать полностью</a>
+                            </div>
+                            <div class="critic-text">
+                                <div class="review-meta">
+                                    <div class="review-author"><p><span>SteamDeckHQ</span> Оливер Стогден</p></div>
+                                </div>
+                                <blockquote><p class="quote">Это продукты своего времени, которые не очень хорошо выдерживают проверку временем из-за устаревшего игрового процесса, отсутствия удобных функций, которые мы привыкли видеть сегодня, и графики, которая до сих пор выглядит как из...</p></blockquote>
+                                <div class="rew-menu">
+                                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                                    <ul>
+                                        <li><a class="complain" rel="nofollow" href="/zhaloba/?c=https://steamdeckhq.com/game-reviews/legacy-of-kain-soul-reaver-remaster/">Сообщить о проблеме</a></li>
+                                    </ul>
+                                </div>
+                                <a class="allreviews" href="/click/?site=https://steamdeckhq.com/game-reviews/legacy-of-kain-soul-reaver-remaster/" rel="nofollow noopener" target="_blank">Читать полностью</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div itemprop="aggregateRating" itemscope="" itemtype="http://schema.org/AggregateRating">
+                        <meta itemprop="reviewCount" content="3">
+                        <meta itemprop="ratingCount" content="3">
+                        <meta itemprop="bestRating" content="10">
+                        <meta itemprop="worstRating" content="1">
+                        Общий рейтинг критиков = <span itemprop="ratingValue">6.7</span>
+                    </div>
+                    <span class="links-add">Добавить обзор</span>
+                </div>
+                <div class="ads-horizont hor-1">
+                    <!-- Yandex.RTB R-A-201169-5 -->
+                    <div id="yandex_rtb_R-A-201169-5_2"></div>
+                    <script>
+                        window.yaContextCb.push(()=>{
+                          Ya.Context.AdvManager.render({
+                            renderTo: "yandex_rtb_R-A-201169-5_2",
+                            blockId: "R-A-201169-5"
+                          })
+                        })</script>
+                </div>
+                <div class="user-reviews comments">
+                    <div id="comments">
+                        <h2 id="users"><span>Отзывы и оценки</span> Игроки</h2>
+                        <span class="countnum">0</span>
+                        <p>Если вы уже поиграли в игру, расскажите, что вы о ней думаете. Расскажите о ее сильных и слабых сторонах, о ее плюсах и минусах. Ваш <a href="/user-reviews/">отзыв</a> поможет тем, кто хочет в нее поиграть.</p><div class="reviews-none"><p><a href="/user-reviews/">Отзывов от игроков</a> пока нет.</p></div>
+                    </div>
+                    <div id="respond" class="comment-respond">
+                        <h3 id="reply-title" class="comment-reply-title"> <small><a rel="nofollow" id="cancel-comment-reply-link" href="/legacy-of-kain-soul-reaver-12-remastered/#respond" style="display:none;">Отменить ответ</a></small></h3>
+                        <form action="https://metarankings.ru/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
+                            <div class="commform-author"><p>Ваше имя <span>Обязательно!</span></p><div><input type="text" name="metarankings-name" id="author" tabindex="2" /></div></div>
+                            <div class="commform-textarea"><div><div class="count"><span id="count">0</span> (60 символов - минимум)</div><label for="comment"><h2>Ваш отзыв о Legacy of Kain Soul Reaver 1&#038;2 Remastered</h2> <span>(не менее 60 символов, без мата, оскорблений, капса и без ссылок на сторонние ресурсы)</span></label><textarea name="metarankings-comm" id="comment" cols="50" rows="7" tabindex="1"></textarea></div></div>												<p class="form-submit">
+                                <input name="submit" type="submit" id="submit" value="Отправить" />
+                                <input type='hidden' name='comment_post_ID' value='25233' id='comment_post_ID' />
+                                <input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+                            </p>
+                        </form>
+                    </div><!-- #respond -->
+                    <script type="text/javascript">
+                        setInterval(ShowCount, 390); function ShowCount(){var Count = document.getElementById('comment').value.length; document.getElementById('count').innerHTML = Count;}
+                    </script>
+                </div>
+            </div>
+            <div class="ads-horizont hor-1">
+                <div id="yandex_rtb_R-A-201169-26"></div>
+                <script>
+                    window.yaContextCb.push(()=>{
+                        Ya.Context.AdvManager.render({
+                            "blockId": "R-A-201169-26",
+                            "renderTo": "yandex_rtb_R-A-201169-26"
+                        })
+                    })
+                </script>
+            </div>
+            <div class="list clear similar">
+                <h2>Похожие игры на Legacy of Kain Soul Reaver 1&#038;2 Remastered</h2>
+                <a href="https://metarankings.ru/indiana-jones-and-the-great-circle/" title="Indiana Jones and the Great Circle">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/02/indiana-jones-and-the-great-circle-cover-art-196x281.jpg" alt="Indiana Jones and the Great Circle">
+                        <div class="small-score mark-8">8.2</div>
+                        <span>Indiana Jones and the Great Circle</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/path-of-exile-2/" title="Path of Exile 2">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/12/path-of-exile-2-boxart-cover-196x281.jpg" alt="Path of Exile 2">
+                        <div class="small-score mark-0">0</div>
+                        <span>Path of Exile 2</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/skydances-behemoth/" title="Skydance&#8217;s Behemoth">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/12/skydances-behemoth-boxart-cover-196x281.jpg" alt="Skydance&#8217;s Behemoth">
+                        <div class="small-score mark-0">0</div>
+                        <span>Skydance&#8217;s Behemoth</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/dragon-quest-iii-hd-2d-remake/" title="Dragon Quest III HD-2D Remake">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/dragon-quest-iii-hd-2d-remake-boxart-cover-196x281.jpg" alt="Dragon Quest III HD-2D Remake">
+                        <div class="small-score mark-8">7.5</div>
+                        <span>Dragon Quest III HD-2D Remake</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/lego-horizon-adventures/" title="LEGO Horizon Adventures">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/lego-horizon-adventures-cover-art-196x281.jpg" alt="LEGO Horizon Adventures">
+                        <div class="small-score mark-5">5.1</div>
+                        <span>LEGO Horizon Adventures</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/teenage-mutant-ninja-turtles-splintered-fate/" title="Teenage Mutant Ninja Turtles: Splintered Fate">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/11/teenage-mutant-ninja-turtles-splintered-fate-cover-art-196x281.jpg" alt="Teenage Mutant Ninja Turtles: Splintered Fate">
+                        <div class="small-score mark-7">6.8</div>
+                        <span>Teenage Mutant Ninja Turtles: Splintered Fate</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="sidebar rcol">
+            <div class="widget">
+                <div class="widget-body">
+                    <ul>
+
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/indiana-jones-and-the-great-circle/">Indiana Jones and the Great Circle</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/stalker-2/">S.T.A.L.K.E.R. 2: Heart of Chernobyl</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/dragon-age-the-veilguard/">Dragon Age: The Veilguard</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/call-of-duty-black-ops-6/">Call of Duty: Black Ops 6</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/game-silent-hill-2-remake/">Silent Hill 2</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/the-legend-of-zelda-echoes-of-wisdom/">The Legend of Zelda: Echoes of Wisdom</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/astro-bot/">Astro Bot</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/star-wars-outlaws/">Star Wars Outlaws</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/black-myth-wukong/">Black Myth: WuKong</a></span>
+                            </div>
+                        </li>
+                        <li class="recent-reviews">
+                            <div class="ureview-text">
+                                <span class="title-reviews"><a href="https://metarankings.ru/senuas-saga-hellblade-2/">Senua’s Saga: Hellblade 2</a></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="footer">
+        <script>
+            [].forEach.call(document.querySelectorAll('img[data-src]'), function(img) {
+                img.setAttribute('src', img.getAttribute('data-src'));
+                img.onload = function() {
+                    img.removeAttribute('data-src');
+                };
+            });
+        </script>
+        <script>
+            (function($){
+              $(function() {
+                $('.menu-icon').on('click', function() {
+                  $(this).closest('.header').toggleClass('menu-open');
+                });
+              });
+            })(jQuery);
+        </script>
+        <script>
+            (function($){
+              $(function() {
+                $('.rew-menu').on('click', function() {
+                  $(this).closest('.rew-menu').toggleClass('open');
+                });
+              });
+            })(jQuery);
+        </script>
+        <script>
+            jQuery('#comments').append('<div class="your-score"><p>Ваша оценка</p></div>');
+            jQuery(window).scroll(function () {
+            if (jQuery(this).scrollTop() > 1200) {
+            jQuery('#comments').append( jQuery('.ratings') );
+            } else {
+            jQuery('#ratings').append( jQuery('#comments> .ratings') );
+            }
+            });
+        </script>
+        <script>
+            jQuery(function($){
+             $(window).scroll(function() {
+             if($(this).scrollTop() >= 90) {
+             $('.header-bottom').addClass('sticky');
+             }
+             else{
+             $('.header-bottom').removeClass('sticky');
+             }
+             });
+            });
+        </script>
+        <script>
+            jQuery(document).ready(function($){
+            $("#toTop").hide();
+            $(function () {
+            $(window).scroll(function () {
+            if ($(this).scrollTop() > 300) {
+            $('#toTop').fadeIn();
+            } else {
+            $('#toTop').fadeOut();
+            }
+            });
+            $('#toTop').click(function () {
+            $('body,html').animate({
+            scrollTop: 0
+            }, 800);
+            return false;
+            });
+            });
+            });
+        </script>
+        <script type="text/javascript">
+            var isProcessing = false;
+            function alter_ul_post_values(obj,post_id,ul_type){
+
+                if (isProcessing)
+                return;
+                isProcessing = true;
+
+                jQuery(obj).find("span").html("..");
+                jQuery.ajax({
+                type: "POST",
+                url: "https://metarankings.ru/wp-content/plugins/like-dislike/ajax_counter.php",
+                data: "post_id="+post_id+"&up_type="+ul_type,
+                success: function(msg){
+                    jQuery(obj).find("span").html(msg);
+                    isProcessing = false;
+                    }
+                });
+            }
+        </script>
+        <script type='text/javascript'>
+            /* <![CDATA[ */
+            var ratingsL10n = {"plugin_url":"https:\/\/metarankings.ru\/wp-content\/plugins\/wp-postratings","ajax_url":"https:\/\/metarankings.ru\/wp-admin\/admin-ajax.php","text_wait":"Please rate only 1 post at a time.","image":"squares","image_ext":"gif","max":"10","show_loading":"0","show_fading":"1","custom":"0"};
+            var ratings_mouseover_image=new Image();ratings_mouseover_image.src=ratingsL10n.plugin_url+"/images/"+ratingsL10n.image+"/rating_over."+ratingsL10n.image_ext;;
+            /* ]]> */
+        </script>
+        <script type='text/javascript' src='https://metarankings.ru/wp-content/plugins/wp-postratings/postratings-js.js?ver=1.63'></script>
+        <script type='text/javascript' src='https://metarankings.ru/wp-content/themes/metarankings/js/jquery.cycle.all.min.js?ver=1.1'></script>
+        <script type='text/javascript' src='https://metarankings.ru/wp-content/themes/metarankings/js/script.js?ver=1.1'></script>
+        <script type='text/javascript' src='https://metarankings.ru/wp-content/themes/metarankings/js/comments.js'></script>
+        <!-- Yandex.RTB R-A-201169-27 -->
+        <script>
+            window.yaContextCb.push(() => {
+                Ya.Context.AdvManager.render({
+                    "blockId": "R-A-201169-27",
+                    "type": "floorAd",
+                    "platform": "touch"
+                })
+            })
+        </script>
+
+        <!-- Yandex.RTB R-A-201169-23 -->
+        <script>
+            window.yaContextCb.push(() => {
+                Ya.Context.AdvManager.render({
+                    "blockId": "R-A-201169-23",
+                    "type": "floorAd",
+                    "platform": "desktop"
+                })
+            })
+        </script>
+
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-63304078-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'UA-63304078-1');
+        </script>
+
+        <script src="https://metarankings.ru/user-ip.php"></script>
+        <script type="text/javascript">
+            (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+            ym(57119962, "init", {
+                 clickmap:true,
+                 trackLinks:true,
+                 accurateTrackBounce:true,
+                 webvisor:true,
+                 params:{'ip': userip}
+            });
+        </script>
+        <noscript><div><img src="https://mc.yandex.ru/watch/57119962" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+        <!-- Rating Mail.ru counter -->
+        <script type="text/javascript">
+            var _tmr = window._tmr || (window._tmr = []);
+            _tmr.push({id: "2595025", type: "pageView", start: (new Date()).getTime()});
+            (function (d, w, id) {
+              if (d.getElementById(id)) return;
+              var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+              ts.src = "https://top-fwz1.mail.ru/js/code.js";
+              var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
+              if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+            })(document, window, "topmailru-code");
+        </script><noscript>
+            <div>
+                <img src="https://top-fwz1.mail.ru/counter?id=2595025;js=na" style="border:0;position:absolute;left:-9999px;" alt="Top.Mail.Ru" />
+            </div>
+        </noscript>
+        <!-- //Rating Mail.ru counter --><div class="copyright">
+            &copy; 2014 - 2024 <span data-title="MetaRankings" class="tooltip">MetaRankings</span>
+            <a rel="nofollow" href="/about/" data-title="О сайте" class="tooltip">О нас</a>
+            <a rel="nofollow" href="/contact/" data-title="Форма обратной связи" class="tooltip">Связь</a>
+            <a rel="nofollow" href="/polzovatelskoe-soglashenie/" data-title="Пользовательское соглашение" class="tooltip">Пользовательское соглашение</a>
+            <a rel="nofollow" href="/politika-konfidencialnosti/" data-title="Политика конфиденциальности" class="tooltip">Конфиденциальность</a>
+        </div>
+        <div class="credits">
+            <span class="pegi"><span data-title="Сайт может содержать контент не предназначенный лицам до 18 лет" class="tooltip">18+</span></span>
+            <a href="https://vk.com/metarankings_ru" rel="nofollow noopener" target="_blank" title="VK"><span class="vko"></span></a>
+            <a href="https://twitter.com/metarankings" rel="nofollow noopener" target="_blank" title="Twitter"><span class="tw"></span></a>
+            <!--LiveInternet counter--><script>
+                                           <!--
+                                           document.write("<img src='https://counter.yadro.ru/hit?t44.6;r"+
+                                           escape(document.referrer)+((typeof(screen)=="undefined")?"":
+                                           ";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+                                           screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+                                           ";"+Math.random()+
+                                           "' alt='' title='LiveInternet' "+
+                                           "border='0' width='31' height='31'>")
+                                           //--></script><!--/LiveInternet-->
+        </div>
+    </div>
+</div>
+<div class="wbody" onclick="show('none')"></div>
+<div class="window">
+</div>
+<div class="popup_block">
+    <form action="https://metarankings.ru/login.php?redirect_to=https%3A%2F%2Fmetarankings.ru%2Flegacy-of-kain-soul-reaver-12-remastered%2F" id="loginForm" method="post">
+        <div class="field">
+            <label>Имя пользователя</label>
+            <div class="input">
+                <input type="text" name="log" value="" id="login" />
+            </div>
+        </div>
+        <div class="field">
+            <a rel="nofollow" href="https://metarankings.ru/login.php?action=lostpassword" id="forgot">Забыли?</a>
+            <label>Пароль</label>
+            <div class="input">
+                <input type="password" name="pwd" value="" id="pass" />
+            </div>
+        </div>
+        <div class="submit">
+            <button name="submit" type="submit">Войти</button>
+            <div class="registr"><a rel="nofollow" href="https://metarankings.ru/login.php?action=register">Регистрация</a></div>
+        </div>
+    </form>
+</div>
+<div class="window-image">
+    <div class="modal-image-wrap">
+        <div class="modal-image">
+            <div class="modal-left"></div>
+            <div class="modal-right"></div>
+        </div>
+        <img src="" alt="">
+    </div>
+</div>
+<div id="toTop" class="toTop">↑</div>

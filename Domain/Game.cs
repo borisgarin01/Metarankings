@@ -18,6 +18,9 @@ public sealed record Game
     [Required]
     public float? Score { get; set; }
 
+    [MaxLength(255)]
+    [MinLength(1)]
+    public string ImageSource { get; set; }
     public string Description { get; set; }
     public GameLocalization Localization { get; set; }
     public long LocalizationId { get; set; }

@@ -1,0 +1,43 @@
+﻿@using Domain
+@inject HttpClient HttpClient;
+
+<div class="list-group">
+    @foreach (var game in Games)
+    {
+        <div class="row">
+            <img class="col-3 m-lg-5 p-lg-5" src="@game.ImageSource" />
+            <div class="col-9 m-lg-5 p-lg-5">
+                <div class="card-header m-lg-2 p-lg-2">@game.Name</div>
+                <p>
+                    @foreach (var developer in game.Developers)
+                    {
+                        <a href="@developer.Url">@developer.Name</a>
+                    }
+                </p>
+                <p>
+                    @foreach (var publisher in game.Publishers)
+                    {
+                        <a href="@publisher.Url">@publisher.Name</a>
+                    }
+                </p>
+                <p>
+                    @foreach (var genre in game.Genres)
+                    {
+                        <a href="@genre.Url">@genre.Name</a>
+                    }
+                </p>
+                <span class="label label-success">
+                    @game.Score
+                </span>
+            </div>
+        </div>
+    }
+</div>
+@code {
+    public IEnumerable<Game> Games { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>("/api/GamesDetailsPage");
+    }
+}
+            ;
