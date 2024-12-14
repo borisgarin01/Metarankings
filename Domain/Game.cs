@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain;
 
 [Index(nameof(Name), IsUnique = true)]
-[Index(nameof(Description), IsUnique = true)]
 public sealed record Game
 {
     public long Id { get; set; }
@@ -21,6 +21,8 @@ public sealed record Game
     [MaxLength(255)]
     [MinLength(1)]
     public string ImageSource { get; set; }
+
+    [Column(TypeName = "nvarchar(max)")]
     public string Description { get; set; }
     public GameLocalization Localization { get; set; }
     public long LocalizationId { get; set; }

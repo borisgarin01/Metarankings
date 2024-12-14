@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241212132456_UniqueConstraints")]
-    partial class UniqueConstraints
+    [Migration("20241214190443_ColumnDataTypeChanged")]
+    partial class ColumnDataTypeChanged
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,6 +39,9 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Collections");
                 });
@@ -72,6 +75,15 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CollectionId");
+
+                    b.HasIndex("Href")
+                        .IsUnique();
+
+                    b.HasIndex("ImageSrc")
+                        .IsUnique();
+
+                    b.HasIndex("Title")
+                        .IsUnique();
 
                     b.ToTable("CollectionItems");
                 });
@@ -115,7 +127,12 @@ namespace Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageSource")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<long>("LocalizationId")
                         .HasColumnType("bigint");
@@ -132,9 +149,6 @@ namespace Data.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Description")
-                        .IsUnique();
 
                     b.HasIndex("LocalizationId");
 
@@ -434,6 +448,31 @@ namespace Data.Migrations
                     b.ToTable("Gamers");
                 });
 
+            modelBuilder.Entity("Domain.Trailer", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("GameId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("Url")
+                        .IsUnique();
+
+                    b.ToTable("Trailers");
+                });
+
             modelBuilder.Entity("GameGameDeveloper", b =>
                 {
                     b.Property<long>("DevelopersId")
@@ -569,6 +608,13 @@ namespace Data.Migrations
                     b.Navigation("Gamer");
                 });
 
+            modelBuilder.Entity("Domain.Trailer", b =>
+                {
+                    b.HasOne("Domain.Game", null)
+                        .WithMany("Trailers")
+                        .HasForeignKey("GameId");
+                });
+
             modelBuilder.Entity("GameGameDeveloper", b =>
                 {
                     b.HasOne("Domain.GameDeveloper", null)
@@ -657,6 +703,8 @@ namespace Data.Migrations
             modelBuilder.Entity("Domain.Game", b =>
                 {
                     b.Navigation("CriticsReviews");
+
+                    b.Navigation("Trailers");
 
                     b.Navigation("UsersReviews");
                 });

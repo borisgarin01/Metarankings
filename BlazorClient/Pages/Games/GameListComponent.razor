@@ -27,7 +27,7 @@ else
                 <iframe class="panel panel-default" src="@(game.Trailers?.FirstOrDefault() != null ? game.Trailers.First().Url : "")" />
                 <div class="panel panel-default">
                     <div class="panel panel-default">@(game.Score.HasValue ? game.Score.Value : 0)</div>
-                    <div class="panel panel-default">@(game.Score.HasValue ? game.Score.Value : 0)></div>
+                    <div class="panel panel-default">@(game.Score.HasValue ? game.Score.Value : 0)</div>
                 </div>
             </div>
         }
@@ -39,6 +39,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>("/api/GamesDetailsPage");
+        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>("api/GamesDetailsPage");
     }
 }
