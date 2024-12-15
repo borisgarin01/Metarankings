@@ -16,10 +16,21 @@ public sealed class GamesDetailsPageController : ControllerBase
         this.dataContext = dataContext;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAllGamesAsync()
+    [HttpGet("pageSize={pageSize}&page={page}")]
+    public async Task<ActionResult<IEnumerable<Game>>> GetAllGamesAsync(int pageSize, int page)
     {
-        var games = await dataContext.Games.Include(g => g.Genres).Include(g => g.CriticsReviews).Include(g => g.Developers).Include(g => g.Platforms).Include(g => g.Localization).Include(g => g.Tags).Include(g => g.Publishers).Include(g => g.UsersReviews).Include(g => g.Trailers).ToArrayAsync();
+        var games = await dataContext.Games
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Include(g => g.Genres)
+            .Include(g => g.CriticsReviews)
+            .Include(g => g.Developers)
+            .Include(g => g.Platforms)
+            .Include(g => g.Localization)
+            .Include(g => g.Tags)
+            .Include(g => g.Publishers)
+            .Include(g => g.UsersReviews)
+            .Include(g => g.Trailers).ToArrayAsync();
         return Ok(games);
     }
 }

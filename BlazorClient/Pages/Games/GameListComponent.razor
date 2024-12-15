@@ -47,6 +47,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>("api/GamesDetailsPage");
+        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>("api/GamesDetailsPage/pageSize=10&page=1");
     }
 }
