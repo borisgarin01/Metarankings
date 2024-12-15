@@ -42,11 +42,34 @@ else
     </div>
 }
 
+<div class="pagination">
+    <div class="navi">
+        <span class="page-numbers current">1</span>
+        <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames())" @onclick:preventDefault />
+        <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(10,2))" @onclick:preventDefault />
+        <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(10,3))" @onclick:preventDefault />
+        <span class="page-numbers dots">…</span>
+        <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(10,10))" @onclick:preventDefault>10</a>
+        <a class="next page-numbers" href="api/GamesDetailsPage/pageSize=10&page=3">Показать еще</a>
+    </div>
+</div>
+
 @code {
     public IEnumerable<Game> Games { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>("api/GamesDetailsPage/pageSize=10&page=1");
+        Games = await GetGamesAsync(10, 1);
+    }
+
+    private async Task RefreshGotGames(int pageSize = 10, int page = 1)
+    {
+        Games = await GetGamesAsync(pageSize, page);
+    }
+
+    private async Task<IEnumerable<Game>> GetGamesAsync(int pageSize = 10, int page = 1)
+    {
+        var games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"api/GamesDetailsPage/pageSize={pageSize}&page={page}");
+        return games;
     }
 }
