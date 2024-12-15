@@ -1,5 +1,6 @@
 ﻿@using Domain
 @inject HttpClient HttpClient;
+@inject NavigationManager NavigationManager;
 
 @if (Games is null)
 {
@@ -61,13 +62,14 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Games = await GetGamesAsync(10, 1);
+        Games = await GetGamesAsync(10, Page);
     }
 
     private async Task RefreshGotGames(int pageSize = 10, int pageNumber = 1)
     {
-        Games = await GetGamesAsync(pageSize, pageNumber);
+        NavigationManager.NavigateTo($"/{pageNumber}");
         Page = pageNumber;
+        Games = await GetGamesAsync(10, Page);
     }
 
     private async Task<IEnumerable<Game>> GetGamesAsync(int pageSize = 10, int pageNumber = 1)

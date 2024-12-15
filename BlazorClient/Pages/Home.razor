@@ -1,5 +1,19 @@
-﻿@page "/"
+﻿@page "/{page:int?}" // Route with integer parameter
 
 <BlazorClient.Pages.Games.NavbarComponent />
 
-<BlazorClient.Pages.Games.GameListComponent Page="1" />
+<BlazorClient.Pages.Games.GameListComponent Page="@Page.Value" />
+
+@code {
+    [Parameter]
+    public int? Page { get; set; }
+
+    protected override void OnInitialized()
+    {
+        // Ensure Page is valid
+        if (Page <= 0 ^ Page is null)
+        {
+            Page = 1; // Default to page 1 if invalid
+        }
+    }
+}
