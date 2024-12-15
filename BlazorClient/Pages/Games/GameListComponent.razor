@@ -1,33 +1,41 @@
 ﻿@using Domain
 @inject HttpClient HttpClient;
 
-
 @if (Games is null)
 {
-    <p>Loading...</p>
+    <div class="mynavbar">Loading...</div>
 }
 else
 {
-    <div>
+    <div class="list clear best">
         @foreach (var game in Games)
         {
-            <div class="panel panel-default">
-                <a href="#" title="Игра @game.Name" class="thumb"><img class="img-fluid" src="@game.ImageSource" alt="@game.Name"></a>
-                <a class="nav-link" href="#">@game.Name</a>
-                <p class="text-info">@string.Join(", ", game.Developers)</p>
-                <p class="text-info">@string.Join(", ", game.Publishers)</p>
-                <p class="text-info">@game.Description</p>
-                @{
-                    var trailer = game.Trailers?.FirstOrDefault();
-                    if (trailer != null && !string.IsNullOrWhiteSpace(trailer.Url))
+            <div class="post clear">
+                <a href="@game.Name" title="Игра @game.Name" class="thumb"><img class="post-image" src="@game.ImageSource" alt="Игра @game.Name"></a>
+                <div class="best-prod">
+                    <div class="counter">1</div>
+                    <span class="star">★</span>
+                </div>
+                <h3><a class="name" href="@game.Name">@game.Name</a></h3>
+                <div class="post-meta">
+                    @foreach (GameDeveloper gameDeveloper in game.Developers)
                     {
-                        <iframe class="panel panel-default" src=@("https://www.youtube.com/embed/@trailer.Url?autoplay=0&mute=1".Replace("@trailer.Url",trailer.Url)) />
+                        <p>@gameDeveloper.Name</p>
                     }
-                }
-                <iframe class="panel panel-default" src="@(game.Trailers?.FirstOrDefault() != null ? game.Trailers.First().Url : "")" />
-                <div class="panel panel-default">
-                    <div class="panel panel-default">@(game.Score.HasValue ? game.Score.Value : 0)</div>
-                    <div class="panel panel-default">@(game.Score.HasValue ? game.Score.Value : 0)</div>
+                </div>
+                <div class="post-meta">
+                    @foreach (GamePlatform gamePlatform in game.Platforms)
+                    {
+                        <p>@gamePlatform.Name</p>
+                    }
+                </div>
+                <div class="post-meta"><p>@string.Join(", ", game.Genres.Select(g => g.Name))</p></div>
+                <div class="trailer" data-video="https://metarankings.ru/the-last-of-us-remastered/#content-trailer"></div>
+                <div class="ratings-graph">
+                    <div class="graph">
+                        <div class="small-score mark-@Math.Round(game.Score.Value)">@Math.Round(game.Score.Value, 1)</div>
+                        <div class="graph-body"><div style="width:@(Math.Round(game.Score.Value,1)*10)%" class="rating-graph mark-@Math.Round(game.Score.Value)"></div></div>
+                    </div>
                 </div>
             </div>
         }
