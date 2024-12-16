@@ -10,4 +10,6 @@ public sealed record Trailer
 
     [Required]
     public string Url { get; set; }
+    public Game Game { get; set; }
+    public long GameId { get; set; }
 }
