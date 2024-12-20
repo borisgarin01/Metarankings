@@ -4498,9 +4498,14 @@ p#cancel-comment-reply {
     outline: none !important;
 }
 
-    .modal-image div:hover {
-        color: #e52d27;
-    }
+div {
+    display: block;
+    unicode-bidi: isolate;
+}
+
+.modal-image div:hover {
+    color: #e52d27;
+}
 
 .modal-show {
     opacity: 1;
