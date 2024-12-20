@@ -1,4 +1,5 @@
 using Data;
+using Domain;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -19,6 +20,8 @@ builder.Services.AddCors(options =>
                           .AllowAnyMethod();
                       });
 });
+
+builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
