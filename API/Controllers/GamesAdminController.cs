@@ -3,6 +3,7 @@ using Data;
 using Domain;
 using Domain.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
@@ -17,7 +18,6 @@ public class GamesAdminController : ControllerBase
         this.dataContext = dataContext;
         this.mapper = mapper;
     }
-
 
     [HttpPost]
     public async Task<ActionResult> AddGame(AddGameViewModel addGameViewModel)
@@ -54,5 +54,34 @@ public class GamesAdminController : ControllerBase
         dataContext.Remove(game);
         await dataContext.SaveChangesAsync();
         return NoContent();
+    }
+
+    [HttpPatch]
+    public async Task<ActionResult> UpdateGame(long id, UpdateGameViewModel updateGameViewModel)
+    {
+        var game = await dataContext.Games.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+
+        if (game is null)
+            return NotFound();
+
+        try
+        {
+            game = mapper.Map<Game>(updateGameViewModel);
+            game.Id = id;
+            try
+            {
+                dataContext.Update(game);
+                await dataContext.SaveChangesAsync();
+                return Ok(game);
+            }
+            catch
+            {
+                return StatusCode(500, updateGameViewModel);
+            }
+        }
+        catch
+        {
+            return BadRequest(updateGameViewModel);
+        }
     }
 }
