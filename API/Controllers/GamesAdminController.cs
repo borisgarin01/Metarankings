@@ -9,7 +9,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class GamesAdminController : ControllerBase
+public sealed class GamesAdminController : ControllerBase
 {
     private readonly DataContext dataContext;
     private readonly IMapper mapper;
