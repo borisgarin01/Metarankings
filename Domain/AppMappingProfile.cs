@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using Domain;
 using Domain.ViewModels;
 
-namespace API.Mapping;
+namespace Domain;
 
 public class AppMappingProfile : Profile
 {

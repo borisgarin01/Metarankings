@@ -1,5 +1,5 @@
-using API.Mapping;
 using Data;
+using Domain;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
