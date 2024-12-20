@@ -42,4 +42,17 @@ public class GamesAdminController : ControllerBase
         }
         return NotFound();
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> RemoveGame(long id)
+    {
+        var game = await dataContext.Games.FindAsync(id);
+
+        if (game is null)
+            return NotFound();
+
+        dataContext.Remove(game);
+        await dataContext.SaveChangesAsync();
+        return NoContent();
+    }
 }
