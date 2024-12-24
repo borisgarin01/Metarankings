@@ -17,13 +17,13 @@ public class GamesImagesController : ControllerBase
     }
 
     [HttpGet("{name}")]
-    public IActionResult Get(string name)
+    public async Task<IActionResult> Get(string name)
     {
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Images", name);
 
         if (System.IO.File.Exists(filePath))
         {
-            var fileBytes = System.IO.File.ReadAllBytes(filePath);
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
             return File(fileBytes, "image/jpeg", name); // The third parameter is the file download name
         }
         else
