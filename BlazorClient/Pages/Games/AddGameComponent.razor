@@ -1,87 +1,82 @@
-﻿@using Domain.ViewModels
+﻿@page "/add-game"
+@using Domain.ViewModels
 @inject HttpClient HttpClient
 
-@page "/add-game"
+<EditForm Model="@addGameViewModel" OnValidSubmit="@HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-<div class="form-control">
-    <div class="row">
-        <div class="col-lg-4">
-            <h4>Название:</h4>
-        </div>
-        <div class="col-lg-8">
-            <input type="text" @bind-value="@Name" />
-        </div>
+    <div>
+        <label for="Name">Name</label>
+        <InputText id="Name" @bind-Value="addGameViewModel.Name" />
     </div>
-    <div class="row">
-        <div class="col-lg-4">
-            <h4>Описание:</h4>
-        </div>
-        <div class="col-lg-8">
-            <input type="text" @bind-value="@Description" />
-        </div>
+
+    <div>
+        <label for="Description">Description</label>
+        <InputTextArea id="Description" @bind-Value="addGameViewModel.Description" />
     </div>
-    <div class="row">
-        <div class="col-lg-4">
-            <h4>Оценка:</h4>
-        </div>
-        <div class="col-lg-8">
-            <input type="number" @bind-value="@Score" />
-        </div>
+
+    <div>
+        <label for="ImageSource">Image</label>
+        <InputFile id="ImageSource" OnChange="HandleFileSelected" />
     </div>
-    <div class="row">
-        <div class="col-lg-4">
-            <h4>Локализация:</h4>
-        </div>
-        <div class="col-lg-8">
-            <input type="tel" @bind-value="@LocalizationId" />
-        </div>
+
+    <div>
+        <label for="Score">Score</label>
+        <InputNumber id="Score" @bind-Value="addGameViewModel.Score" />
     </div>
-    <div class="row">
-        <div class="col-lg-4">
-            <h4>Дата выхода:</h4>
-        </div>
-        <div class="col-lg-8">
-            <input type="date" @bind-value="@ReleaseDate" />
-        </div>
+
+    <div>
+        <label for="LocalizationId">Localization ID</label>
+        <InputNumber id="LocalizationId" @bind-Value="addGameViewModel.LocalizationId" />
     </div>
-    <div class="row">
-        <div class="col-lg-4">
-            <h4>Изображение:</h4>
-        </div>
-        <div class="col-lg-8">
-            <input type="text" @bind-value="@Image" />
-        </div>
+
+    <div>
+        <label for="ReleaseDate">Release Date</label>
+        <InputDate id="ReleaseDate" @bind-Value="addGameViewModel.ReleaseDate" />
     </div>
-    <div class="row">
-        <div class="col-lg-4">
-            <h4>Добавить</h4>
-        </div>
-        <div class="col-lg-8">
-            <input type="submit" value="Добавить" @onclick="@AddGameAsync" />
-        </div>
-    </div>
-</div>
+
+    <button type="submit">Add Game</button>
+</EditForm>
 
 @code {
-    public string Name { get; set; }
-    public float? Score { get; set; }
-    public string Image { get; set; }
-    public string Description { get; set; }
-    public long? LocalizationId { get; set; }
-    public DateTime? ReleaseDate { get; set; }
+    private AddGameViewModel addGameViewModel = new AddGameViewModel();
+    private IBrowserFile selectedImage;
 
-    public async Task AddGameAsync()
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        var addGameViewModel = new AddGameViewModel
-            {
-                Description = Description,
-                ImageSource = Image,
-                LocalizationId = LocalizationId,
-                Name = Name,
-                ReleaseDate = ReleaseDate,
-                Score = Score
-            };
+        selectedImage = e.File;
 
-        await HttpClient.PostAsJsonAsync<AddGameViewModel>("api/GamesAdmin", addGameViewModel);
+        // Optionally, you can preview the selected image
+        var stream = selectedImage.OpenReadStream();
+        // Example of reading the file and setting the source (you can use this for displaying a preview)
+        addGameViewModel.ImageSource = selectedImage.Name; // Just the file name, you might want to do more here
+    }
+
+    private async Task HandleSubmit()
+    {
+        // If you want to upload the file before submitting the form
+        if (selectedImage != null)
+        {
+            var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(selectedImage.OpenReadStream());
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedImage.ContentType);
+            content.Add(fileContent, "file", selectedImage.Name);
+
+            var response = await HttpClient.PostAsync("api/GamesAdmin/upload", content);
+            if (response.IsSuccessStatusCode)
+            {
+                // Process the response, perhaps save the file URL into ImageSource
+                var fileUrl = await response.Content.ReadAsStringAsync();
+                addGameViewModel.ImageSource = fileUrl;
+            }
+        }
+
+        // Now submit the rest of the form data
+        var addGameResponse = await HttpClient.PostAsJsonAsync("api/GamesAdmin", addGameViewModel);
+        if (addGameResponse.IsSuccessStatusCode)
+        {
+            // Handle success (e.g., navigate away or show a success message)
+        }
     }
 }

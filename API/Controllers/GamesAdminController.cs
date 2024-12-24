@@ -19,6 +19,27 @@ public sealed class GamesAdminController : ControllerBase
         this.mapper = mapper;
     }
 
+    [HttpPost("upload")]
+    public async Task<IActionResult> UploadImage(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file uploaded.");
+        }
+
+        // Example: Save file to the server (adjust the path as needed)
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", file.FileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        // Return the file path or URL to the caller (adjust as needed)
+        var fileUrl = $"/uploads/{file.FileName}";
+        return Ok(fileUrl);
+    }
+
     [HttpPost]
     public async Task<ActionResult> AddGame(AddGameViewModel addGameViewModel)
     {
