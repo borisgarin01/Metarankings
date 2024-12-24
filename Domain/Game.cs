@@ -18,7 +18,7 @@ public sealed record Game
     [Required]
     public float? Score { get; set; }
 
-    [MaxLength(255)]
+    [MaxLength(511)]
     [MinLength(1)]
     public string ImageSource { get; set; }
 
