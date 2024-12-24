@@ -31,4 +31,30 @@ public class GamesImagesController : ControllerBase
             return NotFound(); // Return 404 if file doesn't exist
         }
     }
+
+    [HttpPost]
+    public async Task<IActionResult> UploadFile(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file uploaded.");
+        }
+
+        // Define the path where the file will be saved
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Images");
+        if (!Directory.Exists(uploadsFolder))
+        {
+            Directory.CreateDirectory(uploadsFolder); // Create the directory if it doesn't exist
+        }
+
+        var filePath = Path.Combine(uploadsFolder, file.FileName);
+
+        // Save the file to the server
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        return Ok(new { FilePath = filePath, FileName = file.FileName });
+    }
 }
