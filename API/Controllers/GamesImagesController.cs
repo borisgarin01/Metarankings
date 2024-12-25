@@ -41,7 +41,7 @@ public class GamesImagesController : ControllerBase
         }
 
         // Define the path where the file will be saved
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Images");
+        var uploadsFolder = "Images";
         if (!Directory.Exists(uploadsFolder))
         {
             Directory.CreateDirectory(uploadsFolder); // Create the directory if it doesn't exist
@@ -54,7 +54,6 @@ public class GamesImagesController : ControllerBase
         {
             await file.CopyToAsync(stream);
         }
-
-        return Ok(new { FilePath = filePath, FileName = file.FileName });
+        return Created($"api/GamesImages/{file.FileName}", file);
     }
 }

@@ -28,7 +28,7 @@ public sealed class GamesAdminController : ControllerBase
         }
 
         // Example: Save file to the server (adjust the path as needed)
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", file.FileName);
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Images", file.FileName);
 
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
@@ -36,7 +36,7 @@ public sealed class GamesAdminController : ControllerBase
         }
 
         // Return the file path or URL to the caller (adjust as needed)
-        var fileUrl = $"/uploads/{file.FileName}";
+        var fileUrl = $"api/GamesImages/{file.FileName}";
         return Ok(fileUrl);
     }
 

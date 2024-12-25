@@ -1,6 +1,7 @@
 ﻿@page "/add-game"
 @using Domain.ViewModels
 @inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
 
 <EditForm Model="@addGameViewModel" OnValidSubmit="@HandleSubmit">
     <DataAnnotationsValidator />
@@ -63,20 +64,16 @@
             fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedImage.ContentType);
             content.Add(fileContent, "file", selectedImage.Name);
 
-            var response = await HttpClient.PostAsync("api/GamesAdmin/upload", content);
+            var response = await HttpClient.PostAsync("api/GamesImages", content);
             if (response.IsSuccessStatusCode)
             {
                 // Process the response, perhaps save the file URL into ImageSource
-                var fileUrl = await response.Content.ReadAsStringAsync();
-                addGameViewModel.ImageSource = fileUrl;
+                addGameViewModel.ImageSource = $"{HttpClient.BaseAddress}api/GamesImages/{selectedImage.Name}";
             }
         }
 
         // Now submit the rest of the form data
         var addGameResponse = await HttpClient.PostAsJsonAsync("api/GamesAdmin", addGameViewModel);
-        if (addGameResponse.IsSuccessStatusCode)
-        {
-            // Handle success (e.g., navigate away or show a success message)
-        }
+        await JSRuntime.InvokeVoidAsync("alert", "Game created succesfully");
     }
 }
