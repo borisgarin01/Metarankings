@@ -12,5 +12,6 @@ public class AppMappingProfile : Profile
         CreateMap<GameLocalizationViewModel, GameLocalization>();
         CreateMap<AddGameDeveloperViewModel, GameDeveloper>();
         CreateMap<AddGamePublisherViewModel, GamePublisher>();
+        CreateMap<AddGameGenreViewModel, GameGenre>();
     }
 }
