@@ -21,4 +21,5 @@ public class DataContext : DbContext
     public DbSet<Collection> Collections { get; set; }
     public DbSet<CollectionItem> CollectionItems { get; set; }
     public DbSet<Trailer> Trailers { get; set; }
+    public DbSet<GameGameGenre> GamesGamesGenres { get; set; }
 }

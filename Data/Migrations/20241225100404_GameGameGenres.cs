@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class GameGameGenres : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -166,7 +166,7 @@ namespace Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Score = table.Column<float>(type: "real", nullable: false),
-                    ImageSource = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    ImageSource = table.Column<string>(type: "nvarchar(511)", maxLength: 511, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LocalizationId = table.Column<long>(type: "bigint", nullable: false),
                     ReleaseDate = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -363,6 +363,32 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GamesGamesGenres",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GameId = table.Column<long>(type: "bigint", nullable: false),
+                    GameGenreId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GamesGamesGenres", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GamesGamesGenres_GamesGenres_GameGenreId",
+                        column: x => x.GameGenreId,
+                        principalTable: "GamesGenres",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GamesGamesGenres_Games_GameId",
+                        column: x => x.GameId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Trailers",
                 columns: table => new
                 {
@@ -528,6 +554,18 @@ namespace Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_GamesGamesGenres_GameGenreId",
+                table: "GamesGamesGenres",
+                column: "GameGenreId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GamesGamesGenres_GameId",
+                table: "GamesGamesGenres",
+                column: "GameId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GamesGenres_Name",
                 table: "GamesGenres",
                 column: "Name",
@@ -627,6 +665,9 @@ namespace Data.Migrations
                 name: "GamesCriticsReviews");
 
             migrationBuilder.DropTable(
+                name: "GamesGamesGenres");
+
+            migrationBuilder.DropTable(
                 name: "Trailers");
 
             migrationBuilder.DropTable(
@@ -634,9 +675,6 @@ namespace Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "GamesDevelopers");
-
-            migrationBuilder.DropTable(
-                name: "GamesGenres");
 
             migrationBuilder.DropTable(
                 name: "GamesPlatforms");
@@ -652,6 +690,9 @@ namespace Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Critics");
+
+            migrationBuilder.DropTable(
+                name: "GamesGenres");
 
             migrationBuilder.DropTable(
                 name: "Games");

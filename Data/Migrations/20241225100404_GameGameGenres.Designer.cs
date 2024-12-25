@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241224100232_IncreaseImageSourceLength")]
-    partial class IncreaseImageSourceLength
+    [Migration("20241225100404_GameGameGenres")]
+    partial class GameGameGenres
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,6 +229,31 @@ namespace Data.Migrations
                         .IsUnique();
 
                     b.ToTable("GamesDevelopers");
+                });
+
+            modelBuilder.Entity("Domain.GameGameGenre", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("GameGenreId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("GameId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameGenreId")
+                        .IsUnique();
+
+                    b.HasIndex("GameId")
+                        .IsUnique();
+
+                    b.ToTable("GamesGamesGenres");
                 });
 
             modelBuilder.Entity("Domain.GameGamerReview", b =>
@@ -587,6 +612,25 @@ namespace Data.Migrations
                     b.Navigation("Critic");
 
                     b.Navigation("Game");
+                });
+
+            modelBuilder.Entity("Domain.GameGameGenre", b =>
+                {
+                    b.HasOne("Domain.GameGenre", "GameGenre")
+                        .WithMany()
+                        .HasForeignKey("GameGenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("GameGenre");
                 });
 
             modelBuilder.Entity("Domain.GameGamerReview", b =>

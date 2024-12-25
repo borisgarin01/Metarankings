@@ -1,4 +1,5 @@
 ﻿@page "/add-game"
+@using Domain
 @using Domain.ViewModels
 @inject HttpClient HttpClient
 @inject IJSRuntime JSRuntime
@@ -37,21 +38,18 @@
         <InputDate class="col-sm-8" id="ReleaseDate" @bind-Value="addGameViewModel.ReleaseDate" />
     </div>
 
-    <div class="row">
-        <select multiple>
-            <option>Экшен</option>
-            <option>Шутер</option>
-            <option>Хоррор</option>
-            <option>РПГ</option>
-            <option>Приключение</option>
-            <option>Гонка</option>
-            <option>Стратегия</option>
-            <option>Аркада</option>
-            <option>ММО</option>
-            <option>Спорт</option>
-            <option>Файтинг</option>
-        </select>
-    </div>
+    @if (gamesGenres is not null && gamesGenres.Any())
+    {
+        <div class="row">
+            <label class="com-sm-4">Genre(s)</label>
+            <select class="col-sm-3 form-select-sm" multiple>
+                @foreach (GameGenre gameGenre in gamesGenres)
+                {
+                    <option value="@gameGenre.Id">@gameGenre.Name</option>
+                }
+            </select>
+        </div>
+    }
 
     <button type="submit">Add Game</button>
 </EditForm>
@@ -59,6 +57,12 @@
 @code {
     private AddGameViewModel addGameViewModel = new AddGameViewModel();
     private IBrowserFile selectedImage;
+    private IEnumerable<GameGenre> gamesGenres;
+
+    protected override async Task OnInitializedAsync()
+    {
+        gamesGenres = await HttpClient.GetFromJsonAsync<IEnumerable<GameGenre>>("api/GamesGenres");
+    }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
