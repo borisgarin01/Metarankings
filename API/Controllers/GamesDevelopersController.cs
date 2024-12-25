@@ -1,5 +1,7 @@
-﻿using Data;
+﻿using AutoMapper;
+using Data;
 using Domain;
+using Domain.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +12,12 @@ namespace API.Controllers;
 public class GamesDevelopersController : ControllerBase
 {
     private readonly DataContext dataContext;
+    private readonly IMapper mapper;
 
-    public GamesDevelopersController(DataContext dataContext)
+    public GamesDevelopersController(DataContext dataContext, IMapper mapper)
     {
         this.dataContext = dataContext;
+        this.mapper = mapper;
     }
 
     [HttpGet]
@@ -32,12 +36,15 @@ public class GamesDevelopersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> AddAsync(GameDeveloper gameDeveloper)
+    public async Task<ActionResult> AddAsync(AddGameDeveloperViewModel addGameDeveloperViewModel)
     {
         if (ModelState.IsValid)
         {
+
             try
             {
+                var gameDeveloper = mapper.Map<GameDeveloper>(addGameDeveloperViewModel);
+
                 dataContext.GamesDevelopers.Add(gameDeveloper);
                 await dataContext.SaveChangesAsync();
                 return Created($"api/GamesDevelopers/{gameDeveloper.Id}", gameDeveloper);
@@ -47,6 +54,6 @@ public class GamesDevelopersController : ControllerBase
                 return StatusCode(500, ex.Message);
             }
         }
-        return BadRequest(gameDeveloper);
+        return BadRequest(addGameDeveloperViewModel);
     }
 }
