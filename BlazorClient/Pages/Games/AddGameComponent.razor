@@ -7,34 +7,50 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div>
-        <label for="Name">Name</label>
-        <InputText id="Name" @bind-Value="addGameViewModel.Name" />
+    <div class="row">
+        <label class="col-sm-4" for="Name">Name</label>
+        <InputText multiline class="col-sm-8" id="Name" @bind-Value="addGameViewModel.Name" />
     </div>
 
-    <div>
-        <label for="Description">Description</label>
-        <InputTextArea id="Description" @bind-Value="addGameViewModel.Description" />
+    <div class="row">
+        <label class="col-sm-4" for="Description">Description</label>
+        <InputText multiline class="col-sm-8" id="Description" @bind-Value="addGameViewModel.Description" />
     </div>
 
-    <div>
-        <label for="ImageSource">Image</label>
-        <InputFile id="ImageSource" OnChange="HandleFileSelected" />
+    <div class="row">
+        <label class="col-sm-4" for="ImageSource">Image</label>
+        <InputFile class="col-sm-8" id="ImageSource" OnChange="HandleFileSelected" />
     </div>
 
-    <div>
-        <label for="Score">Score</label>
-        <InputNumber id="Score" @bind-Value="addGameViewModel.Score" />
+    <div class="row">
+        <label class="col-sm-4" for="Score">Score</label>
+        <InputNumber class="col-sm-8" id="Score" @bind-Value="addGameViewModel.Score" />
     </div>
 
-    <div>
-        <label for="LocalizationId">Localization ID</label>
-        <InputNumber id="LocalizationId" @bind-Value="addGameViewModel.LocalizationId" />
+    <div class="row">
+        <label class="col-sm-4" for="LocalizationId">Localization ID</label>
+        <InputNumber class="col-sm-8" id="LocalizationId" @bind-Value="addGameViewModel.LocalizationId" />
     </div>
 
-    <div>
-        <label for="ReleaseDate">Release Date</label>
-        <InputDate id="ReleaseDate" @bind-Value="addGameViewModel.ReleaseDate" />
+    <div class="row">
+        <label class="col-sm-4" for="ReleaseDate">Release Date</label>
+        <InputDate class="col-sm-8" id="ReleaseDate" @bind-Value="addGameViewModel.ReleaseDate" />
+    </div>
+
+    <div class="row">
+        <select multiple>
+            <option>Экшен</option>
+            <option>Шутер</option>
+            <option>Хоррор</option>
+            <option>РПГ</option>
+            <option>Приключение</option>
+            <option>Гонка</option>
+            <option>Стратегия</option>
+            <option>Аркада</option>
+            <option>ММО</option>
+            <option>Спорт</option>
+            <option>Файтинг</option>
+        </select>
     </div>
 
     <button type="submit">Add Game</button>
