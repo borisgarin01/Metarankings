@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[ApiController]
+[Route("api/[controller]")]
 public class GameGameGenreController : ControllerBase
 {
     private readonly DataContext dataContext;
@@ -13,7 +15,7 @@ public class GameGameGenreController : ControllerBase
         this.dataContext = dataContext;
     }
 
-    [HttpPost]
+    [HttpPost("{genreId}/{gameId}")]
     public async Task<ActionResult> AddGenreToGameAsync(long genreId, long gameId)
     {
         if (dataContext.GamesGamesGenres.FirstOrDefault(g => g.GameGenreId == genreId && g.GameId == gameId) is null

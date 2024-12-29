@@ -28,10 +28,18 @@
         <InputNumber class="col-sm-8" id="Score" @bind-Value="addGameViewModel.Score" />
     </div>
 
-    <div class="row">
-        <label class="col-sm-4" for="LocalizationId">Localization ID</label>
-        <InputNumber class="col-sm-8" id="LocalizationId" @bind-Value="addGameViewModel.LocalizationId" />
-    </div>
+    @if (gamesLocalizations is not null && gamesLocalizations.Any())
+    {
+        <div class="row">
+            <label class="com-sm-4">Localization</label>
+            <select class="col-sm-3 form-select-sm" @bind=addGameViewModel.LocalizationId>
+                @foreach (GameLocalization gameLocalization in gamesLocalizations)
+                {
+                    <option value="@gameLocalization.Id">@gameLocalization.Title</option>
+                }
+            </select>
+        </div>
+    }
 
     <div class="row">
         <label class="col-sm-4" for="ReleaseDate">Release Date</label>
@@ -58,10 +66,12 @@
     private AddGameViewModel addGameViewModel = new AddGameViewModel();
     private IBrowserFile selectedImage;
     private IEnumerable<GameGenre> gamesGenres;
+    private IEnumerable<GameLocalization> gamesLocalizations;
 
     protected override async Task OnInitializedAsync()
     {
         gamesGenres = await HttpClient.GetFromJsonAsync<IEnumerable<GameGenre>>("api/GamesGenres");
+        gamesLocalizations = await HttpClient.GetFromJsonAsync<IEnumerable<GameLocalization>>("api/GamesLocalizations");
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
