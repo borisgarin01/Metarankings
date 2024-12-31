@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Domain;
 
 [Index(nameof(Name), IsUnique = true)]
-public sealed record Collection
+public record Collection
 {
     public long Id { get; set; }
 
@@ -12,5 +12,5 @@ public sealed record Collection
     [MinLength(1)]
     [MaxLength(255)]
     public string Name { get; set; }
-    public IEnumerable<CollectionItem> CollectionItems { get; set; }
+    public virtual IEnumerable<CollectionItem> CollectionItems { get; set; }
 }

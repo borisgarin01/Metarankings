@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Data.Migrations
 {
     /// <inheritdoc />
-    public partial class GameGameGenres : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -137,6 +137,20 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Platform",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Link = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Platform", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CollectionItems",
                 columns: table => new
                 {
@@ -183,6 +197,26 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GameGamePublishers",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GameId = table.Column<long>(type: "bigint", nullable: false),
+                    GamePublisherId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GameGamePublishers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GameGamePublishers_GamesPublishers_GamePublisherId",
+                        column: x => x.GamePublisherId,
+                        principalTable: "GamesPublishers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GameGameDeveloper",
                 columns: table => new
                 {
@@ -201,6 +235,32 @@ namespace Data.Migrations
                     table.ForeignKey(
                         name: "FK_GameGameDeveloper_Games_GamesId",
                         column: x => x.GamesId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GameGameDevelopers",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GameId = table.Column<long>(type: "bigint", nullable: false),
+                    GameDeveloperId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GameGameDevelopers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GameGameDevelopers_GamesDevelopers_GameDeveloperId",
+                        column: x => x.GameDeveloperId,
+                        principalTable: "GamesDevelopers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GameGameDevelopers_Games_GameId",
+                        column: x => x.GameId,
                         principalTable: "Games",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -250,6 +310,32 @@ namespace Data.Migrations
                         name: "FK_GameGamePlatform_Games_GamesId",
                         column: x => x.GamesId,
                         principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GameGamePlatforms",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GameId = table.Column<long>(type: "bigint", nullable: false),
+                    PlatformId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GameGamePlatforms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GameGamePlatforms_Games_GameId",
+                        column: x => x.GameId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GameGamePlatforms_Platform_PlatformId",
+                        column: x => x.PlatformId,
+                        principalTable: "Platform",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -455,6 +541,17 @@ namespace Data.Migrations
                 column: "GamesId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GameGameDevelopers_GameDeveloperId",
+                table: "GameGameDevelopers",
+                column: "GameDeveloperId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GameGameDevelopers_GameId_GameDeveloperId",
+                table: "GameGameDevelopers",
+                columns: new[] { "GameId", "GameDeveloperId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GameGameGenre_GenresId",
                 table: "GameGameGenre",
                 column: "GenresId");
@@ -465,9 +562,31 @@ namespace Data.Migrations
                 column: "PlatformsId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GameGamePlatforms_GameId_PlatformId",
+                table: "GameGamePlatforms",
+                columns: new[] { "GameId", "PlatformId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GameGamePlatforms_PlatformId",
+                table: "GameGamePlatforms",
+                column: "PlatformId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GameGamePublisher_PublishersId",
                 table: "GameGamePublisher",
                 column: "PublishersId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GameGamePublishers_GameId_GamePublisherId",
+                table: "GameGamePublishers",
+                columns: new[] { "GameId", "GamePublisherId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GameGamePublishers_GamePublisherId",
+                table: "GameGamePublishers",
+                column: "GamePublisherId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GameGamerReview_GameId",
@@ -556,13 +675,12 @@ namespace Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_GamesGamesGenres_GameGenreId",
                 table: "GamesGamesGenres",
-                column: "GameGenreId",
-                unique: true);
+                column: "GameGenreId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GamesGamesGenres_GameId",
+                name: "IX_GamesGamesGenres_GameId_GameGenreId",
                 table: "GamesGamesGenres",
-                column: "GameId",
+                columns: new[] { "GameId", "GameGenreId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -647,13 +765,22 @@ namespace Data.Migrations
                 name: "GameGameDeveloper");
 
             migrationBuilder.DropTable(
+                name: "GameGameDevelopers");
+
+            migrationBuilder.DropTable(
                 name: "GameGameGenre");
 
             migrationBuilder.DropTable(
                 name: "GameGamePlatform");
 
             migrationBuilder.DropTable(
+                name: "GameGamePlatforms");
+
+            migrationBuilder.DropTable(
                 name: "GameGamePublisher");
+
+            migrationBuilder.DropTable(
+                name: "GameGamePublishers");
 
             migrationBuilder.DropTable(
                 name: "GameGamerReview");
@@ -678,6 +805,9 @@ namespace Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "GamesPlatforms");
+
+            migrationBuilder.DropTable(
+                name: "Platform");
 
             migrationBuilder.DropTable(
                 name: "GamesPublishers");

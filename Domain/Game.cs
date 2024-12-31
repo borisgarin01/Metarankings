@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Domain;
 
 [Index(nameof(Name), IsUnique = true)]
-public sealed record Game
+public class Game
 {
     public long Id { get; set; }
 
@@ -24,15 +24,19 @@ public sealed record Game
 
     [Column(TypeName = "nvarchar(max)")]
     public string Description { get; set; }
+
     public GameLocalization Localization { get; set; }
     public long LocalizationId { get; set; }
-    public IEnumerable<GameDeveloper> Developers { get; set; }
-    public IEnumerable<GamePublisher> Publishers { get; set; }
-    public IEnumerable<GamePlatform> Platforms { get; set; }
-    public IEnumerable<GameGenre> Genres { get; set; }
+
+    public virtual ICollection<GameDeveloper> Developers { get; set; } = new List<GameDeveloper>();
+    public virtual ICollection<GamePublisher> Publishers { get; set; } = new List<GamePublisher>();
+    public virtual ICollection<GamePlatform> Platforms { get; set; } = new List<GamePlatform>();
+    public virtual ICollection<GameGenre> Genres { get; set; } = new List<GameGenre>();
+
     public DateTime ReleaseDate { get; set; }
-    public IEnumerable<GameTag> Tags { get; set; }
-    public IEnumerable<GameCriticReview> CriticsReviews { get; set; }
-    public IEnumerable<GameGamerReview> UsersReviews { get; set; }
-    public IEnumerable<Trailer> Trailers { get; set; }
+
+    public virtual ICollection<GameTag> Tags { get; set; } = new List<GameTag>();
+    public virtual ICollection<GameCriticReview> CriticsReviews { get; set; } = new List<GameCriticReview>();
+    public virtual ICollection<GameGamerReview> UsersReviews { get; set; } = new List<GameGamerReview>();
+    public virtual ICollection<Trailer> Trailers { get; set; } = new List<Trailer>();
 }

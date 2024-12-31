@@ -5,10 +5,10 @@ namespace Domain;
 
 [Index(nameof(Title), IsUnique = true)]
 [Index(nameof(Url), IsUnique = true)]
-public sealed record GameTag
+public record GameTag
 {
     public long Id { get; set; }
-    public IEnumerable<Game> Games { get; set; }
+    public virtual IEnumerable<Game> Games { get; set; }
 
     [Required]
     [MinLength(1)]

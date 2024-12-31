@@ -3,6 +3,7 @@
 namespace Domain;
 public sealed record Platform
 {
+    public long Id { get; set; }
     [Parameter]
     public string Name { get; set; }
 

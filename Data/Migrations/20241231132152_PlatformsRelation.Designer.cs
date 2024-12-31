@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241225100404_GameGameGenres")]
-    partial class GameGameGenres
+    [Migration("20241231132152_PlatformsRelation")]
+    partial class PlatformsRelation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -231,6 +231,30 @@ namespace Data.Migrations
                     b.ToTable("GamesDevelopers");
                 });
 
+            modelBuilder.Entity("Domain.GameGameDeveloper", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("GameDeveloperId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("GameId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameDeveloperId");
+
+                    b.HasIndex("GameId", "GameDeveloperId")
+                        .IsUnique();
+
+                    b.ToTable("GameGameDevelopers");
+                });
+
             modelBuilder.Entity("Domain.GameGameGenre", b =>
                 {
                     b.Property<long>("Id")
@@ -247,13 +271,60 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameGenreId")
-                        .IsUnique();
+                    b.HasIndex("GameGenreId");
 
-                    b.HasIndex("GameId")
+                    b.HasIndex("GameId", "GameGenreId")
                         .IsUnique();
 
                     b.ToTable("GamesGamesGenres");
+                });
+
+            modelBuilder.Entity("Domain.GameGamePlatform", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("GameId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("GamePlatformId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GamePlatformId");
+
+                    b.HasIndex("GameId", "GamePlatformId")
+                        .IsUnique();
+
+                    b.ToTable("GameGamePlatforms");
+                });
+
+            modelBuilder.Entity("Domain.GameGamePublisher", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("GameId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("GamePublisherId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GamePublisherId");
+
+                    b.HasIndex("GameId", "GamePublisherId")
+                        .IsUnique();
+
+                    b.ToTable("GameGamePublishers");
                 });
 
             modelBuilder.Entity("Domain.GameGamerReview", b =>
@@ -498,66 +569,6 @@ namespace Data.Migrations
                     b.ToTable("Trailers");
                 });
 
-            modelBuilder.Entity("GameGameDeveloper", b =>
-                {
-                    b.Property<long>("DevelopersId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("GamesId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("DevelopersId", "GamesId");
-
-                    b.HasIndex("GamesId");
-
-                    b.ToTable("GameGameDeveloper");
-                });
-
-            modelBuilder.Entity("GameGameGenre", b =>
-                {
-                    b.Property<long>("GamesId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("GenresId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("GamesId", "GenresId");
-
-                    b.HasIndex("GenresId");
-
-                    b.ToTable("GameGameGenre");
-                });
-
-            modelBuilder.Entity("GameGamePlatform", b =>
-                {
-                    b.Property<long>("GamesId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PlatformsId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("GamesId", "PlatformsId");
-
-                    b.HasIndex("PlatformsId");
-
-                    b.ToTable("GameGamePlatform");
-                });
-
-            modelBuilder.Entity("GameGamePublisher", b =>
-                {
-                    b.Property<long>("GamesId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PublishersId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("GamesId", "PublishersId");
-
-                    b.HasIndex("PublishersId");
-
-                    b.ToTable("GameGamePublisher");
-                });
-
             modelBuilder.Entity("GameGameTag", b =>
                 {
                     b.Property<long>("GamesId")
@@ -614,6 +625,25 @@ namespace Data.Migrations
                     b.Navigation("Game");
                 });
 
+            modelBuilder.Entity("Domain.GameGameDeveloper", b =>
+                {
+                    b.HasOne("Domain.GameDeveloper", "GameDeveloper")
+                        .WithMany()
+                        .HasForeignKey("GameDeveloperId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("GameDeveloper");
+                });
+
             modelBuilder.Entity("Domain.GameGameGenre", b =>
                 {
                     b.HasOne("Domain.GameGenre", "GameGenre")
@@ -631,6 +661,44 @@ namespace Data.Migrations
                     b.Navigation("Game");
 
                     b.Navigation("GameGenre");
+                });
+
+            modelBuilder.Entity("Domain.GameGamePlatform", b =>
+                {
+                    b.HasOne("Domain.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.GamePlatform", "GamePlatform")
+                        .WithMany()
+                        .HasForeignKey("GamePlatformId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("GamePlatform");
+                });
+
+            modelBuilder.Entity("Domain.GameGamePublisher", b =>
+                {
+                    b.HasOne("Domain.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.GamePublisher", "GamePublisher")
+                        .WithMany()
+                        .HasForeignKey("GamePublisherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("GamePublisher");
                 });
 
             modelBuilder.Entity("Domain.GameGamerReview", b =>
@@ -661,66 +729,6 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Game");
-                });
-
-            modelBuilder.Entity("GameGameDeveloper", b =>
-                {
-                    b.HasOne("Domain.GameDeveloper", null)
-                        .WithMany()
-                        .HasForeignKey("DevelopersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Game", null)
-                        .WithMany()
-                        .HasForeignKey("GamesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("GameGameGenre", b =>
-                {
-                    b.HasOne("Domain.Game", null)
-                        .WithMany()
-                        .HasForeignKey("GamesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.GameGenre", null)
-                        .WithMany()
-                        .HasForeignKey("GenresId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("GameGamePlatform", b =>
-                {
-                    b.HasOne("Domain.Game", null)
-                        .WithMany()
-                        .HasForeignKey("GamesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.GamePlatform", null)
-                        .WithMany()
-                        .HasForeignKey("PlatformsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("GameGamePublisher", b =>
-                {
-                    b.HasOne("Domain.Game", null)
-                        .WithMany()
-                        .HasForeignKey("GamesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.GamePublisher", null)
-                        .WithMany()
-                        .HasForeignKey("PublishersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("GameGameTag", b =>

@@ -45,8 +45,41 @@ public sealed class GamesAdminController : ControllerBase
     {
         if (ModelState.IsValid)
         {
-            var game = mapper.Map<Game>(addGameViewModel);
+            var game = new Game
+            {
+                Description = addGameViewModel.Description,
+                ImageSource = addGameViewModel.ImageSource,
+                LocalizationId = addGameViewModel.LocalizationId.Value,
+                Name = addGameViewModel.Name,
+                ReleaseDate = addGameViewModel.ReleaseDate.Value,
+                Score = addGameViewModel.Score
+            };
             dataContext.Add(game);
+            dataContext.SaveChanges();
+
+            foreach (var genre in addGameViewModel.GameGenres)
+            {
+                var gameGameGenre = new GameGameGenre { GameId = game.Id, GameGenreId = genre.Id };
+                dataContext.Add(gameGameGenre);
+            }
+
+            foreach (var platform in addGameViewModel.Platforms)
+            {
+                var gameGamePlatform = new GameGamePlatform { GamePlatformId = platform.Id, GameId = game.Id };
+                dataContext.Add(gameGamePlatform);
+            }
+
+            foreach (var developer in addGameViewModel.Developers)
+            {
+                var gameGameDeveloper = new GameGameDeveloper { GameDeveloperId = developer.Id, GameId = game.Id };
+                dataContext.Add(gameGameDeveloper);
+            }
+
+            foreach (var publisher in addGameViewModel.Publishers)
+            {
+                var gameGamePublisher = new GameGamePublisher { GamePublisherId = publisher.Id, GameId = game.Id };
+                dataContext.Add(gameGamePublisher);
+            }
             await dataContext.SaveChangesAsync();
             return Created($"api/gamesAdmin/{game.Id}", game);
         }

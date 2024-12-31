@@ -5,7 +5,7 @@ namespace Domain;
 
 [Index(nameof(Name), IsUnique = true)]
 [Index(nameof(Url), IsUnique = true)]
-public sealed record GameDeveloper
+public record GameDeveloper
 {
     public long Id { get; set; }
 
@@ -18,5 +18,5 @@ public sealed record GameDeveloper
     [MinLength(1)]
     [MaxLength(255)]
     public string Url { get; set; }
-    public IEnumerable<Game> Games { get; set; }
+    public virtual IEnumerable<Game>? Games { get; set; }
 }

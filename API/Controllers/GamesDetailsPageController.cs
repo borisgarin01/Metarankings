@@ -20,17 +20,14 @@ public sealed class GamesDetailsPageController : ControllerBase
     public async Task<ActionResult<IEnumerable<Game>>> GetAllGamesAsync(int pageSize, int page)
     {
         var games = await dataContext.Games
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Include(g => g.Genres)
-            .Include(g => g.CriticsReviews)
-            .Include(g => g.Developers)
+            .Include(g => g.Developers) // Include Developers
+            .Include(g => g.Publishers) // Include Publishers
+            .Include(g => g.Genres) // Include Genres
             .Include(g => g.Platforms)
-            .Include(g => g.Localization)
-            .Include(g => g.Tags)
-            .Include(g => g.Publishers)
-            .Include(g => g.UsersReviews)
-            .Include(g => g.Trailers).ToArrayAsync();
+            .Skip(pageSize * (page - 1))
+            .Take(pageSize)
+            .ToListAsync();
+
         return Ok(games);
     }
 

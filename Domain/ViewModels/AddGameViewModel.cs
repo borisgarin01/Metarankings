@@ -20,4 +20,9 @@ public sealed record AddGameViewModel
 
     [Required]
     public DateTime? ReleaseDate { get; set; }
+
+    public List<GameGenre> GameGenres { get; set; } = new();
+    public List<GameDeveloper> Developers { get; set; } = new();
+    public List<GamePublisher> Publishers { get; set; } = new();
+    public List<GamePlatform> Platforms { get; set; } = new();
 }

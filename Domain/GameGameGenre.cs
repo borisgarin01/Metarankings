@@ -3,8 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain;
 
-[Index(nameof(GameId), IsUnique = true)]
-[Index(nameof(GameGenreId), IsUnique = true)]
+[Index(nameof(GameId), nameof(GameGenreId), IsUnique = true)]
 public sealed record GameGameGenre
 {
     public long Id { get; set; }

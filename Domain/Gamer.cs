@@ -5,7 +5,7 @@ namespace Domain;
 
 [Index(nameof(Url), IsUnique = true)]
 [Index(nameof(AccountName), IsUnique = true)]
-public sealed record Gamer
+public record Gamer
 {
     public long Id { get; set; }
 
@@ -18,5 +18,5 @@ public sealed record Gamer
     [MinLength(1)]
     [MaxLength(255)]
     public string AccountName { get; set; }
-    public IEnumerable<GameGamerReview> GameGamerReviews { get; set; }
+    public virtual IEnumerable<GameGamerReview> GameGamerReviews { get; set; }
 }
