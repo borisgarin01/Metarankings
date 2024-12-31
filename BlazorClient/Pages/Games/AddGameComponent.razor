@@ -3,6 +3,7 @@
 @using Domain.ViewModels
 @inject HttpClient HttpClient
 @inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 
 <EditForm Model="@addGameViewModel" OnValidSubmit="@HandleSubmit">
     <DataAnnotationsValidator />
@@ -85,6 +86,19 @@
         </div>
     }
 
+    @if (gamesPlatforms is not null && gamesPlatforms.Any())
+    {
+        <div class="row">
+            <label class="com-sm-4">Publisher(s)</label>
+            <select class="col-sm-3 form-select-sm" multiple>
+                @foreach (GamePlatform gamePlatform in gamesPlatforms)
+                {
+                    <option value="@gamePlatform.Id" @onclick="@(()=>SelectPlatformForGame(gamePlatform))">@gamePlatform.Name</option>
+                }
+            </select>
+        </div>
+    }
+
     <button type="submit">Add Game</button>
 </EditForm>
 
@@ -95,6 +109,7 @@
     private IEnumerable<GameLocalization> gamesLocalizations;
     private IEnumerable<GameDeveloper> gamesDevelopers;
     private IEnumerable<GamePublisher> gamesPublishers;
+    private IEnumerable<GamePlatform> gamesPlatforms;
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,6 +117,7 @@
         gamesLocalizations = await HttpClient.GetFromJsonAsync<IEnumerable<GameLocalization>>("api/GamesLocalizations");
         gamesDevelopers = await HttpClient.GetFromJsonAsync<IEnumerable<GameDeveloper>>("api/GamesDevelopers");
         gamesPublishers = await HttpClient.GetFromJsonAsync<IEnumerable<GamePublisher>>("api/GamesPublishers");
+        gamesPlatforms = await HttpClient.GetFromJsonAsync<IEnumerable<GamePlatform>>("api/GamesPlatforms");
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
@@ -138,6 +154,14 @@
             addGameViewModel.Publishers.Add(gamePublisher);
     }
 
+    private void SelectPlatformForGame(GamePlatform gamePlatform)
+    {
+        if (addGameViewModel.Platforms.Contains(gamePlatform))
+            addGameViewModel.Platforms.Remove(gamePlatform);
+        else
+            addGameViewModel.Platforms.Add(gamePlatform);
+    }
+
     private async Task HandleSubmit()
     {
         // If you want to upload the file before submitting the form
@@ -159,7 +183,10 @@
         // Now submit the rest of the form data
         var addGameResponse = await HttpClient.PostAsJsonAsync("api/GamesAdmin", addGameViewModel);
         if (addGameResponse.IsSuccessStatusCode)
+        {
             await JSRuntime.InvokeVoidAsync("alert", "Game created succesfully");
+            NavigationManager.NavigateTo("/");
+        }
         else
             await JSRuntime.InvokeVoidAsync("alert", await addGameResponse.Content.ReadAsStringAsync());
     }
