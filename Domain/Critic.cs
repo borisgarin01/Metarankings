@@ -18,5 +18,6 @@ public record Critic
     [MinLength(1)]
     [Required]
     public string Url { get; set; }
+
     public virtual IEnumerable<GameCriticReview> CriticReviews { get; set; }
 }

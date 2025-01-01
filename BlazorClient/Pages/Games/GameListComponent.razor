@@ -1,6 +1,8 @@
-﻿@using Domain
+﻿@using Blazored.LocalStorage
+@using Domain
 @inject HttpClient HttpClient;
 @inject NavigationManager NavigationManager;
+@inject ILocalStorageService LocalStorageService;
 
 @if (Games is null)
 {
@@ -62,7 +64,12 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Games = await GetGamesAsync(10, Page);
+        Games = await LocalStorageService.GetItemAsync<IEnumerable<Game>>("games");
+        if (Games is null || !Games.Any())
+        {
+            Games = await GetGamesAsync(10, Page);
+            await LocalStorageService.SetItemAsync<IEnumerable<Game>>("games", Games);
+        }
     }
 
     private async Task RefreshGotGames(int pageSize = 10, int pageNumber = 1)

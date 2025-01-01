@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Domain;
 
@@ -8,6 +9,8 @@ namespace Domain;
 public record GameTag
 {
     public long Id { get; set; }
+
+    [JsonIgnore]
     public virtual IEnumerable<Game> Games { get; set; }
 
     [Required]

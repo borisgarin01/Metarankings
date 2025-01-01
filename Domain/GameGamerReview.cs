@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace Domain;
 
@@ -9,6 +10,7 @@ public sealed record GameGamerReview
     public long Id { get; set; }
     public Gamer Gamer { get; set; }
     public long GamerId { get; set; }
+    [JsonIgnore]
     public Game Game { get; set; }
     public long GameId { get; set; }
     public string Text { get; set; }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Domain;
 
@@ -12,5 +13,7 @@ public record Collection
     [MinLength(1)]
     [MaxLength(255)]
     public string Name { get; set; }
+
+    [JsonIgnore]
     public virtual IEnumerable<CollectionItem> CollectionItems { get; set; }
 }
