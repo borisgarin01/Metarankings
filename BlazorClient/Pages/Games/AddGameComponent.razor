@@ -1,9 +1,11 @@
 ﻿@page "/add-game"
+@using Blazored.LocalStorage
 @using Domain
 @using Domain.ViewModels
 @inject HttpClient HttpClient
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorageService;
 
 <EditForm Model="@addGameViewModel" OnValidSubmit="@HandleSubmit">
     <DataAnnotationsValidator />
@@ -189,6 +191,14 @@
         var addGameResponse = await HttpClient.PostAsJsonAsync("api/GamesAdmin", addGameViewModel);
         if (addGameResponse.IsSuccessStatusCode)
         {
+            var createdGame = await addGameResponse.Content.ReadFromJsonAsync<Game>();
+
+            var cachedGames = (await LocalStorageService.GetItemAsync<IEnumerable<Game>>("games")).ToList();
+
+            cachedGames.Add(createdGame);
+
+            await LocalStorageService.SetItemAsync<IEnumerable<Game>>("games", cachedGames);
+
             await JSRuntime.InvokeVoidAsync("alert", "Game created succesfully");
             NavigationManager.NavigateTo("/");
         }

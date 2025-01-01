@@ -81,7 +81,9 @@ public sealed class GamesAdminController : ControllerBase
                 dataContext.Add(gameGamePublisher);
             }
             await dataContext.SaveChangesAsync();
-            return Created($"api/gamesAdmin/{game.Id}", game);
+
+            var createdGame = await dataContext.Games.Include(a => a.Genres).Include(a => a.Platforms).Include(a => a.Developers).Include(a => a.Publishers).FirstOrDefaultAsync(a => a.Id == game.Id);
+            return Created($"api/gamesAdmin/{game.Id}", createdGame);
         }
         return BadRequest(addGameViewModel);
     }
