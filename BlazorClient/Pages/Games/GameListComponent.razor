@@ -29,13 +29,28 @@ else
                     }
                 </div>
                 <div class="post-meta">
-                    @foreach (GamePlatform gamePlatform in Games[i].Platforms)
-                    {
-                        <p>@gamePlatform.Name</p>
-                    }
+                    <p>
+                        @for (int j = 0; j < Games[i].Platforms.Count; j++)
+                        {
+                            @Games[i].Platforms.ElementAt(j).Name
+                            if (j < Games[i].Platforms.Count - 1)
+                            {
+                                <text>, </text>
+                            }
+                        }
+                    </p>
                 </div>
                 <div class="post-meta">
-                    <p>@string.Join(", ", Games[i].Genres.Select(g => g.Name))</p>
+                    <p>
+                        @for (int j = 0; j < Games[i].Genres.Count; j++)
+                        {
+                            @Games[i].Genres.ElementAt(j).Name
+                            if (j < Games[i].Genres.Count - 1)
+                            {
+                                <text>, </text>
+                            }
+                        }
+                    </p>
                 </div>
                 <div class="trailer" data-video="https://metarankings.ru/the-last-of-us-remastered/#content-trailer"></div>
                 <div class="ratings-graph">
@@ -49,21 +64,21 @@ else
             </div>
         }
     </div>
-}
 
-<div class="pagination">
-    <div class="navi">
-        @if (Page > 1)
-        {
-            <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page-1))" @onclick:preventDefault>@(Page - 1)</a>
-        }
-        <span class="page-numbers current">@Page</span>
-        @if (Games.Count() == PageSize)
-        {
-            <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page+1))" @onclick:preventDefault>@(Page + 1)</a>
-        }
+    <div class="pagination">
+        <div class="navi">
+            @if (Page > 1)
+            {
+                <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page-1))" @onclick:preventDefault>@(Page - 1)</a>
+            }
+            <span class="page-numbers current">@Page</span>
+            @if (Games.Count() == PageSize)
+            {
+                <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page+1))" @onclick:preventDefault>@(Page + 1)</a>
+            }
+        </div>
     </div>
-</div>
+}
 
 @code {
     [Parameter]
