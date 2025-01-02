@@ -17,7 +17,7 @@ public sealed class GamesDetailsPageController : ControllerBase
     }
 
     [HttpGet("pageSize={pageSize}&page={page}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAllGamesAsync(int pageSize, int page)
+    public async Task<ActionResult<Game[]>> GetAllGamesAsync(int pageSize, int page)
     {
         var games = await dataContext.Games
             .Include(g => g.Developers) // Include Developers
@@ -26,7 +26,7 @@ public sealed class GamesDetailsPageController : ControllerBase
             .Include(g => g.Platforms)
             .Skip(pageSize * (page - 1))
             .Take(pageSize)
-            .ToListAsync();
+            .ToArrayAsync();
 
         return Ok(games);
     }

@@ -11,33 +11,39 @@
 else
 {
     <div class="list clear best">
-        @foreach (var game in Games)
+        @for (int i = 0; i < Games.Length; i++)
         {
             <div class="post clear">
-                <a href="@game.Name" title="Игра @game.Name" class="thumb"><img class="post-image" src="@game.ImageSource" alt="Игра @game.Name"></a>
+                <a href="@Games[i].Name" title="Игра @Games[i].Name" class="thumb"><img class="post-image" src="@Games[i].ImageSource" alt="Игра @Games[i].Name"></a>
                 <div class="best-prod">
-                    <div class="counter">1</div>
+                    <div class="counter">@((Page - 1) * PageSize + i + 1)</div>
                     <span class="star">★</span>
                 </div>
-                <h3><a class="name" href="/games/details/@game.Name">@game.Name</a></h3>
+                <h3>
+                    <a class="name" href="/games/details/@Games[i].Name">@Games[i].Name</a>
+                </h3>
                 <div class="post-meta">
-                    @foreach (GameDeveloper gameDeveloper in game.Developers)
+                    @foreach (GameDeveloper gameDeveloper in Games[i].Developers)
                     {
                         <p>@gameDeveloper.Name</p>
                     }
                 </div>
                 <div class="post-meta">
-                    @foreach (GamePlatform gamePlatform in game.Platforms)
+                    @foreach (GamePlatform gamePlatform in Games[i].Platforms)
                     {
                         <p>@gamePlatform.Name</p>
                     }
                 </div>
-                <div class="post-meta"><p>@string.Join(", ", game.Genres.Select(g => g.Name))</p></div>
+                <div class="post-meta">
+                    <p>@string.Join(", ", Games[i].Genres.Select(g => g.Name))</p>
+                </div>
                 <div class="trailer" data-video="https://metarankings.ru/the-last-of-us-remastered/#content-trailer"></div>
                 <div class="ratings-graph">
                     <div class="graph">
-                        <div class="small-score mark-@Math.Round(game.Score.Value)">@Math.Round(game.Score.Value, 1)</div>
-                        <div class="graph-body"><div style="width:@(Math.Round(game.Score.Value,1)*10)%" class="rating-graph mark-@Math.Round(game.Score.Value)"></div></div>
+                        <div class="small-score mark-@Math.Round(Games[i].Score.Value)">@Math.Round(Games[i].Score.Value, 1)</div>
+                        <div class="graph-body">
+                            <div style="width:@(Math.Round(Games[i].Score.Value,1)*10)%" class="rating-graph mark-@Math.Round(Games[i].Score.Value)"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -47,41 +53,41 @@ else
 
 <div class="pagination">
     <div class="navi">
-        <span class="page-numbers current">1</span>
-        <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page))" @onclick:preventDefault>@(Page)</a>
-        <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page+1))" @onclick:preventDefault>@(Page + 1)</a>
-        <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page+2))" @onclick:preventDefault>@(Page + 2)</a>
-        <span class="page-numbers dots">…</span>
-        <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames())" @onclick:preventDefault>10</a>
-        <a class="next page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page+3))">Показать еще</a>
+        @if (Page > 1)
+        {
+            <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page-1))" @onclick:preventDefault>@(Page - 1)</a>
+        }
+        <span class="page-numbers current">@Page</span>
+        @if (Games.Count() == PageSize)
+        {
+            <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page+1))" @onclick:preventDefault>@(Page + 1)</a>
+        }
     </div>
 </div>
 
 @code {
     [Parameter]
     public int Page { get; set; }
-    public IEnumerable<Game> Games { get; set; }
+    [Parameter]
+    public int PageSize { get; set; }
+    public Game[] Games { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Games = await LocalStorageService.GetItemAsync<IEnumerable<Game>>("games");
-        if (Games is null || !Games.Any())
-        {
-            Games = await GetGamesAsync(10, Page);
-            await LocalStorageService.SetItemAsync<IEnumerable<Game>>("games", Games);
-        }
+        await RefreshGotGames(PageSize, Page);
     }
 
     private async Task RefreshGotGames(int pageSize = 10, int pageNumber = 1)
     {
         NavigationManager.NavigateTo($"/{pageNumber}");
         Page = pageNumber;
-        Games = await GetGamesAsync(10, Page);
+        Games = await GetGamesAsync(PageSize, Page);
+        await LocalStorageService.SetItemAsync<Game[]>("games", Games);
     }
 
-    private async Task<IEnumerable<Game>> GetGamesAsync(int pageSize = 10, int pageNumber = 1)
+    private async Task<Game[]> GetGamesAsync(int pageSize = 10, int pageNumber = 1)
     {
-        var games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"api/GamesDetailsPage/pageSize={pageSize}&page={pageNumber}");
+        var games = await HttpClient.GetFromJsonAsync<Game[]>($"api/GamesDetailsPage/pageSize={pageSize}&page={pageNumber}");
         return games;
     }
 }
