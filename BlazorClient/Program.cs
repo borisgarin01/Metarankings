@@ -11,6 +11,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7148") });
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://192.168.1.102:5001") });
 
 await builder.Build().RunAsync();

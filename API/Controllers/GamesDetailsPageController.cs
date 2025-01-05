@@ -16,7 +16,7 @@ public sealed class GamesDetailsPageController : ControllerBase
         this.dataContext = dataContext;
     }
 
-    [HttpGet("pageSize={pageSize}&page={page}")]
+    [HttpGet("{pageSize}/{page}")]
     public async Task<ActionResult<Game[]>> GetAllGamesAsync(int pageSize, int page)
     {
         var games = await dataContext.Games

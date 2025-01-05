@@ -13,3 +13,5 @@ Domain/bin
 API/bin
 BlazorClient/bin
 Data/bin
+BlazorClient/Publish
+API/Images

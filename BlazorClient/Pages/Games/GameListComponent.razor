@@ -102,7 +102,7 @@ else
 
     private async Task<Game[]> GetGamesAsync(int pageSize = 10, int pageNumber = 1)
     {
-        var games = await HttpClient.GetFromJsonAsync<Game[]>($"api/GamesDetailsPage/pageSize={pageSize}&page={pageNumber}");
+        var games = await HttpClient.GetFromJsonAsync<Game[]>($"api/GamesDetailsPage/{pageSize}/{pageNumber}");
         return games;
     }
 }
