@@ -199,7 +199,7 @@
             if (response.IsSuccessStatusCode)
             {
                 // Process the response, perhaps save the file URL into ImageSource
-                addGameViewModel.ImageSource = $"{HttpClient.BaseAddress}api/GamesImages/{selectedImage.Name}";
+                addGameViewModel.ImageSource = $"api/GamesImages/{selectedImage.Name}";
             }
         }
 

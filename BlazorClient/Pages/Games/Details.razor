@@ -21,7 +21,7 @@ else
         </div>
         <div class="post-content">
             <div class="thumb">
-                <img class="post-image" src="@Game.ImageSource" alt="Игра @Game.Name" title="Игра @Game.Name" itemprop="image">
+                <img class="post-image" src="@GetImageUrl(Game.ImageSource)" alt="Игра @Game.Name" title="Игра @Game.Name" itemprop="image">
                 <div class="best-prod">
                     <span class="star">★</span> Лучшие в @Game.ReleaseDate.Year году <span class="inform">?</span>
                 </div>
@@ -182,8 +182,8 @@ else
                         <link itemprop="url" href="@NavigationManager.Uri">
                         <meta itemprop="name" content="Трейлер @Game.Name">
                         <meta itemprop="description" content="Трейлер игры @Game.Name">
-                        <link itemprop="thumbnail" href="@Game.ImageSource">
-                        <link itemprop="thumbnailUrl" href="@Game.ImageSource">
+                        <link itemprop="thumbnail" href="@string.Join('/',HttpClient.BaseAddress, Game.ImageSource)">
+                        <link itemprop="thumbnailUrl" href="@string.Join('/',HttpClient.BaseAddress, Game.ImageSource)">
                         @foreach (var videoUrl in Game.Trailers)
                         {
                             <link itemprop="embedUrl" href="@videoUrl.Url">
@@ -196,11 +196,11 @@ else
                 </div>
             </div>
             <ul class="gallery">
-                <li><img class="attachment-screenshot" src="@Game.ImageSource" data-original="@Game.ImageSource" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
-                <li><img class="attachment-screenshot" src="@Game.ImageSource" data-original="@Game.ImageSource" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
-                <li><img class="attachment-screenshot" src="@Game.ImageSource" data-original="@Game.ImageSource" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
-                <li><img class="attachment-screenshot" src="@Game.ImageSource" data-original="@Game.ImageSource" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
-                <li><img class="attachment-screenshot" src="@Game.ImageSource" data-original="@Game.ImageSource" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
+                <li><img class="attachment-screenshot" src="@GetImageUrl(Game.ImageSource)" data-original="@GetImageUrl(Game.ImageSource)" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
+                <li><img class="attachment-screenshot" src="@GetImageUrl(Game.ImageSource)" data-original="@GetImageUrl(Game.ImageSource)" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
+                <li><img class="attachment-screenshot" src="@GetImageUrl(Game.ImageSource)" data-original="@GetImageUrl(Game.ImageSource)" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
+                <li><img class="attachment-screenshot" src="@GetImageUrl(Game.ImageSource)" data-original="@GetImageUrl(Game.ImageSource)" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
+                <li><img class="attachment-screenshot" src="@GetImageUrl(Game.ImageSource)" data-original="@GetImageUrl(Game.ImageSource)" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
             </ul>
         </div>
     </div>
@@ -215,5 +215,11 @@ else
     protected override async Task OnInitializedAsync()
     {
         Game = await HttpClient.GetFromJsonAsync<Game>($"api/GamesDetailsPage/{Name}");
+    }
+
+    private string GetImageUrl(string imageSource)
+    {
+        // Ensure there's no double slashes in the URL
+        return new Uri(new Uri(HttpClient.BaseAddress.ToString(), UriKind.Absolute), imageSource.TrimStart('/')).ToString();
     }
 }

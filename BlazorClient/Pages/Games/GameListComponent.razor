@@ -14,7 +14,9 @@ else
         @for (int i = 0; i < Games.Length; i++)
         {
             <div class="post clear">
-                <a href="@Games[i].Name" title="Игра @Games[i].Name" class="thumb"><img class="post-image" src="@Games[i].ImageSource" alt="Игра @Games[i].Name"></a>
+                <a href="@Games[i].Name" title="Игра @Games[i].Name" class="thumb">
+                    <img class="post-image" src="@GetImageUrl(Games[i].ImageSource)" alt="Игра @Games[i].Name">
+                </a>
                 <div class="best-prod">
                     <div class="counter">@((Page - 1) * PageSize + i + 1)</div>
                     <span class="star">★</span>
@@ -104,5 +106,11 @@ else
     {
         var games = await HttpClient.GetFromJsonAsync<Game[]>($"api/GamesDetailsPage/{pageSize}/{pageNumber}");
         return games;
+    }
+
+    private string GetImageUrl(string imageSource)
+    {
+        // Ensure there's no double slashes in the URL
+        return new Uri(new Uri(HttpClient.BaseAddress.ToString(), UriKind.Absolute), imageSource.TrimStart('/')).ToString();
     }
 }
