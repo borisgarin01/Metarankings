@@ -23,7 +23,13 @@
 
     <div class="row">
         <label class="col-sm-4" for="ImageSource">Image</label>
-        <InputFile class="col-sm-8" id="ImageSource" OnChange="HandleFileSelected" />
+        <div class="col-sm-8">
+            @if (!string.IsNullOrEmpty(previewImage))
+            {
+                    <img src="@previewImage" alt="Image Preview" style="max-width: 300px; max-height: 300px; margin-bottom: 10px;" />
+            }
+        <InputFile id="ImageSource" OnChange="HandleFileSelected" />
+        </div>
     </div>
 
     <div class="row">
@@ -33,16 +39,16 @@
 
     @if (gamesLocalizations is not null && gamesLocalizations.Any())
     {
-        <div class="row">
-            <label class="com-sm-4">Localization</label>
-            <select class="col-sm-3 form-select-sm" @bind=addGameViewModel.LocalizationId>
-                <option selected>Select localization</option>
+            <div class="row">
+                <label class="com-sm-4">Localization</label>
+                <select class="col-sm-3 form-select-sm" @bind=addGameViewModel.LocalizationId>
+                    <option selected>Select localization</option>
                 @foreach (GameLocalization gameLocalization in gamesLocalizations)
                 {
-                    <option value="@gameLocalization.Id">@gameLocalization.Title</option>
+                            <option value="@gameLocalization.Id">@gameLocalization.Title</option>
                 }
-            </select>
-        </div>
+                </select>
+            </div>
     }
 
     <div class="row">
@@ -52,58 +58,58 @@
 
     @if (gamesGenres is not null && gamesGenres.Any())
     {
-        <div class="row">
-            <label class="com-sm-4">Genre(s)</label>
-            <select class="col-sm-3 form-select-sm" multiple>
-                <option selected>Select genre(s)</option>
+            <div class="row">
+                <label class="com-sm-4">Genre(s)</label>
+                <select class="col-sm-3 form-select-sm" multiple>
+                    <option selected>Select genre(s)</option>
                 @foreach (GameGenre gameGenre in gamesGenres)
                 {
-                    <option value="@gameGenre.Id" @onclick="@(()=>SelectGenreForGame(gameGenre))">@gameGenre.Name</option>
+                            <option value="@gameGenre.Id" @onclick="@(()=>SelectGenreForGame(gameGenre))">@gameGenre.Name</option>
                 }
-            </select>
-        </div>
+                </select>
+            </div>
     }
 
     @if (gamesDevelopers is not null && gamesDevelopers.Any())
     {
-        <div class="row">
-            <label class="com-sm-4">Developer(s)</label>
-            <select class="col-sm-3 form-select-sm" multiple>
-                <option selected>Select developer(s)</option>
+            <div class="row">
+                <label class="com-sm-4">Developer(s)</label>
+                <select class="col-sm-3 form-select-sm" multiple>
+                    <option selected>Select developer(s)</option>
                 @foreach (GameDeveloper gameDeveloper in gamesDevelopers)
                 {
-                    <option value="@gameDeveloper.Id" @onclick="@(()=>SelectDeveloperForGame(gameDeveloper))">@gameDeveloper.Name</option>
+                            <option value="@gameDeveloper.Id" @onclick="@(()=>SelectDeveloperForGame(gameDeveloper))">@gameDeveloper.Name</option>
                 }
-            </select>
-        </div>
+                </select>
+            </div>
     }
 
     @if (gamesPublishers is not null && gamesPublishers.Any())
     {
-        <div class="row">
-            <label class="com-sm-4">Publisher(s)</label>
-            <select class="col-sm-3 form-select-sm" multiple>
-                <option selected>Select publisher(s)</option>
+            <div class="row">
+                <label class="com-sm-4">Publisher(s)</label>
+                <select class="col-sm-3 form-select-sm" multiple>
+                    <option selected>Select publisher(s)</option>
                 @foreach (GamePublisher publisher in gamesPublishers)
                 {
-                    <option value="@publisher.Id" @onclick="@(()=>SelectPublisherForGame(publisher))">@publisher.Name</option>
+                            <option value="@publisher.Id" @onclick="@(()=>SelectPublisherForGame(publisher))">@publisher.Name</option>
                 }
-            </select>
-        </div>
+                </select>
+            </div>
     }
 
     @if (gamesPlatforms is not null && gamesPlatforms.Any())
     {
-        <div class="row">
-            <label class="com-sm-4">Platforms(s)</label>
-            <select class="col-sm-3 form-select-sm" multiple>
-                <option selected>Select platform(s)</option>
+            <div class="row">
+                <label class="com-sm-4">Platforms(s)</label>
+                <select class="col-sm-3 form-select-sm" multiple>
+                    <option selected>Select platform(s)</option>
                 @foreach (GamePlatform gamePlatform in gamesPlatforms)
                 {
-                    <option value="@gamePlatform.Id" @onclick="@(()=>SelectPlatformForGame(gamePlatform))">@gamePlatform.Name</option>
+                            <option value="@gamePlatform.Id" @onclick="@(()=>SelectPlatformForGame(gamePlatform))">@gamePlatform.Name</option>
                 }
-            </select>
-        </div>
+                </select>
+            </div>
     }
 
     <button type="submit">Add Game</button>
@@ -117,6 +123,7 @@
     private IEnumerable<GameDeveloper> gamesDevelopers;
     private IEnumerable<GamePublisher> gamesPublishers;
     private IEnumerable<GamePlatform> gamesPlatforms;
+    private string previewImage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -131,10 +138,19 @@
     {
         selectedImage = e.File;
 
-        // Optionally, you can preview the selected image
-        var stream = selectedImage.OpenReadStream();
-        // Example of reading the file and setting the source (you can use this for displaying a preview)
-        addGameViewModel.ImageSource = selectedImage.Name; // Just the file name, you might want to do more here
+        if (selectedImage.ContentType.StartsWith("image/"))
+        {
+            using var stream = new MemoryStream();
+            await selectedImage.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(stream); // Limit to 5 MB
+            var bytes = stream.ToArray();
+            previewImage = $"data:{selectedImage.ContentType};base64,{Convert.ToBase64String(bytes)}";
+            addGameViewModel.ImageSource = selectedImage.Name;
+        }
+        else
+        {
+            // Reset preview for invalid file type
+            previewImage = null;
+        }
     }
 
     private void SelectGenreForGame(GameGenre gameGenre)
