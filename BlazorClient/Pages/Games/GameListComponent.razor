@@ -14,7 +14,7 @@ else
         @for (int i = 0; i < Games.Length; i++)
         {
             <div class="post clear">
-                <a href="@Games[i].Name" title="Игра @Games[i].Name" class="thumb">
+                <a href="/games/details/@Games[i].Name" title="Игра @Games[i].Name" class="thumb">
                     <img class="post-image" src="@GetImageUrl(Games[i].ImageSource)" alt="Игра @Games[i].Name">
                 </a>
                 <div class="best-prod">
