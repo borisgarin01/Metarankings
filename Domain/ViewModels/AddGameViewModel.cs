@@ -10,7 +10,10 @@ public sealed record AddGameViewModel
     public float? Score { get; set; }
 
     [Required]
-    public string ImageSource { get; set; }
+    public string ListImageSource { get; set; }
+
+    [Required]
+    public string DetailsImageSource { get; set; }
 
     [Required]
     public string Description { get; set; }

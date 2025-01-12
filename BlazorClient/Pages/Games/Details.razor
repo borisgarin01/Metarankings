@@ -24,7 +24,7 @@ else
                 </div>
                 <div class="post-content">
                     <div class="thumb">
-                        <img class="post-image" src="@GetImageUrl(Game.ImageSource)" alt="Игра @Game.Name" title="Игра @Game.Name" itemprop="image">
+                        <img class="post-image" src="@GetImageUrl(Game.DetailsImageSource)" alt="Игра @Game.Name" title="Игра @Game.Name" itemprop="image">
                         <div class="best-prod">
                             <span class="star">&#9733;</span> Лучшие в @Game.ReleaseDate.Year году <span class="inform">?</span>
                         </div>
@@ -166,8 +166,8 @@ else
                                 <link itemprop="url" href="https://metarankings.ru/the-last-of-us-remastered/">
                                 <meta itemprop="name" content="Трейлер @Game.Name">
                                 <meta itemprop="description" content="Трейлер игры @Game.Name">
-                                <link itemprop="thumbnail" href="@GetImageUrl(Game.ImageSource)">
-                                <link itemprop="thumbnailUrl" href="@GetImageUrl(Game.ImageSource)">
+                                <link itemprop="thumbnail" href="@GetImageUrl(Game.ListImageSource)">
+                                <link itemprop="thumbnailUrl" href="@GetImageUrl(Game.ListImageSource)">
                                 @if (Game.Trailers.Any())
                                 {
                                     <link itemprop="embedUrl" href="@("https://www.youtube.com/embed/GAME_TRAILER".Replace("GAME_TRAILER",Game.Trailers.First().Url))">
@@ -177,8 +177,8 @@ else
                         </div>
                     </div>
                     <ul class="gallery">
-                        <li><img class="attachment-screenshot" src="@GetImageUrl(Game.ImageSource)" data-original="@GetImageUrl(Game.ImageSource)" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
-                        <li><img class="attachment-screenshot" src="@GetImageUrl(Game.ImageSource)" data-original="@GetImageUrl(Game.ImageSource)" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
+                        <li><img class="attachment-screenshot" src="@GetImageUrl(Game.ListImageSource)" data-original="@GetImageUrl(Game.ListImageSource)" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
+                        <li><img class="attachment-screenshot" src="@GetImageUrl(Game.ListImageSource)" data-original="@GetImageUrl(Game.ListImageSource)" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
                     </ul>
                 </div>
             </div>

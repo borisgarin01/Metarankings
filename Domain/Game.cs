@@ -20,7 +20,11 @@ public class Game
 
     [MaxLength(511)]
     [MinLength(1)]
-    public string ImageSource { get; set; }
+    public string ListImageSource { get; set; }
+
+    [MaxLength(511)]
+    [MinLength(1)]
+    public string DetailsImageSource { get; set; }
 
     [Column(TypeName = "nvarchar(max)")]
     public string Description { get; set; }

@@ -42,13 +42,14 @@ public sealed class GamesAdminController : ControllerBase
 
     [HttpPost]
     public async Task<ActionResult> AddGame(AddGameViewModel addGameViewModel)
-    {
+     {
         if (ModelState.IsValid)
         {
             var game = new Game
             {
                 Description = addGameViewModel.Description,
-                ImageSource = addGameViewModel.ImageSource,
+                DetailsImageSource = addGameViewModel.DetailsImageSource,
+                ListImageSource = addGameViewModel.ListImageSource,
                 LocalizationId = addGameViewModel.LocalizationId.Value,
                 Name = addGameViewModel.Name,
                 ReleaseDate = addGameViewModel.ReleaseDate.Value,

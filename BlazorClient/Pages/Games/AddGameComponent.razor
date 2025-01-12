@@ -22,13 +22,24 @@
     </div>
 
     <div class="row">
-        <label class="col-sm-4" for="ImageSource">Image</label>
+        <label class="col-sm-4" for="ListImageSource">List image</label>
         <div class="col-sm-8">
-            @if (!string.IsNullOrEmpty(previewImage))
+            @if (!string.IsNullOrEmpty(listPreviewImage))
             {
-                <img src="@previewImage" alt="Image Preview" style="max-width: 300px; max-height: 300px; margin-bottom: 10px;" />
+                <img src="@listPreviewImage" alt="List image preview" style="max-width: 300px; max-height: 300px; margin-bottom: 10px;" />
             }
-            <InputFile id="ImageSource" OnChange="HandleFileSelected" />
+            <InputFile id="ListImageSource" OnChange="HandleListImageFileSelected" />
+        </div>
+    </div>
+
+    <div class="row">
+        <label class="col-sm-4" for="DetailsImageSource">Details image</label>
+        <div class="col-sm-8">
+            @if (!string.IsNullOrEmpty(detailsPreviewImage))
+            {
+                <img src="@detailsPreviewImage" alt="Details image preview" style="max-width: 300px; max-height: 300px; margin-bottom: 10px;" />
+            }
+            <InputFile id="DetailsImageSource" OnChange="HandleDetailsImageFileSelected" />
         </div>
     </div>
 
@@ -142,13 +153,15 @@
 
 @code {
     private AddGameViewModel addGameViewModel = new AddGameViewModel();
-    private IBrowserFile selectedImage;
+    private IBrowserFile selectedListImage;
+    private IBrowserFile selectedDetailsImage;
     private IEnumerable<GameGenre> gamesGenres;
     private IEnumerable<GameLocalization> gamesLocalizations;
     private IEnumerable<GameDeveloper> gamesDevelopers;
     private IEnumerable<GamePublisher> gamesPublishers;
     private IEnumerable<GamePlatform> gamesPlatforms;
-    private string previewImage;
+    private string listPreviewImage;
+    private string detailsPreviewImage;
 
     private bool dialogAddNewDeveloperOpened;
 
@@ -189,22 +202,41 @@
         gamesPlatforms = await HttpClient.GetFromJsonAsync<IEnumerable<GamePlatform>>("api/GamesPlatforms");
     }
 
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    private async Task HandleListImageFileSelected(InputFileChangeEventArgs e)
     {
-        selectedImage = e.File;
+        selectedListImage = e.File;
 
-        if (selectedImage.ContentType.StartsWith("image/"))
+        if (selectedListImage.ContentType.StartsWith("image/"))
         {
             using var stream = new MemoryStream();
-            await selectedImage.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(stream); // Limit to 5 MB
+            await selectedListImage.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(stream); // Limit to 5 MB
             var bytes = stream.ToArray();
-            previewImage = $"data:{selectedImage.ContentType};base64,{Convert.ToBase64String(bytes)}";
-            addGameViewModel.ImageSource = selectedImage.Name;
+            listPreviewImage = $"data:{selectedListImage.ContentType};base64,{Convert.ToBase64String(bytes)}";
+            addGameViewModel.ListImageSource = selectedListImage.Name;
         }
         else
         {
             // Reset preview for invalid file type
-            previewImage = null;
+            listPreviewImage = null;
+        }
+    }
+
+    private async Task HandleDetailsImageFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedDetailsImage = e.File;
+
+        if (selectedDetailsImage.ContentType.StartsWith("image/"))
+        {
+            using var stream = new MemoryStream();
+            await selectedDetailsImage.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(stream); // Limit to 5 MB
+            var bytes = stream.ToArray();
+            detailsPreviewImage = $"data:{selectedDetailsImage.ContentType};base64,{Convert.ToBase64String(bytes)}";
+            addGameViewModel.DetailsImageSource = selectedDetailsImage.Name;
+        }
+        else
+        {
+            // Reset preview for invalid file type
+            detailsPreviewImage = null;
         }
     }
 
@@ -253,18 +285,33 @@
     private async Task HandleSubmit()
     {
         // If you want to upload the file before submitting the form
-        if (selectedImage != null)
+        if (selectedListImage != null)
         {
             var content = new MultipartFormDataContent();
-            var fileContent = new StreamContent(selectedImage.OpenReadStream());
-            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedImage.ContentType);
-            content.Add(fileContent, "file", selectedImage.Name);
+            var fileContent = new StreamContent(selectedListImage.OpenReadStream());
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedListImage.ContentType);
+            content.Add(fileContent, "file", selectedListImage.Name);
 
             var response = await HttpClient.PostAsync("api/GamesImages", content);
             if (response.IsSuccessStatusCode)
             {
                 // Process the response, perhaps save the file URL into ImageSource
-                addGameViewModel.ImageSource = $"api/GamesImages/{selectedImage.Name}";
+                addGameViewModel.ListImageSource = $"api/GamesImages/{selectedListImage.Name}";
+            }
+        }
+
+        if (selectedDetailsImage != null)
+        {
+            var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(selectedDetailsImage.OpenReadStream());
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedDetailsImage.ContentType);
+            content.Add(fileContent, "file", selectedDetailsImage.Name);
+
+            var response = await HttpClient.PostAsync("api/GamesImages", content);
+            if (response.IsSuccessStatusCode)
+            {
+                // Process the response, perhaps save the file URL into ImageSource
+                addGameViewModel.DetailsImageSource = $"api/GamesImages/{selectedDetailsImage.Name}";
             }
         }
 
