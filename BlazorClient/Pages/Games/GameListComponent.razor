@@ -10,75 +10,57 @@
 }
 else
 {
-    <div class="list clear best">
+    <div id="loop" class="list clear best" itemscope="" itemtype="https://schema.org/ItemList">
         @for (int i = 0; i < Games.Length; i++)
         {
-            <div class="post clear">
-                <a href="/games/details/@Games[i].Name" title="Игра @Games[i].Name" class="thumb">
-                    <img class="post-image" src="@GetImageUrl(Games[i].ListImageSource)" alt="Игра @Games[i].Name">
-                </a>
+            <div class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+                <a href="/games/details/@Games[i].Name" title="Игра @Games[i].Name" class="thumb"><img class="post-image" src="@GetImageUrl(@Games[i].ListImageSource)" alt="Игра @Games[i].Name"></a>
                 <div class="best-prod">
-                    <div class="counter">@((Page - 1) * PageSize + i + 1)</div>
+                    <div class="counter" itemprop="position">@(i + 1)</div>
                     <span class="star">★</span>
                 </div>
-                <h3>
-                    <a class="name" href="/games/details/@Games[i].Name">@Games[i].Name</a>
-                </h3>
-                <div class="post-meta">
-                    @foreach (GameDeveloper gameDeveloper in Games[i].Developers)
-                    {
-                        <p>@gameDeveloper.Name</p>
-                    }
+                <div itemprop="item" itemscope="" itemtype="https://schema.org/VideoGame">
+                    <link itemprop="url" href="/games/details/@Games[i].Name">
+                    <link itemprop="image" href="@GetImageUrl(Games[i].ListImageSource)">
+                    <meta itemprop="dateCreated" content="@Games[i].ReleaseDate.Year">
+                    <h3 itemprop="name"><a class="name" href="/games/details/@Games[i].Name">@Games[i].Name</a></h3>
+                    <div class="post-meta">
+                        <p itemprop="gamePlatform">@string.Join(", ", Games[i].Publishers.Select(g => g.Name))</p>
+                    </div>
+                    <div class="post-meta">
+                        <p itemprop="gamePlatform">@string.Join(", ", Games[i].Platforms.Select(g => g.Name))</p>
+                    </div>
+                    <div class="post-meta"><p itemprop="genre">@string.Join(", ", Games[i].Genres.Select(g => g.Name))</p></div>
                 </div>
-                <div class="post-meta">
-                    <p>
-                        @for (int j = 0; j < Games[i].Platforms.Count; j++)
-                        {
-                            @Games[i].Platforms.ElementAt(j).Name
-                            if (j < Games[i].Platforms.Count - 1)
-                            {
-                                <text>, </text>
-                            }
-                        }
-                    </p>
-                </div>
-                <div class="post-meta">
-                    <p>
-                        @for (int j = 0; j < Games[i].Genres.Count; j++)
-                        {
-                            @Games[i].Genres.ElementAt(j).Name
-                            if (j < Games[i].Genres.Count - 1)
-                            {
-                                <text>, </text>
-                            }
-                        }
-                    </p>
-                </div>
-                <div class="trailer" data-video="https://metarankings.ru/the-last-of-us-remastered/#content-trailer"></div>
+                <div class="trailer" data-video="https://metarankings.ru/@Games[i].Name.Replace(" ","-")/#content-trailer"></div>
                 <div class="ratings-graph">
                     <div class="graph">
-                        <div class="small-score mark-@Math.Round(Games[i].Score.Value)">@Math.Round(Games[i].Score.Value, 1)</div>
-                        <div class="graph-body">
-                            <div style="width:@(Math.Round(Games[i].Score.Value,1)*10)%" class="rating-graph mark-@Math.Round(Games[i].Score.Value)"></div>
-                        </div>
+                        <div class="small-score mark-@(Games[i].Score.HasValue ? Math.Round(Games[i].Score.Value) : 0)">@(Games[i].Score.HasValue ? Games[i].Score.Value : 0)</div>
+                        <div class="graph-body"><div style="width:@(Games[i].Score.HasValue ? Games[i].Score.Value*10 : 0)%" class="rating-graph mark-@(Games[i].Score.HasValue ? Math.Round(Games[i].Score.Value) : 0)"></div></div>
                     </div>
                 </div>
             </div>
         }
     </div>
 
-    <div class="pagination">
-        <div class="navi">
+    <div class="row">
+        <ul class="pagination">
             @if (Page > 1)
             {
-                <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page-1))" @onclick:preventDefault>@(Page - 1)</a>
+                <li class="page-item">
+                    <a class="page-link" href="#" @onclick="@(() => RefreshGotGames(pageNumber: Page-1))">@(Page - 1)</a>
+                </li>
             }
-            <span class="page-numbers current">@Page</span>
+            <li class="page-item active">
+                <a class="page-link" href="#" @onclick="@(() => RefreshGotGames(pageNumber: Page))"><span class="sr-only">@Page</span></a>
+            </li>
             @if (Games.Count() == PageSize)
             {
-                <a class="page-numbers" href="" @onclick="@(()=>RefreshGotGames(pageNumber:Page+1))" @onclick:preventDefault>@(Page + 1)</a>
+                <li class="page-item">
+                    <a class="page-link" href="#" @onclick="@(() => RefreshGotGames(pageNumber: Page+1))">@(Page + 1)</a>
+                </li>
             }
-        </div>
+        </ul>
     </div>
 }
 
