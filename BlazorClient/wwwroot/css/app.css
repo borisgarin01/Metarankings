@@ -4498,14 +4498,9 @@ p#cancel-comment-reply {
     outline: none !important;
 }
 
-div {
-    display: block;
-    unicode-bidi: isolate;
-}
-
-.modal-image div:hover {
-    color: #e52d27;
-}
+    .modal-image div:hover {
+        color: #e52d27;
+    }
 
 .modal-show {
     opacity: 1;
@@ -5125,27 +5120,27 @@ a.help {
     margin-bottom: 30px;
 }
 
-    .systems h2 {
-        cursor: pointer;
-        position: relative;
+.systr {
+    cursor: pointer;
+    position: relative;
+}
+
+    .systr:after {
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #ccc;
+        content: "";
+        position: absolute;
+        top: 2px;
+        margin: 10px;
     }
 
-        .systems h2:after {
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid #ccc;
-            content: "";
-            position: absolute;
-            top: 2px;
-            margin: 10px;
-        }
-
-        .systems h2:hover:after {
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid #333;
-            content: "";
-        }
+    .systr:hover:after {
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #333;
+        content: "";
+    }
 
 .system-info {
     display: none;
@@ -5153,6 +5148,14 @@ a.help {
     border: 1px solid #ccc;
     padding: 15px;
     border-radius: 4px;
+}
+
+.system-info-full {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 20px;
 }
 
 #filter {
@@ -5195,6 +5198,14 @@ a.help {
     background: #7e7e7e;
     color: #fff;
 }
+
+.systems td {
+    padding: 5px 0;
+}
+
+    .systems td:first-child {
+        width: 180px;
+    }
 
 @media only screen and (max-width:800px) {
     .wrapper, #slideshow, .slideshow, .slide {
