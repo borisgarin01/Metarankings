@@ -43,24 +43,19 @@ else
         }
     </div>
 
-    <div class="row">
-        <ul class="pagination">
+    <div class="pagination">
+        <div class="navi">
             @if (Page > 1)
             {
-                <li class="page-item">
-                    <a class="page-link" href="#" @onclick="@(() => RefreshGotGames(pageNumber: Page-1))">@(Page - 1)</a>
-                </li>
+                <a class="page-numbers" @onclick="@(async () => {Page=Page-1; NavigationManager.NavigateTo($"/{Page}"); await RefreshGotGames(PageSize, Page);})">@(Page - 1)</a>
             }
-            <li class="page-item active">
-                <a class="page-link" href="#" @onclick="@(() => RefreshGotGames(pageNumber: Page))"><span class="sr-only">@Page</span></a>
-            </li>
+            <span class="page-numbers current">@Page</span>
+
             @if (Games.Count() == PageSize)
             {
-                <li class="page-item">
-                    <a class="page-link" href="#" @onclick="@(() => RefreshGotGames(pageNumber: Page+1))">@(Page + 1)</a>
-                </li>
+                <a class="page-numbers" @onclick="@(async () => {Page=Page+1; NavigationManager.NavigateTo($"/{Page}"); await RefreshGotGames(PageSize, Page);})">@(Page + 1)</a>
             }
-        </ul>
+        </div>
     </div>
 }
 
@@ -78,10 +73,9 @@ else
 
     private async Task RefreshGotGames(int pageSize = 10, int pageNumber = 1)
     {
-        NavigationManager.NavigateTo($"/{pageNumber}");
+        PageSize = pageSize;
         Page = pageNumber;
         Games = await GetGamesAsync(PageSize, Page);
-        await LocalStorageService.SetItemAsync<Game[]>("games", Games);
     }
 
     private async Task<Game[]> GetGamesAsync(int pageSize = 10, int pageNumber = 1)
