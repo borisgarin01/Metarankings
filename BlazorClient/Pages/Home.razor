@@ -1,4 +1,5 @@
 ﻿@page "/"
+@page "/{PageSize:int}/{PageNumber:int}"
 
 @if (Games is null)
 {
@@ -21,5 +22,12 @@ else
                                                       Score="@game.Score"
                                                       ScoresCount="@game.ScoresCount" />
     }
-
+    @if (PageNumber > 1)
+    {
+        <a href="/@(PageSize)/@(PageNumber-1)">Пред.</a>
+    }
+    @if(Games.Count()==PageSize)
+    {
+        <a href="/@(PageSize)/@(PageNumber+1)">След.</a>
+    }
 }

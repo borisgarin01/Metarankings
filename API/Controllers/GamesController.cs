@@ -21,9 +21,18 @@ public sealed class GamesController : ControllerBase
     {
         using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
         {
-
             var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(fileStream, jsonSerializerOptions);
             games = games!.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+            return Ok(games);
+        }
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Game>>> GetAsync()
+    {
+        using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
+        {
+            var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(fileStream, jsonSerializerOptions);
             return Ok(games);
         }
     }
