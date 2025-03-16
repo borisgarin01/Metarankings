@@ -1,6 +1,7 @@
 ﻿namespace Domain;
 public sealed record Game
 {
+    public long Id { get; set; }
     public required string Href { get; set; }
     public required string Name { get; set; }
     public required string Image { get; set; }

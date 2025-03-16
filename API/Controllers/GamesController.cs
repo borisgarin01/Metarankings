@@ -16,8 +16,8 @@ public sealed class GamesController : ControllerBase
         jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
     }
 
-    [HttpGet("{pageNumber}/{pageSize}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAsync(ushort pageNumber = 1, byte pageSize = 5)
+    [HttpGet("{pageNumber:int}/{pageSize:int}")]
+    public async Task<ActionResult<IEnumerable<Game>>> GetAsync(int pageNumber = 1, int pageSize = 5)
     {
         using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
         {
@@ -34,6 +34,19 @@ public sealed class GamesController : ControllerBase
         {
             var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(fileStream, jsonSerializerOptions);
             return Ok(games);
+        }
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<Game>> GetAsync(int id)
+    {
+        using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
+        {
+            var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(fileStream, jsonSerializerOptions);
+            var game = games.FirstOrDefault(a => a.Id == id);
+            if (game is null)
+                return NotFound();
+            return Ok(game);
         }
     }
 }

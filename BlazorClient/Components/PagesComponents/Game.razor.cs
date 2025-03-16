@@ -5,6 +5,9 @@ namespace BlazorClient.Components.PagesComponents;
 public partial class Game
 {
     [Parameter, EditorRequired]
+    public int Id { get; set; }
+
+    [Parameter, EditorRequired]
     public required string Href { get; set; }
 
     [Parameter, EditorRequired]

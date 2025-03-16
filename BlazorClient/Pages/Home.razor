@@ -1,6 +1,9 @@
 ﻿@page "/"
 @page "/{PageSize:int}/{PageNumber:int}"
 
+<Headerer />
+<GameMenu />
+
 @if (Games is null)
 {
     <p>Loading...</p>
@@ -9,7 +12,8 @@ else
 {
     foreach (var game in Games)
     {
-        <BlazorClient.Components.PagesComponents.Game Name="@game.Name"
+        <BlazorClient.Components.PagesComponents.Game Id="@game.Id"
+                                                      Name="@game.Name"
                                                       Description="@game.Description"
                                                       Developers="@game.Developers"
                                                       Genres="@game.Genres"
@@ -26,7 +30,7 @@ else
     {
         <a href="/@(PageSize)/@(PageNumber-1)">Пред.</a>
     }
-    @if(Games.Count()==PageSize)
+    @if (Games.Count() == PageSize)
     {
         <a href="/@(PageSize)/@(PageNumber+1)">След.</a>
     }
