@@ -1,0 +1,11 @@
+﻿.vs
+API/bin
+API/obj
+BlazorClient/bin
+*.user
+BlazorClient/obj
+Data/bin
+Data/obj
+Domain/bin
+Domain/obj
+*.sln

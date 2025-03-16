@@ -1,0 +1,71 @@
+﻿<div class="post single clear game" id="post_25943">
+    <div class="post-meta">
+        <h1><span itemprop="name">@Name</span></h1>
+        <meta itemprop="headline" content="WWE 2K25">
+        <meta itemprop="description" content="@Description">
+        <link itemprop="url" href="@Href">
+        <meta itemprop="dateCreated" content="@ReleaseDate!.Value.Year">
+    </div>
+    <div class="post-content">
+        <div class="thumb">
+            <img class="post-image" src="@Image" alt="Игра @Name" title="Игра @Name" itemprop="image">
+            <div class="watch-trailer">
+                <h3><span class="twatch"><span class="p-twatch">Смотреть трейлер</span></span></h3>
+            </div>
+        </div>
+        <div id="ratings">
+            <div class="ratings mark-0">
+                <div id="post-ratings-25943" class="post-ratings" data-nonce="55e8cd6520">
+                    <div class="rating">
+                        <div class="score">
+                            @Score!.Value
+                        </div>
+                        Оценки: <span>@ScoresCount!.Value</span>
+                    </div>
+                    <div class="your-score">
+                        <img id="rating_25943_1" class="rating-on mark-1" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="1" onmouseover="current_rating(25943, 1, '1');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;"><img id="rating_25943_2" class="rating-on mark-2" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="2" onmouseover="current_rating(25943, 2, '2');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;"><img id="rating_25943_3" class="rating-on mark-3" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="3" onmouseover="current_rating(25943, 3, '3');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;"><img id="rating_25943_4" class="rating-on mark-4" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="4" onmouseover="current_rating(25943, 4, '4');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;"><img id="rating_25943_5" class="rating-on mark-5" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="5" onmouseover="current_rating(25943, 5, '5');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;"><img id="rating_25943_6" class="rating-on mark-6" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="6" onmouseover="current_rating(25943, 6, '6');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;"><img id="rating_25943_7" class="rating-on mark-7" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="7" onmouseover="current_rating(25943, 7, '7');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;"><img id="rating_25943_8" class="rating-on mark-8" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="8" onmouseover="current_rating(25943, 8, '8');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;"><img id="rating_25943_9" class="rating-on mark-9" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="9" onmouseover="current_rating(25943, 9, '9');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;"><img id="rating_25943_10" class="rating-on mark-10" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="10" onmouseover="current_rating(25943, 10, '10');" onmouseout="ratings_off(0, 0, 0);" onclick="rate_post();" onkeypress="rate_post();" style="cursor: pointer;"> <span class="post-ratings-text" id="ratings_25943_text" style="display: none;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="featured-game">
+            <p>
+                <span class="label">Разработчик:</span> @foreach (var developer in Developers)
+                {
+                    <a itemprop="author" href="/razrabotchiki/visual_concepts/">@developer</a>
+                } ...
+            </p>
+            <p><span class="label">Издатель:</span> <a itemprop="publisher" href="/izdateli/2k_games/">@Publisher</a> </p>
+            <p>
+                <span class="label">Платформы:</span> <span itemprop="gamePlatform">
+                    @foreach (var platform in Platforms)
+                    {
+                        <a href="https://metarankings.ru/meta/games/pc/">@platform</a>
+
+                        <text>, </text>
+                    }
+                </span>
+            </p>
+            <p>
+                <span class="label">Жанр:</span> <span itemprop="genre">
+                    @foreach (var genre in Genres)
+                    {
+                        <a href="https://metarankings.ru/meta/games/pc/">@genre</a>
+
+                        <text>, </text>
+                    }
+                </span>
+            </p>
+            <p><span class="label">Локализация:</span> <span itemprop="inLanguage">@Localization</span></p>
+            <p><span class="label">Дата выхода:</span> <span>14 марта 2025</span></p>
+        </div>
+
+        <div class="description">
+            <h3>Описание</h3>
+            <div>
+                <p>@Description</p>
+            </div>
+        </div>
+    </div>
+</div>
