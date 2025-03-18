@@ -35,13 +35,7 @@
         </div>
 
         <div class="featured-game">
-            <p>
-                <span class="label">Разработчик:</span>
-                @foreach (var developer in Game.Developers)
-                {
-                    <a itemprop="author" href="/razrabotchiki/naughty_dog/">@developer</a>
-                }
-            </p>
+            <BlazorClient.Components.PagesComponents.GameDevelopers Developers="@Game.Developers" />
             <p><span class="label">Издатель:</span> <a itemprop="publisher" href="/izdateli/sony_computer_entertainment/">@Game.Publisher</a> </p>
             <p>
                 <span class="label">Платформы:</span> <span itemprop="gamePlatform">
