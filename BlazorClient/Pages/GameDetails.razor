@@ -36,15 +36,8 @@
 
         <div class="featured-game">
             <BlazorClient.Components.PagesComponents.GameDevelopers Developers="@Game.Developers" />
-            <p><span class="label">Издатель:</span> <a itemprop="publisher" href="/izdateli/sony_computer_entertainment/">@Game.Publisher</a> </p>
-            <p>
-                <span class="label">Платформы:</span> <span itemprop="gamePlatform">
-                    @foreach (var platform in Game.Platforms)
-                    {
-                        <a href="https://metarankings.ru/meta/games/ps4/">@platform</a>
-                    }
-                </span>
-            </p>
+            <BlazorClient.Components.PagesComponents.GamePublisher Publisher="@Game.Publisher" />
+            <BlazorClient.Components.PagesComponents.GamePlatforms Platforms="@Game.Platforms" />
             <p>
                 <span class="label">Жанр:</span> <span itemprop="genre">
                     @foreach (var genre in Game.Genres)
