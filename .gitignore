@@ -9,3 +9,4 @@ Data/obj
 Domain/bin
 Domain/obj
 *.sln
+BlazorClient/Publish

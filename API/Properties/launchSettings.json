@@ -23,6 +23,13 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+    "IIS": {
+      "commandName": "IIS",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
     "Container (Dockerfile)": {
       "commandName": "Docker",
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
@@ -41,6 +48,10 @@
     "iisExpress": {
       "applicationUrl": "http://localhost:56408/",
       "sslPort": 44312
+    },
+    "iis": {
+      "applicationUrl": "https://localhost:5001/",
+      "sslPort": 44313
     }
   }
 }
