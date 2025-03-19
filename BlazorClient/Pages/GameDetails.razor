@@ -10,8 +10,7 @@
     </div>
     <div class="post-content">
         <div class="thumb">
-            @Game.Images.
-            <img class="post-image" src="@Game.Images" alt="Игра @Game.Name" title="Игра @Game.Name" itemprop="image">
+            <img class="post-image" src="@Game.Images.First().Href" alt="Игра @Game.Name" title="Игра @Game.Name" itemprop="image">
             <div class="best-prod">
                 <span class="star">★</span> Лучшие в @Game.ReleaseDate.Value.Year году <span class="inform">?</span>
             </div>
