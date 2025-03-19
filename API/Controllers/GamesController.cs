@@ -13,7 +13,7 @@ public sealed class GamesController : ControllerBase
 
     public GamesController()
     {
-        jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
+        jsonSerializerOptions.Converters.Add(new DateTimeJsonConverter("yyyy-MM-dd"));
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]

@@ -1,0 +1,28 @@
+﻿<div class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+    <a href="/games/Details/@Game.Id" title="Игра @Game.Name" class="thumb"><img class="post-image" src="@Game.Images.First().Href" alt="Игра @Game.Name"></a>
+    <div class="best-prod">
+        <div class="counter" itemprop="position">1</div>
+        <span class="star">★</span>
+    </div>
+    <div itemprop="item" itemscope="" itemtype="https://schema.org/VideoGame">
+        <link itemprop="url" href="/games/Details/@Game.Id">
+        <link itemprop="image" href="@Game.Images.First().Href">
+        <meta itemprop="dateCreated" content="@Game.ReleaseDate!.Value.Year">
+        <h3 itemprop="name"><a class="name" href="/games/Details/@Game.Id">@Game.Name</a></h3>
+        <div class="post-meta"><p>@Game.Publisher.Name</p></div>
+        <div class="post-meta">
+            @foreach (var platform in Game.Platforms)
+            {
+                <p itemprop="gamePlatform">@platform.Name</p>
+            }
+        </div>
+        <div class="post-meta"><p itemprop="genre">@string.Join(", ", Game.Genres.Select(a => a.Name))</p></div>
+    </div>
+    <div class="trailer" data-video="/games/Details/@Game.Id/#content-trailer"></div>
+    <div class="ratings-graph">
+        <div class="graph">
+            <div class="small-score mark-@Math.Round(Game.Score.Value)">@Game.Score.Value</div>
+            <div class="graph-body"><div style="width:100%" class="rating-graph mark-@Math.Round(Game.Score.Value)"></div></div>
+        </div>
+    </div>
+</div>

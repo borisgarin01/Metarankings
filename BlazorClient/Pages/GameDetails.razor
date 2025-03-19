@@ -10,7 +10,8 @@
     </div>
     <div class="post-content">
         <div class="thumb">
-            <img class="post-image" src="@Game.Image" alt="Игра @Game.Name" title="Игра @Game.Name" itemprop="image">
+            @Game.Images.
+            <img class="post-image" src="@Game.Images" alt="Игра @Game.Name" title="Игра @Game.Name" itemprop="image">
             <div class="best-prod">
                 <span class="star">★</span> Лучшие в @Game.ReleaseDate.Value.Year году <span class="inform">?</span>
             </div>
@@ -35,18 +36,10 @@
         </div>
 
         <div class="featured-game">
-            <BlazorClient.Components.PagesComponents.GameDevelopers Developers="@Game.Developers" />
-            <BlazorClient.Components.PagesComponents.GamePublisher Publisher="@Game.Publisher" />
-            <BlazorClient.Components.PagesComponents.GamePlatforms Platforms="@Game.Platforms" />
-            <p>
-                <span class="label">Жанр:</span> <span itemprop="genre">
-                    @foreach (var genre in Game.Genres)
-                    {
-                        <a href="https://metarankings.ru/genre/priklyuchenie/">@genre</a>
-                        <text>, </text>
-                    }
-                </span>
-            </p>
+            <BlazorClient.Components.PagesComponents.GameDevelopers Developers="@Game.Developers.Select(a=>a.Name)" />
+            <BlazorClient.Components.PagesComponents.GamePublisher Publisher="@Game.Publisher.Name" />
+            <BlazorClient.Components.PagesComponents.GamePlatforms Platforms="@Game.Platforms.Select(a=>a.Name)" />
+            <BlazorClient.Components.PagesComponents.GamesGenres Genres="@Game.Genres.Select(a=>a.Name)" />
             <p><span class="label">Локализация:</span> <span itemprop="inLanguage"><a>@Game.Localization</a></span></p>
             <p><span class="label">Дата выхода:</span> <span>@Game.ReleaseDate.Value.ToString("dd MMMM yyyy")</span></p>
         </div>

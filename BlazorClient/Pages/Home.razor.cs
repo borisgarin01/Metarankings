@@ -9,7 +9,7 @@ public partial class Home : ComponentBase
     [Inject]
     public HttpClient HttpClient { get; set; }
 
-    public IEnumerable<Game> Games { get; set; }
+    public IEnumerable<Domain.Game> Games { get; set; }
 
     [Parameter]
     public int PageSize { get; set; } = 5; // Default value
@@ -19,11 +19,7 @@ public partial class Home : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        if (PageNumber < 1)
-            PageNumber = 1;
-        if (PageSize < 1)
-            PageSize = 5;
         // Fetch data based on the current PageSize and PageNumber
-        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/{PageNumber}/{PageSize}");
+        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Domain.Game>>($"/api/Games");
     }
 }

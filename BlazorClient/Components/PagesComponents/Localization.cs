@@ -2,8 +2,11 @@
 
 namespace BlazorClient.Components.PagesComponents;
 
-public partial class GamePlatforms
+public class Localization
 {
     [Parameter]
-    public IEnumerable<string> Platforms { get; set; }
+    public long Id { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
 }

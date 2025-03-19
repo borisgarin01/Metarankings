@@ -5,5 +5,5 @@ namespace BlazorClient.Components.PagesComponents;
 public partial class GameDevelopers
 {
     [Parameter]
-    public string[] Developers { get; set; }
+    public IEnumerable<string> Developers { get; set; }
 }

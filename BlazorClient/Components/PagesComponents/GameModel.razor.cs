@@ -2,8 +2,8 @@
 
 namespace BlazorClient.Components.PagesComponents;
 
-public partial class GamePlatforms
+public partial class GameModel
 {
     [Parameter]
-    public IEnumerable<string> Platforms { get; set; }
+    public Domain.Game Game { get; set; }
 }
