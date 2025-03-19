@@ -49,5 +49,256 @@
     "LocalizationId": 1,
     "ReleaseDate": "2014-07-30",
     "Description": "The Last of Us: Remastered — это переиздание лучшей игры 2013 для PlayStation 3 — The Last of Us, которое будет иметь более большее разрешение 1080p, модели более высокого разрешения, новые тени и освещение, обновленные текстуры и множество других улучшений. \nСюжет The Last of Us: Remastered отправит вас в пост-апокалиптический зараженный мир, где люди превращаются в зомби-мутантов, но не они ваш главный враг, а выжившие люди. \nВ обновленную версии The Last of Us для PS4 также войдут внутриигровое видео с комментариями от Нила Дракманна (сценарист, арт-директор игры) и тонна дополнительного контента из оригинала."
+  },
+  {
+    "Id": 2,
+    "Href": "https://metarankings.ru/uncharted-4-a-thiefs-end/",
+    "Name": "Uncharted 4: A Thief’s End",
+    "Images": [
+      {
+        "Id": 2,
+        "GameId": 2,
+        "Href": "https://metarankings.ru/images/uploads/2016/05/uncharted-4-a-thiefs-end-boxart-cover.jpg"
+      }
+    ],
+    "Score": 8.7,
+    "ScoresCount": 1900,
+    "Developers": [
+      {
+        "Id": 1,
+        "Name": "Naughty Dog"
+      }
+    ],
+    "Publisher": {
+      "Id": 1,
+      "Name": "Sony Computer Entertainment"
+    },
+    "Platforms": [
+      {
+        "Id": 1,
+        "Name": "PS4"
+      }
+    ],
+    "Genres": [
+      {
+        "Id": 1,
+        "Name": "Приключение"
+      },
+      {
+        "Id": 3,
+        "Name": "Экшен"
+      }
+    ],
+    "Localization": {
+      "Id": 1,
+      "Name": "Полностью на русском языке"
+    },
+    "LocalizationId": 1,
+    "ReleaseDate": "2016-05-10",
+    "Description": "Игра Uncharted 4: A Thief’s End — это новая, четвертая часть популярного приключенческого экшена о Нейтане Дрейке, которая разрабатывается для PlayStation 4. Натан Дрейк возвращается с обновленной графикой, 1080p разрешением и совершенно новой историей. Благодаря мощи системы нового поколения PS4, модель Дрейка в Uncharted 4 намного превосходит модели из PS3-версий серии и имеет в два раза больше полигонов. На этот раз, Дрейк должен отыскать легендарное пиратское сокровище. Опасное путешествие подвергнет героя не только суровому физическому испытанию, но заставит его пожертвовать многим, чтобы спасти тех, кем он дорожит. Натан Дрейк нового поколения в Uncharted 4: A Thief’s End более реалистичен. Он вынужден будет вернуться в оставленный мир воров, отправившись в свое величайшее приключение, проверяя свои физические возможности и решимость. Он проверит себя, на что готов и чем готов пожертвовать, чтобы сохранить тех, кого он любит."
+  },
+  {
+    "Id": 1,
+    "Href": "https://metarankings.ru/games/the-last-of-us",
+    "Name": "The Last of Us",
+    "Images": [
+      {
+        "Id": 1,
+        "GameId": 1,
+        "Href": "https://metarankings.ru/images/uploads/2014/07/the-last-of-us-remastered-boxart-cover.jpg"
+      }
+    ],
+    "Score": 10,
+    "ScoresCount": 1200,
+    "Developers": [
+      {
+        "Id": 1,
+        "Name": "Naughty Dog"
+      }
+    ],
+    "Publisher": {
+      "Id": 1,
+      "Name": "Sony Computer Entertainment"
+    },
+    "Platforms": [
+      {
+        "Id": 2,
+        "Name": "PS3"
+      }
+    ],
+    "Genres": [
+      {
+        "Id": 1,
+        "Name": "Приключение"
+      },
+      {
+        "Id": 2,
+        "Name": "Хоррор"
+      },
+      {
+        "Id": 3,
+        "Name": "Экшен"
+      }
+    ],
+    "Localization": {
+      "Id": 1,
+      "Name": "Полностью на русском языке"
+    },
+    "LocalizationId": 1,
+    "ReleaseDate": "2014-07-30",
+    "Description": "The Last of Us: Remastered — это переиздание лучшей игры 2013 для PlayStation 3 — The Last of Us, которое будет иметь более большее разрешение 1080p, модели более высокого разрешения, новые тени и освещение, обновленные текстуры и множество других улучшений. \nСюжет The Last of Us: Remastered отправит вас в пост-апокалиптический зараженный мир, где люди превращаются в зомби-мутантов, но не они ваш главный враг, а выжившие люди. \nВ обновленную версии The Last of Us для PS4 также войдут внутриигровое видео с комментариями от Нила Дракманна (сценарист, арт-директор игры) и тонна дополнительного контента из оригинала."
+  },
+  {
+    "Id": 1,
+    "Href": "https://metarankings.ru/games/the-last-of-us",
+    "Name": "The Last of Us",
+    "Images": [
+      {
+        "Id": 1,
+        "GameId": 1,
+        "Href": "https://metarankings.ru/images/uploads/2014/07/the-last-of-us-remastered-boxart-cover.jpg"
+      }
+    ],
+    "Score": 10,
+    "ScoresCount": 1200,
+    "Developers": [
+      {
+        "Id": 1,
+        "Name": "Naughty Dog"
+      }
+    ],
+    "Publisher": {
+      "Id": 1,
+      "Name": "Sony Computer Entertainment"
+    },
+    "Platforms": [
+      {
+        "Id": 1,
+        "Name": "PS4"
+      }
+    ],
+    "Genres": [
+      {
+        "Id": 1,
+        "Name": "Приключение"
+      },
+      {
+        "Id": 2,
+        "Name": "Хоррор"
+      },
+      {
+        "Id": 3,
+        "Name": "Экшен"
+      }
+    ],
+    "Localization": {
+      "Id": 1,
+      "Name": "Полностью на русском языке"
+    },
+    "LocalizationId": 1,
+    "ReleaseDate": "2014-07-30",
+    "Description": "The Last of Us: Remastered — это переиздание лучшей игры 2013 для PlayStation 3 — The Last of Us, которое будет иметь более большее разрешение 1080p, модели более высокого разрешения, новые тени и освещение, обновленные текстуры и множество других улучшений. \nСюжет The Last of Us: Remastered отправит вас в пост-апокалиптический зараженный мир, где люди превращаются в зомби-мутантов, но не они ваш главный враг, а выжившие люди. \nВ обновленную версии The Last of Us для PS4 также войдут внутриигровое видео с комментариями от Нила Дракманна (сценарист, арт-директор игры) и тонна дополнительного контента из оригинала."
+  },
+  {
+    "Id": 1,
+    "Href": "https://metarankings.ru/games/the-last-of-us",
+    "Name": "The Last of Us",
+    "Images": [
+      {
+        "Id": 1,
+        "GameId": 1,
+        "Href": "https://metarankings.ru/images/uploads/2014/07/the-last-of-us-remastered-boxart-cover.jpg"
+      }
+    ],
+    "Score": 10,
+    "ScoresCount": 1200,
+    "Developers": [
+      {
+        "Id": 1,
+        "Name": "Naughty Dog"
+      }
+    ],
+    "Publisher": {
+      "Id": 1,
+      "Name": "Sony Computer Entertainment"
+    },
+    "Platforms": [
+      {
+        "Id": 1,
+        "Name": "PS4"
+      }
+    ],
+    "Genres": [
+      {
+        "Id": 1,
+        "Name": "Приключение"
+      },
+      {
+        "Id": 2,
+        "Name": "Хоррор"
+      },
+      {
+        "Id": 3,
+        "Name": "Экшен"
+      }
+    ],
+    "Localization": {
+      "Id": 1,
+      "Name": "Полностью на русском языке"
+    },
+    "LocalizationId": 1,
+    "ReleaseDate": "2014-07-30",
+    "Description": "The Last of Us: Remastered — это переиздание лучшей игры 2013 для PlayStation 3 — The Last of Us, которое будет иметь более большее разрешение 1080p, модели более высокого разрешения, новые тени и освещение, обновленные текстуры и множество других улучшений. \nСюжет The Last of Us: Remastered отправит вас в пост-апокалиптический зараженный мир, где люди превращаются в зомби-мутантов, но не они ваш главный враг, а выжившие люди. \nВ обновленную версии The Last of Us для PS4 также войдут внутриигровое видео с комментариями от Нила Дракманна (сценарист, арт-директор игры) и тонна дополнительного контента из оригинала."
+  },
+  {
+    "Id": 1,
+    "Href": "https://metarankings.ru/games/the-last-of-us",
+    "Name": "The Last of Us",
+    "Images": [
+      {
+        "Id": 1,
+        "GameId": 1,
+        "Href": "https://metarankings.ru/images/uploads/2014/07/the-last-of-us-remastered-boxart-cover.jpg"
+      }
+    ],
+    "Score": 10,
+    "ScoresCount": 1200,
+    "Developers": [
+      {
+        "Id": 1,
+        "Name": "Naughty Dog"
+      }
+    ],
+    "Publisher": {
+      "Id": 1,
+      "Name": "Sony Computer Entertainment"
+    },
+    "Platforms": [
+      {
+        "Id": 1,
+        "Name": "PS4"
+      }
+    ],
+    "Genres": [
+      {
+        "Id": 1,
+        "Name": "Приключение"
+      },
+      {
+        "Id": 2,
+        "Name": "Хоррор"
+      },
+      {
+        "Id": 3,
+        "Name": "Экшен"
+      }
+    ],
+    "Localization": {
+      "Id": 1,
+      "Name": "Полностью на русском языке"
+    },
+    "LocalizationId": 1,
+    "ReleaseDate": "2014-07-30",
+    "Description": "The Last of Us: Remastered — это переиздание лучшей игры 2013 для PlayStation 3 — The Last of Us, которое будет иметь более большее разрешение 1080p, модели более высокого разрешения, новые тени и освещение, обновленные текстуры и множество других улучшений. \nСюжет The Last of Us: Remastered отправит вас в пост-апокалиптический зараженный мир, где люди превращаются в зомби-мутантов, но не они ваш главный враг, а выжившие люди. \nВ обновленную версии The Last of Us для PS4 также войдут внутриигровое видео с комментариями от Нила Дракманна (сценарист, арт-директор игры) и тонна дополнительного контента из оригинала."
   }
 ]
