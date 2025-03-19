@@ -1,105 +1,53 @@
 [
   {
     "Id": 1,
-    "Href": "https://example.com/games/1",
-    "Name": "Sample Game 1",
+    "Href": "https://metarankings.ru/games/the-last-of-us",
+    "Name": "The Last of Us",
     "Images": [
       {
-        "Id": 101,
+        "Id": 1,
         "GameId": 1,
-        "Href": "https://example.com/images/101"
-      },
-      {
-        "Id": 102,
-        "GameId": 1,
-        "Href": "https://example.com/images/102"
+        "Href": "https://metarankings.ru/images/uploads/2014/07/the-last-of-us-remastered-boxart-cover.jpg"
       }
     ],
-    "Score": 9.5,
+    "Score": 10,
     "ScoresCount": 1200,
     "Developers": [
       {
-        "Id": 201,
-        "Name": "Developer A"
-      },
-      {
-        "Id": 202,
-        "Name": "Developer B"
+        "Id": 1,
+        "Name": "Naughty Dog"
       }
     ],
     "Publisher": {
-      "Id": 301,
-      "Name": "Publisher X"
+      "Id": 1,
+      "Name": "Sony Computer Entertainment"
     },
     "Platforms": [
       {
-        "Id": 401,
-        "Name": "PC"
-      },
-      {
-        "Id": 402,
-        "Name": "PlayStation 5"
+        "Id": 1,
+        "Name": "PS4"
       }
     ],
     "Genres": [
       {
-        "Id": 501,
-        "Name": "Action"
+        "Id": 1,
+        "Name": "Приключение"
       },
       {
-        "Id": 502,
-        "Name": "Adventure"
+        "Id": 2,
+        "Name": "Хоррор"
+      },
+      {
+        "Id": 3,
+        "Name": "Экшен"
       }
     ],
     "Localization": {
-      "Id": 601,
-      "Name": "English"
+      "Id": 1,
+      "Name": "Полностью на русском языке"
     },
-    "LocalizationId": 601,
-    "ReleaseDate": "2023-10-15",
-    "Description": "An exciting action-adventure game with stunning visuals."
-  },
-  {
-    "Id": 2,
-    "Href": "https://example.com/games/2",
-    "Name": "Sample Game 2",
-    "Images": [
-      {
-        "Id": 103,
-        "GameId": 2,
-        "Href": "https://example.com/images/103"
-      }
-    ],
-    "Score": 8.7,
-    "ScoresCount": 950,
-    "Developers": [
-      {
-        "Id": 203,
-        "Name": "Developer C"
-      }
-    ],
-    "Publisher": {
-      "Id": 302,
-      "Name": "Publisher Y"
-    },
-    "Platforms": [
-      {
-        "Id": 403,
-        "Name": "Xbox Series X"
-      }
-    ],
-    "Genres": [
-      {
-        "Id": 503,
-        "Name": "RPG"
-      }
-    ],
-    "Localization": {
-      "Id": 602,
-      "Name": "French"
-    },
-    "LocalizationId": 602,
-    "ReleaseDate": "2023-11-20",
-    "Description": "A deep role-playing game with immersive storytelling."
+    "LocalizationId": 1,
+    "ReleaseDate": "2014-07-30",
+    "Description": "The Last of Us: Remastered — это переиздание лучшей игры 2013 для PlayStation 3 — The Last of Us, которое будет иметь более большее разрешение 1080p, модели более высокого разрешения, новые тени и освещение, обновленные текстуры и множество других улучшений. \nСюжет The Last of Us: Remastered отправит вас в пост-апокалиптический зараженный мир, где люди превращаются в зомби-мутантов, но не они ваш главный враг, а выжившие люди. \nВ обновленную версии The Last of Us для PS4 также войдут внутриигровое видео с комментариями от Нила Дракманна (сценарист, арт-директор игры) и тонна дополнительного контента из оригинала."
   }
 ]
