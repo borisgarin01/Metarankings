@@ -39,7 +39,7 @@
             <BlazorClient.Components.PagesComponents.GamePublisher Publisher="@Game.Publisher.Name" />
             <BlazorClient.Components.PagesComponents.GamePlatforms Platforms="@Game.Platforms.Select(a=>a.Name)" />
             <BlazorClient.Components.PagesComponents.GamesGenres Genres="@Game.Genres.Select(a=>a.Name)" />
-            <p><span class="label">Локализация:</span> <span itemprop="inLanguage"><a>@Game.Localization</a></span></p>
+            <p><span class="label">Локализация:</span> <span itemprop="inLanguage"><a>@Game.Localization.Name</a></span></p>
             <p><span class="label">Дата выхода:</span> <span>@Game.ReleaseDate.Value.ToString("dd MMMM yyyy")</span></p>
         </div>
 
