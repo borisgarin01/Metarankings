@@ -11,7 +11,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Приключение",
@@ -45,7 +48,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS3"
+      {
+        "Name": "PS3",
+        "Url": "https://metarankings.ru/meta/games/ps3/"
+      }
     ],
     "Genres": [
       "Хоррор",
@@ -78,7 +84,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Приключение",
@@ -123,7 +132,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Приключение",
@@ -192,10 +204,22 @@
     ],
     "Publisher": "Namco Bandai Games",
     "Platforms": [
-      "PC",
-      "PS4",
-      "Switch",
-      "Xbox One"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
+      {
+        "Name": "Switch",
+        "Url": "https://metarankings.ru/meta/games/switch/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      }
     ],
     "Genres": [
       "РПГ"
@@ -239,9 +263,18 @@
     ],
     "Publisher": "Rockstar Games",
     "Platforms": [
-      "PC",
-      "PS4",
-      "Xbox One"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      }
     ],
     "Genres": [
       "Приключение",
@@ -270,9 +303,18 @@
     ],
     "Publisher": "Rockstar Games",
     "Platforms": [
-      "PC",
-      "PS4",
-      "Xbox One"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      }
     ],
     "Genres": [
       "Экшен"
@@ -312,8 +354,14 @@
     ],
     "Publisher": "Rockstar Games",
     "Platforms": [
-      "PS3",
-      "Xbox 360"
+      {
+        "Name": "PS3",
+        "Url": "https://metarankings.ru/meta/games/ps3/"
+      },
+      {
+        "Name": "Xbox 360",
+        "Url": "https://metarankings.ru/meta/games/xbox-360/"
+      }
     ],
     "Genres": [
       "Экшен"
@@ -341,7 +389,10 @@
     ],
     "Publisher": "Larian Studios",
     "Platforms": [
-      "PC"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      }
     ],
     "Genres": [
       "РПГ"
@@ -369,8 +420,14 @@
     ],
     "Publisher": "Rockstar Games",
     "Platforms": [
-      "PS3",
-      "Xbox 360"
+      {
+        "Name": "PS3",
+        "Url": "https://metarankings.ru/meta/games/ps3/"
+      },
+      {
+        "Name": "Xbox 360",
+        "Url": "https://metarankings.ru/meta/games/xbox-360/"
+      }
     ],
     "Genres": [
       "Экшен"
@@ -398,8 +455,14 @@
     ],
     "Publisher": "Nintendo",
     "Platforms": [
-      "Switch",
-      "Wii U"
+      {
+        "Name": "Switch",
+        "Url": "https://metarankings.ru/meta/games/switch/"
+      },
+      {
+        "Name": "Wii U",
+        "Url": "https://metarankings.ru/meta/games/wii-u/"
+      }
     ],
     "Genres": [
       "Приключение",
@@ -445,10 +508,22 @@
     ],
     "Publisher": "CD Projekt RED",
     "Platforms": [
-      "PC",
-      "PS4",
-      "Switch",
-      "Xbox One"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
+      {
+        "Name": "Switch",
+        "Url": "https://metarankings.ru/meta/games/switch/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      }
     ],
     "Genres": [
       "РПГ"
@@ -490,7 +565,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -512,9 +590,18 @@
     ],
     "Publisher": "Capcom",
     "Platforms": [
-      "PC",
-      "PS4",
-      "Xbox One"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      }
     ],
     "Genres": [
       "Хоррор",
@@ -536,11 +623,26 @@
     ],
     "Publisher": "Bandai Namco Entertainment",
     "Platforms": [
-      "PC",
-      "PS4",
-      "PS5",
-      "Xbox One",
-      "Xbox Series X"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
+      {
+        "Name": "PS5",
+        "Url": "https://metarankings.ru/meta/games/ps5/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      },
+      {
+        "Name": "Xbox Series X",
+        "Url": "https://metarankings.ru/meta/games/xbox-series-x/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -562,8 +664,14 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PC",
-      "PS4"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Приключение",
@@ -587,7 +695,10 @@
     ],
     "Publisher": "Sony Interactive Entertainment",
     "Platforms": [
-      "PS5"
+      {
+        "Name": "PS5",
+        "Url": "https://metarankings.ru/meta/games/ps5/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -609,7 +720,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Приключение",
@@ -631,7 +745,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS3"
+      {
+        "Name": "PS3",
+        "Url": "https://metarankings.ru/meta/games/ps3/"
+      }
     ],
     "Genres": [
       "Приключение",
@@ -653,7 +770,10 @@
     ],
     "Publisher": "Valve",
     "Platforms": [
-      "PC"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      }
     ],
     "Genres": [
       "Головоломка",
@@ -675,9 +795,18 @@
     ],
     "Publisher": "ZAUM",
     "Platforms": [
-      "PC",
-      "PS4",
-      "Xbox One"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      }
     ],
     "Genres": [
       "РПГ"
@@ -698,7 +827,10 @@
     ],
     "Publisher": "Larian Studios",
     "Platforms": [
-      "PC"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -720,8 +852,14 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PC",
-      "PS4"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -743,10 +881,22 @@
     ],
     "Publisher": "CD Projekt RED",
     "Platforms": [
-      "PC",
-      "PS4",
-      "Switch",
-      "Xbox One"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
+      {
+        "Name": "Switch",
+        "Url": "https://metarankings.ru/meta/games/switch/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      }
     ],
     "Genres": [
       "РПГ"
@@ -767,7 +917,10 @@
     ],
     "Publisher": "Nintendo",
     "Platforms": [
-      "Switch"
+      {
+        "Name": "Switch",
+        "Url": "https://metarankings.ru/meta/games/switch/"
+      }
     ],
     "Genres": [
       "Аркада",
@@ -789,7 +942,10 @@
     ],
     "Publisher": "Microsoft Game Studios",
     "Platforms": [
-      "Xbox 360"
+      {
+        "Name": "Xbox 360",
+        "Url": "https://metarankings.ru/meta/games/xbox-360/"
+      }
     ],
     "Genres": [
       "Экшен"
@@ -810,8 +966,14 @@
     ],
     "Publisher": "Microsoft Studios",
     "Platforms": [
-      "PC",
-      "Xbox Series X"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "Xbox Series X",
+        "Url": "https://metarankings.ru/meta/games/xbox-series-x/"
+      }
     ],
     "Genres": [
       "Платформер"
@@ -832,7 +994,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS3"
+      {
+        "Name": "PS3",
+        "Url": "https://metarankings.ru/meta/games/ps3/"
+      }
     ],
     "Genres": [
       "Приключение"
@@ -853,9 +1018,18 @@
     ],
     "Publisher": "Deep Silver",
     "Platforms": [
-      "PC",
-      "PS4",
-      "Xbox One"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      }
     ],
     "Genres": [
       "Шутер"
@@ -876,7 +1050,10 @@
     ],
     "Publisher": "Nintendo",
     "Platforms": [
-      "Switch"
+      {
+        "Name": "Switch",
+        "Url": "https://metarankings.ru/meta/games/switch/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -898,7 +1075,10 @@
     ],
     "Publisher": "Nintendo",
     "Platforms": [
-      "3DS"
+      {
+        "Name": "3DS",
+        "Url": "https://metarankings.ru/meta/games/3ds/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -921,8 +1101,14 @@
     ],
     "Publisher": "Microsoft Studios",
     "Platforms": [
-      "PC",
-      "Xbox One"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      }
     ],
     "Genres": [
       "Гонки"
@@ -943,9 +1129,18 @@
     ],
     "Publisher": "Square Enix",
     "Platforms": [
-      "PC",
-      "Xbox 360",
-      "Xbox One"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "Xbox 360",
+        "Url": "https://metarankings.ru/meta/games/xbox-360/"
+      },
+      {
+        "Name": "Xbox One",
+        "Url": "https://metarankings.ru/meta/games/xbox-one/"
+      }
     ],
     "Genres": [
       "Приключение",
@@ -967,9 +1162,18 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PC",
-      "PS4",
-      "PS5"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
+      {
+        "Name": "PS5",
+        "Url": "https://metarankings.ru/meta/games/ps5/"
+      }
     ],
     "Genres": [
       "Экшен"
@@ -990,8 +1194,14 @@
     ],
     "Publisher": "Microsoft Studios",
     "Platforms": [
-      "PC",
-      "Xbox Series X"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "Xbox Series X",
+        "Url": "https://metarankings.ru/meta/games/xbox-series-x/"
+      }
     ],
     "Genres": [
       "Гонки"
@@ -1012,9 +1222,18 @@
     ],
     "Publisher": "2K Games",
     "Platforms": [
-      "PC",
-      "PS3",
-      "Xbox 360"
+      {
+        "Name": "PC",
+        "Url": "https://metarankings.ru/meta/games/pc/"
+      },
+      {
+        "Name": "PS3",
+        "Url": "https://metarankings.ru/meta/games/ps3/"
+      },
+      {
+        "Name": "Xbox 360",
+        "Url": "https://metarankings.ru/meta/games/xbox-360/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -1036,7 +1255,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS5"
+      {
+        "Name": "PS5",
+        "Url": "https://metarankings.ru/meta/games/ps5/"
+      }
     ],
     "Genres": [
       "Аркада",
@@ -1059,7 +1281,10 @@
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
       "PC",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Приключение"
@@ -1081,7 +1306,10 @@
     "Publisher": "Bandai Namco",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1105,7 +1333,10 @@
     "Publisher": "Atlus",
     "Platforms": [
       "PS3",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Японское РПГ"
@@ -1150,7 +1381,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -1194,7 +1428,10 @@
     "Publisher": "Activision",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1218,7 +1455,10 @@
     "Publisher": "Bethesda Softworks",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Switch",
       "Xbox One"
     ],
@@ -1241,7 +1481,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Платформер",
@@ -1265,7 +1508,10 @@
     "Platforms": [
       "PC",
       "PS3",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox 360",
       "Xbox One"
     ],
@@ -1290,7 +1536,10 @@
     "Platforms": [
       "PC",
       "PS3",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Switch",
       "Xbox 360",
       "Xbox One"
@@ -1316,7 +1565,10 @@
     "Publisher": "Warner Bros. Interactive Entertainment",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1360,7 +1612,10 @@
     "Publisher": "Activision",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1384,7 +1639,10 @@
     "Publisher": "Bethesda Softworks",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Switch",
       "Xbox One"
     ],
@@ -1430,7 +1688,10 @@
     "Publisher": "Annapurna Interactive",
     "Platforms": [
       "PC",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Приключение"
@@ -1451,7 +1712,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Приключение"
@@ -1473,7 +1737,10 @@
     "Publisher": "Playdead",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1543,7 +1810,10 @@
     "Publisher": "Bethesda Softworks",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Switch",
       "Xbox One"
     ],
@@ -1565,7 +1835,10 @@
     ],
     "Publisher": "Capcom",
     "Platforms": [
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1588,7 +1861,10 @@
     "Publisher": "Bethesda Softworks",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1633,7 +1909,10 @@
     "Platforms": [
       "PC",
       "PS VR",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1677,7 +1956,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Хоррор"
@@ -1719,7 +2001,10 @@
     "Publisher": "Bethesda Softworks",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1784,7 +2069,10 @@
     "Publisher": "Warner Bros. Interactive Entertainment",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1806,7 +2094,10 @@
     "Publisher": "Electronic Arts",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1827,7 +2118,10 @@
     ],
     "Publisher": "Square Enix",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Японское РПГ"
@@ -1848,7 +2142,10 @@
     "Publisher": "Deep Silver",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -1917,7 +2214,10 @@
       "PC",
       "PS Vita",
       "PS3",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Wii U",
       "Xbox 360",
       "Xbox One"
@@ -1964,7 +2264,10 @@
     "Publisher": "Sony Interactive Entertainment",
     "Platforms": [
       "PS VR",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Платформер"
@@ -1985,7 +2288,10 @@
     "Publisher": "Bethesda Softworks",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Switch",
       "Xbox One"
     ],
@@ -2008,7 +2314,10 @@
     "Publisher": "Capcom",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "PS5",
       "Xbox One",
       "Xbox Series X"
@@ -2033,7 +2342,10 @@
     "Publisher": "Annapurna Interactive",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "PS5"
     ],
     "Genres": [
@@ -2076,7 +2388,10 @@
     "Publisher": "Sony Interactive Entertainment",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "PS5"
     ],
     "Genres": [
@@ -2099,7 +2414,10 @@
     ],
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Приключение",
@@ -2121,7 +2439,10 @@
     "Publisher": "Electronic Arts",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "PS5",
       "Xbox One",
       "Xbox Series X"
@@ -2168,7 +2489,10 @@
     "Publisher": "Blizzard Entertainment",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -2214,7 +2538,10 @@
     ],
     "Publisher": "Atlus",
     "Platforms": [
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Японское РПГ"
@@ -2297,7 +2624,10 @@
     "Platforms": [
       "PC",
       "PS Vita",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Аркада",
@@ -2319,7 +2649,10 @@
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "PS5"
     ],
     "Genres": [
@@ -2341,7 +2674,10 @@
     "Publisher": "Sony Interactive Entertainment",
     "Platforms": [
       "PC",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -2384,7 +2720,10 @@
     "Publisher": "Warner Bros Interactive Entertainment",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -2408,7 +2747,10 @@
     "Publisher": "Codemasters",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -2431,7 +2773,10 @@
     "Publisher": "2K Games",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -2455,7 +2800,10 @@
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "PS5"
     ],
     "Genres": [
@@ -2477,7 +2825,10 @@
     "Publisher": "Sony Interactive Entertainment",
     "Platforms": [
       "PC",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "РПГ",
@@ -2540,7 +2891,10 @@
     "Publisher": "Klei Entertainment",
     "Platforms": [
       "PC",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Стратегия",
@@ -2562,7 +2916,10 @@
     "Publisher": "Square Enix",
     "Platforms": [
       "PC",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Японское РПГ"
@@ -2583,7 +2940,10 @@
     "Publisher": "Frictional Games",
     "Platforms": [
       "PC",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Хоррор"
@@ -2648,7 +3008,10 @@
     "Platforms": [
       "PC",
       "PS3",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox 360",
       "Xbox One"
     ],
@@ -2670,7 +3033,10 @@
     ],
     "Publisher": "Warner Bros. Interactive Entertainment",
     "Platforms": [
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -2714,7 +3080,10 @@
     "Platforms": [
       "PC",
       "PS3",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -2736,7 +3105,10 @@
     "Publisher": "Blizzard Entertainment",
     "Platforms": [
       "PS3",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox 360",
       "Xbox One"
     ],
@@ -2760,7 +3132,10 @@
     "Publisher": "Electronic Arts",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -2802,7 +3177,10 @@
     "Publisher": "11 bit studios",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -2869,7 +3247,10 @@
     "Publisher": "Bandai Namco",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Switch",
       "Xbox One"
     ],
@@ -2894,7 +3275,10 @@
     "Publisher": "Activision",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -2936,7 +3320,10 @@
     "Publisher": "Capcom",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [
@@ -2980,7 +3367,10 @@
     "Platforms": [
       "PC",
       "PS3",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox 360",
       "Xbox One"
     ],
@@ -3026,7 +3416,10 @@
     "Publisher": "505 Games",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Switch",
       "Xbox One"
     ],
@@ -3070,7 +3463,10 @@
     "Publisher": "Sony Computer Entertainment",
     "Platforms": [
       "PC",
-      "PS4"
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      }
     ],
     "Genres": [
       "Хоррор",
@@ -3092,7 +3488,10 @@
     "Publisher": "Ubisoft",
     "Platforms": [
       "PC",
-      "PS4",
+      {
+        "Name": "PS4",
+        "Url": "https://metarankings.ru/meta/games/ps4/"
+      },
       "Xbox One"
     ],
     "Genres": [

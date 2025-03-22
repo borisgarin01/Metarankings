@@ -2,7 +2,7 @@
     <span class="label">Платформы:</span> <span itemprop="gamePlatform">
         @foreach (var platform in Platforms)
         {
-            <a href="https://metarankings.ru/meta/games/ps4/">@platform</a>
+            <a href="@platform.Url">@platform.Name</a>
         }
     </span>
 </p>

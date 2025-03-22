@@ -9,11 +9,11 @@ public sealed record Game
     public long? ScoresCount { get; set; }
     public required string[] Developers { get; set; }
     public required string Publisher { get; set; }
-    public required string[] Platforms { get; set; }
     public required string[] Genres { get; set; }
     public required string Localization { get; set; }
     public DateOnly? ReleaseDate { get; set; }
     public required string Description { get; set; }
     public string Trailer { get; set; }
+    public Platform[] Platforms { get; set; } = Array.Empty<Platform>();
     public Screenshot[] Screenshots { get; set; } = Array.Empty<Screenshot>();
 }
