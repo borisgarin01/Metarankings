@@ -1,4 +1,5 @@
 ﻿@page "/games/Details/{Id:int}"
+@using System.Globalization
 
 <div class="post single clear game">
     <div class="post-meta">
@@ -48,7 +49,7 @@
                 </span>
             </p>
             <p><span class="label">Локализация:</span> <span itemprop="inLanguage"><a>@Game.Localization</a></span></p>
-            <p><span class="label">Дата выхода:</span> <span>@Game.ReleaseDate.Value.ToString("dd MMMM yyyy")</span></p>
+            <p><span class="label">Дата выхода:</span> <span>@Game.ReleaseDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span></p>
         </div>
 
         <div class="description">
