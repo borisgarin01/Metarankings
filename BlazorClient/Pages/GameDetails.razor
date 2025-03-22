@@ -145,7 +145,10 @@
                     <link itemprop="thumbnail" href="@Game.Image">
                     <link itemprop="thumbnailUrl" href="@Game.Href">
                     <link itemprop="embedUrl" href="@Game.Name">
-                    <iframe title="Трейлер @Game.Name" src="@Game.Trailer" height="240" width="670" allowfullscreen="" style="border-width:0"></iframe>
+                    @if (!string.IsNullOrWhiteSpace(Game.Trailer))
+                    {
+                        <iframe title="Трейлер @Game.Name" src="@Game.Trailer" height="240" width="670" allowfullscreen="" style="border-width:0"></iframe>
+                    }
                 </div>
             </div>
         </div>
