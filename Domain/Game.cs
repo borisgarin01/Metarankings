@@ -15,5 +15,5 @@ public sealed record Game
     public DateOnly? ReleaseDate { get; set; }
     public required string Description { get; set; }
     public string Trailer { get; set; }
-    public Screenshot[] Screenshots { get; set; }
+    public Screenshot[] Screenshots { get; set; } = Array.Empty<Screenshot>();
 }
