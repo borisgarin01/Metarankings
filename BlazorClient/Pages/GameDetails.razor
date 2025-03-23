@@ -1,6 +1,9 @@
 ﻿@page "/games/Details/{Id:int}"
 @using System.Globalization
 
+<BlazorClient.Components.PagesComponents.Headerer />
+<BlazorClient.Components.PagesComponents.GameMenu />
+
 <div class="post single clear game">
     <div class="post-meta">
         <h1><span itemprop="name">@Game.Name</span></h1>
