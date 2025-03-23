@@ -1,4 +1,4 @@
-﻿using BlazorClient.Components.PagesComponents;
+﻿using Domain;
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 

@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Domain;
+using Microsoft.AspNetCore.Components;
 
 namespace BlazorClient.Components.PagesComponents;
 
 public partial class Game
 {
     [Parameter, EditorRequired]
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     [Parameter, EditorRequired]
     public required string Href { get; set; }
@@ -29,7 +30,7 @@ public partial class Game
     public required string Publisher { get; set; }
 
     [Parameter, EditorRequired]
-    public required string[] Platforms { get; set; }
+    public required Platform[] Platforms { get; set; }
 
     [Parameter, EditorRequired]
     public required string[] Genres { get; set; }

@@ -13,7 +13,7 @@
         <div class="post-meta">
             @foreach (var platform in Platforms)
             {
-                <p itemprop="gamePlatform">@platform</p>
+                <p itemprop="gamePlatform">@platform.Name</p>
             }
         </div>
         <div class="post-meta"><p itemprop="genre">@string.Join(", ", Genres)</p></div>
