@@ -28,7 +28,7 @@ public sealed record Game
     public required string Publisher { get; set; }
 
     [JsonPropertyName("genres")]
-    public required string[] Genres { get; set; }
+    public required Genre[] Genres { get; set; }
 
     [JsonPropertyName("localization")]
     public required string Localization { get; set; }

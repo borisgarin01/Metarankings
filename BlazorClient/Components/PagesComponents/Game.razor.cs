@@ -33,7 +33,7 @@ public partial class Game
     public required Platform[] Platforms { get; set; }
 
     [Parameter, EditorRequired]
-    public required string[] Genres { get; set; }
+    public required Genre[] Genres { get; set; }
 
     [Parameter, EditorRequired]
     public required string Localization { get; set; }

@@ -23,7 +23,7 @@
             </div>
         </div>
         <div id="ratings">
-            <div class="ratings mark-@Math.Round(Game.Score.Value)">
+            <div class="ratings mark-@Math.Round(Game.Score!.Value)">
                 <div id="post-ratings-372" class="post-ratings" data-nonce="95af90afbd">
                     <div class="rating">
                         <div class="score">
@@ -42,15 +42,7 @@
             <BlazorClient.Components.PagesComponents.GameDevelopers Developers="@Game.Developers" />
             <BlazorClient.Components.PagesComponents.GamePublisher Publisher="@Game.Publisher" />
             <BlazorClient.Components.PagesComponents.GamePlatforms Platforms="@Game.Platforms" />
-            <p>
-                <span class="label">Жанр:</span> <span itemprop="genre">
-                    @foreach (var genre in Game.Genres)
-                    {
-                        <a href="https://metarankings.ru/genre/priklyuchenie/">@genre</a>
-                        <text>, </text>
-                    }
-                </span>
-            </p>
+            <BlazorClient.Components.PagesComponents.GenresComponent Genres="@Game.Genres" />
             <p><span class="label">Локализация:</span> <span itemprop="inLanguage"><a>@Game.Localization</a></span></p>
             <p><span class="label">Дата выхода:</span> <span>@Game.ReleaseDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span></p>
         </div>

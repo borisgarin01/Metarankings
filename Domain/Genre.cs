@@ -1,0 +1,15 @@
+﻿using System.Text.Json.Serialization;
+
+namespace Domain;
+
+public sealed record Genre
+{
+    [JsonPropertyName("id")]
+    public long Id { get; set; }
+
+    [JsonPropertyName("name")]
+    public string Name { get; set; }
+
+    [JsonPropertyName("url")]
+    public string Url { get; set; }
+}
