@@ -16,7 +16,7 @@
                 <p itemprop="gamePlatform">@platform.Name</p>
             }
         </div>
-        <div class="post-meta"><p itemprop="genre">@string.Join(", ", Genres.Select(g => g.Name))</p></div>
+        <BlazorClient.Components.PagesComponents.GenresComponent Genres="@Genres" />
     </div>
     <div class="trailer" data-video="/games/Details/@Id/#content-trailer"></div>
     <div class="ratings-graph">

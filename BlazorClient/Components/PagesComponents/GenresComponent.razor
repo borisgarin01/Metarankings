@@ -1,0 +1,9 @@
+﻿<p>
+    <span class="label">Жанр:</span> <span itemprop="genre">
+        @foreach (var genre in Genres)
+        {
+            <a href="@genre.Url">@genre.Name</a>
+            <text>, </text>
+        }
+    </span>
+</p>
