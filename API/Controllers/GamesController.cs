@@ -33,6 +33,7 @@ public sealed class GamesController : ControllerBase
         using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
         {
             var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(fileStream, jsonSerializerOptions);
+
             return Ok(games);
         }
     }
