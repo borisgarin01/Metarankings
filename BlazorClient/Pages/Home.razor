@@ -1,8 +1,8 @@
 ﻿@page "/"
 @page "/{PageSize:int}/{PageNumber:int}"
 
-<Headerer />
-<GameMenu />
+<BlazorClient.Components.PagesComponents.Headerer />
+<BlazorClient.Components.PagesComponents.GameMenu />
 
 @if (Games is null)
 {
