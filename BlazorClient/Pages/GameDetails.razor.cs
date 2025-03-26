@@ -18,4 +18,14 @@ public partial class GameDetails
     {
         Game = await HttpClient.GetFromJsonAsync<Game>($"/api/Games/{Id}");
     }
+
+    public void SetRatingPreview(byte ratingToSet)
+    {
+        var a = ratingToSet;
+    }
+
+    public void RatePost(byte ratingToSet)
+    {
+        var a = ratingToSet;
+    }
 }
