@@ -4,163 +4,170 @@
 <BlazorClient.Components.PagesComponents.Headerer />
 <BlazorClient.Components.PagesComponents.GameMenu />
 
-<div class="post single clear game">
-    <div class="post-meta">
-        <h1><span itemprop="name">@Game.Name</span></h1>
-        <meta itemprop="headline" content="@Game.Name">
-        <meta itemprop="description" content="@Game.Description">
-        <link itemprop="url" href="/games/Details/@Id">
-        <meta itemprop="dateCreated" content="@Game.ReleaseDate.Value.Year">
-    </div>
-    <div class="post-content">
-        <div class="thumb">
-            <img class="post-image" src="@Game.Image" alt="Игра @Game.Name" title="Игра @Game.Name" itemprop="image">
-            <div class="best-prod">
-                <span class="star">★</span> Лучшие в @Game.ReleaseDate.Value.Year году <span class="inform">?</span>
-            </div>
-            <div class="watch-trailer">
-                <h3><span class="twatch"><span class="p-twatch">Смотреть трейлер</span></span></h3>
-            </div>
-        </div>
-        <div id="ratings">
-            <div class="ratings mark-@Math.Round(Game.Score!.Value)">
-                <div id="post-ratings-372" class="post-ratings" data-nonce="95af90afbd">
-                    <div class="rating">
-                        <div class="score">
-                            @Game.Score.Value
+@if (Game == null)
+{
+                    <div>Loading...</div>
+}
+else
+{
+            <div class="post single clear game">
+                <div class="post-meta">
+                    <h1><span itemprop="name">@Game.Name</span></h1>
+                    <meta itemprop="headline" content="@Game.Name">
+                    <meta itemprop="description" content="@Game.Description">
+                    <link itemprop="url" href="/games/Details/@Id">
+                    <meta itemprop="dateCreated" content="@Game.ReleaseDate.Value.Year">
+                </div>
+                <div class="post-content">
+                    <div class="thumb">
+                        <img class="post-image" src="@Game.Image" alt="Игра @Game.Name" title="Игра @Game.Name" itemprop="image">
+                        <div class="best-prod">
+                            <span class="star">★</span> Лучшие в @Game.ReleaseDate.Value.Year году <span class="inform">?</span>
                         </div>
-                        Оценки: <span>@Game.ScoresCount</span>
+                        <div class="watch-trailer">
+                            <h3><span class="twatch"><span class="p-twatch">Смотреть трейлер</span></span></h3>
+                        </div>
                     </div>
-                    <div class="your-score">
-                        <img id="rating_372_1" class="rating-on mark-1" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="1" @onmouseover="()=>SetRatingPreview(1)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(1)" @onkeypress="()=>RatePost(1)" style="cursor: pointer;">
-                        <img id="rating_372_2" class="rating-on mark-2" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="2" @onmouseover="()=>SetRatingPreview(2)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(2)" @onkeypress="()=>RatePost(2)" style="cursor: pointer;">
-                        <img id="rating_372_3" class="rating-on mark-3" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="3" @onmouseover="()=>SetRatingPreview(3)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(3)" @onkeypress="()=>RatePost(3)" style="cursor: pointer;">
-                        <img id="rating_372_4" class="rating-on mark-4" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="4" @onmouseover="()=>SetRatingPreview(4)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(4)" @onkeypress="()=>RatePost(4)" style="cursor: pointer;">
-                        <img id="rating_372_5" class="rating-on mark-5" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="5" @onmouseover="()=>SetRatingPreview(5)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(5)" @onkeypress="()=>RatePost(5)" style="cursor: pointer;">
-                        <img id="rating_372_6" class="rating-on mark-6" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="7" @onmouseover="()=>SetRatingPreview(6)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(7)" @onkeypress="()=>RatePost(7)" style="cursor: pointer;">
-                        <img id="rating_372_7" class="rating-on mark-7" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="7" @onmouseover="()=>SetRatingPreview(7)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(7)" @onkeypress="()=>RatePost(7)" style="cursor: pointer;">
-                        <img id="rating_372_8" class="rating-on mark-8" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_on.gif" alt="8" @onmouseover="()=>SetRatingPreview(8)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(8)" @onkeypress="()=>RatePost(8)" style="cursor: pointer;">
-                        <img id="rating_372_9" class="rating-on mark-9" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_half.gif" alt="9" @onmouseover="()=>SetRatingPreview(9)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(9)" @onkeypress="()=>RatePost(9)" style="cursor: pointer;">
-                        <img id="rating_372_10" class="rating-on mark-10" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/rating_off.gif" alt="10" @onmouseover="()=>SetRatingPreview(10)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(10)" @onkeypress="()=>RatePost(10)" style="cursor: pointer;"> <span class="post-ratings-text" id="ratings_372_text" style="display: none;"></span>
+                    <div id="ratings">
+                        <div class="ratings mark-@Math.Round(Game.Score!.Value)">
+                            <div id="post-ratings-372" class="post-ratings" data-nonce="95af90afbd">
+                                <div class="rating">
+                                    <div class="score">
+                                @Game.Score.Value
+                                    </div>
+                                    Оценки: <span>@Game.ScoresCount</span>
+                                </div>
+                                <div class="your-score">
+                                    <img id="rating_372_1" class="rating-on mark-1" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@(1 <= currentHoverRating ? "rating_on.gif" : "rating_off.gif")" alt="1" @onmouseover="()=>SetRatingPreview(1)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(1)" @onkeypress="()=>RatePost(1)" style="cursor: pointer;">
+                                    <img id="rating_372_2" class="rating-on mark-2" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@(2 <= currentHoverRating ? "rating_on.gif" : "rating_off.gif")" alt="2" @onmouseover="()=>SetRatingPreview(2)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(2)" @onkeypress="()=>RatePost(2)" style="cursor: pointer;">
+                                    <img id="rating_372_3" class="rating-on mark-3" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@(3 <= currentHoverRating ? "rating_on.gif" : "rating_off.gif")" alt="3" @onmouseover="()=>SetRatingPreview(3)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(3)" @onkeypress="()=>RatePost(3)" style="cursor: pointer;">
+                                    <img id="rating_372_4" class="rating-on mark-4" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@(4 <= currentHoverRating ? "rating_on.gif" : "rating_off.gif")" alt="4" @onmouseover="()=>SetRatingPreview(4)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(4)" @onkeypress="()=>RatePost(4)" style="cursor: pointer;">
+                                    <img id="rating_372_5" class="rating-on mark-5" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@(5 <= currentHoverRating ? "rating_on.gif" : "rating_off.gif")" alt="5" @onmouseover="()=>SetRatingPreview(5)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(5)" @onkeypress="()=>RatePost(5)" style="cursor: pointer;">
+                                    <img id="rating_372_6" class="rating-on mark-6" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@(6 <= currentHoverRating ? "rating_on.gif" : "rating_off.gif")" alt="7" @onmouseover="()=>SetRatingPreview(6)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(7)" @onkeypress="()=>RatePost(7)" style="cursor: pointer;">
+                                    <img id="rating_372_7" class="rating-on mark-7" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@(7 <= currentHoverRating ? "rating_on.gif" : "rating_off.gif")" alt="7" @onmouseover="()=>SetRatingPreview(7)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(7)" @onkeypress="()=>RatePost(7)" style="cursor: pointer;">
+                                    <img id="rating_372_8" class="rating-on mark-8" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@(8 <= currentHoverRating ? "rating_on.gif" : "rating_off.gif")" alt="8" @onmouseover="()=>SetRatingPreview(8)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(8)" @onkeypress="()=>RatePost(8)" style="cursor: pointer;">
+                                    <img id="rating_372_9" class="rating-on mark-9" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@(9 <= currentHoverRating ? "rating_on.gif" : "rating_off.gif")" alt="9" @onmouseover="()=>SetRatingPreview(9)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(9)" @onkeypress="()=>RatePost(9)" style="cursor: pointer;">
+                                    <img id="rating_372_10" class="rating-on mark-10" src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@(10 <= currentHoverRating ? "rating_on.gif" : "rating_off.gif")" alt="10" @onmouseover="()=>SetRatingPreview(10)" @onmouseout="()=>SetRatingPreview(0)" @onclick="()=>RatePost(10)" @onkeypress="()=>RatePost(10)" style="cursor: pointer;"> <span class="post-ratings-text" id="ratings_372_text" style="display: none;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="featured-game">
+                        <BlazorClient.Components.PagesComponents.GameDevelopers Developers="@Game.Developers" />
+                        <BlazorClient.Components.PagesComponents.GamePublisher Publisher="@Game.Publisher" />
+                        <BlazorClient.Components.PagesComponents.GamePlatforms Platforms="@Game.Platforms" />
+                        <BlazorClient.Components.PagesComponents.GenresComponent Genres="@Game.Genres" />
+                        <p><span class="label">Локализация:</span> <span itemprop="inLanguage"><a>@Game.Localization</a></span></p>
+                        <p><span class="label">Дата выхода:</span> <span>@Game.ReleaseDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span></p>
+                    </div>
+
+                    <div class="description">
+                        <h3>Описание</h3>
+                        <div>
+                            <p>@Game.Description</p>
+                        </div>
+
+                    </div>
+                    <div class="systems">
+                        <h2 class="systr" onclick="jQuery( document ).ready(function($){$('.system-info').slideToggle('fast')});">Системные требования</h2>
+                        <div class="system-info">
+                            <h3>Минимальные требования:</h3>
+                            <table class="systems">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Операционная система:</strong></td>
+                                        <td itemprop="operatingSystem">PS4</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Процессор:</strong></td>
+                                        <td itemprop="processorRequirements">—</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Оперативная память:</strong></td>
+                                        <td itemprop="memoryRequirements">—</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Видеокарта:</strong></td>
+                                        <td>—</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Место на диске:</strong></td>
+                                        <td itemprop="storageRequirements">—</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Рекомендуемые требования:</h3>
+                            <table class="systems">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Операционная система:</strong></td>
+                                        <td>PS4</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Процессор:</strong></td>
+                                        <td>—</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Оперативная память:</strong></td>
+                                        <td>—</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Видеокарта:</strong></td>
+                                        <td>—</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Место на диске:</strong></td>
+                                        <td>—</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="podborki">
+                        <p>
+                            <a class="mark-link" href="https://metarankings.ru/best-ps4-games/">Топ игры для PS4</a>
+                            <a class="mark-link" href="https://metarankings.ru/top-igry-priklyucheniya/">приключения</a>
+                        </p>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="featured-game">
-            <BlazorClient.Components.PagesComponents.GameDevelopers Developers="@Game.Developers" />
-            <BlazorClient.Components.PagesComponents.GamePublisher Publisher="@Game.Publisher" />
-            <BlazorClient.Components.PagesComponents.GamePlatforms Platforms="@Game.Platforms" />
-            <BlazorClient.Components.PagesComponents.GenresComponent Genres="@Game.Genres" />
-            <p><span class="label">Локализация:</span> <span itemprop="inLanguage"><a>@Game.Localization</a></span></p>
-            <p><span class="label">Дата выхода:</span> <span>@Game.ReleaseDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span></p>
-        </div>
-
-        <div class="description">
-            <h3>Описание</h3>
-            <div>
-                <p>@Game.Description</p>
-            </div>
-
-        </div>
-        <div class="systems">
-            <h2 class="systr" onclick="jQuery( document ).ready(function($){$('.system-info').slideToggle('fast')});">Системные требования</h2>
-            <div class="system-info">
-                <h3>Минимальные требования:</h3>
-                <table class="systems">
-                    <tbody>
-                        <tr>
-                            <td><strong>Операционная система:</strong></td>
-                            <td itemprop="operatingSystem">PS4</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Процессор:</strong></td>
-                            <td itemprop="processorRequirements">—</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Оперативная память:</strong></td>
-                            <td itemprop="memoryRequirements">—</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Видеокарта:</strong></td>
-                            <td>—</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Место на диске:</strong></td>
-                            <td itemprop="storageRequirements">—</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <h3>Рекомендуемые требования:</h3>
-                <table class="systems">
-                    <tbody>
-                        <tr>
-                            <td><strong>Операционная система:</strong></td>
-                            <td>PS4</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Процессор:</strong></td>
-                            <td>—</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Оперативная память:</strong></td>
-                            <td>—</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Видеокарта:</strong></td>
-                            <td>—</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Место на диске:</strong></td>
-                            <td>—</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="podborki">
-            <p>
-                <a class="mark-link" href="https://metarankings.ru/best-ps4-games/">Топ игры для PS4</a>
-                <a class="mark-link" href="https://metarankings.ru/top-igry-priklyucheniya/">приключения</a>
-            </p>
-        </div>
-    </div>
-    <div class="ads-horizont hor-1">
-        <!-- Yandex.RTB R-A-201169-7 -->
-        <div id="yandex_rtb_R-A-201169-7-1" data-2acb0025d4=""><div></div><div data-r-a-201169-7-yandex_rtb_r-a-201169-7-1="" class="csr-uniq3"></div></div>
-        @* <script>
+                <div class="ads-horizont hor-1">
+                    <!-- Yandex.RTB R-A-201169-7 -->
+                    <div id="yandex_rtb_R-A-201169-7-1" data-2acb0025d4=""><div></div><div data-r-a-201169-7-yandex_rtb_r-a-201169-7-1="" class="csr-uniq3"></div></div>
+            @* <script>
             window.yaContextCb.push(()=>{
               Ya.Context.AdvManager.render({
                 renderTo: 'yandex_rtb_R-A-201169-7-1',
                 blockId: 'R-A-201169-7'
               })
             })</script> *@
-    </div>
-    <div class="post-footer">
-        <h2>Трейлер и скриншоты</h2>
-        <div id="tcontent">
-            <div class="video-content" itemprop="subjectOf" itemscope="" itemtype="https://schema.org/VideoObject">
-                <div id="content-trailer">
-                    <meta itemprop="isFamilyFriendly" content="true">
-                    <meta itemprop="uploadDate" content="@Game.ReleaseDate">
-                    <link itemprop="url" href=@Game.Href>
-                    <meta itemprop="name" content="Трейлер The @Game.Name">
-                    <meta itemprop="description" content="Трейлер игры @Game.Name">
-                    <link itemprop="thumbnail" href="@Game.Image">
-                    <link itemprop="thumbnailUrl" href="@Game.Href">
-                    <link itemprop="embedUrl" href="@Game.Name">
-                    @if (!string.IsNullOrWhiteSpace(Game.Trailer))
-                    {
-                        <iframe title="Трейлер @Game.Name" src="@Game.Trailer" height="240" width="670" allowfullscreen="" style="border-width:0"></iframe>
-                    }
+                </div>
+                <div class="post-footer">
+                    <h2>Трейлер и скриншоты</h2>
+                    <div id="tcontent">
+                        <div class="video-content" itemprop="subjectOf" itemscope="" itemtype="https://schema.org/VideoObject">
+                            <div id="content-trailer">
+                                <meta itemprop="isFamilyFriendly" content="true">
+                                <meta itemprop="uploadDate" content="@Game.ReleaseDate">
+                                <link itemprop="url" href=@Game.Href>
+                                <meta itemprop="name" content="Трейлер The @Game.Name">
+                                <meta itemprop="description" content="Трейлер игры @Game.Name">
+                                <link itemprop="thumbnail" href="@Game.Image">
+                                <link itemprop="thumbnailUrl" href="@Game.Href">
+                                <link itemprop="embedUrl" href="@Game.Name">
+                        @if (!string.IsNullOrWhiteSpace(Game.Trailer))
+                        {
+                                                <iframe title="Трейлер @Game.Name" src="@Game.Trailer" height="240" width="670" allowfullscreen="" style="border-width:0"></iframe>
+                        }
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="gallery">
+                @foreach (var screenshot in Game.Screenshots)
+                {
+                                        <li><img class="attachment-screenshot" src="@screenshot.Small" data-original="@screenshot.Original" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
+                }
+                    </ul>
                 </div>
             </div>
-        </div>
-        <ul class="gallery">
-            @foreach (var screenshot in Game.Screenshots)
-            {
-                <li><img class="attachment-screenshot" src="@screenshot.Small" data-original="@screenshot.Original" alt="Скриншоты @Game.Name" title="@Game.Name" width="100" height="75"></li>
-            }
-        </ul>
-    </div>
-</div>
+}

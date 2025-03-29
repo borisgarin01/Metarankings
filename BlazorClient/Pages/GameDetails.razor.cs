@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 
 namespace BlazorClient.Pages;
 
-public partial class GameDetails
+public partial class GameDetails : ComponentBase
 {
     public Game Game { get; set; }
 
@@ -19,13 +19,18 @@ public partial class GameDetails
         Game = await HttpClient.GetFromJsonAsync<Game>($"/api/Games/{Id}");
     }
 
-    public void SetRatingPreview(byte ratingToSet)
+    private byte currentHoverRating = 0;
+    private byte selectedRating = 0; // Optional: to store the actual selected rating
+
+    private void SetRatingPreview(byte rating)
     {
-        var a = ratingToSet;
+        currentHoverRating = rating;
     }
 
-    public void RatePost(byte ratingToSet)
+    private void RatePost(byte rating)
     {
-        var a = ratingToSet;
+        selectedRating = rating;
+        currentHoverRating = rating;
+        // Add your post rating logic here
     }
 }
