@@ -29,7 +29,8 @@ public partial class GameDetails : ComponentBase
 
     private void RatePost(byte rating)
     {
-        selectedRating = rating;
+        if (selectedRating == 0)
+            selectedRating = rating;
         currentHoverRating = rating;
         // Add your post rating logic here
     }
