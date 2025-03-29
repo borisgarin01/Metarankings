@@ -32,6 +32,7 @@ public partial class GameDetails : ComponentBase
         if (selectedRating == 0)
             selectedRating = rating;
         currentHoverRating = rating;
+        Game.ScoresCount++;
         // Add your post rating logic here
     }
 }
