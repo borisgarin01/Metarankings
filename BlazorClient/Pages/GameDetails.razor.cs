@@ -26,7 +26,10 @@ public partial class GameDetails : ComponentBase
 
     private void SetRatingPreview(byte rating)
     {
-        currentHoverRating = rating;
+        if (!hasRated)
+        {
+            currentHoverRating = rating;
+        }
     }
 
     private void RatePost(byte rating)
@@ -36,7 +39,7 @@ public partial class GameDetails : ComponentBase
             selectedRating = rating;
             Game.ScoresCount++;
             hasRated = true;
+            SetRatingPreview(selectedRating);
         }
-        currentHoverRating = rating;
     }
 }
