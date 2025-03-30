@@ -21,6 +21,7 @@ public partial class GameDetails : ComponentBase
 
     private byte currentHoverRating = 0;
     private byte selectedRating = 0; // Optional: to store the actual selected rating
+    private bool hasRated = false; // Track if user has already rated
 
     private void SetRatingPreview(byte rating)
     {
@@ -29,10 +30,12 @@ public partial class GameDetails : ComponentBase
 
     private void RatePost(byte rating)
     {
-        if (selectedRating == 0)
+        if (!hasRated)
+        {
             selectedRating = rating;
+            Game.ScoresCount++;
+            hasRated = true;
+        }
         currentHoverRating = rating;
-        Game.ScoresCount++;
-        // Add your post rating logic here
     }
 }
