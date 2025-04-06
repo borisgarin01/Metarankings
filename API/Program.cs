@@ -5,6 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMvc(options => options.EnableEndpointRouting = false);
 
+builder.Services.AddSwaggerGen();
+
 // Add CORS services
 builder.Services.AddCors(options =>
 {
@@ -17,6 +19,9 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Use CORS middleware
 app.UseCors("AllowBlazorFrontend");

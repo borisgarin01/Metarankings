@@ -11,7 +11,7 @@
                 @for (var i = 1; i <= 10; i++)
                 {
                     <img class="rating-on mark-@i"
-                         src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@GetRatingImage(i)"
+                         src="/wp-content/plugins/wp-postratings/images/squares/@GetRatingImage(i)"
                          alt="@i"
                          @onmouseover="() => OnHover.InvokeAsync((byte)i)"
                          @onmouseout="() => OnHover.InvokeAsync(SelectedRating)"

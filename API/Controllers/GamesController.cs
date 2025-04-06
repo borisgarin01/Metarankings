@@ -51,10 +51,10 @@ public sealed class GamesController : ControllerBase
         }
     }
 
-    [HttpGet("{image}")]
-    public async Task<IActionResult> GetImage(string image)
+    [HttpGet("images/uploads/{year:int}/{month:int}/{image}")]
+    public async Task<IActionResult> GetImage(int year, int month, string image)
     {
-        var file = await System.IO.File.ReadAllBytesAsync(Path.Combine("Images", image));
+        var file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{((month < 10) ? $"0{month}" : $"{month}")}/{image}");
         if (file is null)
             return NotFound();
         return File(file, "image/jpeg");

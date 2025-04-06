@@ -1,12 +1,14 @@
 ﻿@using System.Globalization
+@inject HttpClient HttpClient
 
 <div class="thumb">
-    <img class="post-image" src="@Image" alt="Игра @Name" title="Игра @Name" itemprop="image">
+    <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{Image}")" alt="Игра @Name" title="Игра @Name" itemprop="image">
 
     @if (ReleaseYear.HasValue)
     {
         <div class="best-prod">
-            <span class="star">★</span> Лучшие в @ReleaseYear.Value году <span class="inform">?</span>
+            <span class="star">★</span> Лучшие в @ReleaseYear.Value году 
+            <span class="inform">?</span>
         </div>
     }
 
