@@ -17,7 +17,7 @@
     <div class="ratings-graph">
         <div class="graph">
             <div class="small-score mark-@Math.Round(Score!.Value)">@Score.Value</div>
-            <div class="graph-body"><div style="width:100%" class="rating-graph mark-@Math.Round(Score.Value)"></div></div>
+            <div class="graph-body"><div style="width:@(Score.Value*10)%" class="rating-graph mark-@Math.Round(Score.Value)"></div></div>
         </div>
     </div>
 </div>

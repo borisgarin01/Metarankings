@@ -50,4 +50,13 @@ public sealed class GamesController : ControllerBase
             return Ok(game);
         }
     }
+
+    [HttpGet("{image}")]
+    public async Task<IActionResult> GetImage(string image)
+    {
+        var file = await System.IO.File.ReadAllBytesAsync(Path.Combine("Images", image));
+        if (file is null)
+            return NotFound();
+        return File(file, "image/jpeg");
+    }
 }
