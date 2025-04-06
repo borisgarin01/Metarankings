@@ -1,7 +1,7 @@
 ﻿<div class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
     <a href="/games/Details/@Id" title="Игра @Name" class="thumb"><img class="post-image" src="@Image" alt="Игра @Name"></a>
     <div class="best-prod">
-        <div class="counter" itemprop="position">1</div>
+        <div class="counter" itemprop="position">@Id</div>
         <span class="star">★</span>
     </div>
     <div itemprop="item" itemscope="" itemtype="https://schema.org/VideoGame">
@@ -10,12 +10,7 @@
         <meta itemprop="dateCreated" content="@ReleaseDate!.Value.Year">
         <h3 itemprop="name"><a class="name" href="/games/Details/@Id">@Name</a></h3>
         <div class="post-meta"><p>@Publisher</p></div>
-        <div class="post-meta">
-            @foreach (var platform in Platforms)
-            {
-                <p itemprop="gamePlatform">@platform.Name</p>
-            }
-        </div>
+        <PlatformsComponent Platforms="@Platforms" />
         <BlazorClient.Components.PagesComponents.GamesList.GenresComponent Genres="@Genres" />
     </div>
     <div class="trailer" data-video="/games/Details/@Id/#content-trailer"></div>
