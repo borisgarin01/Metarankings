@@ -1,8 +1,8 @@
 ﻿@page "/"
 @page "/{PageSize:int}/{PageNumber:int}"
 
-<BlazorClient.Components.PagesComponents.Headerer />
-<BlazorClient.Components.PagesComponents.GameMenu />
+<BlazorClient.Components.PagesComponents.Common.Headerer />
+<BlazorClient.Components.PagesComponents.Common.GameMenu />
 
 @if (Games is null)
 {
@@ -12,19 +12,19 @@ else
 {
     foreach (var game in Games)
     {
-        <BlazorClient.Components.PagesComponents.Game Id="@game.Id"
-                                                      Name="@game.Name"
-                                                      Description="@game.Description"
-                                                      Developers="@game.Developers"
-                                                      Genres="@game.Genres"
-                                                      Href="@game.Href"
-                                                      Image="@game.Image"
-                                                      Localization="@game.Localization"
-                                                      Platforms="@game.Platforms"
-                                                      Publisher="@game.Publisher"
-                                                      ReleaseDate="@game.ReleaseDate"
-                                                      Score="@game.Score"
-                                                      ScoresCount="@game.ScoresCount" />
+        <BlazorClient.Components.PagesComponents.GamesList.Game Id="@game.Id"
+                                                                Name="@game.Name"
+                                                                Description="@game.Description"
+                                                                Developers="@game.Developers"
+                                                                Genres="@game.Genres"
+                                                                Href="@game.Href"
+                                                                Image="@game.Image"
+                                                                Localization="@game.Localization"
+                                                                Platforms="@game.Platforms"
+                                                                Publisher="@game.Publisher"
+                                                                ReleaseDate="@game.ReleaseDate"
+                                                                Score="@game.Score"
+                                                                ScoresCount="@game.ScoresCount" />
     }
     @if (PageNumber > 1)
     {

@@ -1,0 +1,22 @@
+﻿@using System.Globalization
+
+<div class="thumb">
+    <img class="post-image" src="@Image" alt="Игра @Name" title="Игра @Name" itemprop="image">
+
+    @if (ReleaseYear.HasValue)
+    {
+        <div class="best-prod">
+            <span class="star">★</span> Лучшие в @ReleaseYear.Value году <span class="inform">?</span>
+        </div>
+    }
+
+    <div class="watch-trailer">
+        <h3><span class="twatch"><span class="p-twatch">Смотреть трейлер</span></span></h3>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Image { get; set; }
+    [Parameter] public string Name { get; set; }
+    [Parameter] public int? ReleaseYear { get; set; }
+}

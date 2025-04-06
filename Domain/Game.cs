@@ -43,8 +43,8 @@ public sealed record Game
     public string Trailer { get; set; }
 
     [JsonPropertyName("platforms")]
-    public Platform[] Platforms { get; set; } = Array.Empty<Platform>();
+    public IEnumerable<Platform> Platforms { get; set; } = Array.Empty<Platform>();
 
     [JsonPropertyName("screenshots")]
-    public Screenshot[] Screenshots { get; set; } = Array.Empty<Screenshot>();
+    public IEnumerable<Screenshot> Screenshots { get; set; } = Array.Empty<Screenshot>();
 }

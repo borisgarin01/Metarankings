@@ -1,0 +1,43 @@
+﻿<div class="post-footer">
+    <h2>Трейлер и скриншоты</h2>
+    <div id="tcontent">
+        @if (!string.IsNullOrWhiteSpace(Trailer))
+        {
+            <div class="video-content" itemprop="subjectOf" itemscope itemtype="https://schema.org/VideoObject">
+                <div id="content-trailer">
+                    <meta itemprop="isFamilyFriendly" content="true">
+                    <meta itemprop="uploadDate" content="@ReleaseDate?.ToString("yyyy-MM-dd")">
+                    <link itemprop="url" href="@Href">
+                    <meta itemprop="name" content="Трейлер The @Name">
+                    <meta itemprop="description" content="Трейлер игры @Name">
+                    <link itemprop="thumbnail" href="@Image">
+                    <link itemprop="thumbnailUrl" href="@Href">
+                    <link itemprop="embedUrl" href="@Name">
+                    <iframe title="Трейлер @Name"
+                            src="@Trailer"
+                            height="240"
+                            width="670"
+                            allowfullscreen
+                            style="border-width:0"></iframe>
+                </div>
+            </div>
+        }
+    </div>
+    @if (Screenshots?.Any() == true)
+    {
+        <ul class="gallery">
+            @foreach (var screenshot in Screenshots)
+            {
+                <li>
+                    <img class="attachment-screenshot"
+                         src="@screenshot.Small"
+                         data-original="@screenshot.Original"
+                         alt="Скриншоты @Name"
+                         title="@Name"
+                         width="100"
+                         height="75">
+                </li>
+            }
+        </ul>
+    }
+</div>

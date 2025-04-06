@@ -1,0 +1,19 @@
+﻿@using BlazorClient.Components.PagesComponents.GamesList
+@using System.Globalization
+
+<div class="featured-game">
+    <GameDevelopers Developers="@Developers" />
+    <GamePublisher Publisher="@Publisher" />
+    <GamePlatforms Platforms="@Platforms" />
+    <GenresComponent Genres="@Genres" />
+
+    <p><span class="label">Локализация:</span> <span itemprop="inLanguage"><a>@Localization</a></span></p>
+
+    @if (ReleaseDate.HasValue)
+    {
+        <p>
+            <span class="label">Дата выхода:</span>
+            <span>@ReleaseDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span>
+        </p>
+    }
+</div>

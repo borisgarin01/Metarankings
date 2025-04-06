@@ -1,0 +1,60 @@
+﻿<div class="systems">
+    <h2 class="systr" @onclick="ToggleRequirements">Системные требования</h2>
+
+    @if (showRequirements)
+    {
+        <div class="system-info">
+            <h3>Минимальные требования:</h3>
+            <table class="systems">
+                <tbody>
+                    <tr>
+                        <td><strong>Операционная система:</strong></td>
+                        <td itemprop="operatingSystem">PS4</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Процессор:</strong></td>
+                        <td itemprop="processorRequirements">—</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Оперативная память:</strong></td>
+                        <td itemprop="memoryRequirements">—</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Видеокарта:</strong></td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Место на диске:</strong></td>
+                        <td itemprop="storageRequirements">—</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Рекомендуемые требования:</h3>
+            <table class="systems">
+                <tbody>
+                    <tr>
+                        <td><strong>Операционная система:</strong></td>
+                        <td>PS4</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Процессор:</strong></td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Оперативная память:</strong></td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Видеокарта:</strong></td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Место на диске:</strong></td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

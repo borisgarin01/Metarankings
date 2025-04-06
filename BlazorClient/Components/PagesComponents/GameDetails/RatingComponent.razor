@@ -1,0 +1,24 @@
+﻿<div id="ratings">
+    <div class="ratings mark-@Math.Round(Convert.ToDecimal(Score))">
+        <div class="post-ratings">
+            <div class="rating">
+                <div class="score">
+                    @Score
+                </div>
+                Оценки: <span>@ScoresCount</span>
+            </div>
+            <div class="your-score">
+                @for (var i = 1; i <= 10; i++)
+                {
+                    <img class="rating-on mark-@i"
+                         src="https://metarankings.ru/wp-content/plugins/wp-postratings/images/squares/@GetRatingImage(i)"
+                         alt="@i"
+                         @onmouseover="() => OnHover.InvokeAsync((byte)i)"
+                         @onmouseout="() => OnHover.InvokeAsync(SelectedRating)"
+                         @onclick="() => OnRate.InvokeAsync((byte)i)"
+                         style="cursor: pointer;">
+                }
+            </div>
+        </div>
+    </div>
+</div>

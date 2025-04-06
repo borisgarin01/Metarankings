@@ -1,9 +1,9 @@
 ﻿using Domain;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorClient.Components.PagesComponents;
+namespace BlazorClient.Components.PagesComponents.GamesList;
 
-public partial class Game
+public partial class Game : ComponentBase
 {
     [Parameter, EditorRequired]
     public long Id { get; set; }
@@ -30,7 +30,7 @@ public partial class Game
     public required string Publisher { get; set; }
 
     [Parameter, EditorRequired]
-    public required Platform[] Platforms { get; set; }
+    public required IEnumerable<Platform> Platforms { get; set; }
 
     [Parameter, EditorRequired]
     public required Genre[] Genres { get; set; }

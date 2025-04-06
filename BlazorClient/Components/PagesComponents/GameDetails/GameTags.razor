@@ -1,0 +1,8 @@
+﻿<div class="podborki">
+    @foreach (var link in Links)
+    {
+        <p>
+            <a class="mark-link" href="@link">@GetLinkText(link)</a>
+        </p>
+    }
+</div>
