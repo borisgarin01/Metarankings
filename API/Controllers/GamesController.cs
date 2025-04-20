@@ -17,7 +17,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAsync(int pageNumber = 1, int pageSize = 5)
+    public async Task<ActionResult<IEnumerable<Game>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
     {
         using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
         {
@@ -28,13 +28,20 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAsync()
+    public async Task<ActionResult<IEnumerable<Game>>> GetAsync(CancellationToken cancellationToken = default)
     {
         using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
         {
-            var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(fileStream, jsonSerializerOptions);
+            try
+            {
+                var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(fileStream, jsonSerializerOptions, cancellationToken);
 
-            return Ok(games);
+                return Ok(games);
+            }
+            catch (TaskCanceledException ex)
+            {
+                return Ok(Enumerable.Empty<Game>());
+            }
         }
     }
 
