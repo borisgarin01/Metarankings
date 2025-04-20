@@ -54,7 +54,6 @@
     <Folder Include="Images\Uploads\2024\12\" />
     <Folder Include="Images\Uploads\2025\01\" />
     <Folder Include="Images\Uploads\2025\02\" />
-    <Folder Include="Images\Uploads\2025\03\" />
   </ItemGroup>
 
 </Project>
