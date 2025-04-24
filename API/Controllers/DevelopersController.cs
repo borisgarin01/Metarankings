@@ -3,7 +3,6 @@ using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.NetworkInformation;
 
 namespace API.Controllers;
 
@@ -81,10 +80,10 @@ public sealed class DevelopersController : ControllerBase
             return NotFound();
 
         // Map the update model to the existing entity
-        _mapper.Map(updateDeveloperModel, developerToUpdate);
+        var developerToGetAfterUpdate= _mapper.Map<Developer>(updateDeveloperModel);
 
         // Update and return the updated entity
-        var updatedDeveloper = await _developersRepository.UpdateAsync(developerToUpdate, id);
+        var updatedDeveloper = await _developersRepository.UpdateAsync(developerToGetAfterUpdate, id);
 
         return Ok(updatedDeveloper);
     }
