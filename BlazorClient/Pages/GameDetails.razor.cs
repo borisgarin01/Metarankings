@@ -7,7 +7,7 @@ namespace BlazorClient.Pages;
 
 public partial class GameDetails
 {
-    public Domain.Game Game { get; set; }
+    public Domain.GameModel Game { get; set; }
 
     [Parameter]
     public int Id { get; set; }
@@ -21,7 +21,7 @@ public partial class GameDetails
 
     protected override async Task OnParametersSetAsync()
     {
-        Game = await HttpClient.GetFromJsonAsync<Domain.Game>($"/api/Games/{Id}");
+        Game = await HttpClient.GetFromJsonAsync<Domain.GameModel>($"/api/Games/{Id}");
         SetRatingPreview(Convert.ToByte(Game.Score.Value));
     }
 
