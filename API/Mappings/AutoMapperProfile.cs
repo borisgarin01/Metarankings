@@ -10,5 +10,7 @@ public class AutoMapperProfile : Profile
     {
         CreateMap<AddDeveloperModel, Developer>();
         CreateMap<UpdateDeveloperModel, Developer>();
+        CreateMap<AddGenreModel, Genre>();
+        CreateMap<UpdateGenreModel, Genre>();
     }
 }
