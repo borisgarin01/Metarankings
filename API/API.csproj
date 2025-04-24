@@ -14,10 +14,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Models\RequestsModels\UpdateDeveloperModel.cs~RF582790.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Properties\launchSettings.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="FluentMigrator" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Console" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Extensions.Postgres" Version="7.1.0" />

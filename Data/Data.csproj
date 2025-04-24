@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <None Remove="Migrations\AddGamesTableMigration.cs~RFc2d61c.TMP" />
+    <None Remove="Repositories\Interfaces\IRepository.cs~RF58f86d.TMP" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +18,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Repositories\Interfaces\Derived\" />
   </ItemGroup>
 
   <PropertyGroup>

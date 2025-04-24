@@ -1,5 +1,9 @@
 using Data.Migrations;
+using Data.Repositories.Classes.Derived;
+using Data.Repositories.Interfaces;
+using Domain;
 using FluentMigrator.Runner;
+using System.Reflection;
 
 internal class Program
 {
@@ -24,6 +28,10 @@ internal class Program
                       .AllowAnyMethod();
             });
         });
+
+        builder.Services.AddScoped<IRepository<Developer>, DevelopersRepository>(instance => new DevelopersRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
+
+        builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
         var app = builder.Build();
 
