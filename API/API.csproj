@@ -14,6 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Properties\launchSettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
@@ -34,26 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Images\Uploads\2023\06\" />
-    <Folder Include="Images\Uploads\2023\07\" />
-    <Folder Include="Images\Uploads\2023\08\" />
-    <Folder Include="Images\Uploads\2023\09\" />
-    <Folder Include="Images\Uploads\2023\10\" />
-    <Folder Include="Images\Uploads\2023\11\" />
-    <Folder Include="Images\Uploads\2023\12\" />
-    <Folder Include="Images\Uploads\2024\02\" />
-    <Folder Include="Images\Uploads\2024\03\" />
-    <Folder Include="Images\Uploads\2024\04\" />
-    <Folder Include="Images\Uploads\2024\05\" />
-    <Folder Include="Images\Uploads\2024\06\" />
-    <Folder Include="Images\Uploads\2024\07\" />
-    <Folder Include="Images\Uploads\2024\08\" />
-    <Folder Include="Images\Uploads\2024\09\" />
-    <Folder Include="Images\Uploads\2024\10\" />
-    <Folder Include="Images\Uploads\2024\11\" />
-    <Folder Include="Images\Uploads\2024\12\" />
-    <Folder Include="Images\Uploads\2025\01\" />
-    <Folder Include="Images\Uploads\2025\02\" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
   </ItemGroup>
 
 </Project>
