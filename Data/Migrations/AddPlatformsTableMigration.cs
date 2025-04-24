@@ -3,7 +3,7 @@
 namespace Data.Migrations;
 
 [Migration(4, "Add platforms table migration")]
-public sealed class AddPlatformsTable : Migration
+public sealed class AddPlatformsTableMigration : Migration
 {
     public override void Down()
     {
