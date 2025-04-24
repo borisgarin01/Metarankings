@@ -3,14 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace Domain;
 
-[Table("platforms")]
-public sealed record Platform
+[Table("Localizations")]
+public sealed record Localization
 {
     [JsonPropertyName("id")]
     public long Id { get; set; }
+
     [JsonPropertyName("name")]
     public string Name { get; set; }
-
-    [JsonPropertyName("url")]
-    public string Url { get; set; }
 }

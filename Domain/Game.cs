@@ -1,6 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Domain;
+
+[Table("Games")]
 public sealed record Game
 {
     [JsonPropertyName("id")]
@@ -13,38 +16,19 @@ public sealed record Game
     public required string Name { get; set; }
 
     [JsonPropertyName("image")]
-    public required string Image { get; set; }
+    public string Image { get; set; }
 
-    [JsonPropertyName("score")]
-    public float? Score { get; set; }
-
-    [JsonPropertyName("scoresCount")]
-    public long? ScoresCount { get; set; }
-
-    [JsonPropertyName("developers")]
-    public required string[] Developers { get; set; }
-
-    [JsonPropertyName("publisher")]
-    public required string Publisher { get; set; }
-
-    [JsonPropertyName("genres")]
-    public required Genre[] Genres { get; set; }
-
-    [JsonPropertyName("localization")]
-    public required string Localization { get; set; }
+    [JsonPropertyName("localizationId")]
+    public required long? LocalizationId { get; set; }
+    [JsonPropertyName("publisherId")]
+    public required long PublisherId { get; set; }
 
     [JsonPropertyName("releaseDate")]
     public DateOnly? ReleaseDate { get; set; }
 
     [JsonPropertyName("description")]
-    public required string Description { get; set; }
+    public string Description { get; set; }
 
     [JsonPropertyName("trailer")]
-    public string Trailer { get; set; }
-
-    [JsonPropertyName("platforms")]
-    public IEnumerable<Platform> Platforms { get; set; } = Array.Empty<Platform>();
-
-    [JsonPropertyName("screenshots")]
-    public IEnumerable<Screenshot> Screenshots { get; set; } = Array.Empty<Screenshot>();
+    public required string Trailer { get; set; }
 }

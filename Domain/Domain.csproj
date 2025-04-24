@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Game.cs~RFa4d071.TMP" />
+    <None Remove="GamePlatform.cs~RFb07b61.TMP" />
+    <None Remove="GameScreenshot.cs~RFb2f80a.TMP" />
+  </ItemGroup>
+
 </Project>
