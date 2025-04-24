@@ -17,40 +17,40 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<GameModel>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
     {
         using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
         {
-            var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(fileStream, jsonSerializerOptions);
+            var games = await JsonSerializer.DeserializeAsync<IEnumerable<GameModel>>(fileStream, jsonSerializerOptions);
             games = games!.Skip((pageNumber - 1) * pageSize).Take(pageSize);
             return Ok(games);
         }
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAsync(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<GameModel>>> GetAsync(CancellationToken cancellationToken = default)
     {
         using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
         {
             try
             {
-                var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(fileStream, jsonSerializerOptions, cancellationToken);
+                var games = await JsonSerializer.DeserializeAsync<IEnumerable<GameModel>>(fileStream, jsonSerializerOptions, cancellationToken);
 
                 return Ok(games);
             }
             catch (TaskCanceledException ex)
             {
-                return Ok(Enumerable.Empty<Game>());
+                return Ok(Enumerable.Empty<GameModel>());
             }
         }
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Game>> GetAsync(int id)
+    public async Task<ActionResult<GameModel>> GetAsync(int id)
     {
         using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
         {
-            var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(fileStream, jsonSerializerOptions);
+            var games = await JsonSerializer.DeserializeAsync<IEnumerable<GameModel>>(fileStream, jsonSerializerOptions);
             var game = games.FirstOrDefault(a => a.Id == id);
             if (game is null)
                 return NotFound();

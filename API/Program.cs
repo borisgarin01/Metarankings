@@ -1,32 +1,79 @@
-var builder = WebApplication.CreateBuilder(args);
+using Data.Migrations;
+using FluentMigrator.Runner;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-
-builder.Services.AddMvc(options => options.EnableEndpointRouting = false);
-
-builder.Services.AddSwaggerGen();
-
-// Add CORS services
-builder.Services.AddCors(options =>
+internal class Program
 {
-    options.AddPolicy("AllowBlazorFrontend", policy =>
+    private static void Main(string[] args)
     {
-        policy.WithOrigins("https://localhost:7280", "http://localhost:5152", "http://localhost:52856", "https://192.168.1.102:5003")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+        var builder = WebApplication.CreateBuilder(args);
 
-var app = builder.Build();
+        // Add services to the container.
+        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
-app.UseSwagger();
-app.UseSwaggerUI();
+        builder.Services.AddMvc(options => options.EnableEndpointRouting = false);
 
-// Use CORS middleware
-app.UseCors("AllowBlazorFrontend");
+        builder.Services.AddSwaggerGen();
 
-app.UseAuthorization();
-app.MapControllers();
+        // Add CORS services
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowBlazorFrontend", policy =>
+            {
+                policy.WithOrigins("https://localhost:7280", "http://localhost:5152", "http://localhost:52856", "https://192.168.1.102:5003")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            });
+        });
 
-app.Run();
+        var app = builder.Build();
+
+        using (var serviceProvider = CreateServices(builder.Configuration))
+        using (var scope = serviceProvider.CreateScope())
+        {
+            // Put the database update into a scope to ensure
+            // that all resources will be disposed.
+            UpdateDatabase(scope.ServiceProvider);
+        }
+
+        app.UseSwagger();
+        app.UseSwaggerUI();
+
+        // Use CORS middleware
+        app.UseCors("AllowBlazorFrontend");
+
+        app.UseAuthorization();
+        app.MapControllers();
+
+        app.Run();
+    }
+
+    private static ServiceProvider CreateServices(ConfigurationManager configurationManager)
+    {
+        return new ServiceCollection()
+            // Add common FluentMigrator services
+            .AddFluentMigratorCore()
+            .ConfigureRunner(rb => rb
+                // Add SQLite support to FluentMigrator
+                .AddPostgres15_0()
+                // Set the connection string
+                .WithGlobalConnectionString(configurationManager.GetConnectionString("MetarankingsConnection"))
+                // Define the assembly containing the migrations, maintenance migrations and other customizations
+                .ScanIn(typeof(AddGamesTableMigration).Assembly).For.Migrations())
+            // Enable logging to console in the FluentMigrator way
+            .AddLogging(lb => lb.AddFluentMigratorConsole())
+            // Build the service provider
+            .BuildServiceProvider(false);
+    }
+
+    /// <summary>
+    /// Update the database
+    /// </summary>
+    private static void UpdateDatabase(IServiceProvider serviceProvider)
+    {
+        // Instantiate the runner
+        var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+        runner.ListMigrations();
+        // Execute the migrations
+        runner.MigrateUp();
+    }
+}
