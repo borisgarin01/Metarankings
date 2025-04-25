@@ -37,6 +37,8 @@ internal class Program
 
         builder.Services.AddScoped<IRepository<Localization>, LocalizationsRepository>(instance => new LocalizationsRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
 
+        builder.Services.AddScoped<IRepository<Publisher>, PublishersRepository>(instance => new PublishersRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
+
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
         var app = builder.Build();
