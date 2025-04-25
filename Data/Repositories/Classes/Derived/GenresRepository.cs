@@ -2,7 +2,6 @@
 using Data.Repositories.Interfaces;
 using Domain;
 using Npgsql;
-using System.Diagnostics.Tracing;
 
 namespace Data.Repositories.Classes.Derived;
 public sealed class GenresRepository : Repository, IRepository<Genre>

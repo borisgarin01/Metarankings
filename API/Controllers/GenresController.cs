@@ -2,6 +2,7 @@
 using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -14,10 +15,15 @@ public sealed class GenresController : ControllerBase
 
     private readonly IRepository<Genre> _genresRepository;
 
-    public GenresController(IMapper mapper, IRepository<Genre> genresRepository)
+    private readonly IValidator<AddGenreModel> _addGenreModelValidator;
+    private readonly IValidator<UpdateGenreModel> _updateGenreModelValidator;
+
+    public GenresController(IMapper mapper, IRepository<Genre> genresRepository, IValidator<AddGenreModel> addGenreModelValidator, IValidator<UpdateGenreModel> updateGenreModelValidator)
     {
         _mapper = mapper;
         _genresRepository = genresRepository;
+        _addGenreModelValidator = addGenreModelValidator;
+        _updateGenreModelValidator = updateGenreModelValidator;
     }
 
     [HttpGet]
@@ -31,6 +37,13 @@ public sealed class GenresController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Genre>> AddAsync(AddGenreModel addGenreModel)
     {
+        var validationResult = _addGenreModelValidator.Validate(addGenreModel);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult);
+        }
+
         var genre = _mapper.Map<Genre>(addGenreModel);
 
         var insertedGenreId = await _genresRepository.AddAsync(genre);
@@ -72,6 +85,13 @@ public sealed class GenresController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<Genre>> UpdateAsync(long id, UpdateGenreModel updateGenreModel)
     {
+        var validationResult = _updateGenreModelValidator.Validate(updateGenreModel);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult);
+        }
+
         var genreToUpdate = await _genresRepository.GetAsync(id);
         if (genreToUpdate is null)
             return NotFound();

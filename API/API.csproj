@@ -16,6 +16,7 @@
   <ItemGroup>
     <None Remove="Mappings\kdecag1e.joy~" />
     <None Remove="Models\RequestsModels\UpdateDeveloperModel.cs~RF582790.TMP" />
+    <None Remove="ValidationRules\RequestsModels\Localizations\AddLocalizationModelValidator.cs~RF107cb20.TMP" />
   </ItemGroup>
 
   <ItemGroup>

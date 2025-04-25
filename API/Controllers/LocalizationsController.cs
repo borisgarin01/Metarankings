@@ -2,6 +2,7 @@
 using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -14,10 +15,15 @@ public sealed class LocalizationsController : ControllerBase
 
     private readonly IRepository<Localization> _localizationsRepository;
 
-    public LocalizationsController(IMapper mapper, IRepository<Localization> localizationsRepository)
+    private readonly IValidator<AddLocalizationModel> _addLocalizationModelValidator;
+    private readonly IValidator<UpdateLocalizationModel> _updateLocalizationModelValidator;
+
+    public LocalizationsController(IMapper mapper, IRepository<Localization> localizationsRepository, IValidator<AddLocalizationModel> addLocalizationModelValidator, IValidator<UpdateLocalizationModel> updateLocalizationModelValidator)
     {
         _mapper = mapper;
         _localizationsRepository = localizationsRepository;
+        _addLocalizationModelValidator = addLocalizationModelValidator;
+        _updateLocalizationModelValidator = updateLocalizationModelValidator;
     }
 
     [HttpGet]
@@ -31,6 +37,13 @@ public sealed class LocalizationsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Localization>> AddAsync(AddLocalizationModel addLocalizationModel)
     {
+        var validationResult = _addLocalizationModelValidator.Validate(addLocalizationModel);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult);
+        }
+
         var localization = _mapper.Map<Localization>(addLocalizationModel);
 
         var insertedLocalizationId = await _localizationsRepository.AddAsync(localization);
@@ -72,6 +85,13 @@ public sealed class LocalizationsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<Localization>> UpdateAsync(long id, UpdateLocalizationModel updateLocalizationModel)
     {
+        var validationResult = _updateLocalizationModelValidator.Validate(updateLocalizationModel);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult);
+        }
+
         var localizationToUpdate = await _localizationsRepository.GetAsync(id);
         if (localizationToUpdate is null)
             return NotFound();
