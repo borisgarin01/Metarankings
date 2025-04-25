@@ -2,6 +2,7 @@
 using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -14,10 +15,15 @@ public sealed class PlatformsController : ControllerBase
 
     private readonly IRepository<Platform> _platformsRepository;
 
-    public PlatformsController(IMapper mapper, IRepository<Platform> platformsRepository)
+    private readonly IValidator<AddPlatformModel> _addPlatformValidator;
+    private readonly IValidator<UpdatePlatformModel> _updatePlatformValidator;
+
+    public PlatformsController(IMapper mapper, IRepository<Platform> platformsRepository, IValidator<AddPlatformModel> addPlatformValidator, IValidator<UpdatePlatformModel> updatePlatformValidator)
     {
         _mapper = mapper;
         _platformsRepository = platformsRepository;
+        _addPlatformValidator = addPlatformValidator;
+        _updatePlatformValidator = updatePlatformValidator;
     }
 
     [HttpGet]
@@ -31,6 +37,13 @@ public sealed class PlatformsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Platform>> AddAsync(AddPlatformModel addPlatformModel)
     {
+        var validationResult = _addPlatformValidator.Validate(addPlatformModel);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult);
+        }
+
         var platform = _mapper.Map<Platform>(addPlatformModel);
 
         var insertedGenreId = await _platformsRepository.AddAsync(platform);
@@ -70,14 +83,21 @@ public sealed class PlatformsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<Platform>> UpdateAsync(long id, UpdatePlatformModel updateGenreModel)
+    public async Task<ActionResult<Platform>> UpdateAsync(long id, UpdatePlatformModel updatePlatformModel)
     {
+        var validationResult = _updatePlatformValidator.Validate(updatePlatformModel);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult);
+        }
+
         var platformToUpdate = await _platformsRepository.GetAsync(id);
         if (platformToUpdate is null)
             return NotFound();
 
         // Map the update model to the existing entity
-        var platformToGetAfterUpdate = _mapper.Map<Platform>(updateGenreModel);
+        var platformToGetAfterUpdate = _mapper.Map<Platform>(updatePlatformModel);
 
         // Update and return the updated entity
         var updatedPlatform = await _platformsRepository.UpdateAsync(platformToGetAfterUpdate, id);
