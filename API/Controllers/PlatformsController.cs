@@ -1,7 +1,5 @@
-﻿using API.Models.RequestsModels.Genres;
-using API.Models.RequestsModels.Platforms;
+﻿using API.Models.RequestsModels.Platforms;
 using AutoMapper;
-using Data.Repositories.Classes.Derived;
 using Data.Repositories.Interfaces;
 using Domain;
 using Microsoft.AspNetCore.Mvc;

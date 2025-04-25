@@ -1,5 +1,6 @@
 ﻿using API.Models.RequestsModels.Developers;
 using API.Models.RequestsModels.Genres;
+using API.Models.RequestsModels.Localizations;
 using API.Models.RequestsModels.Platforms;
 using AutoMapper;
 using Domain;
@@ -16,5 +17,7 @@ public class AutoMapperProfile : Profile
         CreateMap<UpdateGenreModel, Genre>();
         CreateMap<AddPlatformModel, Platform>();
         CreateMap<UpdatePlatformModel, Platform>();
+        CreateMap<AddLocalizationModel, Localization>();
+        CreateMap<UpdateLocalizationModel, Localization>();
     }
 }

@@ -92,25 +92,18 @@ Genres WHERE Id=@id", new { id });
 
     public async Task<Genre> UpdateAsync(Genre entity, long id)
     {
-        var genre = await GetAsync(id);
-
-        if (genre is not null)
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            using (var connection = new NpgsqlConnection(ConnectionString))
-            {
-                await connection.ExecuteAsync(@"UPDATE Genres set Name=@Name, Url=@Url 
+            await connection.ExecuteAsync(@"UPDATE Genres set Name=@Name, Url=@Url 
 where Id=@Id", new
-                {
-                    entity.Name,
-                    entity.Url,
-                    id
-                });
-            }
-
-            genre = await GetAsync(id);
-            return genre;
+            {
+                entity.Name,
+                entity.Url,
+                id
+            });
         }
 
-        return null;
+        var genre = await GetAsync(id);
+        return genre;
     }
 }
