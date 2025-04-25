@@ -11,7 +11,7 @@ public sealed class LocalizationsRepository : Repository, IRepository<Localizati
     {
     }
 
-    public async Task<long> AddAsync(Localization entity)
+    public async Task<long> AddAsync(Localization localization)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -21,8 +21,8 @@ VALUES (@Name, @Href)
 RETURNING Id;"
  , new
  {
-     entity.Name,
-     entity.Href
+     localization.Name,
+     localization.Href
  });
             return id;
         }
@@ -90,20 +90,20 @@ Localizations WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<Localization> UpdateAsync(Localization entity, long id)
+    public async Task<Localization> UpdateAsync(Localization localization, long id)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            await connection.ExecuteAsync(@"UPDATE Localizations set Name=@Name, Href=@Href 
-where Id=@Id", new
+            var updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name, Href=@Href 
+where Id=@Id
+returning Name, Href, Id", new
             {
-                entity.Name,
-                entity.Href,
+                localization.Name,
+                localization.Href,
                 id
             });
-        }
 
-        var localization = await GetAsync(id);
-        return localization;
+            return updatedLocalization;
+        }
     }
 }

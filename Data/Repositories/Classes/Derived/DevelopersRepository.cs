@@ -10,7 +10,7 @@ public sealed class DevelopersRepository : Repository, IRepository<Developer>
     {
     }
 
-    public async Task<long> AddAsync(Developer entity)
+    public async Task<long> AddAsync(Developer developer)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -20,18 +20,18 @@ VALUES (@Name, @Url)
 RETURNING Id;"
  , new
  {
-     entity.Name,
-     entity.Url
+     developer.Name,
+     developer.Url
  });
             return id;
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<Developer> entities)
+    public async Task AddRangeAsync(IEnumerable<Developer> developers)
     {
-        foreach (var entity in entities)
+        foreach (var developer in developers)
         {
-            await AddAsync(entity);
+            await AddAsync(developer);
         }
     }
 
@@ -90,27 +90,20 @@ Developers WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<Developer> UpdateAsync(Developer entity, long id)
+    public async Task<Developer> UpdateAsync(Developer developer, long id)
     {
-        var developer = await GetAsync(id);
-
-        if (developer is not null)
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            using (var connection = new NpgsqlConnection(ConnectionString))
+            var updatedDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"UPDATE Developers set Name=@Name, Url=@Url 
+where Id=@id
+returning Name, Url, Id", new
             {
-                await connection.ExecuteAsync(@"UPDATE Developers set Name=@Name, Url=@Url 
-where Id=@Id", new
-                {
-                    entity.Name,
-                    entity.Url,
-                    entity.Id
-                });
-            }
+                developer.Name,
+                developer.Url,
+                id
+            });
 
-            developer = await GetAsync(entity.Id);
-            return developer;
+            return updatedDeveloper;
         }
-
-        return null;
     }
 }

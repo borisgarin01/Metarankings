@@ -2,6 +2,7 @@
 using Data.Repositories.Interfaces;
 using Domain;
 using Npgsql;
+using System.Diagnostics.Tracing;
 
 namespace Data.Repositories.Classes.Derived;
 public sealed class GenresRepository : Repository, IRepository<Genre>
@@ -10,7 +11,7 @@ public sealed class GenresRepository : Repository, IRepository<Genre>
     {
     }
 
-    public async Task<long> AddAsync(Genre entity)
+    public async Task<long> AddAsync(Genre genre)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -20,18 +21,18 @@ VALUES (@Name, @Url)
 RETURNING Id;"
  , new
  {
-     entity.Name,
-     entity.Url
+     genre.Name,
+     genre.Url
  });
             return id;
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<Genre> entities)
+    public async Task AddRangeAsync(IEnumerable<Genre> genres)
     {
-        foreach (var entity in entities)
+        foreach (var genre in genres)
         {
-            await AddAsync(entity);
+            await AddAsync(genre);
         }
     }
 
@@ -90,20 +91,20 @@ Genres WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<Genre> UpdateAsync(Genre entity, long id)
+    public async Task<Genre> UpdateAsync(Genre genre, long id)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            await connection.ExecuteAsync(@"UPDATE Genres set Name=@Name, Url=@Url 
-where Id=@Id", new
+            var updatedGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE Genres set Name=@Name, Url=@Url 
+where Id=@id
+returning Name, Url, Id", new
             {
-                entity.Name,
-                entity.Url,
+                genre.Name,
+                genre.Url,
                 id
             });
-        }
 
-        var genre = await GetAsync(id);
-        return genre;
+            return updatedGenre;
+        }
     }
 }

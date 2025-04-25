@@ -11,7 +11,7 @@ public sealed class PlatformsRepository : Repository, IRepository<Platform>
     {
     }
 
-    public async Task<long> AddAsync(Platform entity)
+    public async Task<long> AddAsync(Platform platform)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -21,18 +21,18 @@ VALUES (@Name, @Href)
 RETURNING Id;"
  , new
  {
-     entity.Name,
-     entity.Href
+     platform.Name,
+     platform.Href
  });
             return id;
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<Platform> entities)
+    public async Task AddRangeAsync(IEnumerable<Platform> platfroms)
     {
-        foreach (var entity in entities)
+        foreach (var platform in platfroms)
         {
-            await AddAsync(entity);
+            await AddAsync(platform);
         }
     }
 
@@ -91,27 +91,20 @@ Platforms WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<Platform> UpdateAsync(Platform entity, long id)
+    public async Task<Platform> UpdateAsync(Platform platform, long id)
     {
-        var platform = await GetAsync(id);
-
-        if (platform is not null)
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            using (var connection = new NpgsqlConnection(ConnectionString))
+            var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name, Href=@Href 
+where Id=@id
+returning Name, Href, Id", new
             {
-                await connection.ExecuteAsync(@"UPDATE Platforms set Name=@Name, Href=@Href 
-where Id=@Id", new
-                {
-                    entity.Name,
-                    entity.Href,
-                    platform.Id
-                });
-            }
+                platform.Name,
+                platform.Href,
+                id
+            });
 
-            platform = await GetAsync(id);
-            return platform;
+            return updatedPlatform;
         }
-
-        return null;
     }
 }
