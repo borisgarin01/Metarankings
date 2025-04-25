@@ -2,6 +2,7 @@
 using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -14,10 +15,15 @@ public sealed class PublishersController : ControllerBase
 
     private readonly IRepository<Publisher> _publishersRepository;
 
-    public PublishersController(IMapper mapper, IRepository<Publisher> publishersRepository)
+    private readonly IValidator<AddPublisherModel> _addPublisherValidator;
+    private readonly IValidator<UpdatePublisherModel> _updatePublisherValidator;
+
+    public PublishersController(IMapper mapper, IRepository<Publisher> publishersRepository, IValidator<AddPublisherModel> addPublisherValidator, IValidator<UpdatePublisherModel> pdatePublisherValidator)
     {
         _mapper = mapper;
         _publishersRepository = publishersRepository;
+        _addPublisherValidator = addPublisherValidator;
+        _updatePublisherValidator = pdatePublisherValidator;
     }
 
     [HttpGet]
@@ -31,6 +37,13 @@ public sealed class PublishersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Publisher>> AddAsync(AddPublisherModel addPublisherModel)
     {
+        var validationResult = _addPublisherValidator.Validate(addPublisherModel);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult);
+        }
+
         var publisher = _mapper.Map<Publisher>(addPublisherModel);
 
         var insertedPublisherId = await _publishersRepository.AddAsync(publisher);
@@ -73,6 +86,13 @@ public sealed class PublishersController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<Publisher>> UpdateAsync(long id, UpdatePublisherModel updatePublisherModel)
     {
+        var validationResult = _updatePublisherValidator.Validate(updatePublisherModel);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult);
+        }
+
         var publisherToUpdate = await _publishersRepository.GetAsync(id);
         if (publisherToUpdate is null)
             return NotFound();
