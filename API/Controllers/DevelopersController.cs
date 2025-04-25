@@ -2,6 +2,7 @@
 using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -14,11 +15,16 @@ public sealed class DevelopersController : ControllerBase
 
     private readonly IRepository<Developer> _developersRepository;
 
-    public DevelopersController(IMapper mapper, IRepository<Developer> developersRepository)
+    private readonly IValidator<AddDeveloperModel> _addDeveloperModelValidator;
+    private readonly IValidator<UpdateDeveloperModel> _updateDeveloperModelValidator;
+
+    public DevelopersController(IMapper mapper, IRepository<Developer> developersRepository, IValidator<AddDeveloperModel> addDeveloperModelValidator, IValidator<UpdateDeveloperModel> updateDeveloperModelValidator)
     {
         _mapper = mapper;
 
         _developersRepository = developersRepository;
+        _addDeveloperModelValidator = addDeveloperModelValidator;
+        _updateDeveloperModelValidator = updateDeveloperModelValidator;
     }
 
     [HttpGet]
@@ -32,6 +38,13 @@ public sealed class DevelopersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Developer>> AddAsync(AddDeveloperModel addDeveloperModel)
     {
+        var validationResult = _addDeveloperModelValidator.Validate(addDeveloperModel);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult);
+        }
+
         var developer = _mapper.Map<Developer>(addDeveloperModel);
 
         var insertedDeveloperId = await _developersRepository.AddAsync(developer);
@@ -73,12 +86,19 @@ public sealed class DevelopersController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<Developer>> UpdateAsync(long id, UpdateDeveloperModel updateDeveloperModel)
     {
+        var validationResult = _updateDeveloperModelValidator.Validate(updateDeveloperModel);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult);
+        }
+
         var developerToUpdate = await _developersRepository.GetAsync(id);
         if (developerToUpdate is null)
             return NotFound();
 
         // Map the update model to the existing entity
-        var developerToGetAfterUpdate= _mapper.Map<Developer>(updateDeveloperModel);
+        var developerToGetAfterUpdate = _mapper.Map<Developer>(updateDeveloperModel);
 
         // Update and return the updated entity
         var updatedDeveloper = await _developersRepository.UpdateAsync(developerToGetAfterUpdate, id);

@@ -1,7 +1,5 @@
+using API.IServiceCollectionExtensions;
 using Data.Migrations;
-using Data.Repositories.Classes.Derived;
-using Data.Repositories.Interfaces;
-using Domain;
 using FluentMigrator.Runner;
 using System.Reflection;
 
@@ -29,15 +27,8 @@ internal class Program
             });
         });
 
-        builder.Services.AddScoped<IRepository<Developer>, DevelopersRepository>(instance => new DevelopersRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
-
-        builder.Services.AddScoped<IRepository<Genre>, GenresRepository>(instance => new GenresRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
-
-        builder.Services.AddScoped<IRepository<Platform>, PlatformsRepository>(instance => new PlatformsRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
-
-        builder.Services.AddScoped<IRepository<Localization>, LocalizationsRepository>(instance => new LocalizationsRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
-
-        builder.Services.AddScoped<IRepository<Publisher>, PublishersRepository>(instance => new PublishersRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
+        builder.Services.RegisterRepositories(builder.Configuration);
+        builder.Services.RegisterValidators();
 
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
