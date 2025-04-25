@@ -1,4 +1,4 @@
-﻿using API.Models.RequestsModels;
+﻿using API.Models.RequestsModels.Developers;
 using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain;
@@ -10,14 +10,12 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public sealed class DevelopersController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
 
     private readonly IRepository<Developer> _developersRepository;
 
-    public DevelopersController(IConfiguration configuration, IMapper mapper, IRepository<Developer> developersRepository)
+    public DevelopersController(IMapper mapper, IRepository<Developer> developersRepository)
     {
-        _configuration = configuration;
         _mapper = mapper;
 
         _developersRepository = developersRepository;

@@ -30,7 +30,10 @@ internal class Program
         });
 
         builder.Services.AddScoped<IRepository<Developer>, DevelopersRepository>(instance => new DevelopersRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
+
         builder.Services.AddScoped<IRepository<Genre>, GenresRepository>(instance => new GenresRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
+
+        builder.Services.AddScoped<IRepository<Platform>, PlatformsRepository>(instance => new PlatformsRepository(builder.Configuration.GetConnectionString("MetarankingsConnection")));
 
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

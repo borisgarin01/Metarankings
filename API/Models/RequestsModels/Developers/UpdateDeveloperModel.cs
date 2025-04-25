@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace API.Models.RequestsModels;
+namespace API.Models.RequestsModels.Developers;
 
 public sealed record UpdateDeveloperModel
 {

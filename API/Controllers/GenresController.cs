@@ -1,4 +1,4 @@
-﻿using API.Models.RequestsModels;
+﻿using API.Models.RequestsModels.Genres;
 using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain;
@@ -10,14 +10,12 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public sealed class GenresController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
 
     private readonly IRepository<Genre> _genresRepository;
 
-    public GenresController(IConfiguration configuration, IMapper mapper, IRepository<Genre> genresRepository)
+    public GenresController(IMapper mapper, IRepository<Genre> genresRepository)
     {
-        _configuration = configuration;
         _mapper = mapper;
         _genresRepository = genresRepository;
     }

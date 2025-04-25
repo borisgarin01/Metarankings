@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace API.Models.RequestsModels;
+namespace API.Models.RequestsModels.Genres;
 
-public sealed record AddDeveloperModel
+public sealed record AddGenreModel
 {
     [JsonPropertyName("name")]
     public string Name { get; set; }

@@ -14,6 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Mappings\kdecag1e.joy~" />
     <None Remove="Models\RequestsModels\UpdateDeveloperModel.cs~RF582790.TMP" />
   </ItemGroup>
 
