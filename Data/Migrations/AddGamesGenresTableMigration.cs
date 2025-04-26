@@ -2,7 +2,7 @@
 
 namespace Data.Migrations;
 
-[Migration(8, "Add games genres table migration")]
+[Migration(9, "Add games genres table migration")]
 public sealed class AddGamesGenresTableMigration : Migration
 {
     public override void Down()
