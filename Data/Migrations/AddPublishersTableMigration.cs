@@ -2,7 +2,7 @@
 
 namespace Data.Migrations;
 
-[Migration(6, "Add publishers table migration")]
+[Migration(5, "Add publishers table migration")]
 public sealed class AddPublishersTableMigration : Migration
 {
     public override void Down()

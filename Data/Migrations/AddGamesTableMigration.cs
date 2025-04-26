@@ -2,7 +2,7 @@
 
 namespace Data.Migrations;
 
-[Migration(1, "Add games table migration")]
+[Migration(6, "Add games table migration")]
 public sealed class AddGamesTableMigration : Migration
 {
     public override void Down()
@@ -21,6 +21,8 @@ LocalizationId bigint null,
 PublisherId bigint not null,
 ReleaseDate date null,
 Description text,
-Trailer varchar(511) null);");
+Trailer varchar(511) null,
+FOREIGN KEY(LocalizationId) REFERENCES Localizations(Id) ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(PublisherId) REFERENCES Publishers(Id) ON DELETE CASCADE ON UPDATE CASCADE);");
     }
 }

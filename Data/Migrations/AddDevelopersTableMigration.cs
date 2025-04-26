@@ -2,7 +2,7 @@
 
 namespace Data.Migrations;
 
-[Migration(5, "Add developers table migration")]
+[Migration(1, "Add developers table migration")]
 public sealed class AddDevelopersTableMigration : Migration
 {
     public override void Down()
