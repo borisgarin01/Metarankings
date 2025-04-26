@@ -18,6 +18,8 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IRepository<Publisher>, PublishersRepository>(instance => new PublishersRepository(configuration.GetConnectionString("MetarankingsConnection")));
 
+        services.AddScoped<GamesRepository>(instance => new GamesRepository(configuration.GetConnectionString("MetarankingsConnection")));
+
         return services;
     }
 }

@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <None Remove="Migrations\AddGamesScreenshotsTableMigration.cs~RF896a0a.TMP" />
     <None Remove="Migrations\AddGamesTableMigration.cs~RFc2d61c.TMP" />
     <None Remove="Repositories\Interfaces\IRepository.cs~RF58f86d.TMP" />
   </ItemGroup>

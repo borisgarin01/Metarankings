@@ -22,19 +22,19 @@ public sealed record GameModel
     public long? ScoresCount { get; set; }
 
     [JsonPropertyName("developers")]
-    public required string[] Developers { get; set; }
+    public required IEnumerable<Developer> Developers { get; set; }
 
     [JsonPropertyName("publisher")]
-    public required string Publisher { get; set; }
+    public required Publisher Publisher { get; set; }
 
     [JsonPropertyName("genres")]
-    public required Genre[] Genres { get; set; }
+    public required IEnumerable<Genre> Genres { get; set; }
 
     [JsonPropertyName("localization")]
-    public required string Localization { get; set; }
+    public required Localization Localization { get; set; }
 
     [JsonPropertyName("releaseDate")]
-    public DateOnly? ReleaseDate { get; set; }
+    public DateTime? ReleaseDate { get; set; }
 
     [JsonPropertyName("description")]
     public required string Description { get; set; }
@@ -43,8 +43,8 @@ public sealed record GameModel
     public string Trailer { get; set; }
 
     [JsonPropertyName("platforms")]
-    public IEnumerable<Platform> Platforms { get; set; } = Array.Empty<Platform>();
+    public IEnumerable<Platform> Platforms { get; set; }
 
     [JsonPropertyName("screenshots")]
-    public IEnumerable<Screenshot> Screenshots { get; set; } = Array.Empty<Screenshot>();
+    public IEnumerable<GameScreenshot> Screenshots { get; set; }
 }

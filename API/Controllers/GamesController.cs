@@ -1,4 +1,5 @@
 ﻿using API.Json;
+using Data.Repositories.Classes.Derived;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -11,9 +12,12 @@ public sealed class GamesController : ControllerBase
 {
     JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
-    public GamesController()
+    private readonly GamesRepository _gamesRepository;
+
+    public GamesController(GamesRepository gamesRepository)
     {
         jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
+        _gamesRepository = gamesRepository;
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
@@ -30,19 +34,8 @@ public sealed class GamesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GameModel>>> GetAsync(CancellationToken cancellationToken = default)
     {
-        using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
-        {
-            try
-            {
-                var games = await JsonSerializer.DeserializeAsync<IEnumerable<GameModel>>(fileStream, jsonSerializerOptions, cancellationToken);
-
-                return Ok(games);
-            }
-            catch (TaskCanceledException ex)
-            {
-                return Ok(Enumerable.Empty<GameModel>());
-            }
-        }
+        var games = await _gamesRepository.GetGameModels();
+        return Ok(games);
     }
 
     [HttpGet("{id:int}")]
