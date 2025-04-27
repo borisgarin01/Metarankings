@@ -22,7 +22,7 @@ public partial class GameDetails
     protected override async Task OnParametersSetAsync()
     {
         Game = await HttpClient.GetFromJsonAsync<Domain.GameModel>($"/api/Games/{Id}");
-        SetRatingPreview(Convert.ToByte(Game.Score.Value));
+        SetRatingPreview(Convert.ToByte(Game.Score.HasValue ? Game.Score.Value : 0));
     }
 
     private void SetRatingPreview(byte rating)
