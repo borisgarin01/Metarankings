@@ -23,12 +23,8 @@ public sealed class GamesController : ControllerBase
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
     public async Task<ActionResult<IEnumerable<GameModel>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
     {
-        using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
-        {
-            var games = await JsonSerializer.DeserializeAsync<IEnumerable<GameModel>>(fileStream, jsonSerializerOptions);
-            games = games!.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-            return Ok(games);
-        }
+        var games = await _gamesRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
+        return Ok(games);
     }
 
     [HttpPost]
@@ -52,7 +48,7 @@ public sealed class GamesController : ControllerBase
 
         if (game is null)
             return NotFound();
-        
+
         return Ok(game);
     }
 

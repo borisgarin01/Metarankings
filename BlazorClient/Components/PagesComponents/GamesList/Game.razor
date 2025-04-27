@@ -11,15 +11,15 @@
         <link itemprop="image" href="@Image">
         <meta itemprop="dateCreated" content="@ReleaseDate!.Value.Year">
         <h3 itemprop="name"><a class="name" href="/games/Details/@Id">@Name</a></h3>
-        <div class="post-meta"><p>@Publisher</p></div>
+        <div class="post-meta"><p>@Publisher.Name</p></div>
         <PlatformsComponent Platforms="@Platforms" />
         <BlazorClient.Components.PagesComponents.GamesList.GenresComponent Genres="@Genres" />
     </div>
     <div class="trailer" data-video="/games/Details/@Id/#content-trailer"></div>
     <div class="ratings-graph">
         <div class="graph">
-            <div class="small-score mark-@Math.Round(Score!.Value)">@Score.Value</div>
-            <div class="graph-body"><div style="width:@(Score.Value*10)%" class="rating-graph mark-@Math.Round(Score.Value)"></div></div>
+            <div class="small-score mark-@Math.Round(Score.HasValue?Score.Value:0)">@(Score.HasValue ? Score.Value : 0)</div>
+            <div class="graph-body"><div style="width:@((Score.HasValue?Score.Value:0)*10)%" class="rating-graph mark-@Math.Round(Score.HasValue?Score.Value:0)"></div></div>
         </div>
     </div>
 </div>

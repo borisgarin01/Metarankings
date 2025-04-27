@@ -22,7 +22,8 @@ else
                            Name="@Game.Name"
                            ReleaseYear="@Game.ReleaseDate.Value.Year" />
 
-            <RatingComponent Score="@Game.Score!.Value"
+
+            <RatingComponent Score="@(Game.Score.HasValue?Game.Score.Value:0)"
                              ScoresCount="@(Game.ScoresCount.HasValue?Game.ScoresCount.Value:0)"
                              OnRate="RatePost"
                              SelectedRating="@selectedRating"

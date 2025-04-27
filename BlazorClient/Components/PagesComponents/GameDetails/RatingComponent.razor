@@ -1,5 +1,5 @@
 ﻿<div id="ratings">
-    <div class="ratings mark-@Math.Round(Convert.ToDecimal(Score))">
+    <div class="ratings mark-@Math.Round(Convert.ToDecimal(Score.HasValue?Score.Value:0))">
         <div class="post-ratings">
             <div class="rating">
                 <div class="score">

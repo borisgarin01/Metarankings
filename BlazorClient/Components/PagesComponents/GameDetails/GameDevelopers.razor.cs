@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Domain;
+using Microsoft.AspNetCore.Components;
 
 namespace BlazorClient.Components.PagesComponents.GameDetails;
 
 public partial class GameDevelopers : ComponentBase
 {
     [Parameter]
-    public IEnumerable<string> Developers { get; set; }
+    public IEnumerable<Developer> Developers { get; set; }
 }
