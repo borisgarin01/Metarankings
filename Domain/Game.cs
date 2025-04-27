@@ -24,7 +24,7 @@ public sealed record Game
     public required long PublisherId { get; set; }
 
     [JsonPropertyName("releaseDate")]
-    public DateOnly? ReleaseDate { get; set; }
+    public DateTime? ReleaseDate { get; set; }
 
     [JsonPropertyName("description")]
     public string Description { get; set; }

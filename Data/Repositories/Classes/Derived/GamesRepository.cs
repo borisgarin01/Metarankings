@@ -10,14 +10,155 @@ public sealed class GamesRepository : Repository, IRepository<GameModel>
     {
     }
 
-    public Task<long> AddAsync(GameModel entity)
+    public async Task<long> AddAsync(GameModel entity)
     {
-        throw new NotImplementedException();
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            List<Developer> insertedDevelopers = new();
+            List<Genre> insertedGenres = new();
+            Publisher insertedPublisher = null;
+            Localization insertedLocalization = null;
+
+            foreach (var developer in entity.Developers)
+            {
+                var developerToFind = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name, Url
+FROM Developers
+WHERE Name=@Name;", new { developer.Name });
+
+                if (developerToFind is null)
+                {
+                    var insertedDeveloper = await connection.QueryFirstAsync<Developer>(@"INSERT INTO Developers 
+(Name, Url)
+VALUES (@Name, @Url) RETURNING Id, Name, Url;", new { developer.Name, developer.Url });
+                    insertedDevelopers.Add(insertedDeveloper);
+                }
+                else
+                    insertedDevelopers.Add(developerToFind);
+            }
+            foreach (var genre in entity.Genres)
+            {
+                var genreToFind = await connection.QueryFirstOrDefaultAsync<Genre>(@"SELECT Id, Name, Url
+FROM Genres
+WHERE Name=@Name;", new { genre.Name });
+
+                if (genreToFind is null)
+                {
+                    var insertedGenre = await connection.QueryFirstAsync<Genre>(@"INSERT INTO Genres 
+(Name, Url)
+VALUES (@Name, @Url)
+RETURNING Id, Name, Url;", new { genre.Name, genre.Url });
+                    insertedGenres.Add(insertedGenre);
+                }
+                else
+                {
+                    insertedGenres.Add(genreToFind);
+                }
+            }
+
+            var publisherToFind = await connection.QueryFirstOrDefaultAsync<Publisher>(@"SELECT Id, Name, Url 
+FROM Publishers 
+WHERE Name=@Name", new { entity.Publisher.Name });
+
+            if (publisherToFind is null)
+            {
+                insertedPublisher = await connection.QueryFirstAsync<Publisher>(@"INSERT INTO Publishers (Name, Url) 
+VALUES (@Name, @Url)
+RETURNING Id, Name, Url;", new { entity.Publisher.Name, entity.Publisher.Url });
+            }
+            else
+                insertedPublisher = publisherToFind;
+
+            var localizationToFind = await connection.QueryFirstOrDefaultAsync<Localization>(@"SELECT Id, Name, Href 
+FROM Localizations WHERE Name=@Name", new { entity.Localization.Name });
+
+            if (localizationToFind is null)
+            {
+                insertedLocalization = await connection.QueryFirstOrDefaultAsync<Localization>(@"INSERT INTO Localizations (Name, Href) 
+VALUES (@Name, @Href) 
+RETURNING Id, Name, Href;", new { entity.Localization.Name, entity.Localization.Href });
+            }
+            else
+                insertedLocalization = localizationToFind;
+
+            var insertedGame = await connection.QueryFirstAsync<Game>(@"INSERT INTO Games 
+(Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer) 
+VALUES
+(@Href, @Name, @Image, @LocalizationId, @PublisherId, @ReleaseDate, @Description, @Trailer)
+RETURNING Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer;", new
+            {
+                entity.Href,
+                entity.Name,
+                entity.Image,
+                LocalizationId = insertedLocalization.Id,
+                PublisherId = insertedPublisher.Id,
+                ReleaseDate = entity.ReleaseDate.Value,
+                Description = entity.Description,
+                Trailer = entity.Trailer
+            });
+
+            foreach (var gameGenre in insertedGenres)
+            {
+                var gameGenreToFind = await connection.QueryFirstOrDefaultAsync(@"SELECT Id, GameId, GenreId FROM GamesGenres WHERE GenreId=@GenreId and GameId=@GameId",
+                    new
+                    {
+                        GenreId = gameGenre.Id,
+                        GameId = entity.Id
+                    });
+
+                if (gameGenreToFind is null)
+                {
+                    var insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(@"INSERT INTO GamesGenres (GameId, GenreId) 
+VALUES (@GameId, @GenreId) 
+RETURNING Id, GameId, GenreId;", new { GameId = insertedGame.Id, GenreId = gameGenre.Id });
+                }
+            }
+
+            foreach (var platform in entity.Platforms)
+            {
+                var existingPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"SELECT Id, Name, Href 
+FROM Platforms
+WHERE Name=@Name;", new { platform.Name });
+
+                if (existingPlatform is null)
+                {
+                    existingPlatform = await connection.QueryFirstAsync<Platform>(@"INSERT INTO Platforms (Name, Href) VALUES (@Name, @Href)
+RETURNING Id, Name, Href;", new { platform.Name, platform.Href });
+                }
+
+                var existingGamePlatform = await connection.QueryFirstOrDefaultAsync<GamePlatform>(@"SELECT GameId, PlatformId FROM GamesPlatforms WHERE GameId=@GameId AND PlatformId=@PlatformId", new { GameId = insertedGame.Id, PlatformId = platform.Id });
+
+                if (existingGamePlatform is null)
+                {
+                    existingGamePlatform = await connection.QueryFirstAsync<GamePlatform>(@"INSERT INTO GamesPlatforms 
+(GameId, PlatformId)
+VALUES (@GameId, @PlatformId)
+RETURNING GameId, PlatformId;", new { GameId = insertedGame.Id, PlatformId = existingPlatform.Id });
+                }
+            }
+
+            foreach (var developer in entity.Developers)
+            {
+                var existingDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name, Url FROM Developers WHERE Name=@Name", new { developer.Name });
+
+                if (existingDeveloper is null)
+                {
+                    existingDeveloper = await connection.QueryFirstAsync<Developer>(@"INSERT INTO Developers (Name, Url) 
+VALUES (@Name, @Url) 
+RETURNING Id, Name, Url");
+                }
+                var insertedGameDeveloper = await connection.QueryAsync(@"INSERT INTO GamesDevelopers(GameId, DeveloperId) 
+VALUES(@GameId, @DeveloperId) 
+RETURNING Id, GameId, DeveloperId", new { GameId = insertedGame.Id, DeveloperId = existingDeveloper.Id });
+            }
+
+            return insertedGame.Id;
+        }
     }
 
-    public Task AddRangeAsync(IEnumerable<GameModel> entities)
+    public async Task AddRangeAsync(IEnumerable<GameModel> entities)
     {
-        throw new NotImplementedException();
+        foreach (var entity in entities)
+            await AddAsync(entity);
     }
 
     public async Task<IEnumerable<GameModel>> GetAllAsync()

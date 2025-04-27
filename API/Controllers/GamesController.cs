@@ -31,6 +31,13 @@ public sealed class GamesController : ControllerBase
         }
     }
 
+    [HttpPost]
+    public async Task<ActionResult> AddAsync(GameModel gameModel)
+    {
+        await _gamesRepository.AddAsync(gameModel);
+        return Ok();
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GameModel>>> GetAsync(CancellationToken cancellationToken = default)
     {
