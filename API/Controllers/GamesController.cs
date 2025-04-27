@@ -34,21 +34,19 @@ public sealed class GamesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GameModel>>> GetAsync(CancellationToken cancellationToken = default)
     {
-        var games = await _gamesRepository.GetGameModels();
+        var games = await _gamesRepository.GetAllAsync();
         return Ok(games);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<GameModel>> GetAsync(int id)
     {
-        using (var fileStream = new FileStream("Games.json", FileMode.Open, FileAccess.Read))
-        {
-            var games = await JsonSerializer.DeserializeAsync<IEnumerable<GameModel>>(fileStream, jsonSerializerOptions);
-            var game = games.FirstOrDefault(a => a.Id == id);
-            if (game is null)
-                return NotFound();
-            return Ok(game);
-        }
+        var game = await _gamesRepository.GetAsync(id);
+
+        if (game is null)
+            return NotFound();
+        
+        return Ok(game);
     }
 
     [HttpGet("images/uploads/{year:int}/{month:int}/{image}")]
