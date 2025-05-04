@@ -2,7 +2,7 @@
 @inject HttpClient HttpClient
 
 <div class="thumb">
-    <img class="post-image" src="@($"{HttpClient.BaseAddress}/api/games/{Image}")" alt="Игра @Name" title="Игра @Name" itemprop="image">
+    <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{Image}")" alt="Игра @Name" title="Игра @Name" itemprop="image">
 
     @if (ReleaseYear.HasValue)
     {
