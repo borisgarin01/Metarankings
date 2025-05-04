@@ -166,25 +166,29 @@ RETURNING Id, GameId, DeveloperId", new { GameId = insertedGame.Id, DeveloperId 
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
-g.Id, g.href, g.name, g.image, g.releasedate, g.description,
-d.id, d.name, d.url,
-p.id, p.name, p.url,
-gen.id, gen.name, gen.url,
-l.id, l.name, l.href,
-plat.id, plat.name, plat.href,
-gs.id, gs.url, gs.gameid
+    g.Id, g.href, g.name, g.image, g.releasedate, g.description,
+    d.id, d.name, d.url,
+    p.id, p.name, p.url,
+    gen.id, gen.name, gen.url,
+    l.id, l.name, l.href,
+    plat.id, plat.name, plat.href,
+    gs.id, gs.url, gs.gameid
+FROM (
+    SELECT DISTINCT g.Id, g.href, g.name, g.image, g.releasedate, g.description, g.publisherid, g.localizationid
     FROM games g
-    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-    LEFT JOIN developers d ON d.id = gd.developerid
-    LEFT JOIN publishers p ON p.id = g.publisherid
-    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-    LEFT JOIN genres gen ON gen.id = gg.genreid
-    LEFT JOIN localizations l ON l.id = g.localizationid
-    LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-    LEFT JOIN platforms plat ON plat.id = gp.platformid
-    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-OFFSET @offset
-LIMIT @limit";
+    ORDER BY g.Id, g.href
+    OFFSET @offset
+    LIMIT @limit
+) g
+LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+LEFT JOIN developers d ON d.id = gd.developerid
+LEFT JOIN publishers p ON p.id = g.publisherid
+LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+LEFT JOIN genres gen ON gen.id = gg.genreid
+LEFT JOIN localizations l ON l.id = g.localizationid
+LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
+LEFT JOIN platforms plat ON plat.id = gp.platformid
+LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id";
 
             var gameDictionary = new Dictionary<long, GameModel>();
 
