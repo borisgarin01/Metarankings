@@ -5969,3 +5969,7 @@ a.help {
         font-size: 16px;
     }
 }
+
+span.label {
+    margin-right: 0.5%;
+}
