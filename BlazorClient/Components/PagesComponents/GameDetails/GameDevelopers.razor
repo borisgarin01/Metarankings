@@ -1,7 +1,9 @@
 ﻿<p>
     <span class="label">Разработчик:</span>
-    @foreach (var developer in Developers)
+    @for (int i = 0; i < Developers.Count() - 1; i++)
     {
-        <a itemprop="author" href="@developer.Url">@developer.Name</a>
+        <a href="@Developers.ElementAt(i).Url">@Developers.ElementAt(i).Name</a>
+        <text>, </text>
     }
+    <a href="@Developers.ElementAt(Developers.Count()-1).Url">@Developers.ElementAt(Developers.Count() - 1).Name</a>
 </p>
