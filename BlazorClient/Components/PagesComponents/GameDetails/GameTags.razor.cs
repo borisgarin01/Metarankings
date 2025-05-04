@@ -4,7 +4,7 @@ namespace BlazorClient.Components.PagesComponents.GameDetails;
 
 public partial class GameTags : ComponentBase
 {
-    [Parameter]
+    [Parameter, EditorRequired]
     public List<string> Links { get; set; } = new();
 
     private string GetLinkText(string link)

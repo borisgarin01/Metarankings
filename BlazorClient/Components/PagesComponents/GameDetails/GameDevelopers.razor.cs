@@ -5,6 +5,6 @@ namespace BlazorClient.Components.PagesComponents.GameDetails;
 
 public partial class GameDevelopers : ComponentBase
 {
-    [Parameter]
+    [Parameter, EditorRequired]
     public IEnumerable<Developer> Developers { get; set; }
 }

@@ -5,7 +5,7 @@ namespace BlazorClient.Components.PagesComponents.GameDetails;
 
 public partial class AdHorizontal : ComponentBase
 {
-    [Parameter]
+    [Parameter, EditorRequired]
     public string AdId { get; set; } = "R-A-201169-7";
 
     [Inject]

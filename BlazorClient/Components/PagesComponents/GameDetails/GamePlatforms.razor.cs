@@ -5,6 +5,6 @@ namespace BlazorClient.Components.PagesComponents.GameDetails;
 
 public partial class GamePlatforms : ComponentBase
 {
-    [Parameter]
+    [Parameter, EditorRequired]
     public IEnumerable<Platform> Platforms { get; set; }
 }
