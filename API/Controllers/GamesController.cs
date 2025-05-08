@@ -78,4 +78,21 @@ public sealed class GamesController : ControllerBase
             return StatusCode(500, ex);
         }
     }
+
+    [HttpGet("platforms/{platformUrlPart}")]
+    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesOfPlatform(string platformUrlPart)
+    {
+        try
+        {
+            var platformUrl = $"/platforms/{platformUrlPart}";
+            var gamesOfPlatform = await _gamesRepository.GetByPlatformUrlAsync(platformUrl);
+            if (gamesOfPlatform is null)
+                return NotFound();
+            return Ok(gamesOfPlatform);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
 }

@@ -1,0 +1,27 @@
+﻿@page "/platforms/{PlatformName}"
+@using Domain
+
+@if (GamesOfPlatform is null)
+{
+        <p>Loading...</p>
+}
+else
+{
+    foreach (var game in GamesOfPlatform)
+    {
+        <BlazorClient.Components.PagesComponents.GamesList.Game
+            Id="@game.Id"
+            Name="@game.Name"
+            Description="@game.Description"
+            Developers="@game.Developers"
+            Genres="@game.Genres"
+            Href="@game.Href"
+            Image="@game.Image"
+            Localization="@game.Localization"
+            Platforms="@game.Platforms"
+            Publisher="@game.Publisher"
+            ReleaseDate="@game.ReleaseDate"
+            Score="@game.Score"
+            ScoresCount="@game.ScoresCount" />
+    }
+}
