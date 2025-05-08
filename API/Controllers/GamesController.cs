@@ -1,6 +1,7 @@
 ﻿using API.Json;
 using Data.Repositories.Classes.Derived;
 using Domain;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -59,5 +60,22 @@ public sealed class GamesController : ControllerBase
         if (file is null)
             return NotFound();
         return File(file, "image/jpeg");
+    }
+
+    [HttpGet("genres/{genreUrlPart}")]
+    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesOfGenre(string genreUrlPart)
+    {
+        try
+        {
+            var genreUrl = $"/genres/{genreUrlPart}";
+            var gamesOfGenre = await _gamesRepository.GetByGenreUrlAsync(genreUrl);
+            if (gamesOfGenre is null)
+                return NotFound();
+            return Ok(gamesOfGenre);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
     }
 }
