@@ -112,4 +112,21 @@ public sealed class GamesController : ControllerBase
             return StatusCode(500, ex);
         }
     }
+
+    [HttpGet("publishers/{publisherUrlPart}")]
+    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesOfPublisher(string publisherUrlPart)
+    {
+        try
+        {
+            var developerUrl = $"/publishers/{publisherUrlPart}";
+            var gamesOfDeveloper = await _gamesRepository.GetByPublisherUrlAsync(developerUrl);
+            if (gamesOfDeveloper is null)
+                return NotFound();
+            return Ok(gamesOfDeveloper);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
 }
