@@ -19,10 +19,10 @@ public sealed record Game
     [JsonPropertyName("image")]
     public string Image { get; set; }
 
-    [JsonPropertyName("localizationId")]
-    public required long? LocalizationId { get; set; }
     [JsonPropertyName("publisherId")]
     public required long PublisherId { get; set; }
+    [JsonPropertyName("publisher")]
+    public Publisher Publisher { get; set; }
 
     [JsonPropertyName("releaseDate")]
     public DateTime? ReleaseDate { get; set; }
@@ -38,4 +38,9 @@ public sealed record Game
 
     [JsonPropertyName("genres")]
     public IEnumerable<Genre> Genres { get; set; } = Enumerable.Empty<Genre>();
+
+    [JsonPropertyName("developers")]
+    public IEnumerable<Developer> Developers { get; set; } = Enumerable.Empty<Developer>();
+    [JsonPropertyName("localization")]
+    public Localization Localization { get; set; }
 }

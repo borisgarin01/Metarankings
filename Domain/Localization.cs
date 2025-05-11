@@ -14,4 +14,7 @@ public sealed record Localization
     
     [JsonPropertyName("href")]
     public string Href { get; set; }
+
+    [JsonPropertyName("games")]
+    public IEnumerable<Game> Games { get; set; } = Enumerable.Empty<Game>();
 }

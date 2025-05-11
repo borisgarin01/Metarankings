@@ -55,6 +55,66 @@ FROM
 Localizations
 WHERE Id=@id;", new { id });
 
+            if (localization is null)
+                return null;
+
+            var localizationGames = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer 
+from Games 
+where LocalizationId=@localizationId", new { localizationId = localization.Id });
+
+            foreach (var game in localizationGames)
+            {
+                game.Localization = localization;
+
+                var gamePlatforms = await connection.QueryAsync<GamePlatform>(@"SELECT Id, GameId, PlatformId FROM GamesPlatforms where GameId=@gameId", new { gameId = game.Id });
+
+                var platforms = new List<Platform>();
+
+                foreach (var gamePlatform in gamePlatforms)
+                {
+                    var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"SELECT Id, Href, Name 
+FROM Platforms
+WHERE Id=@Id", new { Id = gamePlatform.PlatformId });
+
+                    if (platform is not null)
+                    {
+                        platforms.Add(platform);
+                    }
+                }
+
+                game.Platforms = platforms;
+
+                var gameDevelopers = await connection.QueryAsync<DeveloperGame>(@"SELECT Id, GameId, DeveloperId FROM GamesDevelopers 
+WHERE GameId=@GameId", new { GameId = game.Id });
+
+                var developers = new List<Developer>();
+
+                foreach (var gameDeveloper in gameDevelopers)
+                {
+                    var developer = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name, Url
+FROM Developers 
+WHERE Id=@Id", new { Id = gameDeveloper.DeveloperId });
+
+                    if (developer is not null)
+                    {
+                        developers.Add(developer);
+                    }
+                }
+
+                game.Developers = developers;
+
+                var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"SELECT Id, Name, Url
+FROM Publishers
+WHERE Id=@Id", new { Id = game.PublisherId });
+
+                if (publisher is not null)
+                {
+                    game.Publisher = publisher;
+                }
+            }
+
+            localization.Games = localizationGames;
+
             return localization;
         }
     }
