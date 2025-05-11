@@ -2,6 +2,7 @@ using API.IServiceCollectionExtensions;
 using Data.Migrations;
 using FluentMigrator.Runner;
 using System.Reflection;
+using System.Text.Json.Serialization;
 
 internal class Program
 {
@@ -12,7 +13,11 @@ internal class Program
         // Add services to the container.
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
-        builder.Services.AddMvc(options => options.EnableEndpointRouting = false);
+        builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
+            .AddJsonOptions(options =>
+         {
+             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+         });
 
         builder.Services.AddSwaggerGen();
 
