@@ -14,4 +14,6 @@ public sealed record Publisher
 
     [JsonPropertyName("url")]
     public string Url { get; set; }
+
+    public IEnumerable<Game> Games { get; set; } = Enumerable.Empty<Game>();
 }

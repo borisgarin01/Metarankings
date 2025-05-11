@@ -7,15 +7,15 @@ namespace BlazorClient.Pages.Publishers;
 public partial class PublisherGamesListPage : ComponentBase
 {
     [Parameter]
-    public string PublisherName { get; set; }
+    public int PublisherId { get; set; }
 
     [Inject]
     public HttpClient HttpClient { get; set; }
 
-    public IEnumerable<GameModel> GamesOfPublisher { get; set; }
+    public Publisher Publisher { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        GamesOfPublisher = await HttpClient.GetFromJsonAsync<IEnumerable<GameModel>>($"/api/Games/Publishers/{PublisherName}");
+        Publisher = await HttpClient.GetFromJsonAsync<Publisher>($"/api/Publishers/{PublisherId}");
     }
 }

@@ -39,9 +39,24 @@ RETURNING Id;"
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var publishers = await connection.QueryAsync<Publisher>(@"SELECT Id, Name, Url 
-FROM 
-Publishers;");
+            var publishers = await connection.QueryAsync<Publisher>(@"select 
+publishers.id, publishers.name, publishers.url from publishers");
+
+            if (publishers is null)
+                return null;
+
+            if (!publishers.Any())
+                return publishers;
+
+            foreach (var publisher in publishers)
+            {
+                var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+
+                publisher.Games = publisherGames;
+
+            }
+
             return publishers;
         }
     }
@@ -50,10 +65,16 @@ Publishers;");
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"SELECT Id, Name, Url 
-FROM 
-Publishers 
-WHERE Id=@id", new { id });
+            var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"select 
+publishers.id, publishers.name, publishers.url from publishers where Id=@id", new { id });
+
+            if (publisher is null)
+                return null;
+
+            var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+
+            publisher.Games = publisherGames;
 
             return publisher;
         }
@@ -63,11 +84,25 @@ WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var publishers = await connection.QueryAsync<Publisher>(@"SELECT Id, Name, Url 
-FROM 
-Publishers 
-OFFSET @offset
-LIMIT @limit;", new { offset, limit });
+            var publishers = await connection.QueryAsync<Publisher>(@"select 
+publishers.id, publishers.name, publishers.url 
+from publishers
+OFFSET @offset limit @limit", new { offset, limit });
+
+            if (publishers is null)
+                return null;
+
+            if (!publishers.Any())
+                return publishers;
+
+            foreach (var publisher in publishers)
+            {
+                var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+
+                publisher.Games = publisherGames;
+
+            }
 
             return publishers;
         }

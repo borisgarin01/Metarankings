@@ -158,7 +158,8 @@ WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
         {
             var developers = await connection.QueryAsync<Developer>(@"select 
 developers.id, developers.name, developers.url 
-from developers OFFSET @offset limit @limit", new { offset, limit });
+from developers
+OFFSET @offset limit @limit", new { offset, limit });
 
             if (developers is null)
                 return null;
