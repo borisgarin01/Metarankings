@@ -13,7 +13,7 @@
     {
         <p>
             <span class="label">Дата выхода:</span>
-            <span>@ReleaseDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))</span>
+            <span>@ReleaseDate.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))</span>
         </p>
     }
 </div>

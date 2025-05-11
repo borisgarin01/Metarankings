@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
 
 namespace Domain;
@@ -31,4 +32,10 @@ public sealed record Game
 
     [JsonPropertyName("trailer")]
     public required string Trailer { get; set; }
+
+    [JsonPropertyName("platforms")]
+    public IEnumerable<Platform> Platforms { get; set; }
+
+    [JsonPropertyName("genres")]
+    public IEnumerable<Genre> Genres { get; set; }
 }

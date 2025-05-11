@@ -1,26 +1,75 @@
-﻿@page "/developers/{DeveloperName}"
+﻿@page "/developers/{DeveloperId:int}"
 @using Domain
+@using System.Globalization
 
-@if (GamesOfDeveloper is null)
+
+<BlazorClient.Components.PagesComponents.Common.Headerer />
+<BlazorClient.Components.PagesComponents.Common.GameMenu />
+
+@if (Developer is null)
 {
     <p>Loading...</p>
 }
 else
 {
-    foreach (var game in GamesOfDeveloper)
-    {
-        <BlazorClient.Components.PagesComponents.GamesList.Game Id="@game.Id"
-                                                                Name="@game.Name"
-                                                                Description="@game.Description"
-                                                                Developers="@game.Developers"
-                                                                Genres="@game.Genres"
-                                                                Href="@game.Href"
-                                                                Image="@game.Image"
-                                                                Localization="@game.Localization"
-                                                                Platforms="@game.Platforms"
-                                                                Publisher="@game.Publisher"
-                                                                ReleaseDate="@game.ReleaseDate"
-                                                                Score="@game.Score"
-                                                                ScoresCount="@game.ScoresCount" />
-    }
+    <div class="content-title">
+        <h1>@Developer.Name</h1>
+    </div>
+
+    <div id="filter">
+        <div class="filter-nav">
+            <div class="filter-name">Студии</div>
+            <div class="filter-menu">
+                <a href="https://metarankings.ru/razrabotchiki/fromsoftware/">FromSoftware</a>
+                <a href="https://metarankings.ru/razrabotchiki/naughty_dog/">Naughty Dog</a>
+                <a href="https://metarankings.ru/razrabotchiki/ubisoft/">Ubisoft</a>
+                <a href="https://metarankings.ru/razrabotchiki/santa_monica/">Santa Monica</a>
+                <a href="https://metarankings.ru/razrabotchiki/infinity_ward/">Infinity Ward</a>
+                <a href="https://metarankings.ru/razrabotchiki/nintendo/">Nintendo</a>
+                <a href="https://metarankings.ru/razrabotchiki/sega/">SEGA</a>
+                <a href="https://metarankings.ru/razrabotchiki/cd_projekt_red/">CD Projekt RED</a>
+                <a href="https://metarankings.ru/razrabotchiki/capcom/">Capcom</a>
+                <a href="https://metarankings.ru/razrabotchiki/insomniac_games/">Insomniac Games</a>
+                <a href="https://metarankings.ru/razrabotchiki/sucker_punch/">Sucker Punch</a>
+            </div>
+        </div>
+        <div class="filter-nav">
+            <div class="filter-name">Год</div>
+            <div class="filter-menu">
+                <a href="https://metarankings.ru/best-games-2025/">2025</a>
+                <a href="https://metarankings.ru/best-games-2024/">2024</a>
+                <a href="https://metarankings.ru/best-games-2023/">2023</a>
+                <a href="https://metarankings.ru/best-games-2022/">2022</a>
+                <a href="https://metarankings.ru/best-games-2021/">2021</a>
+                <a href="https://metarankings.ru/best-games-2020/">2020</a>
+                <a href="https://metarankings.ru/best-games-2019/">2019</a>
+                <a href="https://metarankings.ru/best-games-2018/">2018</a>
+            </div>
+        </div>
+        <div class="filter-nav">
+            <div class="filter-name">Лучшие</div>
+            <div class="filter-menu">
+                <a title="Лучшие игры для PC" href="https://metarankings.ru/best-pc-games/">PC</a>
+                <a title="Лучшие игры для PlayStation 5" href="https://metarankings.ru/best-ps5-games/">PlayStation 5</a>
+                <a title="Лучшие игры для Xbox Series X" href="https://metarankings.ru/best-xbox-series-x-s-games/">Xbox Series X</a>
+                <a title="Лучшие игры для PS4" href="https://metarankings.ru/best-ps4-games/">PlayStation 4</a>
+                <a title="Лучшие игры для Xbox One" href="https://metarankings.ru/best-xboxone-games/">Xbox One</a>
+                <a title="Лучшие игры для Nintendo Switch" href="https://metarankings.ru/best-switch-games/">Nintendo Switch</a>
+                <a title="Лучшие игры для PS3" href="https://metarankings.ru/best-ps3-games/">PlayStation 3</a>
+                <a title="Лучшие игры для Xbox 360" href="https://metarankings.ru/best-xbox360-games/">Xbox 360</a>
+                <a title="Лучшие игры для Nintendo Wii U" href="https://metarankings.ru/best-wiiu-games/">Wii U</a>
+                <a title="Лучшие игры для PS Vita" href="https://metarankings.ru/best-psvita-games/">PS Vita</a>
+                <a title="Лучшие игры для Nintendo 3DS" href="https://metarankings.ru/best-3ds-games/">3DS</a>
+            </div>
+        </div>
+        <h2>Новые игры</h2>
+    </div>
+
+    <div id="loop" class="list clear">
+        @foreach (var game in Developer.Games)
+        {
+            <BlazorClient.Components.PagesComponents.DeveloperDetails.DeveloperGameComponent Game="@game" />
+        }
+    </div>
 }
+

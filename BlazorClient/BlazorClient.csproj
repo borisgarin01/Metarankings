@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Pages\chiaulyz.zpe~" />
+    <None Remove="Pages\Developers\DeveloperGamesListPage.razor.cs~RF6a3bec.TMP" />
   </ItemGroup>
 
   <ItemGroup>

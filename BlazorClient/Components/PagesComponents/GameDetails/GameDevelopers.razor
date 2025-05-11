@@ -2,8 +2,8 @@
     <span class="label">Разработчик:</span>
     @for (int i = 0; i < Developers.Count() - 1; i++)
     {
-        <a href="@Developers.ElementAt(i).Url">@Developers.ElementAt(i).Name</a>
+        <a href="/developers/@Developers.ElementAt(i).Id">@Developers.ElementAt(i).Name</a>
         <text>, </text>
     }
-    <a href="@Developers.ElementAt(Developers.Count()-1).Url">@Developers.ElementAt(Developers.Count() - 1).Name</a>
+    <a href="/developers/@Developers.ElementAt(Developers.Count()-1).Id">@Developers.ElementAt(Developers.Count() - 1).Name</a>
 </p>

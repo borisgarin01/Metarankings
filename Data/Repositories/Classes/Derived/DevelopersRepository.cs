@@ -39,9 +39,54 @@ RETURNING Id;"
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var developers = await connection.QueryAsync<Developer>(@"SELECT Id, Name, Url 
-FROM 
-Developers;");
+            var developers = await connection.QueryAsync<Developer>(@"select 
+developers.id, developers.name, developers.url from developers");
+
+            if (developers is null)
+                return null;
+
+            if (!developers.Any())
+                return developers;
+
+            foreach (var developer in developers)
+            {
+                var developerGames = await connection.QueryAsync(@"SELECT Id, GameId, DeveloperId 
+from GamesDevelopers 
+where developerId=@developerId", new { developerId = developer.Id });
+
+                foreach (var gameDeveloper in developerGames)
+                {
+                    var games = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games WHERE Id=@GameId", new { gameDeveloper.GameId });
+
+                    developer.Games = games;
+                }
+
+                foreach (var game in developer.Games)
+                {
+                    var platforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name, platforms.Href 
+FROM
+platforms
+INNER JOIN gamesPlatforms
+on platforms.Id=gamesPlatforms.PlatformId
+INNER JOIN games
+on games.Id=gamesPlatforms.GameId
+WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
+
+                    game.Platforms = platforms;
+
+                    var genres = await connection.QueryAsync<Genre>(@"SELECT genres.Id, genres.Name, genres.Url 
+FROM
+genres
+INNER JOIN gamesGenres
+on genres.Id=gamesGenres.GenreId
+INNER JOIN games
+on games.Id=gamesGenres.GameId
+WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
+
+                    game.Genres = genres;
+                }
+            }
             return developers;
         }
     }
@@ -50,10 +95,49 @@ Developers;");
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var developer = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name, Url 
-FROM 
-Developers 
-WHERE Id=@id", new { id });
+            var developer = await connection.QueryFirstOrDefaultAsync<Developer>(@"select 
+developers.id, developers.name, developers.url from developers
+WHERE developers.Id=@id", new { id });
+
+            if (developer is null)
+                return null;
+
+            var developerGames = await connection.QueryAsync<DeveloperGame>(@"SELECT Id, GameId, DeveloperId 
+from GamesDevelopers 
+where developerId=@developerId", new { developerId = developer.Id });
+
+            foreach (var gameDeveloper in developerGames)
+            {
+                var games = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games WHERE Id=@GameId", new { gameDeveloper.GameId });
+
+                developer.Games = games;
+            }
+
+            foreach (var game in developer.Games)
+            {
+                var platforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name, platforms.Href 
+FROM
+platforms
+INNER JOIN gamesPlatforms
+on platforms.Id=gamesPlatforms.PlatformId
+INNER JOIN games
+on games.Id=gamesPlatforms.GameId
+WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
+
+                game.Platforms = platforms;
+
+                var genres = await connection.QueryAsync<Genre>(@"SELECT genres.Id, genres.Name, genres.Url 
+FROM
+genres
+INNER JOIN gamesGenres
+on genres.Id=gamesGenres.GenreId
+INNER JOIN games
+on games.Id=gamesGenres.GameId
+WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
+
+                game.Genres = genres;
+            }
 
             return developer;
         }
@@ -63,12 +147,57 @@ WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var developers = await connection.QueryAsync<Developer>(@"SELECT Id, Name, Url 
-FROM 
-Developers 
-OFFSET @offset
-LIMIT @limit;", new { offset, limit });
+            var developers = await connection.QueryAsync<Developer>(@"select 
+developers.id, developers.name, developers.url 
+from developers OFFSET @offset limit @limit", new { offset, limit });
 
+            if (developers is null)
+                return null;
+
+            if (!developers.Any())
+                return null;
+
+            foreach (var developer in developers)
+            {
+
+                var developerGames = await connection.QueryAsync<DeveloperGame>(@"SELECT Id, GameId, DeveloperId 
+from GamesDevelopers 
+where developerId=@developerId", new { developerId = developer.Id });
+
+                foreach (var gameDeveloper in developerGames)
+                {
+                    var games = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games WHERE Id=@GameId", new { gameDeveloper.GameId });
+
+                    developer.Games = games;
+                }
+
+
+                foreach (var game in developer.Games)
+                {
+                    var platforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name, platforms.Href 
+FROM
+platforms
+INNER JOIN gamesPlatforms
+on platforms.Id=gamesPlatforms.PlatformId
+INNER JOIN games
+on games.Id=gamesPlatforms.GameId
+WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
+
+                    game.Platforms = platforms;
+
+                    var genres = await connection.QueryAsync<Genre>(@"SELECT genres.Id, genres.Name, genres.Url 
+FROM
+genres
+INNER JOIN gamesGenres
+on genres.Id=gamesGenres.GenreId
+INNER JOIN games
+on games.Id=gamesGenres.GameId
+WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
+
+                    game.Genres = genres;
+                }
+            }
             return developers;
         }
     }

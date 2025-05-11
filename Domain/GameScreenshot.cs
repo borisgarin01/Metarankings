@@ -13,5 +13,5 @@ public sealed record GameScreenshot
 
     [Required]
     [JsonPropertyName("gameId")]
-    public decimal GameId { get; set; }
+    public long GameId { get; set; }
 }

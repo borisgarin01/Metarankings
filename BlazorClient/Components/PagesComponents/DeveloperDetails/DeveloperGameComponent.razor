@@ -1,0 +1,20 @@
+﻿@using System.Globalization
+<div class="post clear">
+    <a href="/games/details/@Game.Id" title="«@Game.Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{Game.Image}")" alt="@Game.Name"></a>
+    <h3><a class="name" href="/games/details/@Game.Id">@Game.Name</a></h3>
+    <div class="post-meta"><p>@string.Join(", ", Game.Platforms.Select(b => b.Name))</p></div>
+    <div class="post-meta"><p>@string.Join(", ", Game.Genres.Select(b => b.Name))</p></div>
+    <div class="post-meta">
+        @if (Game.ReleaseDate.HasValue)
+        {
+            <p>@Game.ReleaseDate.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))</p>
+        }
+    </div>
+    <div class="trailer" data-video="/games/details/@Game.Id/#content-trailer"></div>
+    <div class="ratings-graph">
+        <div class="graph">
+            <div class="small-score mark-0">0</div>
+            <div class="graph-body"><div style="width:0%" class="rating-graph mark-0"></div></div>
+        </div>
+    </div>
+</div>
