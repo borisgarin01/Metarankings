@@ -1,11 +1,9 @@
-﻿using BlazorClient.Components.PagesComponents;
-using Domain;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 
 namespace BlazorClient.Pages;
 
-public partial class GameDetails
+public partial class GameDetails : ComponentBase
 {
     public Domain.GameModel Game { get; set; }
 
