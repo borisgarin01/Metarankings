@@ -6,7 +6,7 @@ public sealed record AddPlatformModel
 {
     [JsonPropertyName("name")]
     public string Name { get; set; }
-    
+
     [JsonPropertyName("href")]
     public string Href { get; set; }
 }

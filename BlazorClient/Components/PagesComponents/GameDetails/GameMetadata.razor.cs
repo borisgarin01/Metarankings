@@ -1,6 +1,5 @@
 ﻿using Domain;
 using Microsoft.AspNetCore.Components;
-using System;
 
 namespace BlazorClient.Components.PagesComponents.GameDetails;
 

@@ -17,13 +17,13 @@ public class AutoMapperProfile : Profile
 
         CreateMap<AddGenreModel, Genre>();
         CreateMap<UpdateGenreModel, Genre>();
-        
+
         CreateMap<AddPlatformModel, Platform>();
         CreateMap<UpdatePlatformModel, Platform>();
-        
+
         CreateMap<AddLocalizationModel, Localization>();
         CreateMap<UpdateLocalizationModel, Localization>();
-        
+
         CreateMap<AddPublisherModel, Publisher>();
         CreateMap<UpdatePublisherModel, Publisher>();
     }

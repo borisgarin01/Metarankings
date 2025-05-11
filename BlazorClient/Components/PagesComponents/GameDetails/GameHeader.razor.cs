@@ -4,15 +4,15 @@ namespace BlazorClient.Components.PagesComponents.GameDetails;
 
 public partial class GameHeader : ComponentBase
 {
-    [Parameter, EditorRequired] 
+    [Parameter, EditorRequired]
     public string Name { get; set; }
-    
-    [Parameter, EditorRequired] 
+
+    [Parameter, EditorRequired]
     public string Description { get; set; }
-    
-    [Parameter, EditorRequired] 
+
+    [Parameter, EditorRequired]
     public long Id { get; set; }
-    
-    [Parameter, EditorRequired] 
+
+    [Parameter, EditorRequired]
     public int? ReleaseYear { get; set; }
 }
