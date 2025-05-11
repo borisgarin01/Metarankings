@@ -9,7 +9,7 @@ public partial class Home : ComponentBase
     [Inject]
     public HttpClient HttpClient { get; set; }
 
-    public IEnumerable<GameModel> Games { get; set; }
+    public IEnumerable<GameModel> Games { get; set; } = Enumerable.Empty<GameModel>();
 
     [Parameter]
     public int PageSize { get; set; } = 5; // Default value

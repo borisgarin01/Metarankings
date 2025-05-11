@@ -12,7 +12,7 @@ public partial class GenreGamesListPage : ComponentBase
     [Inject]
     public HttpClient HttpClient { get; set; }
 
-    public IEnumerable<GameModel> GamesOfGenre { get; set; }
+    public IEnumerable<GameModel> GamesOfGenre { get; set; } = Enumerable.Empty<GameModel>();
 
     protected override async Task OnParametersSetAsync()
     {

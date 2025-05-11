@@ -50,7 +50,7 @@ developers.id, developers.name, developers.url from developers");
 
             foreach (var developer in developers)
             {
-                var developerGames = await connection.QueryAsync(@"SELECT Id, GameId, DeveloperId 
+                var developerGames = await connection.QueryAsync<DeveloperGame>(@"SELECT Id, GameId, DeveloperId 
 from GamesDevelopers 
 where developerId=@developerId", new { developerId = developer.Id });
 
@@ -59,7 +59,10 @@ where developerId=@developerId", new { developerId = developer.Id });
                     var games = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
 FROM Games WHERE Id=@GameId", new { gameDeveloper.GameId });
 
-                    developer.Games = games;
+                    if (games is not null)
+                        developer.Games = games;
+                    else
+                        developer.Games = Enumerable.Empty<Game>();
                 }
 
                 foreach (var game in developer.Games)
@@ -73,7 +76,10 @@ INNER JOIN games
 on games.Id=gamesPlatforms.GameId
 WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
 
-                    game.Platforms = platforms;
+                    if (platforms is not null)
+                        game.Platforms = platforms;
+                    else
+                        game.Platforms = Enumerable.Empty<Platform>();
 
                     var genres = await connection.QueryAsync<Genre>(@"SELECT genres.Id, genres.Name, genres.Url 
 FROM
@@ -84,7 +90,10 @@ INNER JOIN games
 on games.Id=gamesGenres.GameId
 WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
 
-                    game.Genres = genres;
+                    if (genres is not null)
+                        game.Genres = genres;
+                    else
+                        game.Genres = Enumerable.Empty<Genre>();
                 }
             }
             return developers;

@@ -24,16 +24,16 @@ public partial class Game : ComponentBase
     public long? ScoresCount { get; set; }
 
     [Parameter, EditorRequired]
-    public required IEnumerable<Developer> Developers { get; set; }
+    public required IEnumerable<Developer> Developers { get; set; } = Enumerable.Empty<Developer>();
 
     [Parameter, EditorRequired]
     public required Publisher Publisher { get; set; }
 
     [Parameter, EditorRequired]
-    public required IEnumerable<Platform> Platforms { get; set; }
+    public required IEnumerable<Platform> Platforms { get; set; } = Enumerable.Empty<Platform>();
 
     [Parameter, EditorRequired]
-    public required IEnumerable<Genre> Genres { get; set; }
+    public required IEnumerable<Genre> Genres { get; set; } = Enumerable.Empty<Genre>();
 
     [Parameter, EditorRequired]
     public required Localization Localization { get; set; }

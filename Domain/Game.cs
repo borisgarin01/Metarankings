@@ -34,8 +34,8 @@ public sealed record Game
     public required string Trailer { get; set; }
 
     [JsonPropertyName("platforms")]
-    public IEnumerable<Platform> Platforms { get; set; }
+    public IEnumerable<Platform> Platforms { get; set; } = Enumerable.Empty<Platform>();
 
     [JsonPropertyName("genres")]
-    public IEnumerable<Genre> Genres { get; set; }
+    public IEnumerable<Genre> Genres { get; set; } = Enumerable.Empty<Genre>();
 }

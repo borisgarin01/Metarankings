@@ -6,5 +6,5 @@ namespace BlazorClient.Components.PagesComponents.GamesList;
 public partial class GenresComponent : ComponentBase
 {
     [Parameter, EditorRequired]
-    public IEnumerable<Genre> Genres { get; set; }
+    public IEnumerable<Genre> Genres { get; set; } = Enumerable.Empty<Genre>();
 }
