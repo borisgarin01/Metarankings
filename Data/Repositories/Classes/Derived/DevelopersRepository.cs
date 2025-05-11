@@ -54,18 +54,18 @@ developers.id, developers.name, developers.url from developers");
 from GamesDevelopers 
 where developerId=@developerId", new { developerId = developer.Id });
 
+                var games = new List<Game>();
+
                 foreach (var gameDeveloper in developerGames)
                 {
-                    var games = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+                    var game = await connection.QueryFirstOrDefaultAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
 FROM Games WHERE Id=@GameId", new { gameDeveloper.GameId });
 
                     if (games is not null)
-                        developer.Games = games;
-                    else
-                        developer.Games = Enumerable.Empty<Game>();
+                        games.Add(game);
                 }
 
-                foreach (var game in developer.Games)
+                foreach (var game in games)
                 {
                     var platforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name, platforms.Href 
 FROM
@@ -95,6 +95,7 @@ WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
                     else
                         game.Genres = Enumerable.Empty<Genre>();
                 }
+                developer.Games = games;
             }
             return developers;
         }

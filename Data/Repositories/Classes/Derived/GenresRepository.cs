@@ -55,6 +55,27 @@ FROM
 Genres
 WHERE Id=@id", new { id });
 
+            if (genre is null)
+                return null;
+
+            var genreGames = await connection.QueryAsync<GameGenre>(@"SELECT Id, GameId, GenreId
+	FROM GamesGenres WHERE GenreId=@GenreId;", new { GenreId = id });
+
+            var games = new List<Game>();
+
+            foreach (var genreGame in genreGames)
+            {
+                var game = await connection.QueryFirstOrDefaultAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games WHERE Id=@GameId", new { GameId = genreGame.GameId });
+
+                if (game is not null)
+                {
+                    games.Add(game);
+                }
+            }
+
+            genre.Games = games;
+
             return genre;
         }
     }

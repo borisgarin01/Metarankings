@@ -2,9 +2,9 @@
     <span class="label">Платформы:</span><span itemprop="gamePlatform">
         @for (int i = 0; i < Platforms.Count() - 1; i++)
         {
-                <a href="@Platforms.ElementAt(i).Href">@Platforms.ElementAt(i).Name</a>
+            <a href="/platforms/@Platforms.ElementAt(i).Id">@Platforms.ElementAt(i).Name</a>
             <text>, </text>
         }
-        <a href="@Platforms.ElementAt(Platforms.Count()-1).Href">@Platforms.ElementAt(Platforms.Count() - 1).Name</a>
+        <a href="/platforms/@Platforms.ElementAt(Platforms.Count()-1).Id">@Platforms.ElementAt(Platforms.Count() - 1).Name</a>
     </span>
 </p>

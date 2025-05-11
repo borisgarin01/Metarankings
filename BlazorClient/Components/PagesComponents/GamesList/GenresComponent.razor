@@ -2,9 +2,9 @@
     <span class="label">Жанр:</span> <span itemprop="genre">
         @for (int i = 0; i < Genres.Count() - 1; i++)
         {
-            <a href="@Genres.ElementAt(i).Url">@Genres.ElementAt(i).Name</a>
+            <a href="/genres/@Genres.ElementAt(i).Id">@Genres.ElementAt(i).Name</a>
             <text>, </text>
         }
-        <a href="@Genres.ElementAt(Genres.Count()-1).Url">@Genres.ElementAt(Genres.Count() - 1).Name</a>
+        <a href="/genres/@Genres.ElementAt(Genres.Count()-1).Id">@Genres.ElementAt(Genres.Count() - 1).Name</a>
     </span>
 </p>

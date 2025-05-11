@@ -1,4 +1,5 @@
-﻿<div class="post-footer">
+﻿@using System.Globalization
+<div class="post-footer">
     <h2>Трейлер и скриншоты</h2>
     <div id="tcontent">
         @if (!string.IsNullOrWhiteSpace(Trailer))
@@ -6,7 +7,7 @@
             <div class="video-content" itemprop="subjectOf" itemscope itemtype="https://schema.org/VideoObject">
                 <div id="content-trailer">
                     <meta itemprop="isFamilyFriendly" content="true">
-                    <meta itemprop="uploadDate" content="@ReleaseDate?.ToString("yyyy-MM-dd")">
+                    <meta itemprop="uploadDate" content="@ReleaseDate?.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))">
                     <link itemprop="url" href="@Href">
                     <meta itemprop="name" content="Трейлер The @Name">
                     <meta itemprop="description" content="Трейлер игры @Name">

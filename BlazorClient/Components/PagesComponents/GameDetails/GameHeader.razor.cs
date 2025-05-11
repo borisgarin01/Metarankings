@@ -11,7 +11,7 @@ public partial class GameHeader : ComponentBase
     public string Description { get; set; }
     
     [Parameter, EditorRequired] 
-    public int Id { get; set; }
+    public long Id { get; set; }
     
     [Parameter, EditorRequired] 
     public int? ReleaseYear { get; set; }

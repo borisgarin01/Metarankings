@@ -7,15 +7,15 @@ namespace BlazorClient.Pages.Genres;
 public partial class GenreGamesListPage : ComponentBase
 {
     [Parameter]
-    public string GenreName { get; set; }
+    public long GenreId { get; set; }
 
     [Inject]
     public HttpClient HttpClient { get; set; }
 
-    public IEnumerable<GameModel> GamesOfGenre { get; set; } = Enumerable.Empty<GameModel>();
+    public Genre Genre { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        GamesOfGenre = await HttpClient.GetFromJsonAsync<IEnumerable<GameModel>>($"/api/Games/genres/{GenreName}");
+        Genre = await HttpClient.GetFromJsonAsync<Genre>($"/api/Genres/{GenreId}");
     }
 }

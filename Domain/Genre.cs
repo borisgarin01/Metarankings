@@ -12,4 +12,7 @@ public sealed record Genre
 
     [JsonPropertyName("url")]
     public string Url { get; set; }
+
+    [JsonPropertyName("games")]
+    public IEnumerable<Game> Games { get; set; } = Enumerable.Empty<Game>();
 }

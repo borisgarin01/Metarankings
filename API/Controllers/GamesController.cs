@@ -42,8 +42,8 @@ public sealed class GamesController : ControllerBase
         return Ok(games);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<GameModel>> GetAsync(int id)
+    [HttpGet("{id:long}")]
+    public async Task<ActionResult<GameModel>> GetAsync(long id)
     {
         var game = await _gamesRepository.GetAsync(id);
 

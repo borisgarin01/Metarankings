@@ -13,4 +13,5 @@ public sealed record Platform
 
     [JsonPropertyName("href")]
     public string Href { get; set; }
+    public IEnumerable<Game> Games { get; set; } = Enumerable.Empty<Game>();
 }

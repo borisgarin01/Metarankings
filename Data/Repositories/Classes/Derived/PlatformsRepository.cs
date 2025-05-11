@@ -40,9 +40,41 @@ RETURNING Id;"
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var platforms = await connection.QueryAsync<Platform>(@"SELECT Id, Name, Href 
-FROM 
-Platforms;");
+            var platforms = await connection.QueryAsync<Platform>(@"select 
+platforms.id, platforms.name, platforms.href 
+from platforms");
+
+            if (platforms is null)
+                return null;
+
+            foreach (var platform in platforms)
+            {
+                var platformGames = await connection.QueryAsync<PlatformGame>(@"SELECT Id, GameId, PlatformId 
+from GamesPlatforms 
+where PlatformId=@platformId", new { platformId = platform.Id });
+
+                foreach (var gamePlatform in platformGames)
+                {
+                    var games = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games WHERE Id=@GameId", new { gamePlatform.GameId });
+
+                    platform.Games = games;
+                }
+
+                foreach (var game in platform.Games)
+                {
+                    var gamePlatforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name, platforms.Href 
+FROM
+platforms
+INNER JOIN gamesPlatforms
+on platforms.Id=gamesPlatforms.PlatformId
+INNER JOIN games
+on games.Id=gamesPlatforms.GameId
+WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
+
+                    game.Platforms = platforms;
+                }
+            }
             return platforms;
         }
     }
@@ -51,10 +83,27 @@ Platforms;");
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"SELECT Id, Name, Href 
-FROM 
-Platforms 
-WHERE Id=@id", new { id });
+            var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"select 
+platforms.id, platforms.name, platforms.href 
+from platforms
+WHERE platforms.Id=@id", new { id });
+
+            if (platform is null)
+                return null;
+
+            var platformGames = await connection.QueryAsync<PlatformGame>(@"SELECT Id, GameId, PlatformId 
+from GamesPlatforms 
+where PlatformId=@platformId", new { platformId = platform.Id });
+
+            var games = new List<Game>();
+
+            foreach (var gamePlatform in platformGames)
+            {
+                games.AddRange(await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games WHERE Id=@GameId", new { gamePlatform.GameId }));
+            }
+
+            platform.Games = games;
 
             return platform;
         }

@@ -10,7 +10,7 @@ public partial class GameDetails
     public Domain.GameModel Game { get; set; }
 
     [Parameter]
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     [Inject]
     public HttpClient HttpClient { get; set; }
