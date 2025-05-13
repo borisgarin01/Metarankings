@@ -1,0 +1,25 @@
+﻿@inject HttpClient HttpClient
+
+<div class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+    <a href="/games/Details/@Id" title="Игра @Name" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{Image}")" alt="Игра @Name"></a>
+    <div class="best-prod">
+        <div class="counter" itemprop="position">@Id</div>
+        <span class="star">★</span>
+    </div>
+    <div itemprop="item" itemscope="" itemtype="https://schema.org/VideoGame">
+        <link itemprop="url" href="/games/Details/@Id">
+        <link itemprop="image" href="@Image">
+        <meta itemprop="dateCreated" content="@ReleaseDate!.Value.Year">
+        <h3 itemprop="name"><a class="name" href="/games/Details/@Id">@Name</a></h3>
+        <div class="post-meta"><p>@Publisher.Name</p></div>
+        <PlatformsComponent Platforms="@Platforms" />
+        <BlazorClient.Components.PagesComponents.GamesList.GenresComponent Genres="@Genres" />
+    </div>
+    <div class="trailer" data-video="/games/Details/@Id/#content-trailer"></div>
+    <div class="ratings-graph">
+        <div class="graph">
+            <div class="small-score mark-@Math.Round(Score.HasValue?Score.Value:0)">@(Score.HasValue ? Score.Value : 0)</div>
+            <div class="graph-body"><div style="width:@((Score.HasValue?Score.Value:0)*10)%" class="rating-graph mark-@Math.Round(Score.HasValue?Score.Value:0)"></div></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,12 @@
+﻿<div class="post clear">
+    <a href="/games/details/@Game.Id" title="«@Game.Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{Game.Image}")" alt="@Game.Name"></a>
+    <h3><a class="name" href="/games/details/@Game.Id">@Game.Name</a></h3>
+
+    <div class="trailer" data-video="/games/details/@Game.Id/#content-trailer"></div>
+    <div class="ratings-graph">
+        <div class="graph">
+            <div class="small-score mark-0">0</div>
+            <div class="graph-body"><div style="width:0%" class="rating-graph mark-0"></div></div>
+        </div>
+    </div>
+</div>

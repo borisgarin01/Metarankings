@@ -9,7 +9,7 @@ public class DateTimeJsonConverter : JsonConverter<DateTime>
     private readonly string format;
     public DateTimeJsonConverter(string format)
     {
-        this.format= format;
+        this.format = format;
     }
 
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

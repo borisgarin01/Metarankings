@@ -1,4 +1,4 @@
-﻿using BlazorClient.Components.PagesComponents;
+﻿using Domain;
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 
@@ -9,7 +9,7 @@ public partial class Home : ComponentBase
     [Inject]
     public HttpClient HttpClient { get; set; }
 
-    public IEnumerable<Domain.Game> Games { get; set; }
+    public IEnumerable<GameModel> Games { get; set; } = Enumerable.Empty<GameModel>();
 
     [Parameter]
     public int PageSize { get; set; } = 5; // Default value
@@ -20,6 +20,6 @@ public partial class Home : ComponentBase
     protected override async Task OnParametersSetAsync()
     {
         // Fetch data based on the current PageSize and PageNumber
-        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Domain.Game>>($"/api/Games");
+        Games = await HttpClient.GetFromJsonAsync<IEnumerable<GameModel>>($"/api/Games/{PageNumber}/{PageSize}");
     }
 }

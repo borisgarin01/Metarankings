@@ -1,0 +1,25 @@
+﻿@page "/localizations/{LocalizationId:long}"
+@using Domain
+
+@if (Localization is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div id="loop" class="list clear">
+        @foreach (var game in Localization.Games)
+        {
+            <div class="post clear">
+                <a href="/games/details/@game.Id" title="Игра «@game.Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{game.Image}")" alt="@game.Name"></a>
+                <h2><a class="name" href="/games/details/@game.Id">@game.Name</a></h2>
+                <div class="post-meta"><p><span style="text-decoration: underline;">@Localization.Name</span></p></div>
+                <div class="post-meta"><p>@string.Join(", ", game.Platforms.Select(a => a.Name))</p></div>
+                <div class="post-meta"><p>@string.Join(", ", game.Developers.Select(a => a.Name))</p></div>
+                <div class="post-meta"><p>@game.Publisher.Name</p></div>
+                <div class="post-content">@game.Description</div>
+                <div class="trailer" data-video="/games/details/@game.Id/#content-trailer"></div>
+            </div>
+        }
+    </div>
+}
