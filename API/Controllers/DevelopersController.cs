@@ -35,6 +35,14 @@ public sealed class DevelopersController : ControllerBase
         return Ok(developers);
     }
 
+    [HttpGet("{offset}/{limit}")]
+    public async Task<ActionResult<IEnumerable<Developer>>> GetAsync(long offset, long limit)
+    {
+        var developers = await _developersRepository.GetAsync(offset, limit);
+
+        return Ok(developers);
+    }
+
     [HttpPost]
     public async Task<ActionResult<Developer>> AddAsync(AddDeveloperModel addDeveloperModel)
     {

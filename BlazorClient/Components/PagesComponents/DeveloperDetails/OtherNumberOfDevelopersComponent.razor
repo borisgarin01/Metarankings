@@ -1,0 +1,12 @@
+﻿@if (OtherNumberOfDevelopers is not null && OtherNumberOfDevelopers.Any())
+{
+    <div class="filter-nav">
+        <div class="filter-name">Студии</div>
+        <div class="filter-menu">
+            @foreach (var developer in OtherNumberOfDevelopers)
+            {
+                <a href="/developers/@developer.Id">@developer.Name</a>
+            }
+        </div>
+    </div>
+}
