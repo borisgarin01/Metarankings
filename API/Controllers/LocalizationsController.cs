@@ -1,6 +1,7 @@
 ﻿using API.Models.RequestsModels.Localizations;
 using AutoMapper;
 using Data.Repositories.Interfaces;
+using Data.Repositories.Interfaces.Derived;
 using Domain;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,12 @@ public sealed class LocalizationsController : ControllerBase
 {
     private readonly IMapper _mapper;
 
-    private readonly IRepository<Localization> _localizationsRepository;
+    private readonly ILocalizationsRepository _localizationsRepository;
 
     private readonly IValidator<AddLocalizationModel> _addLocalizationModelValidator;
     private readonly IValidator<UpdateLocalizationModel> _updateLocalizationModelValidator;
 
-    public LocalizationsController(IMapper mapper, IRepository<Localization> localizationsRepository, IValidator<AddLocalizationModel> addLocalizationModelValidator, IValidator<UpdateLocalizationModel> updateLocalizationModelValidator)
+    public LocalizationsController(IMapper mapper, ILocalizationsRepository localizationsRepository, IValidator<AddLocalizationModel> addLocalizationModelValidator, IValidator<UpdateLocalizationModel> updateLocalizationModelValidator)
     {
         _mapper = mapper;
         _localizationsRepository = localizationsRepository;
@@ -52,17 +53,22 @@ public sealed class LocalizationsController : ControllerBase
         return Created($"api/developers/{localization.Id}", localization);
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Localization>> GetAsync(long id)
+    [HttpGet("{id:long}/{platformId:long?}")]
+    public async Task<ActionResult<Localization>> GetAsync(long id, long? platformId)
     {
-        var localization = await _localizationsRepository.GetAsync(id);
+        Localization localization = null;
+
+        if (!platformId.HasValue)
+            localization = await _localizationsRepository.GetAsync(id);
+        else
+            localization = await _localizationsRepository.GetByPlatformAsync(id, platformId.Value);
         if (localization is null)
             return NotFound();
         else
             return Ok(localization);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:long}")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         var localization = await _localizationsRepository.GetAsync(id);
@@ -82,7 +88,7 @@ public sealed class LocalizationsController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
     public async Task<ActionResult<Localization>> UpdateAsync(long id, UpdateLocalizationModel updateLocalizationModel)
     {
         var validationResult = _updateLocalizationModelValidator.Validate(updateLocalizationModel);

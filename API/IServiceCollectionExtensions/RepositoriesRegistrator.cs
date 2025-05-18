@@ -1,5 +1,6 @@
 ﻿using Data.Repositories.Classes.Derived;
 using Data.Repositories.Interfaces;
+using Data.Repositories.Interfaces.Derived;
 using Domain;
 
 namespace API.IServiceCollectionExtensions;
@@ -19,6 +20,8 @@ public static class RepositoriesRegistrator
         services.AddScoped<IRepository<Publisher>, PublishersRepository>(instance => new PublishersRepository(configuration.GetConnectionString("MetarankingsConnection")));
 
         services.AddScoped<GamesRepository>(instance => new GamesRepository(configuration.GetConnectionString("MetarankingsConnection")));
+
+        services.AddScoped<ILocalizationsRepository>(instance => new LocalizationsRepository(configuration.GetConnectionString("MetarankingsConnection")));
 
         return services;
     }

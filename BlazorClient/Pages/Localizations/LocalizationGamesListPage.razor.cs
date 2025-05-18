@@ -13,8 +13,19 @@ public partial class LocalizationGamesListPage : ComponentBase
     [Inject]
     public HttpClient HttpClient { get; set; }
 
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int? PlatformId { get; set; }
+
     protected override async Task OnParametersSetAsync()
     {
-        Localization = await HttpClient.GetFromJsonAsync<Localization>($"/api/Localizations/{LocalizationId}");
+        if (PlatformId is null)
+        {
+            Localization = await HttpClient.GetFromJsonAsync<Localization>($"/api/Localizations/{LocalizationId}");
+        }
+        else
+        {
+            Localization = await HttpClient.GetFromJsonAsync<Localization>($"/api/Localizations/{LocalizationId}/{PlatformId}");
+        }
     }
 }

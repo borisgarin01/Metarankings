@@ -1,4 +1,5 @@
 ﻿@page "/localizations/{LocalizationId:long}"
+
 @using Domain
 
 @if (Localization is null)
@@ -7,6 +8,22 @@
 }
 else
 {
+    <div id="filter">
+        <div class="filter-nav">
+            <div class="filter-name">Платформа</div>
+            <a class="selected" href="/localizations/@LocalizationId">Все</a>
+            <a href="/localizations/@LocalizationId?PlatformId=6">PS5</a>
+            <a href="/localizations/@LocalizationId?PlatformId=7">Xbox Series X</a>
+            <a href="/localizations/@LocalizationId?PlatformId=1">PS4</a>
+            <a href="/localizations/@LocalizationId?PlatformId=5">Xbox One</a>
+            <a href="/localizations/@LocalizationId?PlatformId=4">Switch</a>
+            <a href="/localizations/@LocalizationId?PlatformId=2">PS3</a>
+            <a href="/localizations/@LocalizationId?PlatformId=8">Xbox 360</a>
+            <a href="/localizations/@LocalizationId?PlatformId=14">PS Vita</a>
+            
+        </div>
+        <h2>На русском</h2>
+    </div>
     <div id="loop" class="list clear">
         @foreach (var game in Localization.Games)
         {
