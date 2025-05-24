@@ -1,0 +1,116 @@
+﻿@page "/games/best-games/{Year:int?}"
+
+<BlazorClient.Components.PagesComponents.Common.Headerer />
+<BlazorClient.Components.PagesComponents.Common.GameMenu />
+
+@if (Games is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="content-title">
+        <h1>Лучшие игры @Year года</h1>
+    </div>
+    <div class="post-info" style="max-height: 85px;">
+        <p>Здесь собраны лучшие игры @Year года — Самые интересные и популярные всех жанров для всех актуальных игровых платформ (ПК, PlayStation, Xbox и Nintendo). Топ формировался по наибольшему рейтингу в десятибалльной рейтинговой системе по данным оценок критиков и проголосовавших пользователей. Пользуясь навигацией, вы можете выбрать конкретную интересующую вас игровую платформу. Выставляйте оценки, оставляйте отзывы и делитесь с друзьями в социальных сетях!</p>
+        <p>Страница динамически меняется, выставляемые оценки влияют на положение проекта в топе, так что зайдя в следующий раз на эту страницу, вы можете видеть обновленные данные с актуальными оценками и сформированным списком топа.</p>
+        <p>Страница динамически меняется, выставляемые оценки влияют на положение проекта в топе, так что зайдя в следующий раз на эту страницу, вы можете видеть обновленные данные с актуальными оценками и сформированным списком топа.</p>
+        <span class="read-more">Читать полностью</span>
+    </div>
+    <div id="filter">
+        <div class="filter-nav">
+            <div class="filter-name">Год</div>
+            <div class="filter-menu">
+                <a href="https://metarankings.ru/best-games/">Все</a>
+                <a href="https://metarankings.ru/best-games-2025/">2025</a>
+                <a href="https://metarankings.ru/best-games-2024/">2024</a>
+                <a class="selected" href="https://metarankings.ru/best-games-2023/">2023</a>
+                <a href="https://metarankings.ru/best-games-2022/">2022</a>
+                <a href="https://metarankings.ru/best-games-2021/">2021</a>
+                <a href="https://metarankings.ru/best-games-2020/">2020</a>
+                <a href="https://metarankings.ru/best-games-2019/">2019</a>
+                <a href="https://metarankings.ru/best-games-2018/">2018</a>
+                <a href="https://metarankings.ru/best-games-2017/">2017</a>
+                <a href="https://metarankings.ru/best-games-2016/">2016</a>
+            </div>
+        </div>
+        <div class="filter-nav">
+            <div class="filter-name">Платформа</div>
+            <div class="filter-menu">
+                <a class="selected" href="https://metarankings.ru/best-games-2023/">Все</a>
+                <a href="https://metarankings.ru/best-games-2023/?platform=pc">PC</a>
+                <a href="https://metarankings.ru/best-games-2023/?platform=ps5">PS5</a>
+                <a href="https://metarankings.ru/best-games-2023/?platform=xboxx">Xbox Series X</a>
+                <a href="https://metarankings.ru/best-games-2023/?platform=ps4">PS4</a>
+                <a href="https://metarankings.ru/best-games-2023/?platform=xboxone">Xbox One</a>
+                <a href="https://metarankings.ru/best-games-2023/?platform=switch">Switch</a>
+
+
+            </div>
+        </div>
+        <div class="filter-nav">
+            <div class="filter-name">Жанр</div>
+            <div class="filter-menu">
+                <a class="selected" href="https://metarankings.ru/best-games-2023/">Все</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=ekshen">Экшены</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=shuter">Шутеры</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=rpg">RPG</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=priklyuchenie">Приключения</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=gonki">Гонки</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=xorror">Хорроры</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=strategiya">Стратегии</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=mmo">ММО</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=arkada">Аркады</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=platformer">Платформеры</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=sport">Спорт</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=fajting">Файтинги</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=taktika">Тактика</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=simulyator">Симуляторы</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=golovolomka">Головоломки</a>
+                <a href="https://metarankings.ru/best-games-2023/?genre=yaponskoe-rpg">JRPG</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="loop" class="list clear best">
+        @{
+            int gamePosition = 1;
+        }
+        @foreach (var game in Games)
+        {
+            <div class="post clear">
+                <a href="@game.Href" title="Игра «@game.Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{game.Image}")" alt="@game.Name"></a>
+                <div class="best-prod">
+                    <div class="counter">@gamePosition</div>
+                    <span class="star">★</span>
+                </div>
+                <a class="name" href="@game.Href">@game.Name</a>
+                <div class="post-meta"><p>@string.Join(", ", game.Platforms.Select(p => p.Name))</p></div>
+                <div class="post-meta"><p>@string.Join(", ", game.Genres.Select(p => p.Name))</p></div>
+                <div class="post-meta">Входит в лучшие в @game.ReleaseDate.Value.Year году по мнению 89% пользователей</div>
+                <div class="post-content">@game.Description</div>
+                <div class="trailer" data-video="@game.Href/#content-trailer"></div>
+                <div class="ratings-graph">
+                    <div class="graph-critic">
+                        <div class="graph">
+                            <div class="small-score mark-10">9.5</div>
+                            Рейтинг критиков
+                            <div class="graph-body"><div style="width:95%" class="rating-graph mark-10"></div></div>
+                        </div>
+                    </div>
+                    <div class="graph-critic">
+                        <div class="graph">
+                            <div class="small-score mark-8">8.3</div>
+                            Игроки<div class="graph-body"><div class="rating-graph mark-8" style="width:83%"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            gamePosition++;
+
+        }
+    </div>
+
+}

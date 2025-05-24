@@ -128,4 +128,20 @@ public sealed class GamesController : ControllerBase
             return StatusCode(500, ex);
         }
     }
+
+    [HttpGet("year/{year:int}")]
+    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesOfYear(int year)
+    {
+        try
+        {
+            var gamesOfYear = await _gamesRepository.GetByReleaseYearAsync(year);
+            if (gamesOfYear is null)
+                return NotFound();
+            return Ok(gamesOfYear);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
 }

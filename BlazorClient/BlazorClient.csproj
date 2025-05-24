@@ -10,6 +10,7 @@
     <None Remove="Components\PagesComponents\GamesList\GenresComponent.razor~RF19fca42.TMP" />
     <None Remove="Pages\chiaulyz.zpe~" />
     <None Remove="Pages\Developers\DeveloperGamesListPage.razor.cs~RF6a3bec.TMP" />
+    <None Remove="Pages\Games\BestGamesOfYearListPage.razor.cs~RF129cc5.TMP" />
   </ItemGroup>
 
   <ItemGroup>
