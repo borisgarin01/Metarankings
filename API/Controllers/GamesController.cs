@@ -144,4 +144,20 @@ public sealed class GamesController : ControllerBase
             return StatusCode(500, ex);
         }
     }
+
+    [HttpPost("gamesByParameters")]
+    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesByParameters(GamesGettingRequestModel gamesGettingRequestModel)
+    {
+        try
+        {
+            var games = await _gamesRepository.GetByParametersAsync(gamesGettingRequestModel);
+            if (games is null)
+                return NotFound();
+            return Ok(games);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
 }
