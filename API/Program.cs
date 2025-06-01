@@ -21,23 +21,26 @@ internal class Program
 
         builder.Services.AddSwaggerGen();
 
-        // Add CORS services
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowBlazorFrontend", policy =>
-            {
-                policy.WithOrigins("https://localhost:7280", "http://localhost:5152", "http://localhost:52856", "https://192.168.1.102:5003")
-                      .AllowAnyHeader()
-                      .AllowAnyMethod();
-            });
-        });
-
         builder.Services.RegisterRepositories(builder.Configuration);
         builder.Services.RegisterValidators();
 
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
         var app = builder.Build();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseWebAssemblyDebugging();
+        }
+
+        app.UseBlazorFrameworkFiles();
+
+        app.UseStaticFiles();
+
+        app.UseRouting();
+        app.MapControllers();
+
+        app.MapFallbackToFile("index.html");
 
         using (var serviceProvider = CreateServices(builder.Configuration))
         using (var scope = serviceProvider.CreateScope())
@@ -54,7 +57,6 @@ internal class Program
         app.UseCors("AllowBlazorFrontend");
 
         app.UseAuthorization();
-        app.MapControllers();
 
         app.Run();
     }
