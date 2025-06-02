@@ -82,7 +82,7 @@ else
                     <div class="counter">@(i + 1)</div>
                     <span class="star">★</span>
                 </div>
-                <a class="name" href="@Games.ElementAt(i).Description">@Games.ElementAt(i).Name</a>
+                <a class="name" href="/games/Details/@Games.ElementAt(i).Id">@Games.ElementAt(i).Name</a>
                 <div class="post-meta"><p>@string.Join(", ", Games.ElementAt(i).Genres.Select(a => a.Name))</p></div><div class="post-meta"><p>@string.Join(", ", Games.ElementAt(i).Platforms.Select(a => a.Name))</p></div>
                 <div class="post-meta"><p>Дата выхода: @Games.ElementAt(i).ReleaseDate.Value.ToString("dd MM yyyy") года</p></div>
                 <div class="post-meta">Входит в лучшие по мнению 83% пользователей</div>
