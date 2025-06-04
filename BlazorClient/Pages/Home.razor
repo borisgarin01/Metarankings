@@ -1,38 +1,598 @@
 ﻿@page "/"
-@page "/{PageSize:int}/{PageNumber:int}"
-@page "/games/{PageSize:int}/{PageNumber:int}"
 
 <BlazorClient.Components.PagesComponents.Common.Headerer />
 <BlazorClient.Components.PagesComponents.Common.GameMenu />
 
-@if (Games is null)
-{
-    <p>Loading...</p>
-}
-else
-{
-    foreach (var game in Games)
-    {
-        <BlazorClient.Components.PagesComponents.GamesList.Game Id="@game.Id"
-                                                                Name="@game.Name"
-                                                                Description="@game.Description"
-                                                                Developers="@game.Developers"
-                                                                Genres="@game.Genres"
-                                                                Href="@game.Href"
-                                                                Image="@game.Image"
-                                                                Localization="@game.Localization"
-                                                                Platforms="@game.Platforms"
-                                                                Publisher="@game.Publisher"
-                                                                ReleaseDate="@game.ReleaseDate"
-                                                                Score="@game.Score"
-                                                                ScoresCount="@game.ScoresCount" />
-    }
-    @if (PageNumber > 1)
-    {
-        <a href="/@(PageSize)/@(PageNumber-1)">Пред.</a>
-    }
-    @if (Games.Count() == PageSize)
-    {
-        <a href="/@(PageSize)/@(PageNumber+1)">След.</a>
-    }
-}
+<div class="pager">Лучшие в прошлом месяце <span class="">Фильмы</span><span class="cycle-pager-active">Игры</span></div>
+
+<div class="slideshow">
+    <div id="slideshow" class="cycle-slideshow" data-cycle-fx="scrollHorz" data-cycle-timeout="7000" data-cycle-slides="&gt; div" data-cycle-pager=".pager" style="overflow: hidden;">
+        <div class="slide clear cycle-slide cycle-sentinel" data-cycle-pager-template="&lt;span&gt;Фильмы&lt;/span&gt;" style="top: 0px; left: 0px; opacity: 1; z-index: 100; position: static; visibility: hidden; display: block;">
+            <div class="post" style="visibility: hidden;">
+                <a href="https://metarankings.ru/vernyj-drug-2025/" title="Верный друг" style="visibility: hidden;">
+                    <div class="featured-image" style="visibility: hidden;">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/vernyj-drug-2025-cover-art-197x281.jpg" alt="Верный друг" style="visibility: hidden;">
+                        <div class="small-score mark-7" style="visibility: hidden;">7.3</div>
+                        <span style="visibility: hidden;">Верный друг</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/car-carej-2025/" title="Царь царей" style="visibility: hidden;">
+                    <div class="featured-image" style="visibility: hidden;">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/car-carej-2025-cover-art-189x281.jpg" alt="Царь царей" style="visibility: hidden;">
+                        <div class="small-score mark-7" style="visibility: hidden;">7</div>
+                        <span style="visibility: hidden;">Царь царей</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/missiya-nevypolnima-finalnaya-rasplata-2025/" title="Миссия невыполнима: Финальная расплата" style="visibility: hidden;">
+                    <div class="featured-image" style="visibility: hidden;">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/missiya-nevypolnima-finalnaya-rasplata-cover-art-189x281.jpg" alt="Миссия невыполнима: Финальная расплата" style="visibility: hidden;">
+                        <div class="small-score mark-0" style="visibility: hidden;">0</div>
+                        <span style="visibility: hidden;">Миссия невыполнима: Финальная расплата</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/para-na-paru-2025/" title="Пара на пару" style="visibility: hidden;">
+                    <div class="featured-image" style="visibility: hidden;">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/para-na-paru-cover-art-196x281.jpg" alt="Пара на пару" style="visibility: hidden;">
+                        <div class="small-score mark-0" style="visibility: hidden;">0</div>
+                        <span style="visibility: hidden;">Пара на пару</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/v-spiskax-ne-znachilsya-2025/" title="В списках не значился" style="visibility: hidden;">
+                    <div class="featured-image" style="visibility: hidden;">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/v-spiskax-ne-znachilsya-cover-art-197x281.jpg" alt="В списках не значился" style="visibility: hidden;">
+                        <div class="small-score mark-5" style="visibility: hidden;">5</div>
+                        <span style="visibility: hidden;">В списках не значился</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/bagrovaya-otmel-2025/" title="Багровая отмель" style="visibility: hidden;">
+                    <div class="featured-image" style="visibility: hidden;">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/bagrovaya-otmel-cover-art-197x281.jpg" alt="Багровая отмель" style="visibility: hidden;">
+                        <div class="small-score mark-0" style="visibility: hidden;">0</div>
+                        <span style="visibility: hidden;">Багровая отмель</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+
+        <div class="slide clear cycle-slide" data-cycle-pager-template="&lt;span&gt;Фильмы&lt;/span&gt;" style="position: absolute; top: 0px; opacity: 1; display: block; z-index: 97; left: 0px; visibility: hidden;">
+            <div class="post">
+                <a href="https://metarankings.ru/vernyj-drug-2025/" title="Верный друг">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/vernyj-drug-2025-cover-art-197x281.jpg" alt="Верный друг">
+                        <div class="small-score mark-7">7.3</div>
+                        <span>Верный друг</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/car-carej-2025/" title="Царь царей">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/car-carej-2025-cover-art-189x281.jpg" alt="Царь царей">
+                        <div class="small-score mark-7">7</div>
+                        <span>Царь царей</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/missiya-nevypolnima-finalnaya-rasplata-2025/" title="Миссия невыполнима: Финальная расплата">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/missiya-nevypolnima-finalnaya-rasplata-cover-art-189x281.jpg" alt="Миссия невыполнима: Финальная расплата">
+                        <div class="small-score mark-0">0</div>
+                        <span>Миссия невыполнима: Финальная расплата</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/para-na-paru-2025/" title="Пара на пару">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/para-na-paru-cover-art-196x281.jpg" alt="Пара на пару">
+                        <div class="small-score mark-0">0</div>
+                        <span>Пара на пару</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/v-spiskax-ne-znachilsya-2025/" title="В списках не значился">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/v-spiskax-ne-znachilsya-cover-art-197x281.jpg" alt="В списках не значился">
+                        <div class="small-score mark-5">5</div>
+                        <span>В списках не значился</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/bagrovaya-otmel-2025/" title="Багровая отмель">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/bagrovaya-otmel-cover-art-197x281.jpg" alt="Багровая отмель">
+                        <div class="small-score mark-0">0</div>
+                        <span>Багровая отмель</span>
+                    </div>
+                </a>
+            </div>
+        </div><div class="slide clear cycle-slide cycle-slide-active" data-cycle-pager-template="&lt;span&gt;Игры&lt;/span&gt;" style="position: absolute; z-index: 99; top: 0px; opacity: 1; visibility: visible; display: block; left: 0px;">
+            <div class="post">
+                <a href="https://metarankings.ru/the-midnight-walk/" title="The Midnight Walk">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/04/the-midnight-walk-boxart-cover-196x281.jpg" alt="The Midnight Walk">
+                        <div class="small-score mark-8">8</div>
+                        <span>The Midnight Walk</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/doom-the-dark-ages/" title="DOOM: The Dark Ages">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/doom-the-dark-ages-cover-box-art-196x281.jpg" alt="DOOM: The Dark Ages">
+                        <div class="small-score mark-8">8.1</div>
+                        <span>DOOM: The Dark Ages</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/elden-ring-nightreign/" title="Elden Ring Nightreign">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2024/12/elden-ring-nightreign-boxart-cover-196x281.jpg" alt="Elden Ring Nightreign">
+                        <div class="small-score mark-7">7.4</div>
+                        <span>Elden Ring Nightreign</span>
+                    </div>
+                </a>
+                <a href="https://metarankings.ru/metal-eden/" title="Metal Eden">
+                    <div class="featured-image">
+                        <img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/metal-eden-boxart-cover-196x281.jpg" alt="Metal Eden">
+                        <div class="small-score mark-0">0</div>
+                        <span>Metal Eden</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="container" class="clear">
+    <div class="sidebar">
+    </div>
+    <div id="content" class="lcol">
+        <div id="loop" class="list clear">
+            <div class="index-movies">
+                <h3><a href="https://metarankings.ru/new-movies/">Новые фильмы</a></h3>
+                <div class="item">
+                    <a href="https://metarankings.ru/igry-vozmezdiya-2025/" title="Фильм Игры возмездия"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/igry-vozmezdiya-boxart-cover-50x70.jpg" alt="Игры возмездия"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/igry-vozmezdiya-2025/">Игры возмездия</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/boeviki/">Боевики</a> / <a href="https://metarankings.ru/meta/movies/thrillers/">Триллеры</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/igry-vozmezdiya-2025/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/igry-vozmezdiya-2025/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">29 мая 2025</span>
+                    <span class="item-description">Бокуши — тень, ставшая крепостью. Камень за камнем он возводит свою цитадель, не просто укрепление, а символ непоколебимой воли. За высокими стенами копятся...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/poslednee-zavtra-2025/" title="Фильм Последнее завтра"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/poslednee-zavtra-cover-art-50x70.jpg" alt="Последнее завтра"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/poslednee-zavtra-2025/">Последнее завтра</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/thrillers/">Триллеры</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/poslednee-zavtra-2025/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/poslednee-zavtra-2025/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">29 мая 2025</span>
+                    <span class="item-description">Измождённый нескончаемыми ночами без сна, музыкант ловит на себе пристальный взгляд таинственной незнакомки, затерявшейся в полумраке зала. Этот миг становится роковым — его...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/snezhnyj-chelovek-2025/" title="Фильм сНежный человек"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/snezhnyj-chelovek-cover-art-50x70.jpg" alt="сНежный человек"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/snezhnyj-chelovek-2025/">сНежный человек</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/semejnye/">Семейные</a> / <a href="https://metarankings.ru/meta/movies/fantasy-movies/">Фэнтези</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/snezhnyj-chelovek-2025/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/snezhnyj-chelovek-2025/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">29 мая 2025</span>
+                    <span class="item-description">Мир Мирона — это тихий остров, отрезанный от других бурным морем непонимания. В школе он невидимка: его слуховой аппарат словно ставит незримую стену...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/bystree-vetra-2025/" title="Фильм Быстрее ветра"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/bystree-vetra-cover-art-50x70.jpg" alt="Быстрее ветра"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/bystree-vetra-2025/">Быстрее ветра</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/boeviki/">Боевики</a> / <a href="https://metarankings.ru/meta/movies/dramy/">Драмы</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/bystree-vetra-2025/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/bystree-vetra-2025/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">29 мая 2025</span>
+                    <span class="item-description">Когда-то Макс грезила скоростью и победами, но, разочаровавшись в большом спорте, променяла гоночные треки на тихую, предсказуемую жизнь. Казалось, гоночные амбиции навсегда остались...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/dzhejn-ostin-isportila-mne-zhizn-2025/" title="Фильм Джейн Остин испортила мне жизнь"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/dzhejn-ostin-isportila-mne-zhizn-cover-art-50x70.jpg" alt="Джейн Остин испортила мне жизнь"></a>
+                    <div class="small-score mark-7"><span data-title="Рейтинг фильма" class="tooltip">7</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/dzhejn-ostin-isportila-mne-zhizn-2025/">Джейн Остин испортила мне жизнь</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/comedy/">Комедии</a> / <a href="https://metarankings.ru/meta/movies/melodramas/">Мелодрамы</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/dzhejn-ostin-isportila-mne-zhizn-2025/#reviews">Рецензии (1)</a> <a rel="nofollow" href="https://metarankings.ru/dzhejn-ostin-isportila-mne-zhizn-2025/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">29 мая 2025</span>
+                    <span class="item-description">С романтичными грёзами в сердце и жаждой перемен Агата, юная француженка, приезжает в английскую писательскую резиденцию. Но вместо долгожданного вдохновения судьба подбрасывает ей...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/verni-eyo-iz-myortvyx-2025/" title="Фильм Верни её из мёртвых"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/verni-eyo-iz-myortvyx-cover-art-50x70.jpg" alt="Верни её из мёртвых"></a>
+                    <div class="small-score mark-9"><span data-title="Рейтинг фильма" class="tooltip">9</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/verni-eyo-iz-myortvyx-2025/">Верни её из мёртвых</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/verni-eyo-iz-myortvyx-2025/#reviews">Рецензии (2)</a> <a rel="nofollow" href="https://metarankings.ru/verni-eyo-iz-myortvyx-2025/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">29 мая 2025</span>
+                    <span class="item-description">После трагической потери родителей брат и сестра, отчаянно ищущие утешения, обретают надежду в лице новой опекунши — женщины, чья доброта кажется безупречной. Но...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/100-tigr-2025/" title="Фильм 100% тигр"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/100-tigr-cover-art-50x70.jpg" alt="100% тигр"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/100-tigr-2025/">100% тигр</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/cartoons/">Мультфильмы</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/100-tigr-2025/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/100-tigr-2025/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">29 мая 2025</span>
+                    <span class="item-description">Тео — последний из своего рода. Последний, но не покорённый. Его клыки ещё не знали настоящей битвы, а лапы — истинного пути, но...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/nechzha-pobezhdaet-carya-drakonov-2025/" title="Фильм Нэчжа побеждает Царя драконов"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/nechzha-pobezhdaet-carya-drakonov-cover-art-50x70.jpg" alt="Нэчжа побеждает Царя драконов"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/nechzha-pobezhdaet-carya-drakonov-2025/">Нэчжа побеждает Царя драконов</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/cartoons/">Мультфильмы</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/nechzha-pobezhdaet-carya-drakonov-2025/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/nechzha-pobezhdaet-carya-drakonov-2025/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">29 мая 2025</span>
+                    <span class="item-description">В вихре кровавой битвы, где клинки сверкают, а магия рвёт земную твердь, юный демон Нэчжа и его верный соратник сражаются против несокрушимого Царя...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/gerojchiki-nezvanyj-gost-2025/" title="Фильм Геройчики. Незваный гость"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/gerojchiki-nezvanyj-gost-cover-art-50x70.jpg" alt="Геройчики. Незваный гость"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/gerojchiki-nezvanyj-gost-2025/">Геройчики. Незваный гость</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/cartoons/">Мультфильмы</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/gerojchiki-nezvanyj-gost-2025/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/gerojchiki-nezvanyj-gost-2025/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">29 мая 2025</span>
+                    <span class="item-description">Рома задумал нечто грандиозное — он хочет не просто поучаствовать в школьном конкурсе, а совершить маленькое чудо, представив публике звездолёт своей мечты, кропотливо...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/chyornye-svyashhenniki-2025/" title="Фильм Чёрные священники"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/chyornye-svyashhenniki-cover-art-50x70.jpg" alt="Чёрные священники"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/chyornye-svyashhenniki-2025/">Чёрные священники</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/chyornye-svyashhenniki-2025/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/chyornye-svyashhenniki-2025/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">22 мая 2025</span>
+                    <span class="item-description">Отец Ким стоит перед испытанием, которое бросает вызов не только его вере, но и самой его человеческой природе. Юная девушка, чьё тело и...</span>
+                </div>
+                <div class="title-index">
+                    <div class="dropdown-menu genre">
+                        <span class="title">Год</span>
+                        <ul>
+                            <li><a href="/best-movies-2025/">Фильмы 2025</a></li>
+                            <li><a href="/best-movies-2024/">Фильмы 2024</a></li>
+                            <li><a href="/best-movies-2023/">Фильмы 2023</a></li>
+                            <li><a href="/best-movies-2022/">Фильмы 2022</a></li>
+                            <li><a href="/best-movies-2021/">Фильмы 2021</a></li>
+                            <li><a href="/best-movies-2020/">Фильмы 2020</a></li>
+                            <li><a href="/best-movies-2019/">Фильмы 2019</a></li>
+                            <li><a href="/best-movies-2018/">Фильмы 2018</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <a class="allreviews" href="https://metarankings.ru/meta/movies/">Обзоры на фильмы</a><br>
+            </div>
+
+            <div class="index-games">
+                <h3><a href="https://metarankings.ru/new-games/">Новые игры</a></h3>
+                <div class="item">
+                    <a href="https://metarankings.ru/elden-ring-nightreign/" title="Игра Elden Ring Nightreign"><img class="post-image" src="https://metarankings.ru/images/uploads/2024/12/elden-ring-nightreign-boxart-cover-50x70.jpg" alt="Elden Ring Nightreign"></a>
+                    <div class="small-score mark-7"><span data-title="Рейтинг игры" class="tooltip">7.4</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/elden-ring-nightreign/">Elden Ring Nightreign</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/elden-ring-nightreign/#reviews">Рецензии (8)</a> <a rel="nofollow" href="https://metarankings.ru/elden-ring-nightreign/#comments">Отзывы (1)</a></span>
+                    <span class="item-meta">30 мая 2025</span>
+                    <span class="item-description">Nightreign — это отдельное приключение во вселенной EldenRing, предлагающее совершенно новый игровой опыт благодаря переосмыслению базовой механики. Объединитесь с двумя друзьями в кооперативном...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/doom-the-dark-ages/" title="Игра DOOM: The Dark Ages"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/doom-the-dark-ages-cover-box-art-50x70.jpg" alt="DOOM: The Dark Ages"></a>
+                    <div class="small-score mark-8"><span data-title="Рейтинг игры" class="tooltip">8.1</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/doom-the-dark-ages/">DOOM: The Dark Ages</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/doom-the-dark-ages/#reviews">Рецензии (7)</a> <a rel="nofollow" href="https://metarankings.ru/doom-the-dark-ages/#comments">Отзывы (1)</a></span>
+                    <span class="item-meta">15 мая 2025</span>
+                    <span class="item-description">DOOM: The Dark Ages — это предыстория последних двух игр культовой серии шутеров. Вас ждет эпическая история о происхождении ярости Истребителя. Вы воплощаете...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/the-midnight-walk/" title="Игра The Midnight Walk"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/04/the-midnight-walk-boxart-cover-50x70.jpg" alt="The Midnight Walk"></a>
+                    <div class="small-score mark-8"><span data-title="Рейтинг игры" class="tooltip">8</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/the-midnight-walk/">The Midnight Walk</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/the-midnight-walk/#reviews">Рецензии (3)</a> <a rel="nofollow" href="https://metarankings.ru/the-midnight-walk/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">8 мая 2025</span>
+                    <span class="item-description">The Midnight Walk — это свежее инди-приключение от создателей тепло встреченной как критиками, так и игроками Lost in Random. В нём вам предстоит...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/metal-eden/" title="Игра Metal Eden"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/metal-eden-boxart-cover-50x70.jpg" alt="Metal Eden"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг игры" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/metal-eden/">Metal Eden</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/metal-eden/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/metal-eden/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">6 мая 2025</span>
+                    <span class="item-description">Игра Metal Eden переносит в увлекательное будущее, где человечество осваивает космос. Для выживания в долгих межзвездных путешествиях были разработаны Ядра – хранилища оцифрованного...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/kiborg/" title="Игра KIBORG"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/kiborg-cover-art-50x70.jpg" alt="KIBORG"></a>
+                    <div class="small-score mark-6"><span data-title="Рейтинг игры" class="tooltip">6.3</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/kiborg/">KIBORG</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps4/">PS4</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-one/">Xbox One</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/kiborg/#reviews">Рецензии (2)</a> <a rel="nofollow" href="https://metarankings.ru/kiborg/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">30 апреля 2025</span>
+                    <span class="item-description">KIBORG — это жесткость, свобода выбора и бесконечный экшен, где каждый забег превращается в кровавый балет смерти и технологий. Вы — узник самой...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/amerzone-the-explorers-legacy/" title="Игра Amerzone — The Explorer’s Legacy"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/04/amerzone-the-explorers-legacy-boxart-cover-50x70.jpg" alt="Amerzone — The Explorer’s Legacy"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг игры" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/amerzone-the-explorers-legacy/">Amerzone — The Explorer’s Legacy</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/amerzone-the-explorers-legacy/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/amerzone-the-explorers-legacy/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">24 апреля 2025</span>
+                    <span class="item-description">Amerzone — The Explorer’s Legacy — это не просто ремейк культового квеста 1999 года, а глубокая перезагрузка, переносящая игрока в сердце затерянного мира....</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/clair-obscur-expedition-33/" title="Игра Clair Obscur: Expedition 33"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/04/clair-obscur-expedition-33-boxart-cover-50x70.jpg" alt="Clair Obscur: Expedition 33"></a>
+                    <div class="small-score mark-9"><span data-title="Рейтинг игры" class="tooltip">9.3</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/clair-obscur-expedition-33/">Clair Obscur: Expedition 33</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/clair-obscur-expedition-33/#reviews">Рецензии (5)</a> <a rel="nofollow" href="https://metarankings.ru/clair-obscur-expedition-33/#comments">Отзывы (2)</a></span>
+                    <span class="item-meta">24 апреля 2025</span>
+                    <span class="item-description">Clair Obscur: Expedition 33 – это новаторская пошаговая RPG, в которой тактика сочетается с динамичным экшеном! Вас ждет атмосфера французской Прекрасной эпохи, в...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/steel-seed/" title="Игра Steel Seed"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/04/steel-seed-boxart-cover-50x70.jpg" alt="Steel Seed"></a>
+                    <div class="small-score mark-7"><span data-title="Рейтинг игры" class="tooltip">6.9</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/steel-seed/">Steel Seed</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/steel-seed/#reviews">Рецензии (5)</a> <a rel="nofollow" href="https://metarankings.ru/steel-seed/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">22 апреля 2024</span>
+                    <span class="item-description">Steel Seed – это не просто игра, а многослойное повествование, созданное студией, подарившей миру Close to the Sun. Здесь вас ждёт мрачная научно-фантастическая...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/the-elder-scrolls-iv-oblivion-remastered/" title="Игра The Elder Scrolls IV: Oblivion Remastered"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/04/the-elder-scrolls-iv-oblivion-remastered-boxart-cover-50x70.jpg" alt="The Elder Scrolls IV: Oblivion Remastered"></a>
+                    <div class="small-score mark-8"><span data-title="Рейтинг игры" class="tooltip">7.5</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/the-elder-scrolls-iv-oblivion-remastered/">The Elder Scrolls IV: Oblivion Remastered</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/the-elder-scrolls-iv-oblivion-remastered/#reviews">Рецензии (5)</a> <a rel="nofollow" href="https://metarankings.ru/the-elder-scrolls-iv-oblivion-remastered/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">22 апреля 2024</span>
+                    <span class="item-description">The Elder Scrolls IV: Oblivion Remastered – это не просто ремастер, а новое прочтение одной из лучших игр в жанре RPG. Знакомая с...</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/rusty-rabbit/" title="Игра Rusty Rabbit"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/04/rusty-rabbit-boxart-cover-50x70.jpg" alt="Rusty Rabbit"></a>
+                    <div class="small-score mark-0"><span data-title="Рейтинг игры" class="tooltip">0</span></div>
+                    <span class="item-name"><a href="https://metarankings.ru/rusty-rabbit/">Rusty Rabbit</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/switch/">Switch</a></span>
+                    <span class="item-meta"><a rel="nofollow" href="https://metarankings.ru/rusty-rabbit/#reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/rusty-rabbit/#comments">Отзывы (0)</a></span>
+                    <span class="item-meta">17 апреля 2025</span>
+                    <span class="item-description">Rusty Rabbit — это метройдования в постапокалиптическом мире после наступления нового ледникового периода, который вынудил человечество покинуть Землю, а вместо них планету заселили...</span>
+                </div>
+                <div class="title-index">
+                    <div class="dropdown-menu genre">
+                        <span class="title">Год</span>
+                        <ul>
+                            <li><a href="/best-games-2025/">Игры 2025</a></li>
+                            <li><a href="/best-games-2024/">Игры 2024</a></li>
+                            <li><a href="/best-games-2023/">Игры 2023</a></li>
+                            <li><a href="/best-games-2022/">Игры 2022</a></li>
+                            <li><a href="/best-games-2021/">Игры 2021</a></li>
+                            <li><a href="/best-games-2020/">Игры 2020</a></li>
+                            <li><a href="/best-games-2019/">Игры 2019</a></li>
+                            <li><a href="/best-games-2018/">Игры 2018</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <a class="allreviews" href="https://metarankings.ru/meta/games/">Обзоры на игры</a>
+            </div>
+            <div class="ads-horizont hor-1">
+                <!-- Yandex.RTB R-A-201169-5 -->
+                <div id="yandex_rtb_R-A-201169-5"></div>
+                <script>
+                    window.yaContextCb.push(()=>{
+                      Ya.Context.AdvManager.render({
+                        renderTo: "yandex_rtb_R-A-201169-5",
+                        blockId: "R-A-201169-5"
+                      })
+                    })</script>
+            </div>
+            <div class="specials-index">
+                <h3><a href="https://metarankings.ru/meta/collections/">Подборки</a></h3>
+                <div class="news-item">
+                    <a href="https://metarankings.ru/samye-slozhnye-igry/" title="Самые сложные игры"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" alt="Самые сложные игры"></a>
+                    <span class="news-title"><a href="https://metarankings.ru/samye-slozhnye-igry/">Самые сложные игры</a></span>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="news-item">
+                    <a href="https://metarankings.ru/best-films-pro-zhenshhin/" title="Лучшие фильмы про женщин"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/films-pro-zhenshhin-445x250.jpg" alt="Лучшие фильмы про женщин"></a>
+                    <span class="news-title"><a href="https://metarankings.ru/best-films-pro-zhenshhin/">Лучшие фильмы про женщин</a></span>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="news-item">
+                    <a href="https://metarankings.ru/filmy-pro-realnye-sobytiya/" title="Фильмы про реальные события"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/pro-realnye-sobytiya-445x250.jpg" alt="Фильмы про реальные события"></a>
+                    <span class="news-title"><a href="https://metarankings.ru/filmy-pro-realnye-sobytiya/">Фильмы про реальные события</a></span>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="news-item">
+                    <a href="https://metarankings.ru/luchshie-filmy-pro-monstrov/" title="Лучшие фильмы про монстров"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/filmy-pro-monstrov-445x250.jpg" alt="Лучшие фильмы про монстров"></a>
+                    <span class="news-title"><a href="https://metarankings.ru/luchshie-filmy-pro-monstrov/">Лучшие фильмы про монстров</a></span>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="news-item">
+                    <a href="https://metarankings.ru/samye-strashnye-igry/" title="Самые страшные игры"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/strashnye-igry-445x250.jpg" alt="Самые страшные игры"></a>
+                    <span class="news-title"><a href="https://metarankings.ru/samye-strashnye-igry/">Самые страшные игры</a></span>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+                <div class="news-item">
+                    <a href="https://metarankings.ru/best-games-open-world/" title="Лучшие игры с открытым миром"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/best-igry-s-otkrytym-mirom-445x250.jpg" alt="Лучшие игры с открытым миром"></a>
+                    <span class="news-title"><a href="https://metarankings.ru/best-games-open-world/">Лучшие игры с открытым миром</a></span>
+                    <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                </div>
+            </div>
+            <div class="index-movies">
+                <h3><a href="https://metarankings.ru/coming-soon/">Скоро в кино</a></h3>
+                <div class="item">
+                    <a href="https://metarankings.ru/balerina-2025/" title="Фильм Балерина"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/06/balerina-2025-cover-art-50x70.jpg" alt="Балерина"></a>
+                    <span class="item-name"><a href="https://metarankings.ru/balerina-2025/">Балерина</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/boeviki/">Боевики</a></span>
+                    <span class="item-meta">Ballerina</span>
+                    <span class="item-meta">5 июня 2025</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/kloun-na-kukuruznom-pole-2025/" title="Фильм Клоун на кукурузном поле"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/06/kloun-na-kukuruznom-pole-cover-art-50x70.jpg" alt="Клоун на кукурузном поле"></a>
+                    <span class="item-name"><a href="https://metarankings.ru/kloun-na-kukuruznom-pole-2025/">Клоун на кукурузном поле</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
+                    <span class="item-meta">Clown in a Cornfield</span>
+                    <span class="item-meta">5 июня 2025</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/zombi-kenguru-2025/" title="Фильм Зомби-кенгуру"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/02/zombi-kenguru-cover-art-50x70.jpg" alt="Зомби-кенгуру"></a>
+                    <span class="item-name"><a href="https://metarankings.ru/zombi-kenguru-2025/">Зомби-кенгуру</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
+                    <span class="item-meta">Rippy</span>
+                    <span class="item-meta">12 июня 2025</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/sinister-iz-tmy-2025/" title="Фильм Синистер. Из тьмы"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/06/sinister-iz-tmy-cover-art-50x70.jpg" alt="Синистер. Из тьмы"></a>
+                    <span class="item-name"><a href="https://metarankings.ru/sinister-iz-tmy-2025/">Синистер. Из тьмы</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
+                    <span class="item-meta">Ur mörkret</span>
+                    <span class="item-meta">12 июня 2025</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/igra-v-kalmara-perezagruzka-2025/" title="Фильм Игра в кальмара: Перезагрузка"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/igra-v-kalmara-perezagruzka-cover-art-50x70.jpg" alt="Игра в кальмара: Перезагрузка"></a>
+                    <span class="item-name"><a href="https://metarankings.ru/igra-v-kalmara-perezagruzka-2025/">Игра в кальмара: Перезагрузка</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/thrillers/">Триллеры</a></span>
+                    <span class="item-meta">Exit</span>
+                    <span class="item-meta">19 июня 2025</span>
+                </div>
+                <a href="https://metarankings.ru/most-waiting-films/" class="allreviews">Самые ожидаемые фильмы</a>
+            </div>
+            <div class="index-games">
+                <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
+                <div class="item">
+                    <a href="https://metarankings.ru/dying-light-the-beast/" title="Игра Dying Light: The Beast"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/07/dying-light-the-beast-boxart-cover-50x70.jpg" alt="Dying Light: The Beast"></a>
+                    <span class="item-name"><a href="https://metarankings.ru/dying-light-the-beast/">Dying Light: The Beast</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/genre/rpg/">РПГ</a> / <a href="https://metarankings.ru/genre/xorror/">Хоррор</a> / <a href="https://metarankings.ru/genre/ekshen/">Экшен</a></span>
+                    <span class="item-meta">Лето 2025</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/donkey-kong-bananza/" title="Игра Donkey Kong Bananza"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/07/donkey-kong-bananza-boxart-cover-50x70.jpg" alt="Donkey Kong Bananza"></a>
+                    <span class="item-name"><a href="https://metarankings.ru/donkey-kong-bananza/">Donkey Kong Bananza</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/switch-2/">Switch 2</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/genre/arkada/">Аркада</a> / <a href="https://metarankings.ru/genre/priklyuchenie/">Приключение</a></span>
+                    <span class="item-meta">17 июля 2025 </span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/mindseye/" title="Игра MindsEye"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/08/mindseye-boxart-cover-50x70.jpg" alt="MindsEye"></a>
+                    <span class="item-name"><a href="https://metarankings.ru/mindseye/">MindsEye</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/genre/priklyuchenie/">Приключение</a> / <a href="https://metarankings.ru/genre/shuter/">Шутер</a> / <a href="https://metarankings.ru/genre/ekshen/">Экшен</a></span>
+                    <span class="item-meta">Лето 2025</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/shinobi-art-of-vengeance/" title="Игра SHINOBI: Art of Vengeance"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/08/shinobi-art-of-vengeance-boxart-cover-50x70.jpg" alt="SHINOBI: Art of Vengeance"></a>
+                    <span class="item-name"><a href="https://metarankings.ru/shinobi-art-of-vengeance/">SHINOBI: Art of Vengeance</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/switch/">Switch</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/genre/arkada/">Аркада</a> / <a href="https://metarankings.ru/genre/platformer/">Платформер</a> / <a href="https://metarankings.ru/genre/ekshen/">Экшен</a></span>
+                    <span class="item-meta">26 августа 2025</span>
+                </div>
+                <div class="item">
+                    <a href="https://metarankings.ru/game-metal-gear-solid-delta-snake-eater/" title="Игра Metal Gear Solid Delta: Snake Eater"><img class="post-image" src="https://metarankings.ru/images/uploads/2023/05/metal-gear-solid-delta-snake-eater-boxart-cover-50x70.jpg" alt="Metal Gear Solid Delta: Snake Eater"></a>
+                    <span class="item-name"><a href="https://metarankings.ru/game-metal-gear-solid-delta-snake-eater/">Metal Gear Solid Delta: Snake Eater</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                    <span class="item-meta"><a href="https://metarankings.ru/genre/ekshen/">Экшен</a></span>
+                    <span class="item-meta">28 августа 2025</span>
+                </div>
+                <a href="https://metarankings.ru/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar rcol" style="height: 2500px;">
+        <div class="widget last-reviews">
+            <h3>Последние отзывы</h3>
+            <div class="widget-body">
+                <ul>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/lilo-i-stich-2025/">Лило и Стич</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/missiya-nevypolnima-finalnaya-rasplata-2025/">Миссия невыполнима: Финальная расплата</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/mikki-monstr-2025/">Микки Монстр</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/minecraft-v-kino/">Minecraft в кино</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/master-2025/">Мастер</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/zhdun-v-kino/">Ждун</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/volshebnik-izumrudnogo-goroda-2025/">Волшебник Изумрудного города. Дорога из желтого кирпича</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/nosferatu-2024/">Носферату</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/mufasa-korol-lev/">Муфаса: Король лев</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/pyatyj-bitl-2024/">Пятый битл</a></span>
+                        </div>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/the-elder-scrolls-iv-oblivion-remastered/">The Elder Scrolls IV: Oblivion Remastered</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/monster-hunter-wilds/">Monster Hunter Wilds</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/avowed/">Avowed</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/kingdom-come-deliverance-2/">Kingdom Come: Deliverance 2</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/indiana-jones-and-the-great-circle/">Indiana Jones and the Great Circle</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/stalker-2/">S.T.A.L.K.E.R. 2: Heart of Chernobyl</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/dragon-age-the-veilguard/">Dragon Age: The Veilguard</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/call-of-duty-black-ops-6/">Call of Duty: Black Ops 6</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/game-silent-hill-2-remake/">Silent Hill 2</a></span>
+                        </div>
+                    </li>
+                    <li class="recent-reviews">
+                        <div class="ureview-text">
+                            <span class="title-reviews"><a href="https://metarankings.ru/the-legend-of-zelda-echoes-of-wisdom/">The Legend of Zelda: Echoes of Wisdom</a></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
