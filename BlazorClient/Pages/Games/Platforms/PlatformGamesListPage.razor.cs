@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Domain;
 using System.Net.Http.Json;
+using Domain.Games;
 
-namespace BlazorClient.Pages.Platforms;
+namespace BlazorClient.Pages.Games.Platforms;
 
 public partial class PlatformGamesListPage : ComponentBase
 {

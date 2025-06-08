@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Domain.Games;
+using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 
-namespace BlazorClient.Pages;
+namespace BlazorClient.Pages.Games.Games;
 
 public partial class GameDetails : ComponentBase
 {
-    public Domain.GameModel Game { get; set; }
+    public GameModel Game { get; set; }
 
     [Parameter]
     public long Id { get; set; }
@@ -19,7 +20,7 @@ public partial class GameDetails : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Game = await HttpClient.GetFromJsonAsync<Domain.GameModel>($"/api/Games/{Id}");
+        Game = await HttpClient.GetFromJsonAsync<GameModel>($"/api/Games/{Id}");
         SetRatingPreview(Convert.ToByte(Game.Score.HasValue ? Game.Score.Value : 0));
     }
 

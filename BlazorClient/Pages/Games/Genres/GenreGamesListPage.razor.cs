@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Domain;
 using System.Net.Http.Json;
+using Domain.Games;
 
-namespace BlazorClient.Pages.Genres;
+namespace BlazorClient.Pages.Games.Genres;
 
 public partial class GenreGamesListPage : ComponentBase
 {

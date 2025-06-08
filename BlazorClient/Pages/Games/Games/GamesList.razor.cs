@@ -1,8 +1,8 @@
-﻿using Domain;
+﻿using Domain.Games;
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 
-namespace BlazorClient.Pages.Games;
+namespace BlazorClient.Pages.Games.Games;
 
 public partial class GamesList : ComponentBase
 {

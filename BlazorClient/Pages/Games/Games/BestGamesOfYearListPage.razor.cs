@@ -1,9 +1,10 @@
 ﻿using Domain;
+using Domain.Games;
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace BlazorClient.Pages.Games;
+namespace BlazorClient.Pages.Games.Games;
 
 public partial class BestGamesOfYearListPage : ComponentBase
 {
@@ -39,7 +40,7 @@ public partial class BestGamesOfYearListPage : ComponentBase
             PublishersIds = PublisherId.HasValue ? [PublisherId.Value] : null
         };
 
-        var httpResponseMessage = await HttpClient.PostAsJsonAsync<GamesGettingRequestModel>($"{HttpClient.BaseAddress}api/games/gamesByParameters", gamesGettingRequestModel);
+        var httpResponseMessage = await HttpClient.PostAsJsonAsync($"{HttpClient.BaseAddress}api/games/gamesByParameters", gamesGettingRequestModel);
 
         if (httpResponseMessage.IsSuccessStatusCode)
         {
