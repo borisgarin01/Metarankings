@@ -1,4 +1,4 @@
-﻿using API.Models.RequestsModels.Publishers;
+﻿using API.Models.RequestsModels.Games.Publishers;
 using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain.Games;

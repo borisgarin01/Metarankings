@@ -56,7 +56,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\RequestsModels\Games\" />
+    <Folder Include="Models\RequestsModels\Movies\MoviesGenres\" />
+    <Folder Include="Models\RequestsModels\Movies\MoviesStudios\" />
   </ItemGroup>
 
 </Project>

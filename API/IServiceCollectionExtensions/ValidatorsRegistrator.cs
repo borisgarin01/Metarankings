@@ -1,8 +1,8 @@
-﻿using API.Models.RequestsModels.Developers;
-using API.Models.RequestsModels.Genres;
-using API.Models.RequestsModels.Localizations;
-using API.Models.RequestsModels.Platforms;
-using API.Models.RequestsModels.Publishers;
+﻿using API.Models.RequestsModels.Games.Developers;
+using API.Models.RequestsModels.Games.Genres;
+using API.Models.RequestsModels.Games.Localizations;
+using API.Models.RequestsModels.Games.Platforms;
+using API.Models.RequestsModels.Games.Publishers;
 using API.ValidationRules.RequestsModels.Developers;
 using API.ValidationRules.RequestsModels.Genres;
 using API.ValidationRules.RequestsModels.Localizations;

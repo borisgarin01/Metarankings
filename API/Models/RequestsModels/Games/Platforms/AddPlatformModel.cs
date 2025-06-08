@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace API.Models.RequestsModels.Localizations;
+namespace API.Models.RequestsModels.Games.Platforms;
 
-public sealed class AddLocalizationModel
+public sealed record AddPlatformModel
 {
     [JsonPropertyName("name")]
     public string Name { get; set; }

@@ -1,4 +1,4 @@
-﻿using API.Models.RequestsModels.Localizations;
+﻿using API.Models.RequestsModels.Games.Localizations;
 using AutoMapper;
 using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace API.Models.RequestsModels.Localizations;
+namespace API.Models.RequestsModels.Games.Localizations;
 
 public class UpdateLocalizationModel
 {

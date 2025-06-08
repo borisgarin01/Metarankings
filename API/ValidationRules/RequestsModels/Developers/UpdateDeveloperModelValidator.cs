@@ -1,4 +1,4 @@
-﻿using API.Models.RequestsModels.Developers;
+﻿using API.Models.RequestsModels.Games.Developers;
 using FluentValidation;
 
 namespace API.ValidationRules.RequestsModels.Developers;

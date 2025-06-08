@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace API.Models.RequestsModels.Publishers;
+namespace API.Models.RequestsModels.Games.Developers;
 
-public sealed record UpdatePublisherModel
+public sealed record UpdateDeveloperModel
 {
     [JsonPropertyName("name")]
     public string Name { get; set; }
