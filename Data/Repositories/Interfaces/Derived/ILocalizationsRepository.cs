@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Games;
 
 namespace Data.Repositories.Interfaces.Derived;
 public interface ILocalizationsRepository : IRepository<Localization>

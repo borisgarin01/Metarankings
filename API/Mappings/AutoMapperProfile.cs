@@ -4,7 +4,7 @@ using API.Models.RequestsModels.Localizations;
 using API.Models.RequestsModels.Platforms;
 using API.Models.RequestsModels.Publishers;
 using AutoMapper;
-using Domain;
+using Domain.Games;
 
 namespace API.Mappings;
 
