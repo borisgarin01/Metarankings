@@ -2,11 +2,11 @@
 using AutoMapper;
 using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
-using Domain;
+using Domain.Games;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers;
+namespace API.Controllers.Games;
 
 [ApiController]
 [Route("api/[controller]")]

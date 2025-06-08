@@ -1,10 +1,10 @@
 ﻿using API.Json;
-using Data.Repositories.Classes.Derived;
-using Domain;
+using Data.Repositories.Classes.Derived.Games;
+using Domain.Games;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
-namespace API.Controllers;
+namespace API.Controllers.Games;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -55,7 +55,7 @@ public sealed class GamesController : ControllerBase
     [HttpGet("images/uploads/{year:int}/{month:int}/{image}")]
     public async Task<IActionResult> GetImage(int year, int month, string image)
     {
-        var file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{((month < 10) ? $"0{month}" : $"{month}")}/{image}");
+        var file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{(month < 10 ? $"0{month}" : $"{month}")}/{image}");
         if (file is null)
             return NotFound();
         return File(file, "image/jpeg");
