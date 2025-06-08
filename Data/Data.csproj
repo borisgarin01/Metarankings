@@ -16,9 +16,7 @@
     <PackageReference Include="FluentMigrator.Console" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Extensions.Postgres" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Runner.Postgres" Version="7.1.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
 
   <ItemGroup>
