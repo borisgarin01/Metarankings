@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces;
-using Domain;
+using Domain.Games;
 using Npgsql;
 
-namespace Data.Repositories.Classes.Derived;
+namespace Data.Repositories.Classes.Derived.Games;
 public sealed class DevelopersRepository : Repository, IRepository<Developer>
 {
     public DevelopersRepository(string connectionString) : base(connectionString)

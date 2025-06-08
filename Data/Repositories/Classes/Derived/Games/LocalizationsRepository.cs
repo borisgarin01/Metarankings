@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces.Derived;
-using Domain;
+using Domain.Games;
 using Npgsql;
 
-namespace Data.Repositories.Classes.Derived;
+namespace Data.Repositories.Classes.Derived.Games;
 
 public sealed class LocalizationsRepository : Repository, ILocalizationsRepository
 {

@@ -1,12 +1,12 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces;
-using Domain;
+using Domain.Games;
 using Npgsql;
 
-namespace Data.Repositories.Classes.Derived;
-public sealed class GenresRepository : Repository, IRepository<Genre>
+namespace Data.Repositories.Classes.Derived.Games;
+public sealed class GamesGenresRepository : Repository, IRepository<Genre>
 {
-    public GenresRepository(string connectionString) : base(connectionString)
+    public GamesGenresRepository(string connectionString) : base(connectionString)
     {
     }
 
@@ -66,7 +66,7 @@ WHERE Id=@id", new { id });
             foreach (var genreGame in genreGames)
             {
                 var game = await connection.QueryFirstOrDefaultAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE Id=@GameId", new { GameId = genreGame.GameId });
+FROM Games WHERE Id=@GameId", new { genreGame.GameId });
 
                 if (game is not null)
                 {

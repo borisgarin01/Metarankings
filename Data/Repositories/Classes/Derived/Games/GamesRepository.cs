@@ -1,10 +1,10 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces;
-using Domain;
+using Domain.Games;
 using Npgsql;
 using System.Text;
 
-namespace Data.Repositories.Classes.Derived;
+namespace Data.Repositories.Classes.Derived.Games;
 public sealed class GamesRepository : Repository, IRepository<GameModel>
 {
     public GamesRepository(string connectionString) : base(connectionString)
@@ -93,8 +93,8 @@ RETURNING Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Descr
                 LocalizationId = insertedLocalization.Id,
                 PublisherId = insertedPublisher.Id,
                 ReleaseDate = entity.ReleaseDate.Value,
-                Description = entity.Description,
-                Trailer = entity.Trailer
+                entity.Description,
+                entity.Trailer
             });
 
             foreach (var gameGenre in insertedGenres)
