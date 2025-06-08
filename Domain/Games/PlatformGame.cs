@@ -1,4 +1,4 @@
-﻿namespace Domain;
+﻿namespace Domain.Games;
 
 public sealed record PlatformGame
 {

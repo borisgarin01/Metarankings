@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Domain;
+namespace Domain.Games;
 public sealed record GameScreenshot
 {
     [JsonPropertyName("id")]

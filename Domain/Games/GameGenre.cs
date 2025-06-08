@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Domain;
+namespace Domain.Games;
 
 [Table("GamesGenres")]
 public sealed record GameGenre

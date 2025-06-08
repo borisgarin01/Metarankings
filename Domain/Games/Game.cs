@@ -2,7 +2,7 @@
 using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
 
-namespace Domain;
+namespace Domain.Games;
 
 [Table("Games")]
 public sealed record Game

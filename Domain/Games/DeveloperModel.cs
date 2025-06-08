@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Domain;
+namespace Domain.Games;
 public sealed record class DeveloperModel
 {
     public decimal Id { get; set; }
