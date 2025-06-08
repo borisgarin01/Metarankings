@@ -1,9 +1,9 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Games.CreateTables;
 
 [Migration(3, "Add localizations table migration")]
-public sealed class AddLocalizationsTableMigration : Migration
+public sealed class CreateLocalizationsTableMigration : Migration
 {
     public override void Down()
     {

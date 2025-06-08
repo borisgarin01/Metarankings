@@ -1,6 +1,6 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Games.InsertData;
 
 [Migration(15, "Insert localizations migration")]
 public sealed class InsertLocalizationsMigration : Migration

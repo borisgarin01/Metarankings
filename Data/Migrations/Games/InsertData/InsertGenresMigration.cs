@@ -1,13 +1,13 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Games.InsertData;
 
 [Migration(12, "Insert genres migration")]
 public sealed class InsertGenresMigration : Migration
 {
     public override void Down()
     {
-		Execute.Sql(@"DELETE FROM Genres 
+        Execute.Sql(@"DELETE FROM Genres 
 WHERE
 Name IN 
 ('Приключение',
@@ -25,7 +25,7 @@ Name IN
 
     public override void Up()
     {
-		Execute.Sql(@"INSERT INTO genres(name, url)
+        Execute.Sql(@"INSERT INTO genres(name, url)
 	VALUES 
 	('Приключение', '/genres/adventure'),
 	('Хоррор', '/genres/horror'),

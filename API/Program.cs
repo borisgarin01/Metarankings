@@ -1,5 +1,5 @@
 using API.IServiceCollectionExtensions;
-using Data.Migrations;
+using Data.Migrations.Games.CreateTables;
 using FluentMigrator.Runner;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -72,7 +72,7 @@ internal class Program
                 // Set the connection string
                 .WithGlobalConnectionString(configurationManager.GetConnectionString("MetarankingsConnection"))
                 // Define the assembly containing the migrations, maintenance migrations and other customizations
-                .ScanIn(typeof(AddGamesTableMigration).Assembly).For.Migrations())
+                .ScanIn(typeof(CreateGamesTableMigration).Assembly).For.Migrations())
             // Enable logging to console in the FluentMigrator way
             .AddLogging(lb => lb.AddFluentMigratorConsole())
             // Build the service provider

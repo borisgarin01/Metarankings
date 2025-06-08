@@ -1,9 +1,9 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Games.CreateTables;
 
 [Migration(9, "Add games genres table migration")]
-public sealed class AddGamesGenresTableMigration : Migration
+public sealed class CreateGamesGenresTableMigration : Migration
 {
     public override void Down()
     {

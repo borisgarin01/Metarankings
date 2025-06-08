@@ -1,9 +1,9 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Movies;
 
-[Migration(17, "Add movies genres table migration")]
-public sealed class AddMoviesGenresTableMigration : Migration
+[Migration(17, "Create movies genres table migration")]
+public sealed class CreateMoviesGenresTableMigration : Migration
 {
     public override void Down()
     {

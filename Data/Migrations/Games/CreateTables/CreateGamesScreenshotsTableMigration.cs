@@ -1,9 +1,9 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Games.CreateTables;
 
 [Migration(10, "Add games screenshots table migration")]
-public sealed class AddGamesScreenshotsTableMigration : Migration
+public sealed class CreateGamesScreenshotsTableMigration : Migration
 {
     public override void Down()
     {

@@ -1,6 +1,6 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Games.InsertData;
 
 [Migration(13, "Insert platforms migration")]
 public sealed class InsertPlatformsMigration : Migration

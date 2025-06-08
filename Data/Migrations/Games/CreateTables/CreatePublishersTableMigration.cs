@@ -1,9 +1,9 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Games.CreateTables;
 
 [Migration(5, "Add publishers table migration")]
-public sealed class AddPublishersTableMigration : Migration
+public sealed class CreatePublishersTableMigration : Migration
 {
     public override void Down()
     {

@@ -1,6 +1,6 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Movies;
 
 [Migration(18, "Create movies genres table migration")]
 public sealed class CreateMoviesStudiosTableMigration : Migration

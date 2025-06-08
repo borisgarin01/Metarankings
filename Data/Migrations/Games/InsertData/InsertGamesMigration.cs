@@ -1,19 +1,19 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Games.InsertData;
 
 [Migration(16, "Add games migration")]
-public sealed class AddGamesMigration : Migration
+public sealed class InsertGamesMigration : Migration
 {
     public override void Down()
     {
-		Execute.Sql(@"DELETE FROM Games 
+        Execute.Sql(@"DELETE FROM Games 
 WHERE Name in ('The Last of Us: Remastered', 'God of War (2018)', 'The Witcher 3: Wild Hunt', 'Grand Theft Auto V (обновленная версия)');");
     }
 
     public override void Up()
     {
-		Execute.Sql(@"
+        Execute.Sql(@"
 insert into games(href, name, image, localizationid, publisherid, releasedate, description, trailer)
 values
 	('games/the-last-of-us-remastered', 

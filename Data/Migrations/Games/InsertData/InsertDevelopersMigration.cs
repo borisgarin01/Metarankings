@@ -1,6 +1,6 @@
 ﻿using FluentMigrator;
 
-namespace Data.Migrations;
+namespace Data.Migrations.Games.InsertData;
 
 [Migration(11, "Insert developers migration")]
 public sealed class InsertDevelopersMigration : Migration
