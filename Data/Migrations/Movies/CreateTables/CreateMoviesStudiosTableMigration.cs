@@ -2,7 +2,7 @@
 
 namespace Data.Migrations.Movies.CreateTables;
 
-[Migration(18, "Create movies genres table migration")]
+[Migration(12, "Create movies genres table migration")]
 public sealed class CreateMoviesStudiosTableMigration : Migration
 {
     public override void Down()
@@ -13,7 +13,6 @@ public sealed class CreateMoviesStudiosTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE MoviesStudios (id bigserial not null primary key,
-name varchar(511) not null unique,
-href varchar(1023) not null unique);");
+name varchar(511) not null unique);");
     }
 }

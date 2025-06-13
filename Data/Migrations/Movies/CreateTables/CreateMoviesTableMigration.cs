@@ -2,7 +2,7 @@
 
 namespace Data.Migrations.Movies.CreateTables;
 
-[Migration(20, "Create movies table migration")]
+[Migration(14, "Create movies table migration")]
 public sealed class CreateMoviesTableMigration : Migration
 {
     public override void Down()

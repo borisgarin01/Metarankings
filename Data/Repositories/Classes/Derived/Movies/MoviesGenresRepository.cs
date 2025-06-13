@@ -15,11 +15,11 @@ public sealed class MoviesGenresRepository : Repository, IRepository<MovieGenre>
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var insertedId = await connection.QueryFirstOrDefaultAsync<long>(@"INSERT INTO MoviesGenres(Name, Href) 
+            var insertedId = await connection.QueryFirstOrDefaultAsync<long>(@"INSERT INTO MoviesGenres(Name) 
 VALUES
-(@Name, @Href) 
+(@Name) 
 RETURNING 
-Id;", new { entity.Name, entity.Href });
+Id;", new { entity.Name });
 
             return insertedId;
         }
@@ -37,7 +37,7 @@ Id;", new { entity.Name, entity.Href });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesGenres = await connection.QueryAsync<MovieGenre>(@"SELECT Id, Name, Href 
+            var moviesGenres = await connection.QueryAsync<MovieGenre>(@"SELECT Id, Name 
 FROM MoviesGenres;");
 
             return moviesGenres;
@@ -48,7 +48,7 @@ FROM MoviesGenres;");
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesGenres = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"SELECT Id, Name, Href 
+            var moviesGenres = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"SELECT Id, Name 
 FROM MoviesGenres
 WHERE Id=@id;", new { id });
 
@@ -60,7 +60,7 @@ WHERE Id=@id;", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesGenres = await connection.QueryAsync<MovieGenre>(@"SELECT Id, Name, Href 
+            var moviesGenres = await connection.QueryAsync<MovieGenre>(@"SELECT Id, Name 
 FROM MoviesGenres
 OFFSET @offset
 LIMIT @limit;", new { offset, limit });
@@ -89,12 +89,11 @@ LIMIT @limit;", new { offset, limit });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"UPDATE MoviesGenres set Name=@Name, Href=@Href 
-where Id=@id 
+            var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"UPDATE MoviesGenres set Name=@Name 
+WHERE Id=@id 
 returning Name, Href, Id", new
             {
                 movieGenre.Name,
-                movieGenre.Href,
                 id
             });
 

@@ -14,9 +14,9 @@ public sealed class MoviesDirectorsRepository : Repository, IRepository<MovieDir
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var insertedId = await connection.QueryFirstAsync<long>(@"INSERT INTO MoviesDirectors (Name, Href)
-VALUES (@Name, @Href)
-RETURNING Id", new { entity.Name, entity.Href });
+            var insertedId = await connection.QueryFirstAsync<long>(@"INSERT INTO MoviesDirectors (Name)
+VALUES (@Name)
+RETURNING Id", new { entity.Name });
 
             return insertedId;
         }
@@ -34,7 +34,7 @@ RETURNING Id", new { entity.Name, entity.Href });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesDirectors = await connection.QueryAsync<MovieDirector>(@"SELECT Id, Name, Href 
+            var moviesDirectors = await connection.QueryAsync<MovieDirector>(@"SELECT Id, Name 
 FROM MoviesDirectors;");
 
             return moviesDirectors;
@@ -45,7 +45,7 @@ FROM MoviesDirectors;");
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var movieDirector = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"SELECT Id, Name, Href 
+            var movieDirector = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"SELECT Id, Name
 FROM MoviesDirectors
 WHERE Id=@id", new { id });
 
@@ -57,7 +57,7 @@ WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesDirectors = await connection.QueryAsync<MovieDirector>(@"SELECT Id, Name, Href 
+            var moviesDirectors = await connection.QueryAsync<MovieDirector>(@"SELECT Id, Name 
 FROM MoviesDirectors
 OFFSET @offset 
 LIMIT @limit;", new { offset, limit });
@@ -88,8 +88,9 @@ WHERE Id=@id", new { id });
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedMovieDirector = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"UPDATE MoviesDirectors 
-SET Name=@Name, Href=@Href WHERE Id=@id",
-new { entity.Name, entity.Href, id });
+SET Name=@Name
+WHERE Id=@id",
+new { entity.Name, id });
 
             return updatedMovieDirector;
         }
