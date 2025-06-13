@@ -27,6 +27,8 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<ILocalizationsRepository>(instance => new LocalizationsRepository(metarankingsConnectionString));
 
+        services.AddScoped<IRepository<MovieModel>, MoviesRepository>(instance => new MoviesRepository(metarankingsConnectionString));
+
         services.AddScoped<IRepository<MovieDirector>, MoviesDirectorsRepository>(instance => new MoviesDirectorsRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<MovieGenre>, MoviesGenresRepository>(instance => new MoviesGenresRepository(metarankingsConnectionString));

@@ -7,6 +7,8 @@
     <None Remove="Migrations\AddMoviesGenresTableMigration.cs~RF7d2971.TMP" />
     <None Remove="Migrations\CreateMoviesDirectorsTableMigration.cs~RF8bfda5.TMP" />
     <None Remove="Migrations\Movies\CreateMoviesTableMigration.cs~RF62aaf8.TMP" />
+    <None Remove="Migrations\Movies\CreateTables\CreateMoviesDirectorsTableMigration.cs~RFd29899.TMP" />
+    <None Remove="Migrations\Movies\CreateTables\CreateMoviesStudiosTableMigration.cs~RFece7f3.TMP" />
     <None Remove="Repositories\Interfaces\IRepository.cs~RF58f86d.TMP" />
   </ItemGroup>
 
