@@ -28,10 +28,10 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> AddAsync(GameModel gameModel)
+    public async Task<ActionResult<long>> AddAsync(GameModel gameModel)
     {
-        await _gamesRepository.AddAsync(gameModel);
-        return Ok();
+        var createdGame = await _gamesRepository.AddAsync(gameModel);
+        return Ok(createdGame);
     }
 
     [HttpGet]
