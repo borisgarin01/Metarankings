@@ -805,7 +805,21 @@ LEFT JOIN localizations l ON l.id = g.localizationid
 LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
 LEFT JOIN platforms plat ON plat.id = gp.platformid
 LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-WHERE 1=1";
+WHERE 
+g.Id in 
+(SELECT games.id 
+FROM games 
+LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+LEFT JOIN developers d ON d.id = gd.developerid
+LEFT JOIN publishers p ON p.id = g.publisherid
+LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+LEFT JOIN genres gen ON gen.id = gg.genreid
+LEFT JOIN localizations l ON l.id = g.localizationid
+LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
+LEFT JOIN platforms plat ON plat.id = gp.platformid
+LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+WHERE 1=1
+";
 
             var queryStringBuilder = new StringBuilder(initialQuery);
 
@@ -843,11 +857,13 @@ WHERE 1=1";
                 parameters.Add("PlatformsIds", gamesGettingRequestModel.PlatformsIds);
             }
 
-            queryStringBuilder.Append(";");
+            queryStringBuilder.Append(");");
+
+            var query = queryStringBuilder.ToString();
 
             var gameDictionary = new Dictionary<long, GameModel>();
 
-            var query = await connection.QueryAsync<GameModel, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameModel>(
+            var games = await connection.QueryAsync<GameModel, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameModel>(
                 queryStringBuilder.ToString(),
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
