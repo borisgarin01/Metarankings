@@ -14,7 +14,6 @@ public sealed class CreatePublishersTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE Publishers
 (Id bigserial not null primary key,
-Name varchar(511) not null unique,
-Url varchar(1023) not null unique);");
+Name varchar(511) not null unique);");
     }
 }

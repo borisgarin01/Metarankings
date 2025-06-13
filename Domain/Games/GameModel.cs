@@ -7,9 +7,6 @@ public sealed record GameModel
     [JsonPropertyName("id")]
     public long Id { get; set; }
 
-    [JsonPropertyName("href")]
-    public required string Href { get; set; }
-
     [JsonPropertyName("name")]
     public required string Name { get; set; }
 
@@ -23,13 +20,13 @@ public sealed record GameModel
     public long? ScoresCount { get; set; }
 
     [JsonPropertyName("developers")]
-    public required List<Developer> Developers { get; set; } = new();
+    public List<Developer> Developers { get; set; } = new();
 
     [JsonPropertyName("publisher")]
     public required Publisher Publisher { get; set; }
 
     [JsonPropertyName("genres")]
-    public required List<Genre> Genres { get; set; } = new();
+    public List<Genre> Genres { get; set; } = new();
 
     [JsonPropertyName("localization")]
     public required Localization Localization { get; set; }
@@ -48,4 +45,7 @@ public sealed record GameModel
 
     [JsonPropertyName("screenshots")]
     public List<GameScreenshot> Screenshots { get; set; } = new();
+
+    [JsonPropertyName("tags")]
+    public List<Tag> Tags { get; set; } = new();
 }

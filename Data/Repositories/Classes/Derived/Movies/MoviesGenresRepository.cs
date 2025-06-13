@@ -91,7 +91,7 @@ LIMIT @limit;", new { offset, limit });
         {
             var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"UPDATE MoviesGenres set Name=@Name 
 WHERE Id=@id 
-returning Name, Href, Id", new
+returning Name, Id", new
             {
                 movieGenre.Name,
                 id

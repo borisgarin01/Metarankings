@@ -6,7 +6,4 @@ public sealed class AddLocalizationModel
 {
     [JsonPropertyName("name")]
     public string Name { get; set; }
-
-    [JsonPropertyName("href")]
-    public string Href { get; set; }
 }

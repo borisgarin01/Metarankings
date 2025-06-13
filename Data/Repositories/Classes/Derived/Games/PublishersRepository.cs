@@ -15,13 +15,12 @@ public sealed class PublishersRepository : Repository, IRepository<Publisher>
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Publishers
-(Name, Url)
-VALUES (@Name, @Url)
+(Name)
+VALUES (@Name)
 RETURNING Id;"
  , new
  {
-     publisher.Name,
-     publisher.Url
+     publisher.Name
  });
             return id;
         }
@@ -40,7 +39,8 @@ RETURNING Id;"
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var publishers = await connection.QueryAsync<Publisher>(@"select 
-publishers.id, publishers.name, publishers.url from publishers");
+publishers.id, publishers.name 
+from publishers");
 
             if (publishers is null)
                 return null;
@@ -50,8 +50,9 @@ publishers.id, publishers.name, publishers.url from publishers");
 
             foreach (var publisher in publishers)
             {
-                var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+                var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games 
+WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
 
                 publisher.Games = publisherGames;
 
@@ -66,13 +67,16 @@ FROM Games WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"select 
-publishers.id, publishers.name, publishers.url from publishers where Id=@id", new { id });
+publishers.id, publishers.name
+from publishers 
+where Id=@id", new { id });
 
             if (publisher is null)
                 return null;
 
-            var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+            var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games 
+WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
 
             publisher.Games = publisherGames;
 
@@ -85,9 +89,10 @@ FROM Games WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var publishers = await connection.QueryAsync<Publisher>(@"select 
-publishers.id, publishers.name, publishers.url 
+publishers.id, publishers.name
 from publishers
-OFFSET @offset limit @limit", new { offset, limit });
+OFFSET @offset 
+limit @limit", new { offset, limit });
 
             if (publishers is null)
                 return null;
@@ -97,8 +102,9 @@ OFFSET @offset limit @limit", new { offset, limit });
 
             foreach (var publisher in publishers)
             {
-                var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+                var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games 
+WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
 
                 publisher.Games = publisherGames;
 
@@ -129,12 +135,11 @@ Publishers WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedPublisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"UPDATE Publishers set Name=@Name, Url=@Url 
+            var updatedPublisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"UPDATE Publishers set Name=@Name 
 where Id=@id 
-returning Name, Url, Id", new
+returning Name, Id", new
             {
                 publisher.Name,
-                publisher.Url,
                 id
             });
 

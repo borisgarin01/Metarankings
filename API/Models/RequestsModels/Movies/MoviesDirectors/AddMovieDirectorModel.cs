@@ -8,9 +8,4 @@ public sealed record AddMovieDirectorModel
     [MaxLength(255, ErrorMessage = "Max length is 255")]
     [MinLength(1, ErrorMessage = "Name should be not empty")]
     public string Name { get; set; }
-
-    [Required(ErrorMessage = "Href is required")]
-    [MaxLength(1023, ErrorMessage = "Href length is 255")]
-    [MinLength(1, ErrorMessage = "Href should be not empty")]
-    public string Href { get; set; }
 }

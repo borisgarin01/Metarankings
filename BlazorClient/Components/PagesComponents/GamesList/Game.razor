@@ -1,7 +1,7 @@
 ﻿@inject HttpClient HttpClient
 
 <div class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
-    <a href="/games/Details/@Id" title="Игра @Name" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{Image}")" alt="Игра @Name"></a>
+    <a href="/games/Details/@Id" title="Игра @Name" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/uploads/{ReleaseDate.Value.Year}/{ReleaseDate.Value.Month}/{Image}")" alt="Игра @Name"></a>
     <div class="best-prod">
         <div class="counter" itemprop="position">@Id</div>
         <span class="star">★</span>

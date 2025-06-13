@@ -14,7 +14,6 @@ public sealed class CreateGamesTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE Games
 (Id bigserial not null primary key,
-Href varchar(1023) not null unique,
 Name varchar(1023) not null unique,
 Image varchar(1023) null unique,
 LocalizationId bigint null,

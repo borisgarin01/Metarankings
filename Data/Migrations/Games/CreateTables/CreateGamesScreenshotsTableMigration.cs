@@ -14,7 +14,6 @@ public sealed class CreateGamesScreenshotsTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE GamesScreenshots 
 (Id bigserial not null primary key,
-Url varchar(1023) not null unique,
 GameId bigint not null,
 FOREIGN KEY(GameId) 
 REFERENCES Games(Id) 

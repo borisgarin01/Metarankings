@@ -7,9 +7,9 @@ public sealed record class DeveloperModel
     public string Name { get; set; }
     public string Url { get; set; }
     [JsonPropertyName("games")]
-    public required List<Game> Games { get; set; } = new();
+    public List<Game> Games { get; set; } = new();
     [JsonPropertyName("platforms")]
-    public required List<Platform> Platforms { get; set; } = new();
+    public List<Platform> Platforms { get; set; } = new();
     [JsonPropertyName("genres")]
-    public required List<Genre> Genres { get; set; } = new();
+    public List<Genre> Genres { get; set; } = new();
 }

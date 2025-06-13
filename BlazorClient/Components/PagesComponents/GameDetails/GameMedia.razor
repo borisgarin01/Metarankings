@@ -8,11 +8,11 @@
                 <div id="content-trailer">
                     <meta itemprop="isFamilyFriendly" content="true">
                     <meta itemprop="uploadDate" content="@ReleaseDate?.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))">
-                    <link itemprop="url" href="@Href">
+                    <link itemprop="url" href="/games/details/">
                     <meta itemprop="name" content="Трейлер The @Name">
                     <meta itemprop="description" content="Трейлер игры @Name">
                     <link itemprop="thumbnail" href="@Image">
-                    <link itemprop="thumbnailUrl" href="@Href">
+                    <link itemprop="thumbnailUrl" href="/games/details/@GameId">
                     <link itemprop="embedUrl" href="@Name">
                     <iframe title="Трейлер @Name"
                             src="@Trailer"

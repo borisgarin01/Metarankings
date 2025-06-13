@@ -16,13 +16,12 @@ public sealed class PlatformsRepository : Repository, IRepository<Platform>
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Platforms
-(Name, Href)
-VALUES (@Name, @Href)
+(Name)
+VALUES (@Name)
 RETURNING Id;"
  , new
  {
-     platform.Name,
-     platform.Href
+     platform.Name
  });
             return id;
         }
@@ -41,7 +40,7 @@ RETURNING Id;"
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var platforms = await connection.QueryAsync<Platform>(@"select 
-platforms.id, platforms.name, platforms.href 
+platforms.id, platforms.name
 from platforms");
 
             if (platforms is null)
@@ -55,7 +54,7 @@ where PlatformId=@platformId", new { platformId = platform.Id });
 
                 foreach (var gamePlatform in platformGames)
                 {
-                    var games = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+                    var games = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
 FROM Games WHERE Id=@GameId", new { gamePlatform.GameId });
 
                     platform.Games = games;
@@ -63,7 +62,7 @@ FROM Games WHERE Id=@GameId", new { gamePlatform.GameId });
 
                 foreach (var game in platform.Games)
                 {
-                    var gamePlatforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name, platforms.Href 
+                    var gamePlatforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name
 FROM
 platforms
 INNER JOIN gamesPlatforms
@@ -72,7 +71,7 @@ INNER JOIN games
 on games.Id=gamesPlatforms.GameId
 WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
 
-                    game.Platforms = platforms;
+                    game.Platforms = platforms.ToList();
                 }
             }
             return platforms;
@@ -84,7 +83,7 @@ WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"select 
-platforms.id, platforms.name, platforms.href 
+platforms.id, platforms.name 
 from platforms
 WHERE platforms.Id=@id", new { id });
 
@@ -99,7 +98,7 @@ where PlatformId=@platformId", new { platformId = platform.Id });
 
             foreach (var gamePlatform in platformGames)
             {
-                games.AddRange(await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+                games.AddRange(await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
 FROM Games WHERE Id=@GameId", new { gamePlatform.GameId }));
             }
 
@@ -113,7 +112,7 @@ FROM Games WHERE Id=@GameId", new { gamePlatform.GameId }));
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var platforms = await connection.QueryAsync<Platform>(@"SELECT Id, Name, Href 
+            var platforms = await connection.QueryAsync<Platform>(@"SELECT Id, Name 
 FROM 
 Platforms 
 OFFSET @offset
@@ -144,12 +143,11 @@ Platforms WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name, Href=@Href 
+            var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name 
 where Id=@id
 returning Name, Href, Id", new
             {
                 platform.Name,
-                platform.Href,
                 id
             });
 

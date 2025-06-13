@@ -9,7 +9,7 @@ public partial class GamesList : ComponentBase
     [Inject]
     public HttpClient HttpClient { get; set; }
 
-    public IEnumerable<GameModel> Games { get; set; } = Enumerable.Empty<GameModel>();
+    public IEnumerable<Game> Games { get; set; } = Enumerable.Empty<Game>();
 
     [Parameter]
     public int PageSize { get; set; } = 5; // Default value
@@ -24,6 +24,6 @@ public partial class GamesList : ComponentBase
         if (PageSize < 1)
             PageSize = 5;
         // Fetch data based on the current PageSize and PageNumber
-        Games = await HttpClient.GetFromJsonAsync<IEnumerable<GameModel>>($"/api/Games/{PageNumber}/{PageSize}");
+        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/{PageNumber}/{PageSize}");
     }
 }

@@ -15,13 +15,12 @@ public sealed class GamesGenresRepository : Repository, IRepository<Genre>
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Genres
-(Name, Url)
-VALUES (@Name, @Url)
+(Name)
+VALUES (@Name)
 RETURNING Id;"
  , new
  {
-     genre.Name,
-     genre.Url
+     genre.Name
  });
             return id;
         }
@@ -39,7 +38,7 @@ RETURNING Id;"
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var genres = await connection.QueryAsync<Genre>(@"SELECT Id, Name, Url 
+            var genres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
 FROM 
 Genres;");
             return genres;
@@ -50,7 +49,7 @@ Genres;");
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var genre = await connection.QueryFirstOrDefaultAsync<Genre>(@"SELECT Id, Name, Url 
+            var genre = await connection.QueryFirstOrDefaultAsync<Genre>(@"SELECT Id, Name 
 FROM 
 Genres
 WHERE Id=@id", new { id });
@@ -59,13 +58,14 @@ WHERE Id=@id", new { id });
                 return null;
 
             var genreGames = await connection.QueryAsync<GameGenre>(@"SELECT Id, GameId, GenreId
-	FROM GamesGenres WHERE GenreId=@GenreId;", new { GenreId = id });
+	FROM GamesGenres 
+WHERE GenreId=@GenreId;", new { GenreId = id });
 
             var games = new List<Game>();
 
             foreach (var genreGame in genreGames)
             {
-                var game = await connection.QueryFirstOrDefaultAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+                var game = await connection.QueryFirstOrDefaultAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
 FROM Games WHERE Id=@GameId", new { genreGame.GameId });
 
                 if (game is not null)
@@ -84,7 +84,7 @@ FROM Games WHERE Id=@GameId", new { genreGame.GameId });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var genres = await connection.QueryAsync<Genre>(@"SELECT Id, Name, Url 
+            var genres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
 FROM 
 Genres 
 OFFSET @offset
@@ -115,12 +115,11 @@ Genres WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE Genres set Name=@Name, Url=@Url 
+            var updatedGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE Genres set Name=@Name 
 where Id=@id
-returning Name, Url, Id", new
+returning Name, Id", new
             {
                 genre.Name,
-                genre.Url,
                 id
             });
 

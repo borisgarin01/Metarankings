@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Domain.Games;
@@ -12,8 +13,5 @@ public sealed record Developer
     [JsonPropertyName("name")]
     public string Name { get; set; }
 
-    [JsonPropertyName("url")]
-    public string Url { get; set; }
-
-    public IEnumerable<Game> Games { get; set; } = Enumerable.Empty<Game>();
+    public List<Game> Games { get; set; } = new List<Game>();
 }

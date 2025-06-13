@@ -21,7 +21,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
-    public async Task<ActionResult<IEnumerable<GameModel>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<Game>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
     {
         var games = await _gamesRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
         return Ok(games);
@@ -35,14 +35,14 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GameModel>>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<Game>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var games = await _gamesRepository.GetAllAsync();
         return Ok(games);
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<GameModel>> GetAsync(long id)
+    public async Task<ActionResult<Game>> GetAsync(long id)
     {
         var game = await _gamesRepository.GetAsync(id);
 
@@ -61,13 +61,12 @@ public sealed class GamesController : ControllerBase
         return File(file, "image/jpeg");
     }
 
-    [HttpGet("genres/{genreUrlPart}")]
-    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesOfGenre(string genreUrlPart)
+    [HttpGet("genres/{genreId:long}")]
+    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfGenre(long genreId)
     {
         try
         {
-            var genreUrl = $"/genres/{genreUrlPart}";
-            var gamesOfGenre = await _gamesRepository.GetByGenreUrlAsync(genreUrl);
+            var gamesOfGenre = await _gamesRepository.GetByGenreIdAsync(genreId);
             if (gamesOfGenre is null)
                 return NotFound();
             return Ok(gamesOfGenre);
@@ -78,13 +77,12 @@ public sealed class GamesController : ControllerBase
         }
     }
 
-    [HttpGet("platforms/{platformUrlPart}")]
-    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesOfPlatform(string platformUrlPart)
+    [HttpGet("platforms/{platformId}")]
+    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfPlatform(long platformId)
     {
         try
         {
-            var platformUrl = $"/platforms/{platformUrlPart}";
-            var gamesOfPlatform = await _gamesRepository.GetByPlatformUrlAsync(platformUrl);
+            var gamesOfPlatform = await _gamesRepository.GetByPlatformIdAsync(platformId);
             if (gamesOfPlatform is null)
                 return NotFound();
             return Ok(gamesOfPlatform);
@@ -95,13 +93,12 @@ public sealed class GamesController : ControllerBase
         }
     }
 
-    [HttpGet("developers/{developerUrlPart}")]
-    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesOfDeveloper(string developerUrlPart)
+    [HttpGet("developers/{developerId}")]
+    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfDeveloper(long developerId)
     {
         try
         {
-            var developerUrl = $"/developers/{developerUrlPart}";
-            var gamesOfDeveloper = await _gamesRepository.GetByDeveloperUrlAsync(developerUrl);
+            var gamesOfDeveloper = await _gamesRepository.GetByDeveloperIdAsync(developerId);
             if (gamesOfDeveloper is null)
                 return NotFound();
             return Ok(gamesOfDeveloper);
@@ -112,13 +109,12 @@ public sealed class GamesController : ControllerBase
         }
     }
 
-    [HttpGet("publishers/{publisherUrlPart}")]
-    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesOfPublisher(string publisherUrlPart)
+    [HttpGet("publishers/{publisherId}")]
+    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfPublisher(long publisherId)
     {
         try
         {
-            var developerUrl = $"/publishers/{publisherUrlPart}";
-            var gamesOfDeveloper = await _gamesRepository.GetByPublisherUrlAsync(developerUrl);
+            var gamesOfDeveloper = await _gamesRepository.GetByPublisherIdAsync(publisherId);
             if (gamesOfDeveloper is null)
                 return NotFound();
             return Ok(gamesOfDeveloper);
@@ -130,7 +126,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("year/{year:int}")]
-    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesOfYear(int year)
+    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfYear(int year)
     {
         try
         {
@@ -146,7 +142,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost("gamesByParameters")]
-    public async Task<ActionResult<IEnumerable<GameModel>>> GetGamesByParameters(GamesGettingRequestModel gamesGettingRequestModel)
+    public async Task<ActionResult<IEnumerable<Game>>> GetGamesByParameters(GamesGettingRequestModel gamesGettingRequestModel)
     {
         try
         {

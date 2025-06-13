@@ -13,7 +13,7 @@ else
         @foreach (var game in Platform.Games)
         {
             <div class="post clear">
-                <a href="/games/details/@game.Id" title="Игра «@game.Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{game.Image}")" alt="@game.Name"></a>
+                <a href="/games/details/@game.Id" title="Игра «@game.Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/uploads/{game.ReleaseDate.Value.Year}/{game.ReleaseDate.Value.Month}/{game.Image}")" alt="@game.Name"></a>
                 <a class="name" href="/games/details/@game.Id">@game.Name</a>
                 <div class="post-meta"><p>@string.Join(", ", game.Platforms.Select(b => b.Name))</p></div>
                 <div class="post-meta">

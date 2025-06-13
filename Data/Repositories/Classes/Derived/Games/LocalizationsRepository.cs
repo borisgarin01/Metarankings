@@ -16,13 +16,12 @@ public sealed class LocalizationsRepository : Repository, ILocalizationsReposito
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Localizations
-(Name, Href)
-VALUES (@Name, @Href)
+(Name)
+VALUES (@Name)
 RETURNING Id;"
  , new
  {
      localization.Name,
-     localization.Href
  });
             return id;
         }
@@ -38,7 +37,7 @@ RETURNING Id;"
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var localizations = await connection.QueryAsync<Localization>(@"SELECT Id, Name, Href 
+            var localizations = await connection.QueryAsync<Localization>(@"SELECT Id, Name
 FROM 
 Localizations;");
 
@@ -50,7 +49,7 @@ Localizations;");
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var localization = await connection.QueryFirstOrDefaultAsync<Localization>(@"SELECT Id, Name, Href 
+            var localization = await connection.QueryFirstOrDefaultAsync<Localization>(@"SELECT Id, Name 
 FROM 
 Localizations
 WHERE Id=@id;", new { id });
@@ -58,7 +57,7 @@ WHERE Id=@id;", new { id });
             if (localization is null)
                 return null;
 
-            var localizationGames = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer 
+            var localizationGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer 
 from Games 
 where LocalizationId=@localizationId", new { localizationId = localization.Id });
 
@@ -72,7 +71,7 @@ where LocalizationId=@localizationId", new { localizationId = localization.Id })
 
                 foreach (var gamePlatform in gamePlatforms)
                 {
-                    var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"SELECT Id, Href, Name 
+                    var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"SELECT Id, Name 
 FROM Platforms
 WHERE Id=@Id", new { Id = gamePlatform.PlatformId });
 
@@ -91,7 +90,7 @@ WHERE GameId=@GameId", new { GameId = game.Id });
 
                 foreach (var gameDeveloper in gameDevelopers)
                 {
-                    var developer = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name, Url
+                    var developer = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name
 FROM Developers 
 WHERE Id=@Id", new { Id = gameDeveloper.DeveloperId });
 
@@ -103,7 +102,7 @@ WHERE Id=@Id", new { Id = gameDeveloper.DeveloperId });
 
                 game.Developers = developers;
 
-                var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"SELECT Id, Name, Url
+                var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"SELECT Id, Name
 FROM Publishers
 WHERE Id=@Id", new { Id = game.PublisherId });
 
@@ -123,7 +122,7 @@ WHERE Id=@Id", new { Id = game.PublisherId });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var localization = await connection.QueryFirstOrDefaultAsync<Localization>(@"SELECT Id, Name, Href 
+            var localization = await connection.QueryFirstOrDefaultAsync<Localization>(@"SELECT Id, Name 
 FROM 
 Localizations
 WHERE Id=@id;", new { id });
@@ -131,7 +130,7 @@ WHERE Id=@id;", new { id });
             if (localization is null)
                 return null;
 
-            var localizationGames = await connection.QueryAsync<Game>(@"SELECT Id, Href, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer 
+            var localizationGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer 
 from Games 
 where LocalizationId=@localizationId and 
 Id in (select GameId from GamesPlatforms where PlatformId=@platformId)", new { localizationId = localization.Id, platformId });
@@ -146,7 +145,7 @@ Id in (select GameId from GamesPlatforms where PlatformId=@platformId)", new { l
 
                 foreach (var gamePlatform in gamePlatforms)
                 {
-                    var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"SELECT Id, Href, Name 
+                    var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"SELECT Id, Name 
 FROM Platforms
 WHERE Id=@Id", new { Id = gamePlatform.PlatformId });
 
@@ -165,7 +164,7 @@ WHERE GameId=@GameId", new { GameId = game.Id });
 
                 foreach (var gameDeveloper in gameDevelopers)
                 {
-                    var developer = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name, Url
+                    var developer = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name
 FROM Developers 
 WHERE Id=@Id", new { Id = gameDeveloper.DeveloperId });
 
@@ -177,7 +176,7 @@ WHERE Id=@Id", new { Id = gameDeveloper.DeveloperId });
 
                 game.Developers = developers;
 
-                var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"SELECT Id, Name, Url
+                var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"SELECT Id, Name
 FROM Publishers
 WHERE Id=@Id", new { Id = game.PublisherId });
 
@@ -197,7 +196,7 @@ WHERE Id=@Id", new { Id = game.PublisherId });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var localizations = await connection.QueryAsync<Localization>(@"SELECT Id, Name, Href 
+            var localizations = await connection.QueryAsync<Localization>(@"SELECT Id, Name 
 FROM 
 Localizations 
 OFFSET @offset
@@ -228,12 +227,11 @@ Localizations WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name, Href=@Href 
+            var updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name
 where Id=@Id
 returning Name, Href, Id", new
             {
                 localization.Name,
-                localization.Href,
                 id
             });
 

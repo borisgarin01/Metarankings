@@ -9,9 +9,6 @@ public sealed record Movie
     [JsonPropertyName("id")]
     public long Id { get; set; }
 
-    [JsonPropertyName("href")]
-    public required string Href { get; set; }
-
     [JsonPropertyName("name")]
     public required string Name { get; set; }
 

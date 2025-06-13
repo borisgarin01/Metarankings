@@ -13,8 +13,7 @@ public sealed class CreateLocalizationsTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE Localizations 
-(Id bigserial not null primary key,
-Href varchar(511) not null unique, 
+(Id bigserial not null primary key, 
 Name varchar(127) not null unique);");
     }
 }

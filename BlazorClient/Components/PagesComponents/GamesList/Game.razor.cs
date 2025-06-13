@@ -9,9 +9,6 @@ public partial class Game : ComponentBase
     public long Id { get; set; }
 
     [Parameter, EditorRequired]
-    public required string Href { get; set; }
-
-    [Parameter, EditorRequired]
     public required string Name { get; set; }
 
     [Parameter, EditorRequired]

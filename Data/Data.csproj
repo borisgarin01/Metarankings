@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations\Developers\" />
     <Folder Include="Migrations\Games\InsertData\" />
     <Folder Include="Migrations\Movies\InsertData\" />
   </ItemGroup>

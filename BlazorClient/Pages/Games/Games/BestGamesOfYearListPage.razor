@@ -77,7 +77,7 @@ else
         @for (int i = 0; i < Games.Count(); i++)
         {
             <div class="post clear">
-                <a href="@Games.ElementAt(i).Href" title="Игра «@Games.ElementAt(i).Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{Games.ElementAt(i).Image}")" alt="@Games.ElementAt(i).Name"></a>
+                <a href="/games/details/@Games.ElementAt(i).Id" title="Игра «@Games.ElementAt(i).Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/uploads/{Games.ElementAt(i).ReleaseDate.Value.Year}/{Games.ElementAt(i).ReleaseDate.Value.Month}/{Games.ElementAt(i).Image}")" alt="@Games.ElementAt(i).Name"></a>
                 <div class="best-prod">
                     <div class="counter">@(i + 1)</div>
                     <span class="star">★</span>
@@ -87,7 +87,7 @@ else
                 <div class="post-meta"><p>Дата выхода: @Games.ElementAt(i).ReleaseDate.Value.ToString("dd MM yyyy") года</p></div>
                 <div class="post-meta">Входит в лучшие по мнению 83% пользователей</div>
                 <div class="post-content">@Games.ElementAt(i).Description</div>
-                <div class="trailer" data-video="@Games.ElementAt(i).Href/#content-trailer"></div>
+                <div class="trailer" data-video="@Games.ElementAt(i).Trailer"></div>
                 <div class="ratings-graph">
                     <div class="graph-critic">
                         <div class="graph">

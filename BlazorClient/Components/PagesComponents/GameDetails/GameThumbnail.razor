@@ -2,15 +2,13 @@
 @inject HttpClient HttpClient
 
 <div class="thumb">
-    <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/{Image}")" alt="Игра @Name" title="Игра @Name" itemprop="image">
+    <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/uploads/{ReleaseYear}/{ReleaseMonth}/{ImageSource}")" alt="Игра @Name" title="Игра @Name" itemprop="image">
 
-    @if (ReleaseYear.HasValue)
-    {
-        <div class="best-prod">
-            <span class="star">★</span> Лучшие в @ReleaseYear.Value году 
-            <span class="inform">?</span>
-        </div>
-    }
+    <div class="best-prod">
+        <span class="star">★</span> Лучшие в @ReleaseYear году
+        <span class="inform">?</span>
+    </div>
+
 
     <div class="watch-trailer">
         <h3><span class="twatch"><span class="p-twatch">Смотреть трейлер</span></span></h3>

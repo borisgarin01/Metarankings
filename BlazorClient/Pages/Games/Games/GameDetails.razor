@@ -18,9 +18,10 @@ else
                     ReleaseYear="@Game.ReleaseDate!.Value.Year" />
 
         <div class="post-content">
-            <GameThumbnail Image="@Game.Image"
-                           Name="@Game.Name"
-                           ReleaseYear="@Game.ReleaseDate.Value.Year" />
+            <GameThumbnail Name="@Game.Name"
+                           ReleaseYear="@Game.ReleaseDate.Value.Year"
+                           ReleaseMonth="@Game.ReleaseDate.Value.Month"
+                           ImageSource="@Game.Image" />
 
 
             <RatingComponent Score="@(Game.Score.HasValue?Game.Score.Value:0)"
@@ -52,8 +53,8 @@ else
                        Screenshots="@Game.Screenshots"
                        Name="@Game.Name"
                        Image="@Game.Image"
-                       Href="@Game.Href"
-                       ReleaseDate="@Game.ReleaseDate" />
+                       ReleaseDate="@Game.ReleaseDate"
+                       GameId="@Game.Id" />
         </div>
     </div>
 }

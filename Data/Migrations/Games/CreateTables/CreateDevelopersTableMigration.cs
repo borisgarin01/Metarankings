@@ -14,7 +14,6 @@ public sealed class CreateDevelopersTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE Developers
 (Id bigserial not null primary key,
-Name varchar(511) not null unique,
-Url varchar(1023) not null unique);");
+Name varchar(511) not null unique);");
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Domain.Games;
@@ -7,39 +8,40 @@ namespace Domain.Games;
 public sealed record Game
 {
     [JsonPropertyName("id")]
-    public long Id { get; set; }
-
-    [JsonPropertyName("href")]
-    public required string Href { get; set; }
+    public required long Id { get; set; }
 
     [JsonPropertyName("name")]
     public required string Name { get; set; }
 
     [JsonPropertyName("image")]
-    public string Image { get; set; }
+    public required string Image { get; set; }
 
     [JsonPropertyName("publisherId")]
     public required long PublisherId { get; set; }
     [JsonPropertyName("publisher")]
-    public Publisher Publisher { get; set; }
+    public required Publisher Publisher { get; set; }
 
     [JsonPropertyName("releaseDate")]
-    public DateTime? ReleaseDate { get; set; }
+    public required DateTime? ReleaseDate { get; set; }
 
     [JsonPropertyName("description")]
-    public string Description { get; set; }
+    public required string Description { get; set; }
 
     [JsonPropertyName("trailer")]
     public required string Trailer { get; set; }
 
     [JsonPropertyName("platforms")]
-    public IEnumerable<Platform> Platforms { get; set; } = Enumerable.Empty<Platform>();
+    public required List<Platform> Platforms { get; set; } = new();
 
     [JsonPropertyName("genres")]
-    public IEnumerable<Genre> Genres { get; set; } = Enumerable.Empty<Genre>();
+    public required List<Genre> Genres { get; set; } = new();
 
     [JsonPropertyName("developers")]
-    public IEnumerable<Developer> Developers { get; set; } = Enumerable.Empty<Developer>();
+    public required List<Developer> Developers { get; set; } = new();
+    
+    [JsonPropertyName("gameScreenshots")]
+    public required List<GameScreenshot> Screenshots { get; set; } = new();
+
     [JsonPropertyName("localization")]
-    public Localization Localization { get; set; }
+    public required Localization Localization { get; set; }
 }

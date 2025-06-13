@@ -10,9 +10,6 @@ public sealed record Genre
     [JsonPropertyName("name")]
     public string Name { get; set; }
 
-    [JsonPropertyName("url")]
-    public string Url { get; set; }
-
     [JsonPropertyName("games")]
     public IEnumerable<Game> Games { get; set; } = Enumerable.Empty<Game>();
 }
