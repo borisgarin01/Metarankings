@@ -35,7 +35,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GameModel>>> GetAsync(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<GameModel>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var games = await _gamesRepository.GetAllAsync();
         return Ok(games);

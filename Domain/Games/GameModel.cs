@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace Domain.Games;
+
 public sealed record GameModel
 {
     [JsonPropertyName("id")]
