@@ -12,3 +12,5 @@ Domain/obj
 BlazorClient/Publish
 API/Images/Uploads
 API/Images
+IdentityLibrary/bin
+IdentityLibrary/obj
