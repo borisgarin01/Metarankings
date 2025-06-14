@@ -3,7 +3,6 @@ using Data.Repositories.Interfaces;
 using Domain.Games;
 using Npgsql;
 using System.Text;
-using System.Transactions;
 
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class GamesRepository : Repository, IRepository<GameModel>
@@ -16,9 +15,10 @@ public sealed class GamesRepository : Repository, IRepository<GameModel>
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
+            connection.Open();
+
             using (var transaction = connection.BeginTransaction())
             {
-
                 List<Developer> insertedDevelopers = new();
                 List<Genre> insertedGenres = new();
                 Publisher insertedPublisher = null;
