@@ -13,12 +13,6 @@ public sealed record GameModel
     [JsonPropertyName("image")]
     public required string Image { get; set; }
 
-    [JsonPropertyName("score")]
-    public float? Score { get; set; }
-
-    [JsonPropertyName("scoresCount")]
-    public long? ScoresCount { get; set; }
-
     [JsonPropertyName("developers")]
     public List<Developer> Developers { get; set; } = new();
 

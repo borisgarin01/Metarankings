@@ -24,8 +24,8 @@ else
                            ImageSource="@Game.Image" />
 
 
-            <RatingComponent Score="@(Game.Score.HasValue?Game.Score.Value:0)"
-                             ScoresCount="@(Game.ScoresCount.HasValue?Game.ScoresCount.Value:0)"
+            <RatingComponent Score="@(0)"
+                             ScoresCount="@(0)"
                              OnRate="RatePost"
                              SelectedRating="@selectedRating"
                              CurrentHoverRating="@currentHoverRating"

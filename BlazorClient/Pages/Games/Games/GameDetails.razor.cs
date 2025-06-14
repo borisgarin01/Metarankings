@@ -21,7 +21,7 @@ public partial class GameDetails : ComponentBase
     protected override async Task OnParametersSetAsync()
     {
         Game = await HttpClient.GetFromJsonAsync<GameModel>($"/api/Games/{Id}");
-        SetRatingPreview(Convert.ToByte(Game.Score.HasValue ? Game.Score.Value : 0));
+        SetRatingPreview(0);
     }
 
     private void SetRatingPreview(byte rating)
@@ -35,7 +35,6 @@ public partial class GameDetails : ComponentBase
         if (!hasRated)
         {
             selectedRating = rating;
-            Game.ScoresCount++;
             hasRated = true;
             // Consider adding API call to persist the rating
             StateHasChanged();
