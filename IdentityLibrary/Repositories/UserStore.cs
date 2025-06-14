@@ -39,10 +39,10 @@ ON CONFLICT DO NOTHING;",
 
         using (var connection = new NpgsqlConnection(_connectionString))
         {
-            user.Id = await connection.QuerySingleAsync<int>($@"INSERT INTO ApplicationUsers (UserName, Email,
+            user.Id = await connection.QuerySingleAsync<int>($@"INSERT INTO ApplicationUsers (UserName, NormalizedUserName, Email,
                     EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled)
-                    VALUES (@UserName, @Email, CAST @EmailConfirmed as bit, @PasswordHash,
-                    @PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled) 
+                    VALUES (@UserName, @NormalizedUserName, @Email,
+                    @EmailConfirmed, @PasswordHash, @PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled)
 RETURNING Id", user);
         }
 
@@ -88,14 +88,14 @@ RETURNING Id", user);
         }
     }
 
-    public async Task<ApplicationUser?> FindByNameAsync(string userName, CancellationToken cancellationToken)
+    public async Task<ApplicationUser?> FindByNameAsync(string normalizedUsername, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             return await connection.QuerySingleOrDefaultAsync<ApplicationUser>($@"SELECT * FROM ApplicationUsers
-                    WHERE UserName = @userName", new { userName });
+                    WHERE NormalizedUserName = @normalizedUsername", new { normalizedUsername });
         }
     }
 
