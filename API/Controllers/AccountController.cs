@@ -1,8 +1,10 @@
 ﻿using API.Models.Identity;
 using IdentityLibrary.DTOs;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace API.Controllers;
 
@@ -47,7 +49,15 @@ public sealed class AccountController : ControllerBase
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                return Ok("You're logged in");
+                var claims = new Claim[]
+                {
+                    new Claim("Demo","Value")
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, "Cookie");
+                var claimPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                return Ok(claimPrincipal.Claims.First().Value);
             }
             else
             {
@@ -57,5 +67,15 @@ public sealed class AccountController : ControllerBase
         }
 
         return BadRequest(model);
+    }
+
+    [Authorize]
+    [HttpGet]
+    public ActionResult<string> GetLyrics()
+    {
+        return @"Однажды, в студёную зимнюю пору я из лесу вышел,
+Был сильный мороз.
+Гляжу, поднимается медленно в гору
+Лошадка, везущая хворосту воз.";
     }
 }
