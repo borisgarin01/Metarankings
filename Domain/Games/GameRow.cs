@@ -5,7 +5,7 @@ public sealed record GameRow
     public long GameId { get; set; }
     public string GameName { get; set; }
     public string GameImage { get; set; }
-    public DateOnly GameReleaseDate { get; set; }
+    public DateTime GameReleaseDate { get; set; }
     public string GameDescription { get; set; }
     public long DeveloperId { get; set; }
     public string DeveloperName { get; set; }
