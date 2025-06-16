@@ -1,6 +1,7 @@
 ﻿using API.Json;
 using Data.Repositories.Classes.Derived.Games;
 using Domain.Games;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -28,6 +29,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<long>> AddAsync(GameModel gameModel)
     {
         var createdGame = await _gamesRepository.AddAsync(gameModel);

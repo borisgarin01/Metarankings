@@ -13,7 +13,7 @@ public sealed class CreatePublishersTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE Publishers
-(Id bigserial not null primary key,
+(Id bigint not null primary key identity(1,1),
 Name varchar(511) not null unique);");
     }
 }

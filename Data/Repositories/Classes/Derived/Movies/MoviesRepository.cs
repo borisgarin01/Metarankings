@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces;
 using Domain.Movies;
-using Npgsql;
+using Microsoft.Data.SqlClient;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 public sealed class MoviesRepository : Repository, IRepository<MovieModel>
@@ -12,7 +12,7 @@ public sealed class MoviesRepository : Repository, IRepository<MovieModel>
 
     public async Task<long> AddAsync(MovieModel entity)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var insertedMovieGenres = new List<MovieGenre>();
             var insertedMovieStudios = new List<MovieStudio>();
@@ -122,7 +122,7 @@ new { MovieId = insertedMovie.Id, MovieDirectorId = insertedMovieDirector.Id });
 
     public async Task<IEnumerable<MovieModel>> GetAllAsync()
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
@@ -174,7 +174,7 @@ md.id, md.name
 
     public async Task<MovieModel> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,

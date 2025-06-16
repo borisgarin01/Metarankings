@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces;
 using Domain.Games;
-using Npgsql;
+using Microsoft.Data.SqlClient;
 using System.Text;
 
 namespace Data.Repositories.Classes.Derived.Games;
@@ -13,7 +13,7 @@ public sealed class GamesRepository : Repository, IRepository<GameModel>
 
     public async Task<long> AddAsync(GameModel entity)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             connection.Open();
 
@@ -194,7 +194,7 @@ VALUES (@GameId, @TagId);",
 
     public async Task<IEnumerable<GameModel>> GetAsync(int offset, int limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
     g.Id as GameId, g.name as GameName, g.image as GameImage, g.releasedate as GameReleaseDate, g.description as GameDescription, g.trailer as GameTrailer,
@@ -269,7 +269,7 @@ LEFT JOIN tags t on gt.tagid=t.id";
 
     public async Task<IEnumerable<GameModel>> GetAllAsync()
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
@@ -337,7 +337,7 @@ gs.id, gs.gameid
 
     public async Task<GameModel> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
@@ -407,7 +407,7 @@ WHERE g.Id=@id";
 
     public async Task<IEnumerable<Game>> GetByGenreIdAsync(long genreId)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
@@ -483,7 +483,7 @@ ORDER BY g.id, gen.id;";
 
     public async Task<IEnumerable<GameModel>> GetByPlatformIdAsync(long platformId)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
@@ -560,7 +560,7 @@ ORDER BY g.id, gen.id;";
 
     public async Task<IEnumerable<GameModel>> GetByDeveloperIdAsync(long developerId)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
@@ -638,7 +638,7 @@ ORDER BY g.id, gen.id;";
 
     public async Task<IEnumerable<GameModel>> GetByPublisherIdAsync(long publisherId)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
@@ -734,7 +734,7 @@ ORDER BY g.id, gen.id;";
 
     public async Task<IEnumerable<GameModel>> GetByReleaseYearAsync(int year)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
@@ -810,7 +810,7 @@ ORDER BY g.id, gen.id;";
 
     public async Task<IEnumerable<GameModel>> GetByParametersAsync(GamesGettingRequestModel gamesGettingRequestModel)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             string initialQuery = @"SELECT
     g.Id, g.name, g.image, g.releasedate, g.description,

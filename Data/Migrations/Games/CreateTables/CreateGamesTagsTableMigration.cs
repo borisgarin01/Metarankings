@@ -14,7 +14,7 @@ public sealed class CreateGamesTagsTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE GamesTags
 (
-Id bigserial not null primary key,
+Id bigint not null primary key identity(1,1),
 GameId bigint not null,
 TagId bigint not null,
 FOREIGN KEY(GameId) REFERENCES Games(Id)

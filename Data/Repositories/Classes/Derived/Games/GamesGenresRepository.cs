@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces;
 using Domain.Games;
-using Npgsql;
+using Microsoft.Data.SqlClient;
 
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class GamesGenresRepository : Repository, IRepository<Genre>
@@ -12,7 +12,7 @@ public sealed class GamesGenresRepository : Repository, IRepository<Genre>
 
     public async Task<long> AddAsync(Genre genre)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Genres
 (Name)
@@ -36,7 +36,7 @@ RETURNING Id;"
 
     public async Task<IEnumerable<Genre>> GetAllAsync()
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var genres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
 FROM 
@@ -47,7 +47,7 @@ Genres;");
 
     public async Task<Genre> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var genre = await connection.QueryFirstOrDefaultAsync<Genre>(@"SELECT Id, Name 
 FROM 
@@ -82,7 +82,7 @@ FROM Games WHERE Id=@GameId", new { genreGame.GameId });
 
     public async Task<IEnumerable<Genre>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var genres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
 FROM 
@@ -96,7 +96,7 @@ LIMIT @limit;", new { offset, limit });
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Genres WHERE Id=@id", new { id });
@@ -113,7 +113,7 @@ Genres WHERE Id=@id", new { id });
 
     public async Task<Genre> UpdateAsync(Genre genre, long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var updatedGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE Genres set Name=@Name 
 where Id=@id

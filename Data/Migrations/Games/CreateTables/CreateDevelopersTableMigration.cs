@@ -13,7 +13,7 @@ public sealed class CreateDevelopersTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE Developers
-(Id bigserial not null primary key,
+(Id bigint not null primary key identity(1,1),
 Name varchar(511) not null unique);");
     }
 }

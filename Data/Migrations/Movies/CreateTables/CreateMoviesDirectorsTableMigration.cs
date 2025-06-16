@@ -12,7 +12,7 @@ public sealed class CreateMoviesDirectorsTableMigration : Migration
 
     public override void Up()
     {
-        Execute.Sql(@"CREATE TABLE MoviesDirectors (id bigserial not null primary key,
+        Execute.Sql(@"CREATE TABLE MoviesDirectors (Id bigint not null primary key identity(1,1),
 name varchar(511) not null unique);");
     }
 }

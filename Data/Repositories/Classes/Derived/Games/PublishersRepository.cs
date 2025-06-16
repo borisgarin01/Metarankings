@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces;
 using Domain.Games;
-using Npgsql;
+using Microsoft.Data.SqlClient;
 
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class PublishersRepository : Repository, IRepository<Publisher>
@@ -12,7 +12,7 @@ public sealed class PublishersRepository : Repository, IRepository<Publisher>
 
     public async Task<long> AddAsync(Publisher publisher)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Publishers
 (Name)
@@ -36,7 +36,7 @@ RETURNING Id;"
 
     public async Task<IEnumerable<Publisher>> GetAllAsync()
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var publishers = await connection.QueryAsync<Publisher>(@"select 
 publishers.id, publishers.name 
@@ -64,7 +64,7 @@ WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
 
     public async Task<Publisher> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"select 
 publishers.id, publishers.name
@@ -86,7 +86,7 @@ WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
 
     public async Task<IEnumerable<Publisher>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var publishers = await connection.QueryAsync<Publisher>(@"select 
 publishers.id, publishers.name
@@ -116,7 +116,7 @@ WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Publishers WHERE Id=@id", new { id });
@@ -133,7 +133,7 @@ Publishers WHERE Id=@id", new { id });
 
     public async Task<Publisher> UpdateAsync(Publisher publisher, long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var updatedPublisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"UPDATE Publishers set Name=@Name 
 where Id=@id 

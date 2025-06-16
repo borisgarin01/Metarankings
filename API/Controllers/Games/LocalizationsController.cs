@@ -4,6 +4,7 @@ using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.Games;
@@ -36,6 +37,7 @@ public sealed class LocalizationsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<Localization>> AddAsync(AddLocalizationModel addLocalizationModel)
     {
         var validationResult = _addLocalizationModelValidator.Validate(addLocalizationModel);

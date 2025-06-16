@@ -3,6 +3,7 @@ using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain.Games;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.Games;
@@ -35,6 +36,7 @@ public sealed class GenresController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<Genre>> AddAsync(AddGenreModel addGenreModel)
     {
         var validationResult = _addGenreModelValidator.Validate(addGenreModel);

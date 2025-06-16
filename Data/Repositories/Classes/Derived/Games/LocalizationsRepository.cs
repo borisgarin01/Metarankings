@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
-using Npgsql;
+using Microsoft.Data.SqlClient;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -13,7 +13,7 @@ public sealed class LocalizationsRepository : Repository, ILocalizationsReposito
 
     public async Task<long> AddAsync(Localization localization)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Localizations
 (Name)
@@ -35,7 +35,7 @@ RETURNING Id;"
 
     public async Task<IEnumerable<Localization>> GetAllAsync()
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var localizations = await connection.QueryAsync<Localization>(@"SELECT Id, Name
 FROM 
@@ -47,7 +47,7 @@ Localizations;");
 
     public async Task<Localization> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var localization = await connection.QueryFirstOrDefaultAsync<Localization>(@"SELECT Id, Name 
 FROM 
@@ -120,7 +120,7 @@ WHERE Id=@Id", new { Id = game.PublisherId });
 
     public async Task<Localization> GetByPlatformAsync(long id, long platformId)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var localization = await connection.QueryFirstOrDefaultAsync<Localization>(@"SELECT Id, Name 
 FROM 
@@ -194,7 +194,7 @@ WHERE Id=@Id", new { Id = game.PublisherId });
 
     public async Task<IEnumerable<Localization>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var localizations = await connection.QueryAsync<Localization>(@"SELECT Id, Name 
 FROM 
@@ -208,7 +208,7 @@ LIMIT @limit;", new { offset, limit });
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Localizations WHERE Id=@id", new { id });
@@ -225,7 +225,7 @@ Localizations WHERE Id=@id", new { id });
 
     public async Task<Localization> UpdateAsync(Localization localization, long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name
 where Id=@Id

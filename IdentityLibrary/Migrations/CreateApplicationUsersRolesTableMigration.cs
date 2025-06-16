@@ -14,8 +14,8 @@ public sealed class CreateApplicationUsersRolesTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE ApplicationUsersRoles
 (
-	UserId INT NOT NULL,
-	RoleId INT NOT NULL,
+	UserId BIGINT NOT NULL,
+	RoleId BIGINT NOT NULL,
     UNIQUE (UserId, RoleId),
     FOREIGN KEY (UserId) 
     REFERENCES ApplicationUsers(Id) 

@@ -13,7 +13,7 @@ public sealed class CreateGamesTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE Games
-(Id bigserial not null primary key,
+(Id bigint not null primary key identity(1,1),
 Name varchar(1023) not null unique,
 Image varchar(1023) null unique,
 LocalizationId bigint null,

@@ -13,7 +13,7 @@ public sealed class CreatePlatformsTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE Platforms 
-(Id bigserial not null primary key,
+(Id bigint not null primary key identity(1,1),
 Name varchar(127) not null unique);");
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces;
 using Domain.Games;
-using Npgsql;
+using Microsoft.Data.SqlClient;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -13,7 +13,7 @@ public sealed class PlatformsRepository : Repository, IRepository<Platform>
 
     public async Task<long> AddAsync(Platform platform)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Platforms
 (Name)
@@ -37,7 +37,7 @@ RETURNING Id;"
 
     public async Task<IEnumerable<Platform>> GetAllAsync()
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var platforms = await connection.QueryAsync<Platform>(@"select 
 platforms.id, platforms.name
@@ -80,7 +80,7 @@ WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
 
     public async Task<Platform> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"select 
 platforms.id, platforms.name 
@@ -110,7 +110,7 @@ FROM Games WHERE Id=@GameId", new { gamePlatform.GameId }));
 
     public async Task<IEnumerable<Platform>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var platforms = await connection.QueryAsync<Platform>(@"SELECT Id, Name 
 FROM 
@@ -124,7 +124,7 @@ LIMIT @limit;", new { offset, limit });
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Platforms WHERE Id=@id", new { id });
@@ -141,7 +141,7 @@ Platforms WHERE Id=@id", new { id });
 
     public async Task<Platform> UpdateAsync(Platform platform, long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = new SqlConnection(ConnectionString))
         {
             var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name 
 where Id=@id

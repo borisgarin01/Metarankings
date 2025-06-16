@@ -11,6 +11,13 @@ public class RegisterViewModel
     [DataType(DataType.EmailAddress)]
     public string Email { get; set; }
 
+    [Required(ErrorMessage = "Phone is required")]
+    [MaxLength(255, ErrorMessage = "Phone max length is 255")]
+    [MinLength(4, ErrorMessage = "Phone min length is 4")]
+    [Phone]
+    [DataType(DataType.PhoneNumber)]
+    public string Phone { get; set; }
+
     [Required(ErrorMessage = "Password is required")]
     [MaxLength(63, ErrorMessage = "Password max length is 63")]
     [MinLength(1, ErrorMessage = "Password min length is 1")]
