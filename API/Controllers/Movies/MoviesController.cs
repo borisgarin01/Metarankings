@@ -1,6 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Movies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -40,7 +39,6 @@ public sealed class MoviesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
     public async Task<ActionResult<long>> AddAsync(MovieModel movieModel)
     {
         var insertedMovie = await _moviesModelsRepository.AddAsync(movieModel);

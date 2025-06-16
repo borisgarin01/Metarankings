@@ -1,6 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Movies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.Movies;
@@ -25,7 +24,6 @@ public sealed class MoviesStudiosController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
     public async Task<ActionResult<MovieStudio>> AddAsync(MovieStudio movieStudio)
     {
         var createdMovieStudioId = await _moviesStudiosRepository.AddAsync(movieStudio);

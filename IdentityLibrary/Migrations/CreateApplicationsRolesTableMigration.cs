@@ -14,7 +14,7 @@ public sealed class CreateApplicationRolesTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE ApplicationRoles
 (	
-	Id bigint not null primary key identity(1,1),
+	Id BIGSERIAL NOT NULL PRIMARY KEY,
     Name VARCHAR(256) NOT NULL,
     NormalizedName VARCHAR(256) NOT NULL
 );");

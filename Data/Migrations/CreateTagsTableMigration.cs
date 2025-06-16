@@ -14,7 +14,7 @@ public sealed class CreateTagsTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE Tags
 (
-Id bigint not null primary key identity(1,1),
+Id bigserial not null primary key, 
 Title varchar(255) not null unique
 );");
     }

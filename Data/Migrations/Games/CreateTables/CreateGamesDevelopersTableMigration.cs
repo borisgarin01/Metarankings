@@ -12,7 +12,7 @@ public sealed class CreateGamesDevelopersTableMigration : Migration
 
     public override void Up()
     {
-        Execute.Sql(@"CREATE TABLE GamesDevelopers(Id bigint primary key not null identity(1,1),
+        Execute.Sql(@"CREATE TABLE GamesDevelopers(Id bigserial primary key not null,
 GameId bigint not null, 
 DeveloperId bigint not null,
 UNIQUE(GameId, DeveloperId),
