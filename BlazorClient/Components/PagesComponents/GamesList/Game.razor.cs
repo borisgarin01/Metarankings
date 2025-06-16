@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Games;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorClient.Components.PagesComponents.GamesList;
@@ -7,9 +7,6 @@ public partial class Game : ComponentBase
 {
     [Parameter, EditorRequired]
     public long Id { get; set; }
-
-    [Parameter, EditorRequired]
-    public required string Href { get; set; }
 
     [Parameter, EditorRequired]
     public required string Name { get; set; }

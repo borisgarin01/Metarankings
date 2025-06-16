@@ -1,0 +1,60 @@
+﻿@page "/games/Details/{Id:long}"
+@using BlazorClient.Components.PagesComponents.GameDetails
+@using BlazorClient.Components.PagesComponents.Common
+
+<Headerer />
+<GameMenu />
+
+@if (Game == null)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <div class="post single clear game">
+        <GameHeader Name="@Game.Name"
+                    Description="@Game.Description"
+                    Id="@Id"
+                    ReleaseYear="@Game.ReleaseDate!.Value.Year" />
+
+        <div class="post-content">
+            <GameThumbnail Name="@Game.Name"
+                           ReleaseYear="@Game.ReleaseDate.Value.Year"
+                           ReleaseMonth="@Game.ReleaseDate.Value.Month"
+                           ImageSource="@Game.Image" />
+
+
+            <RatingComponent Score="@(0)"
+                             ScoresCount="@(0)"
+                             OnRate="RatePost"
+                             SelectedRating="@selectedRating"
+                             CurrentHoverRating="@currentHoverRating"
+                             OnHover="SetRatingPreview" />
+
+            <GameMetadata Developers="@Game.Developers"
+                          Publisher="@Game.Publisher"
+                          Platforms="@Game.Platforms"
+                          Genres="@Game.Genres"
+                          Localization="@Game.Localization"
+                          ReleaseDate="@Game.ReleaseDate.Value" />
+
+            <GameDescription Description="@Game.Description" />
+
+            <SystemRequirements />
+
+            <GameTags Links="@(new List<string> {
+                "/best-ps4-games/",
+                "/top-igry-priklyucheniya/"
+            })" />
+
+            <AdHorizontal AdId="R-A-201169-7" />
+
+            <GameMedia Trailer="@Game.Trailer"
+                       Screenshots="@Game.Screenshots"
+                       Name="@Game.Name"
+                       Image="@Game.Image"
+                       ReleaseDate="@Game.ReleaseDate"
+                       GameId="@Game.Id" />
+        </div>
+    </div>
+}

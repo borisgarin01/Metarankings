@@ -1,0 +1,35 @@
+﻿@page "/games/{PageSize:int}/{PageNumber:int}"
+
+<BlazorClient.Components.PagesComponents.Common.Headerer />
+<BlazorClient.Components.PagesComponents.Common.GameMenu />
+
+@if (Games is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    foreach (var game in Games)
+    {
+        <BlazorClient.Components.PagesComponents.GamesList.Game Id="@game.Id"
+                                                                Name="@game.Name"
+                                                                Description="@game.Description"
+                                                                Developers="@game.Developers"
+                                                                Genres="@game.Genres"
+                                                                Image="@game.Image"
+                                                                Localization="@game.Localization"
+                                                                Platforms="@game.Platforms"
+                                                                Publisher="@game.Publisher"
+                                                                ReleaseDate="@game.ReleaseDate"
+                                                                Score="0"
+                                                                ScoresCount="0" />
+    }
+    @if (PageNumber > 1)
+    {
+        <a href="/@(PageSize)/@(PageNumber-1)">Пред.</a>
+    }
+    @if (Games.Count() == PageSize)
+    {
+        <a href="/@(PageSize)/@(PageNumber+1)">След.</a>
+    }
+}

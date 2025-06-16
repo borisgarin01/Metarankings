@@ -14,12 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Mappings\kdecag1e.joy~" />
-    <None Remove="Models\RequestsModels\UpdateDeveloperModel.cs~RF582790.TMP" />
-    <None Remove="ValidationRules\RequestsModels\Localizations\AddLocalizationModelValidator.cs~RF107cb20.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Properties\launchSettings.json" />
   </ItemGroup>
 
@@ -43,6 +37,7 @@
     <ProjectReference Include="..\blazorclient\BlazorClient.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\IdentityLibrary\IdentityLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,7 +51,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\RequestsModels\Games\" />
+    <Folder Include="Models\RequestsModels\Movies\MoviesGenres\" />
+    <Folder Include="Models\RequestsModels\Movies\MoviesStudios\" />
   </ItemGroup>
 
 </Project>

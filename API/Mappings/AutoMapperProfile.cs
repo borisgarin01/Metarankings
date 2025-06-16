@@ -1,10 +1,12 @@
-﻿using API.Models.RequestsModels.Developers;
-using API.Models.RequestsModels.Genres;
-using API.Models.RequestsModels.Localizations;
-using API.Models.RequestsModels.Platforms;
-using API.Models.RequestsModels.Publishers;
+﻿using API.Models.RequestsModels.Games.Developers;
+using API.Models.RequestsModels.Games.Genres;
+using API.Models.RequestsModels.Games.Localizations;
+using API.Models.RequestsModels.Games.Platforms;
+using API.Models.RequestsModels.Games.Publishers;
+using API.Models.RequestsModels.Movies.MoviesDirectors;
 using AutoMapper;
-using Domain;
+using Domain.Games;
+using Domain.Movies;
 
 namespace API.Mappings;
 
@@ -26,5 +28,8 @@ public class AutoMapperProfile : Profile
 
         CreateMap<AddPublisherModel, Publisher>();
         CreateMap<UpdatePublisherModel, Publisher>();
+
+        CreateMap<AddMovieDirectorModel, MovieDirector>();
+        CreateMap<UpdateMovieDirectorModel, MovieDirector>();
     }
 }

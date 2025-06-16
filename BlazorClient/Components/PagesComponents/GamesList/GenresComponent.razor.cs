@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Games;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorClient.Components.PagesComponents.GamesList;

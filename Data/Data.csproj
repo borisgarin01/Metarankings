@@ -1,27 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <None Remove="Migrations\AddGamesScreenshotsTableMigration.cs~RF896a0a.TMP" />
-    <None Remove="Migrations\AddGamesTableMigration.cs~RFc2d61c.TMP" />
-    <None Remove="Migrations\AddMoviesGenresTableMigration.cs~RF77ac89.TMP" />
-    <None Remove="Migrations\AddMoviesGenresTableMigration.cs~RF7d2971.TMP" />
-    <None Remove="Migrations\CreateMoviesDirectorsTableMigration.cs~RF8bfda5.TMP" />
-    <None Remove="Repositories\Interfaces\IRepository.cs~RF58f86d.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="FluentMigrator" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Console" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Extensions.Postgres" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Runner.Postgres" Version="7.1.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\Developers\" />
+    <Folder Include="Migrations\Games\InsertData\" />
+    <Folder Include="Migrations\Movies\InsertData\" />
   </ItemGroup>
 
   <PropertyGroup>

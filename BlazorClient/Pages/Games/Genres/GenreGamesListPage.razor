@@ -1,0 +1,27 @@
+﻿@page "/genres/{GenreId:long}"
+
+@using Domain
+
+@if (Genre is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div id="loop" class="list clear">
+        @foreach (var game in Genre.Games)
+        {
+            <div class="post clear">
+                <a href="/games/details/@game.Id" title="Игра «@game.Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/uploads/{game.ReleaseDate.Value.Year}/{game.ReleaseDate.Value.Month}/{game.Image}")" alt="@game.Name"></a>
+                <a class="name" href="/games/details/@game.Id">@game.Name</a>
+                <div class="post-meta"><p>@string.Join(", ", game.Platforms.Select(b => b.Name))</p></div>
+                <div class="post-meta">
+
+                    <a href="/games/details/@game.Id/#reviews" title="@game.Name - обзоры и рецензии">Обзоры критиков (0)</a> <a href="/games/details/@game.Id/#comments" title="@game.Name - отзывы">Отзывы игроков (0)</a>
+                </div>
+                <div class="post-content">@game.Description</div>
+                <div class="trailer" data-video="/games/details/@game.Id/#content-trailer"></div>
+            </div>
+        }
+    </div>
+}
