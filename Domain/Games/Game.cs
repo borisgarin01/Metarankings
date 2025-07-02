@@ -8,7 +8,7 @@ namespace Domain.Games;
 public sealed record Game
 {
     [JsonPropertyName("id")]
-    public required long Id { get; set; }
+    public long Id { get; set; }
 
     [JsonPropertyName("name")]
     public required string Name { get; set; }
@@ -38,10 +38,13 @@ public sealed record Game
 
     [JsonPropertyName("developers")]
     public required List<Developer> Developers { get; set; } = new();
-    
+
     [JsonPropertyName("gameScreenshots")]
     public required List<GameScreenshot> Screenshots { get; set; } = new();
 
     [JsonPropertyName("localization")]
     public required Localization Localization { get; set; }
+
+    [JsonPropertyName("tags")]
+    public required List<Tag> Tags { get; set; } = new();
 }

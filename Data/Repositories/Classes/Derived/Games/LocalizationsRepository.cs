@@ -227,7 +227,7 @@ Localizations WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name
+            var updatedLocalization = await connection.QueryFirstOrDefaultAsync<Localization>(@"UPDATE Localizations set Name=@Name
 where Id=@Id
 returning Name, Href, Id", new
             {
@@ -236,6 +236,16 @@ returning Name, Href, Id", new
             });
 
             return updatedLocalization;
+        }
+    }
+
+    public async Task<Localization> GetByNameAsync(string name)
+    {
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            var localization = await connection.QueryFirstOrDefaultAsync<Localization>("SELECT Id, Name FROM Localizations WHERE Name=@name", new { name });
+
+            return localization;
         }
     }
 }

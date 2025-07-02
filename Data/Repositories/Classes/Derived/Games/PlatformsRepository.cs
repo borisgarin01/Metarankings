@@ -154,4 +154,34 @@ returning Name, Href, Id", new
             return updatedPlatform;
         }
     }
+
+    public async Task<Platform> GetByNameAsync(string name)
+    {
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"select 
+platforms.id, platforms.name 
+from platforms
+WHERE platforms.Name=@name", new { name });
+
+            if (platform is null)
+                return null;
+
+            var platformGames = await connection.QueryAsync<PlatformGame>(@"SELECT Id, GameId, PlatformId 
+from GamesPlatforms 
+where PlatformId=@platformId", new { platformId = platform.Id });
+
+            var games = new List<Game>();
+
+            foreach (var gamePlatform in platformGames)
+            {
+                games.AddRange(await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games WHERE Id=@GameId", new { gamePlatform.GameId }));
+            }
+
+            platform.Games = games;
+
+            return platform;
+        }
+    }
 }

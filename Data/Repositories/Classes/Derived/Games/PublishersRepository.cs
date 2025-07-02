@@ -84,6 +84,28 @@ WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
         }
     }
 
+    public async Task<Publisher> GetByNameAsync(string name)
+    {
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"select 
+publishers.id, publishers.name
+from publishers 
+where Name=@name", new { name });
+
+            if (publisher is null)
+                return null;
+
+            var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
+FROM Games 
+WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+
+            publisher.Games = publisherGames;
+
+            return publisher;
+        }
+    }
+
     public async Task<IEnumerable<Publisher>> GetAsync(long offset, long limit)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))

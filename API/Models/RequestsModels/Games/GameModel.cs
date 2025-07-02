@@ -1,6 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using API.Models.RequestsModels.Games.Developers;
+using API.Models.RequestsModels.Games.Genres;
+using API.Models.RequestsModels.Games.Localizations;
+using API.Models.RequestsModels.Games.Platforms;
+using API.Models.RequestsModels.Games.Publishers;
+using Domain.Games;
+using System.Text.Json.Serialization;
 
-namespace Domain.Games;
+namespace API.Models.RequestsModels.Games;
 
 public sealed record GameModel
 {
@@ -14,16 +20,16 @@ public sealed record GameModel
     public required string Image { get; set; }
 
     [JsonPropertyName("developers")]
-    public List<Developer> Developers { get; set; } = new();
+    public List<AddDeveloperModel> Developers { get; set; } = new();
 
     [JsonPropertyName("publisher")]
-    public required Publisher Publisher { get; set; }
+    public required AddPublisherModel Publisher { get; set; }
 
     [JsonPropertyName("genres")]
-    public List<Genre> Genres { get; set; } = new();
+    public List<AddGenreModel> Genres { get; set; } = new();
 
     [JsonPropertyName("localization")]
-    public required Localization Localization { get; set; }
+    public required AddLocalizationModel Localization { get; set; }
 
     [JsonPropertyName("releaseDate")]
     public DateTime? ReleaseDate { get; set; }
@@ -35,11 +41,5 @@ public sealed record GameModel
     public string Trailer { get; set; }
 
     [JsonPropertyName("platforms")]
-    public List<Platform> Platforms { get; set; } = new();
-
-    [JsonPropertyName("screenshots")]
-    public List<GameScreenshot> Screenshots { get; set; } = new();
-
-    [JsonPropertyName("tags")]
-    public List<Tag> Tags { get; set; } = new();
+    public List<AddPlatformModel> Platforms { get; set; } = new();
 }

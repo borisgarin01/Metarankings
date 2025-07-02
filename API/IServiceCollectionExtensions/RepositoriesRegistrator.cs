@@ -17,11 +17,11 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IRepository<Genre>, GamesGenresRepository>(instance => new GamesGenresRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Platform>, PlatformsRepository>(instance => new PlatformsRepository(metarankingsConnectionString));
+        services.AddScoped<PlatformsRepository>(instance => new PlatformsRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<Localization>, LocalizationsRepository>(instance => new LocalizationsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Publisher>, PublishersRepository>(instance => new PublishersRepository(metarankingsConnectionString));
+        services.AddScoped<PublishersRepository>(instance => new PublishersRepository(metarankingsConnectionString));
 
         services.AddScoped(instance => new GamesRepository(metarankingsConnectionString));
 

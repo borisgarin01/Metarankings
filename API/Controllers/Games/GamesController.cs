@@ -1,5 +1,8 @@
 ﻿using API.Json;
+using API.Models.RequestsModels.Games;
 using Data.Repositories.Classes.Derived.Games;
+using Data.Repositories.Interfaces;
+using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -13,11 +16,17 @@ public sealed class GamesController : ControllerBase
     JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
     private readonly GamesRepository _gamesRepository;
+    private readonly PublishersRepository _publishersRepository;
+    private readonly PlatformsRepository _platformsRepository;
+    private readonly ILocalizationsRepository _localizationsRepository;
 
-    public GamesController(GamesRepository gamesRepository)
+    public GamesController(GamesRepository gamesRepository, ILocalizationsRepository localizationsRepository, PublishersRepository publishersRepository, PlatformsRepository platformsRepository)
     {
         jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
         _gamesRepository = gamesRepository;
+        _localizationsRepository = localizationsRepository;
+        _publishersRepository = publishersRepository;
+        _platformsRepository = platformsRepository;
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
@@ -30,7 +39,75 @@ public sealed class GamesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<long>> AddAsync(GameModel gameModel)
     {
-        var createdGame = await _gamesRepository.AddAsync(gameModel);
+        var localization = await _localizationsRepository.GetByNameAsync(gameModel.Localization.Name);
+
+        long localizationId = 0;
+        if (localization is null)
+        {
+            var localizationToAdd = new Localization { Name = localization.Name };
+
+            localizationId = await _localizationsRepository.AddAsync(localizationToAdd);
+        }
+        else
+        {
+            localizationId = localization.Id;
+        }
+
+        var publiher = await _publishersRepository.GetByNameAsync(gameModel.Publisher.Name);
+
+        long publisherId = 0;
+        if (publiher is null)
+        {
+            var publisherToAdd = new Publisher { Name = gameModel.Publisher.Name };
+
+            publisherId = await _publishersRepository.AddAsync(publisherToAdd);
+        }
+        else
+        {
+            publisherId = publiher.Id;
+        }
+
+        var platformsToAddToGame = new List<Platform>();
+
+        foreach (var platform in gameModel.Platforms)
+        {
+            long platformId = 0;
+            Platform platformToCheckExistance = await _platformsRepository.GetByNameAsync(platform.Name);
+            if (platformToCheckExistance is null)
+            {
+                var platformToAdd = new Platform { Name = platformToCheckExistance.Name };
+                platformId = await _platformsRepository.AddAsync(platformToAdd);
+                platformToAdd.Id = platformId;
+                platformsToAddToGame.Add(platformToAdd);
+            }
+            else
+            {
+                platformsToAddToGame.Add(platformToCheckExistance);
+            }
+        }
+
+        var game = new Game
+        {
+            Description = gameModel.Description,
+            Developers = gameModel.Developers.Select(d => new Developer { Name = d.Name }).ToList(),
+            Genres = gameModel.Genres.Select(g => new Genre { Name = g.Name }).ToList(),
+            Image = gameModel.Image,
+            Localization = new Localization
+            {
+                Id = localizationId,
+                Name = localization.Name
+            },
+            Name = gameModel.Name,
+            Platforms = platformsToAddToGame,
+            Publisher = publiher,
+            PublisherId = publisherId,
+            ReleaseDate = gameModel.ReleaseDate,
+            Screenshots = new List<GameScreenshot>(),
+            Tags = new List<Tag>(),
+            Trailer = null
+        };
+
+        var createdGame = await _gamesRepository.AddAsync(game);
         return Ok(createdGame);
     }
 
