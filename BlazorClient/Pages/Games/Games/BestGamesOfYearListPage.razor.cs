@@ -24,7 +24,7 @@ public partial class BestGamesOfYearListPage : ComponentBase
     public int? PublisherId { get; set; }
 
 
-    public IEnumerable<GameModel> Games { get; set; }
+    public IEnumerable<Game> Games { get; set; }
 
     [Inject]
     public HttpClient HttpClient { get; set; }
@@ -40,19 +40,19 @@ public partial class BestGamesOfYearListPage : ComponentBase
             PublishersIds = PublisherId.HasValue ? [PublisherId.Value] : null
         };
 
-        var httpResponseMessage = await HttpClient.PostAsJsonAsync($"{HttpClient.BaseAddress}api/games/gamesByParameters", gamesGettingRequestModel);
+        var httpResponseMessage = await HttpClient.PostAsJsonAsync($"/api/games/gamesByParameters", gamesGettingRequestModel);
 
         if (httpResponseMessage.IsSuccessStatusCode)
         {
             try
             {
-                var games = await JsonSerializer.DeserializeAsync<IEnumerable<GameModel>>(await httpResponseMessage.Content.ReadAsStreamAsync());
+                var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(await httpResponseMessage.Content.ReadAsStreamAsync());
 
                 Games = games;
             }
             catch
             {
-                Games = Enumerable.Empty<GameModel>();
+                Games = Enumerable.Empty<Game>();
             }
         }
     }
