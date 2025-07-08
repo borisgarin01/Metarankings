@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace API.Controllers.Auth;
 
@@ -22,7 +23,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public ActionResult<string> Login(LoginModel loginModel)
+    public async Task<ActionResult<string>> Login(LoginModel loginModel)
     {
         if (loginModel is null)
             return BadRequest("Неверный логин");
@@ -31,10 +32,15 @@ public sealed class AuthController : ControllerBase
         if (string.IsNullOrWhiteSpace(loginModel.Email) || string.IsNullOrWhiteSpace(loginModel.Password))
             return BadRequest("Email и пароль должны быть указаны");
 
-        var userToCheckExistance = _usersManager.FindByEmailAsync(loginModel.Email);
+        var userToCheckExistance = await _usersManager.FindByEmailAsync(loginModel.Email);
 
         if (userToCheckExistance is null)
             return NotFound("Пользователь не зарегистрирован");
+
+        var isCorrectPassword = BCrypt.Net.BCrypt.EnhancedVerify(loginModel.Password, userToCheckExistance.PasswordHash);
+
+        if (!isCorrectPassword)
+            return BadRequest("Неверный пароль");
 
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
@@ -57,7 +63,7 @@ public sealed class AuthController : ControllerBase
         if (!string.Equals(registerModel.Password, registerModel.PasswordConfirmation))
             return BadRequest("Пароль не совпадает с подтверждением пароля");
 
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(registerModel.Password);
+        var passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(registerModel.Password);
 
         var user = new ApplicationUser
         {
