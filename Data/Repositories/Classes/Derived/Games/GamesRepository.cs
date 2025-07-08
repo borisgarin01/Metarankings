@@ -5,13 +5,13 @@ using Microsoft.Data.SqlClient;
 using System.Text;
 
 namespace Data.Repositories.Classes.Derived.Games;
-public sealed class GamesRepository : Repository, IRepository<GameModel>
+public sealed class GamesRepository : Repository, IRepository<Game>
 {
     public GamesRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(GameModel entity)
+    public async Task<long> AddAsync(Game entity)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -28,14 +28,14 @@ public sealed class GamesRepository : Repository, IRepository<GameModel>
                 {
                     var developerToFind = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name
 FROM Developers
-WHERE Name=@Name;", new { developer.Name });
+WHERE Name=@Name;", new { developer.Name }, transaction: transaction);
 
                     if (developerToFind is null)
                     {
                         var insertedDeveloper = await connection.QueryFirstAsync<Developer>(@"INSERT INTO Developers 
 (Name)
 output inserted.id, inserted.name
-VALUES (@Name);", new { developer.Name });
+VALUES (@Name);", new { developer.Name }, transaction: transaction);
                         insertedDevelopers.Add(insertedDeveloper);
                     }
                     else
@@ -159,29 +159,6 @@ output inserted.Id, inserted.GameId, inserted.DeveloperId
 VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = existingDeveloper.Id });
                 }
 
-                foreach (var tag in entity.Tags)
-                {
-                    var existingTag = await connection.QueryFirstOrDefaultAsync<Tag>(@"SELECT Id, Title 
-FROM Tags
-WHERE Title=@Title", new { tag.Title });
-
-                    if (existingTag is null)
-                    {
-                        existingTag = await connection.QueryFirstAsync<Tag>(@"INSERT INTO Tags (Title)
-output inserted.Id, inserted.Title
-VALUES (@Title)", new { tag.Title });
-                    }
-
-                    var insertedGameTag = await connection.QueryAsync(@"INSERT INTO GamesTags (GameId, TagId)
-output inserted.Id, inserted.GameId, inserted.TagId
-VALUES (@GameId, @TagId);",
-    new
-    {
-        GameId = insertedGame.Id,
-        TagId = existingTag.Id
-    });
-                }
-
                 await transaction.CommitAsync();
 
                 return insertedGame.Id;
@@ -189,13 +166,13 @@ VALUES (@GameId, @TagId);",
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<GameModel> entities)
+    public async Task AddRangeAsync(IEnumerable<Game> games)
     {
-        foreach (var entity in entities)
+        foreach (var entity in games)
             await AddAsync(entity);
     }
 
-    public async Task<IEnumerable<GameModel>> GetAsync(int offset, int limit)
+    public async Task<IEnumerable<Game>> GetAsync(int offset, int limit)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -224,7 +201,7 @@ LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 LEFT JOIN gamestags gt on gt.gameId=g.id
 LEFT JOIN tags t on gt.tagid=t.id";
 
-            var gameDictionary = new Dictionary<long, GameModel>();
+            var gameDictionary = new Dictionary<long, Game>();
 
             var gameRows = await connection.QueryAsync<GameRow>(
                 sql,
@@ -270,7 +247,7 @@ LEFT JOIN tags t on gt.tagid=t.id";
         }
     }
 
-    public async Task<IEnumerable<GameModel>> GetAllAsync()
+    public async Task<IEnumerable<Game>> GetAllAsync()
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -293,9 +270,9 @@ gs.id, gs.gameid
     LEFT JOIN platforms plat ON plat.id = gp.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id";
 
-            var gameDictionary = new Dictionary<string, GameModel>();
+            var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<GameModel, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameModel>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
@@ -338,7 +315,7 @@ gs.id, gs.gameid
         }
     }
 
-    public async Task<GameModel> GetAsync(long id)
+    public async Task<Game> GetAsync(long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -362,9 +339,9 @@ gs.id, gs.gameid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.Id=@id";
 
-            var gameDictionary = new Dictionary<string, GameModel>();
+            var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<GameModel, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameModel>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
@@ -484,7 +461,7 @@ ORDER BY g.id, gen.id;";
         }
     }
 
-    public async Task<IEnumerable<GameModel>> GetByPlatformIdAsync(long platformId)
+    public async Task<IEnumerable<Game>> GetByPlatformIdAsync(long platformId)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -515,9 +492,9 @@ LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
-            var gameDictionary = new Dictionary<string, GameModel>();
+            var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<GameModel, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameModel>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
@@ -561,7 +538,7 @@ ORDER BY g.id, gen.id;";
         }
     }
 
-    public async Task<IEnumerable<GameModel>> GetByDeveloperIdAsync(long developerId)
+    public async Task<IEnumerable<Game>> GetByDeveloperIdAsync(long developerId)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -592,9 +569,9 @@ LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
-            var gameDictionary = new Dictionary<string, GameModel>();
+            var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<GameModel, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameModel>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
@@ -639,7 +616,7 @@ ORDER BY g.id, gen.id;";
     }
 
 
-    public async Task<IEnumerable<GameModel>> GetByPublisherIdAsync(long publisherId)
+    public async Task<IEnumerable<Game>> GetByPublisherIdAsync(long publisherId)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -669,9 +646,9 @@ LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
-            var gameDictionary = new Dictionary<string, GameModel>();
+            var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<GameModel, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameModel>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
@@ -715,7 +692,7 @@ ORDER BY g.id, gen.id;";
         }
     }
 
-    public Task<IEnumerable<GameModel>> GetAsync(long offset, long limit)
+    public Task<IEnumerable<Game>> GetAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }
@@ -730,12 +707,12 @@ ORDER BY g.id, gen.id;";
         throw new NotImplementedException();
     }
 
-    public Task<GameModel> UpdateAsync(GameModel entity, long id)
+    public Task<Game> UpdateAsync(Game entity, long id)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<IEnumerable<GameModel>> GetByReleaseYearAsync(int year)
+    public async Task<IEnumerable<Game>> GetByReleaseYearAsync(int year)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -765,9 +742,9 @@ LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
-            var gameDictionary = new Dictionary<string, GameModel>();
+            var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<GameModel, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameModel>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
@@ -811,7 +788,7 @@ ORDER BY g.id, gen.id;";
         }
     }
 
-    public async Task<IEnumerable<GameModel>> GetByParametersAsync(GamesGettingRequestModel gamesGettingRequestModel)
+    public async Task<IEnumerable<Game>> GetByParametersAsync(GamesGettingRequestModel gamesGettingRequestModel)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -889,9 +866,9 @@ WHERE 1=1
 
             var query = queryStringBuilder.ToString();
 
-            var gameDictionary = new Dictionary<string, GameModel>();
+            var gameDictionary = new Dictionary<string, Game>();
 
-            var games = await connection.QueryAsync<GameModel, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameModel>(
+            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 queryStringBuilder.ToString(),
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {

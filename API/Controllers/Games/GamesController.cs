@@ -1,4 +1,6 @@
 ﻿using API.Json;
+using API.Models.RequestsModels.Games;
+using AutoMapper;
 using Data.Repositories.Classes.Derived.Games;
 using Domain.Games;
 using Microsoft.AspNetCore.Authorization;
@@ -12,13 +14,14 @@ namespace API.Controllers.Games;
 public sealed class GamesController : ControllerBase
 {
     JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
-
+    private readonly IMapper _mapper;
     private readonly GamesRepository _gamesRepository;
 
-    public GamesController(GamesRepository gamesRepository)
+    public GamesController(GamesRepository gamesRepository, IMapper mapper)
     {
         jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
         _gamesRepository = gamesRepository;
+        _mapper = mapper;
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
@@ -30,9 +33,10 @@ public sealed class GamesController : ControllerBase
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = "Bearer")]
-    public async Task<ActionResult<long>> AddAsync(GameModel gameModel)
+    public async Task<ActionResult<long>> AddAsync(AddGameModel gameModel)
     {
-        var createdGame = await _gamesRepository.AddAsync(gameModel);
+        var game = _mapper.Map<Game>(gameModel);
+        var createdGame = await _gamesRepository.AddAsync(game);
         return Ok(createdGame);
     }
 

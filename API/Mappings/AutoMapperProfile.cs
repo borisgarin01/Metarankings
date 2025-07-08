@@ -1,4 +1,5 @@
-﻿using API.Models.RequestsModels.Games.Developers;
+﻿using API.Models.RequestsModels.Games;
+using API.Models.RequestsModels.Games.Developers;
 using API.Models.RequestsModels.Games.Genres;
 using API.Models.RequestsModels.Games.Localizations;
 using API.Models.RequestsModels.Games.Platforms;
@@ -14,6 +15,8 @@ public class AutoMapperProfile : Profile
 {
     public AutoMapperProfile()
     {
+        CreateMap<AddGameModel, Game>();
+
         CreateMap<AddDeveloperModel, Developer>();
         CreateMap<UpdateDeveloperModel, Developer>();
 
