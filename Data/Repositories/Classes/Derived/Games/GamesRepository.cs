@@ -45,14 +45,14 @@ VALUES (@Name);", new { developer.Name }, transaction: transaction);
                 {
                     var genreToFind = await connection.QueryFirstOrDefaultAsync<Genre>(@"SELECT Id, Name
 FROM Genres
-WHERE Name=@Name;", new { genre.Name });
+WHERE Name=@Name;", new { genre.Name }, transaction: transaction);
 
                     if (genreToFind is null)
                     {
                         var insertedGenre = await connection.QueryFirstAsync<Genre>(@"INSERT INTO Genres 
 (Name)
 output inserted.id, inserted.name
-VALUES (@Name);", new { genre.Name });
+VALUES (@Name);", new { genre.Name }, transaction: transaction);
                         insertedGenres.Add(insertedGenre);
                     }
                     else
@@ -63,25 +63,25 @@ VALUES (@Name);", new { genre.Name });
 
                 var publisherToFind = await connection.QueryFirstOrDefaultAsync<Publisher>(@"SELECT Id, Name 
 FROM Publishers 
-WHERE Name=@Name", new { entity.Publisher.Name });
+WHERE Name=@Name", new { entity.Publisher.Name }, transaction: transaction);
 
                 if (publisherToFind is null)
                 {
                     insertedPublisher = await connection.QueryFirstAsync<Publisher>(@"INSERT INTO Publishers (Name) 
 output inserted.id, inserted.name
-VALUES (@Name);", new { entity.Publisher.Name });
+VALUES (@Name);", new { entity.Publisher.Name }, transaction: transaction);
                 }
                 else
                     insertedPublisher = publisherToFind;
 
                 var localizationToFind = await connection.QueryFirstOrDefaultAsync<Localization>(@"SELECT Id, Name 
-FROM Localizations WHERE Name=@Name", new { entity.Localization.Name });
+FROM Localizations WHERE Name=@Name", new { entity.Localization.Name }, transaction: transaction);
 
                 if (localizationToFind is null)
                 {
                     insertedLocalization = await connection.QueryFirstOrDefaultAsync<Localization>(@"INSERT INTO Localizations (Name)
 output inserted.id, inserted.name
-VALUES (@Name);", new { entity.Localization.Name });
+VALUES (@Name);", new { entity.Localization.Name }, transaction: transaction);
                 }
                 else
                     insertedLocalization = localizationToFind;
@@ -99,7 +99,7 @@ VALUES
                     ReleaseDate = entity.ReleaseDate.Value,
                     entity.Description,
                     entity.Trailer
-                });
+                }, transaction: transaction);
 
                 foreach (var gameGenre in insertedGenres)
                 {
@@ -108,13 +108,13 @@ VALUES
                         {
                             GenreId = gameGenre.Id,
                             GameId = insertedGame.Id
-                        });
+                        }, transaction: transaction);
 
                     if (gameGenreToFind is null)
                     {
                         var insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(@"INSERT INTO GamesGenres (GameId, GenreId) 
 OUTPUT inserted.Id, inserted.GameId, inserted.GenreId
-VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = gameGenre.Id });
+VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = gameGenre.Id }, transaction: transaction);
                     }
                 }
 
@@ -122,23 +122,23 @@ VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = gameGenr
                 {
                     var existingPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"SELECT Id, Name 
 FROM Platforms
-WHERE Name=@Name;", new { platform.Name });
+WHERE Name=@Name;", new { platform.Name }, transaction: transaction);
 
                     if (existingPlatform is null)
                     {
                         existingPlatform = await connection.QueryFirstAsync<Platform>(@"INSERT INTO Platforms (Name)
 output inserted.Id, inserted.Name
-VALUES (@Name);", new { platform.Name });
+VALUES (@Name);", new { platform.Name }, transaction: transaction);
                     }
 
-                    var existingGamePlatform = await connection.QueryFirstOrDefaultAsync<GamePlatform>(@"SELECT GameId, PlatformId FROM GamesPlatforms WHERE GameId=@GameId AND PlatformId=@PlatformId", new { GameId = insertedGame.Id, PlatformId = platform.Id });
+                    var existingGamePlatform = await connection.QueryFirstOrDefaultAsync<GamePlatform>(@"SELECT GameId, PlatformId FROM GamesPlatforms WHERE GameId=@GameId AND PlatformId=@PlatformId", new { GameId = insertedGame.Id, PlatformId = platform.Id }, transaction: transaction);
 
                     if (existingGamePlatform is null)
                     {
                         existingGamePlatform = await connection.QueryFirstAsync<GamePlatform>(@"INSERT INTO GamesPlatforms 
 (GameId, PlatformId)
 output inserted.GameId, inserted.PlatformId
-VALUES (@GameId, @PlatformId);", new { GameId = insertedGame.Id, PlatformId = existingPlatform.Id });
+VALUES (@GameId, @PlatformId);", new { GameId = insertedGame.Id, PlatformId = existingPlatform.Id }, transaction: transaction);
                     }
                 }
 
@@ -146,17 +146,17 @@ VALUES (@GameId, @PlatformId);", new { GameId = insertedGame.Id, PlatformId = ex
                 {
                     var existingDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name 
 FROM Developers 
-WHERE Name=@Name", new { developer.Name });
+WHERE Name=@Name", new { developer.Name }, transaction: transaction);
 
                     if (existingDeveloper is null)
                     {
                         existingDeveloper = await connection.QueryFirstAsync<Developer>(@"INSERT INTO Developers (Name)
 output inserted.Id, inserted.Name
-VALUES (@Name)");
+VALUES (@Name)", new { Name = developer.Name }, transaction: transaction);
                     }
                     var insertedGameDeveloper = await connection.QueryAsync(@"INSERT INTO GamesDevelopers(GameId, DeveloperId)
 output inserted.Id, inserted.GameId, inserted.DeveloperId
-VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = existingDeveloper.Id });
+VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = existingDeveloper.Id }, transaction: transaction);
                 }
 
                 await transaction.CommitAsync();
@@ -185,9 +185,8 @@ VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = ex
     plat.id as PlatformId, plat.name as PlatformName, 
     gs.id as GameScreenshotId, gs.gameid as GameScreenshotGameId
 FROM (
-    SELECT DISTINCT g.Id, g.name, g.image, g.releasedate, g.description, g.trailer, g.publisherid, g.localizationid
+    SELECT g.Id, g.name, g.image, g.releasedate, g.description, g.trailer, g.publisherid, g.localizationid
     FROM games g
-    ORDER BY g.Id
 ) g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
