@@ -23,7 +23,6 @@ internal class Program
         // Add services to the container.
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
-
         var tokenValidationParameters = new TokenValidationParameters
         {
             RequireExpirationTime = false,
@@ -105,8 +104,6 @@ internal class Program
 
         builder.Services.RegisterRepositories(builder.Configuration);
         builder.Services.RegisterValidators();
-
-        builder.Services.AddScoped<JwtProvider>();
 
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddUserStore<UsersStore>()
