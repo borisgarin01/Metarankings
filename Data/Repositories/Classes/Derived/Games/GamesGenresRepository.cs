@@ -16,8 +16,8 @@ public sealed class GamesGenresRepository : Repository, IRepository<Genre>
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Genres
 (Name)
-VALUES (@Name)
-RETURNING Id;"
+OUTPUT inserted.Id
+VALUES (@Name);"
  , new
  {
      genre.Name
@@ -116,8 +116,8 @@ Genres WHERE Id=@id", new { id });
         using (var connection = new SqlConnection(ConnectionString))
         {
             var updatedGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE Genres set Name=@Name 
-where Id=@id
-returning Name, Id", new
+output inserted.name, inserted.id
+where Id=@id", new
             {
                 genre.Name,
                 id

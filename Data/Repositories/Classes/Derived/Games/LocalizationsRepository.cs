@@ -17,8 +17,8 @@ public sealed class LocalizationsRepository : Repository, ILocalizationsReposito
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Localizations
 (Name)
-VALUES (@Name)
-RETURNING Id;"
+output inserted.id
+VALUES (@Name);"
  , new
  {
      localization.Name,
@@ -228,8 +228,8 @@ Localizations WHERE Id=@id", new { id });
         using (var connection = new SqlConnection(ConnectionString))
         {
             var updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name
-where Id=@Id
-returning Name, Href, Id", new
+output inserted.name, inserted.href, inserted.id
+where Id=@Id", new
             {
                 localization.Name,
                 id

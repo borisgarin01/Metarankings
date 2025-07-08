@@ -17,8 +17,8 @@ public sealed class PlatformsRepository : Repository, IRepository<Platform>
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Platforms
 (Name)
-VALUES (@Name)
-RETURNING Id;"
+output inserted.id
+VALUES (@Name);"
  , new
  {
      platform.Name
@@ -144,8 +144,8 @@ Platforms WHERE Id=@id", new { id });
         using (var connection = new SqlConnection(ConnectionString))
         {
             var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name 
-where Id=@id
-returning Name, Href, Id", new
+output inserted.name, inserted.href, inserted.id
+where Id=@id", new
             {
                 platform.Name,
                 id

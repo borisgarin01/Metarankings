@@ -16,8 +16,8 @@ public sealed class PublishersRepository : Repository, IRepository<Publisher>
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Publishers
 (Name)
-VALUES (@Name)
-RETURNING Id;"
+output inserted.id
+VALUES (@Name);"
  , new
  {
      publisher.Name
@@ -136,8 +136,8 @@ Publishers WHERE Id=@id", new { id });
         using (var connection = new SqlConnection(ConnectionString))
         {
             var updatedPublisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"UPDATE Publishers set Name=@Name 
-where Id=@id 
-returning Name, Id", new
+output inserted.name, inserted.id
+where Id=@id", new
             {
                 publisher.Name,
                 id

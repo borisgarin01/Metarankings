@@ -15,8 +15,8 @@ public sealed class MoviesDirectorsRepository : Repository, IRepository<MovieDir
         using (var connection = new SqlConnection(ConnectionString))
         {
             var insertedId = await connection.QueryFirstAsync<long>(@"INSERT INTO MoviesDirectors (Name)
-VALUES (@Name)
-RETURNING Id", new { entity.Name });
+output inserted.id
+VALUES (@Name)", new { entity.Name });
 
             return insertedId;
         }

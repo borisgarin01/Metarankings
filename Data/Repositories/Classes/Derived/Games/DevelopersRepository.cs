@@ -16,8 +16,8 @@ public sealed class DevelopersRepository : Repository, IRepository<Developer>
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Developers
 (Name)
-VALUES (@Name)
-RETURNING Id;"
+OUTPUT inserted.Id
+VALUES (@Name);"
  , new
  {
      developer.Name
@@ -233,9 +233,9 @@ Developers WHERE Id=@id", new { id });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var updatedDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"UPDATE Developers set Name=@Name 
-where Id=@id
-returning Name, Id", new
+            var updatedDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"UPDATE Developers set Name=@Name
+OUTPUT inserted.Name, inserted.Id
+where Id=@id", new
             {
                 developer.Name,
                 id

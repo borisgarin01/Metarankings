@@ -23,8 +23,8 @@ public sealed class RoleStore : IRoleStore<IdentityRole>
         {
             await connection.OpenAsync(cancellationToken);
             role.Id = await connection.QuerySingleAsync<string>($@"INSERT INTO [ApplicationRoles] ([Name])
-                    VALUES (@Name)
-                    RETURNING str(Id);", role);
+output str(id)
+                    VALUES (@Name);", role);
         }
 
         return IdentityResult.Success;

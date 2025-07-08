@@ -16,8 +16,8 @@ public sealed class MoviesStudiosRepository : Repository, IRepository<MovieStudi
         {
             var insertedId = await connection.QueryFirstOrDefaultAsync<long>(@"INSERT INTO MoviesStudios 
 (Name) 
-VALUES(@Name)
-RETURNING Id", new { Name = entity.Name });
+output inserted.id
+VALUES(@Name)", new { Name = entity.Name });
 
             return insertedId;
         }
@@ -93,8 +93,8 @@ WHERE Id=@id", new { id });
             var updatedMovieStudio = await connection.QueryFirstOrDefaultAsync<MovieStudio>(@"UPDATE MoviesStudios 
 SET
 Name=@Name
-WHERE Id=@id
-RETURNING Name, Id", new { entity.Name, id });
+output inserted.id, inserted.name
+WHERE Id=@id", new { entity.Name, id });
 
             return updatedMovieStudio;
         }
