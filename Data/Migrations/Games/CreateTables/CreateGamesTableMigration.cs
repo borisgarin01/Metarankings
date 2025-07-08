@@ -14,13 +14,13 @@ public sealed class CreateGamesTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE Games
 (Id bigint not null primary key identity(1,1),
-Name varchar(1023) not null unique,
-Image varchar(1023) null unique,
+Name nvarchar(1023) not null unique,
+Image nvarchar(1023) null unique,
 LocalizationId bigint null,
 PublisherId bigint not null,
 ReleaseDate date null,
 Description text,
-Trailer varchar(511) null,
+Trailer nvarchar(511) null,
 FOREIGN KEY(LocalizationId) REFERENCES Localizations(Id) ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY(PublisherId) REFERENCES Publishers(Id) ON DELETE CASCADE ON UPDATE CASCADE);");
     }

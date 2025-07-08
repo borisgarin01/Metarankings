@@ -14,6 +14,6 @@ public sealed class CreatePlatformsTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE Platforms 
 (Id bigint not null primary key identity(1,1),
-Name varchar(127) not null unique);");
+Name nvarchar(127) not null unique);");
     }
 }

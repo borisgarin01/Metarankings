@@ -15,13 +15,13 @@ public sealed class CreateApplicationUsersTableMigration : Migration
         Execute.Sql(@"CREATE TABLE ApplicationUsers
 (
 	Id bigint not null primary key identity(1,1),
-    UserName VARCHAR(256) NOT NULL,
-    NormalizedUserName VARCHAR(256) NOT NULL,
-    Email VARCHAR(256) NULL,
-    NormalizedEmail VARCHAR(256) NULL,
+    UserName nvarchar(256) NOT NULL,
+    NormalizedUserName nvarchar(256) NOT NULL,
+    Email nvarchar(256) NULL,
+    NormalizedEmail nvarchar(256) NULL,
     EmailConfirmed bit NOT NULL default 0,
-    PasswordHash VARCHAR(255) NULL,
-    PhoneNumber VARCHAR(50) NULL,
+    PasswordHash nvarchar(255) NULL,
+    PhoneNumber nvarchar(50) NULL,
     PhoneNumberConfirmed bit NOT NULL default 0,
     TwoFactorEnabled bit NOT NULL default 0
 )");

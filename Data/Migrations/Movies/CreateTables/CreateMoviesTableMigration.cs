@@ -14,10 +14,10 @@ public sealed class CreateMoviesTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE Movies 
 (Id bigint not null primary key identity(1,1),
-Name varchar(255) not null unique,
-ImageSource varchar(1023) null unique,
-OriginalName varchar(255) not null unique,
+Name nvarchar(255) not null unique,
+ImageSource nvarchar(1023) null unique,
+OriginalName nvarchar(255) not null unique,
 PremierDate date not null,
-Description varchar(1023) null);");
+Description nvarchar(1023) null);");
     }
 }

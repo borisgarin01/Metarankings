@@ -200,8 +200,6 @@ LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 LEFT JOIN gamestags gt on gt.gameId=g.id
 LEFT JOIN tags t on gt.tagid=t.id";
 
-            var gameDictionary = new Dictionary<long, Game>();
-
             var gameRows = await connection.QueryAsync<GameRow>(
                 sql,
                 new { offset, limit }
@@ -240,9 +238,7 @@ LEFT JOIN tags t on gt.tagid=t.id";
                 }
                 );
 
-            var result = gameDictionary.Values.ToList();
-
-            return result;
+            return games;
         }
     }
 

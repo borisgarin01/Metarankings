@@ -13,6 +13,6 @@ public sealed class CreateMoviesGenresTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE MoviesGenres (Id bigint not null primary key identity(1,1),
-name varchar(511) not null unique);");
+name nvarchar(511) not null unique);");
     }
 }
