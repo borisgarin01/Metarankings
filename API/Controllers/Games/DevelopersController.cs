@@ -36,7 +36,7 @@ public sealed class DevelopersController : ControllerBase
         return Ok(developers);
     }
 
-    [HttpGet("{offset}/{limit}")]
+    [HttpGet("{offset:long}/{limit:long}")]
     public async Task<ActionResult<IEnumerable<Developer>>> GetAsync(long offset, long limit)
     {
         var developers = await _developersRepository.GetAsync(offset, limit);
@@ -45,7 +45,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<Developer>> AddAsync(AddDeveloperModel addDeveloperModel)
     {
         var validationResult = _addDeveloperModelValidator.Validate(addDeveloperModel);
@@ -63,7 +63,7 @@ public sealed class DevelopersController : ControllerBase
         return Created($"api/developers/{developer.Id}", developer);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:long}")]
     public async Task<ActionResult<Developer>> GetAsync(long id)
     {
         var developer = await _developersRepository.GetAsync(id);
@@ -73,7 +73,8 @@ public sealed class DevelopersController : ControllerBase
             return Ok(developer);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         var developer = await _developersRepository.GetAsync(id);
@@ -93,7 +94,8 @@ public sealed class DevelopersController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<Developer>> UpdateAsync(long id, UpdateDeveloperModel updateDeveloperModel)
     {
         var validationResult = _updateDeveloperModelValidator.Validate(updateDeveloperModel);

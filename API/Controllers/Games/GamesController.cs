@@ -29,7 +29,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<long>> AddAsync(GameModel gameModel)
     {
         var createdGame = await _gamesRepository.AddAsync(gameModel);
@@ -79,7 +79,7 @@ public sealed class GamesController : ControllerBase
         }
     }
 
-    [HttpGet("platforms/{platformId}")]
+    [HttpGet("platforms/{platformId:long}")]
     public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfPlatform(long platformId)
     {
         try
@@ -95,7 +95,7 @@ public sealed class GamesController : ControllerBase
         }
     }
 
-    [HttpGet("developers/{developerId}")]
+    [HttpGet("developers/{developerId:long}")]
     public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfDeveloper(long developerId)
     {
         try
@@ -111,7 +111,7 @@ public sealed class GamesController : ControllerBase
         }
     }
 
-    [HttpGet("publishers/{publisherId}")]
+    [HttpGet("publishers/{publisherId:long}")]
     public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfPublisher(long publisherId)
     {
         try

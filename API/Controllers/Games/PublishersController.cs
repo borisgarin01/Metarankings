@@ -36,7 +36,7 @@ public sealed class PublishersController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<Publisher>> AddAsync(AddPublisherModel addPublisherModel)
     {
         var validationResult = _addPublisherValidator.Validate(addPublisherModel);
@@ -55,7 +55,7 @@ public sealed class PublishersController : ControllerBase
         return Created($"api/publishers/{publisher.Id}", publisher);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:long}")]
     public async Task<ActionResult<Publisher>> GetAsync(long id)
     {
         var publisher = await _publishersRepository.GetAsync(id);
@@ -65,7 +65,8 @@ public sealed class PublishersController : ControllerBase
             return Ok(publisher);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         var publisher = await _publishersRepository.GetAsync(id);
@@ -85,7 +86,8 @@ public sealed class PublishersController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<Publisher>> UpdateAsync(long id, UpdatePublisherModel updatePublisherModel)
     {
         var validationResult = _updatePublisherValidator.Validate(updatePublisherModel);

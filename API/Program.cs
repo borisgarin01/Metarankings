@@ -5,8 +5,13 @@ using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 using IdentityLibrary.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Reflection;
+using System.Text;
 using System.Text.Json.Serialization;
 
 internal class Program
@@ -15,10 +20,72 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
-
         // Add services to the container.
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            RequireExpirationTime = false,
+            RequireSignedTokens = false,
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Auth:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Auth:Audience"],
+            ValidateLifetime = false,
+            ClockSkew = TimeSpan.Zero,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth:Secret"]))
+        };
+
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
+        }).AddJwtBearer(options =>
+        {
+            options.Authority = builder.Configuration["Auth:Authority"];
+            options.Audience = builder.Configuration["Auth:Audience"];
+            options.ClaimsIssuer = builder.Configuration["Auth:Issuer"];
+            options.RequireHttpsMetadata = false;
+            options.TokenValidationParameters = tokenValidationParameters;
+            options.SaveToken = true;
+        });
+
+        builder.Services.AddAuthorization();
+
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "MyAPI",
+                Version = "v1"
+            });
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "bearer"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference=new OpenApiReference
+                        {
+                            Type=ReferenceType.SecurityScheme,
+                            Id="Bearer"
+                        }
+                    },
+                    new string[]{}
+                }
+            });
+        });
 
         builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
             .AddJsonOptions(options =>
@@ -26,7 +93,15 @@ internal class Program
              options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
          });
 
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowBlazorFrontend", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
+        });
 
         builder.Services.RegisterRepositories(builder.Configuration);
         builder.Services.RegisterValidators();
@@ -52,9 +127,11 @@ internal class Program
 
         app.UseStaticFiles();
 
-        app.UseAuthentication();
-
         app.UseRouting();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.MapControllers();
 
         app.MapFallbackToFile("index.html");
@@ -72,8 +149,6 @@ internal class Program
 
         // Use CORS middleware
         app.UseCors("AllowBlazorFrontend");
-
-        app.UseAuthorization();
 
         app.Run();
     }

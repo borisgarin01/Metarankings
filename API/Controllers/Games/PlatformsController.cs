@@ -36,7 +36,7 @@ public sealed class PlatformsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<Platform>> AddAsync(AddPlatformModel addPlatformModel)
     {
         var validationResult = _addPlatformValidator.Validate(addPlatformModel);
@@ -54,7 +54,7 @@ public sealed class PlatformsController : ControllerBase
         return Created($"api/developers/{platform.Id}", platform);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:long}")]
     public async Task<ActionResult<Platform>> GetAsync(long id)
     {
         var platform = await _platformsRepository.GetAsync(id);
@@ -64,7 +64,8 @@ public sealed class PlatformsController : ControllerBase
             return Ok(platform);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         var platform = await _platformsRepository.GetAsync(id);
@@ -84,7 +85,8 @@ public sealed class PlatformsController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<Platform>> UpdateAsync(long id, UpdatePlatformModel updatePlatformModel)
     {
         var validationResult = _updatePlatformValidator.Validate(updatePlatformModel);

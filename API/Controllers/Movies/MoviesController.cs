@@ -40,7 +40,7 @@ public sealed class MoviesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<long>> AddAsync(MovieModel movieModel)
     {
         var insertedMovie = await _moviesModelsRepository.AddAsync(movieModel);

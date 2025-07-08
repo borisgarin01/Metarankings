@@ -3,5 +3,7 @@
 public sealed record JwtOptions
 {
     public string SecretKey { get; set; } = string.Empty;
-    public int ExpiresIn { get; set; }
+    public int ExpiresHours { get; set; }
+    public string Issuer { get; set; }
+    public string Audience { get; set; }
 }

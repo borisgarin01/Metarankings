@@ -36,7 +36,7 @@ public sealed class GenresController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<Genre>> AddAsync(AddGenreModel addGenreModel)
     {
         var validationResult = _addGenreModelValidator.Validate(addGenreModel);
@@ -54,7 +54,7 @@ public sealed class GenresController : ControllerBase
         return Created($"api/developers/{genre.Id}", genre);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:long}")]
     public async Task<ActionResult<Genre>> GetAsync(long id)
     {
         var genre = await _genresRepository.GetAsync(id);
@@ -64,7 +64,8 @@ public sealed class GenresController : ControllerBase
             return Ok(genre);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         var developer = await _genresRepository.GetAsync(id);
@@ -84,7 +85,8 @@ public sealed class GenresController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<Genre>> UpdateAsync(long id, UpdateGenreModel updateGenreModel)
     {
         var validationResult = _updateGenreModelValidator.Validate(updateGenreModel);

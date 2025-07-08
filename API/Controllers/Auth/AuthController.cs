@@ -1,9 +1,10 @@
-﻿using API.Models.Identity;
-using BCrypt.Net;
-using IdentityLibrary.DTOs;
-using IdentityLibrary.Services;
+﻿using IdentityLibrary.DTOs;
+using IdentityLibrary.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace API.Controllers.Auth;
@@ -12,66 +13,73 @@ namespace API.Controllers.Auth;
 [Route("api/[controller]")]
 public sealed class AuthController : ControllerBase
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
-
-    private readonly JwtProvider _jwtProvider;
-
-    public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,
-        JwtProvider jwtProvider)
+    private readonly IConfiguration _configuration;
+    private readonly UserManager<ApplicationUser> _usersManager;
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager)
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
-        _jwtProvider = jwtProvider;
+        _configuration = configuration;
+        _usersManager = usersManager;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetAllUsersAsync()
+    [HttpPost("login")]
+    public ActionResult<string> Login(LoginModel loginModel)
     {
-        var users = _userManager.Users.ToArray();
-        return Ok(users);
+        if (loginModel is null)
+            return BadRequest("Неверный логин");
+
+
+        if (string.IsNullOrWhiteSpace(loginModel.Email) || string.IsNullOrWhiteSpace(loginModel.Password))
+            return BadRequest("Email и пароль должны быть указаны");
+
+        var userToCheckExistance = _usersManager.FindByEmailAsync(loginModel.Email);
+
+        if (userToCheckExistance is null)
+            return NotFound("Пользователь не зарегистрирован");
+
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
+        var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
+
+        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], new List<Claim>(), expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
+
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+        return Ok(new { Token = tokenString });
     }
 
-    [HttpPost("Register")]
-    public async Task<ActionResult> AddApplicationUserAsync(RegisterViewModel registerViewModel)
+    [HttpPost("register")]
+    public async Task<ActionResult<string>> Register(RegisterModel registerModel)
     {
-        if (await _userManager.FindByEmailAsync(registerViewModel.Email) is not null)
-            return BadRequest("Duplicate email");
+        var userToCheckExistance = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
-        var applicationUser = new ApplicationUser
+        if (userToCheckExistance is not null)
+            return BadRequest($"Пользователь с {registerModel.UserEmail} уже существует");
+
+        if (!string.Equals(registerModel.Password, registerModel.PasswordConfirmation))
+            return BadRequest("Пароль не совпадает с подтверждением пароля");
+
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(registerModel.Password);
+
+        var user = new ApplicationUser
         {
-            Email = registerViewModel.Email,
+            Email = registerModel.UserEmail,
+            PasswordHash = passwordHash,
             EmailConfirmed = false,
-            NormalizedEmail = registerViewModel.Email.ToUpper(),
-            NormalizedUserName = registerViewModel.Email.ToUpper(),
-            PhoneNumber = registerViewModel.Phone,
-            UserName = registerViewModel.Email,
-            PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(registerViewModel.Password),
+            NormalizedEmail = registerModel.UserEmail.ToUpperInvariant(),
+            NormalizedUserName = registerModel.UserName.ToUpperInvariant(),
+            PhoneNumber = registerModel.PhoneNumber,
             PhoneNumberConfirmed = false,
-            TwoFactorEnabled = false
+            TwoFactorEnabled = false,
+            UserName = registerModel.UserName
         };
+        await _usersManager.CreateAsync(user);
 
-        await _userManager.CreateAsync(applicationUser);
-        return Ok(applicationUser);
-    }
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
+        var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
 
-    [HttpPost("Login")]
-    public async Task<ActionResult> LoginAsync(LoginViewModel loginViewModel)
-    {
-        var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
+        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], new List<Claim>(), expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
 
-        if (user is null)
-            return NotFound("User not found");
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        var passwordVerificationResult = BCrypt.Net.BCrypt.EnhancedVerify(loginViewModel.Password, user.PasswordHash);
-
-
-        if (passwordVerificationResult is false)
-        {
-            return BadRequest("Failed to login");
-        }
-        var token = _jwtProvider.GenerateToken(user);
-
-        return Ok(token);
+        return Ok(new { Token = tokenString });
     }
 }

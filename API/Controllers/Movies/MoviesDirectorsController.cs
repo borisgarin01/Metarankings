@@ -34,7 +34,7 @@ public class MoviesDirectorsController : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:long}")]
     public async Task<ActionResult<MovieDirector>> GetAsync(long id)
     {
         try
@@ -53,7 +53,7 @@ public class MoviesDirectorsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<MovieDirector>> AddAsync(AddMovieDirectorModel addMovieDirectorModel)
     {
         if (ModelState.IsValid)
@@ -76,7 +76,8 @@ public class MoviesDirectorsController : ControllerBase
         return BadRequest();
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<MovieDirector>> UpdateAsync(long id, UpdateMovieDirectorModel updateMovieDirectorModel)
     {
         var movieDirectorToUpdate = await _moviesDirectorsRepository.GetAsync(id);
@@ -102,7 +103,8 @@ public class MoviesDirectorsController : ControllerBase
         return BadRequest();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<MovieDirector>> UpdateAsync(long id)
     {
         var movieDirectorToUpdate = await _moviesDirectorsRepository.GetAsync(id);

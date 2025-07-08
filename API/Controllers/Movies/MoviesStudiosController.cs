@@ -25,7 +25,7 @@ public sealed class MoviesStudiosController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<MovieStudio>> AddAsync(MovieStudio movieStudio)
     {
         var createdMovieStudioId = await _moviesStudiosRepository.AddAsync(movieStudio);

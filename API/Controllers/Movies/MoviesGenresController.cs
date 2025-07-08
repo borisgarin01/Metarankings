@@ -30,7 +30,7 @@ public class MoviesGenresController : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:long}")]
     public async Task<ActionResult<MovieGenre>> GetAsync(long id)
     {
         try
@@ -49,7 +49,7 @@ public class MoviesGenresController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<MovieGenre>> AddAsync(MovieGenre movieGenre)
     {
         if (ModelState.IsValid)
