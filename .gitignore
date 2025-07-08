@@ -14,3 +14,6 @@ API/Images/Uploads
 API/Images
 IdentityLibrary/bin
 IdentityLibrary/obj
+API/appsettings.Development.json
+API/appsettings.json
+API/appsettings.Production.json
