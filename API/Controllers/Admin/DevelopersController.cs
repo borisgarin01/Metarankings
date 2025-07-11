@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace API.Controllers.Admin;
 
 [ApiController]
-[Authorize(AuthenticationSchemes = "Bearer")]
+[Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
 [Route("api/admin/[controller]")]
 public sealed class DevelopersController : ControllerBase
 {

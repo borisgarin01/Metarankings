@@ -37,7 +37,7 @@ public sealed class LocalizationsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Localization>> AddAsync(AddLocalizationModel addLocalizationModel)
     {
         var validationResult = _addLocalizationModelValidator.Validate(addLocalizationModel);
@@ -71,7 +71,7 @@ public sealed class LocalizationsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         var localization = await _localizationsRepository.GetAsync(id);
@@ -92,7 +92,7 @@ public sealed class LocalizationsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Localization>> UpdateAsync(long id, UpdateLocalizationModel updateLocalizationModel)
     {
         var validationResult = _updateLocalizationModelValidator.Validate(updateLocalizationModel);

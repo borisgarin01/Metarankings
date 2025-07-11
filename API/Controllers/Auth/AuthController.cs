@@ -16,10 +16,16 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager)
+    private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager,
+        RoleManager<ApplicationRole> roleManager,
+        SignInManager<ApplicationUser> signInManager)
     {
         _configuration = configuration;
         _usersManager = usersManager;
+        _roleManager = roleManager;
+        _signInManager = signInManager;
     }
 
     [HttpPost("login")]
@@ -78,6 +84,16 @@ public sealed class AuthController : ControllerBase
             UserName = registerModel.UserName
         };
         await _usersManager.CreateAsync(user);
+
+
+        if (registerModel.UserEmail == "admin@admin.com")
+        {
+            await _usersManager.AddToRoleAsync(user, "Admin");
+        }
+        else
+        {
+            await _usersManager.AddToRoleAsync(user, "User");
+        }
 
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);

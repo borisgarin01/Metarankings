@@ -8,7 +8,8 @@ using NPOI.XSSF.UserModel;
 
 namespace API.Controllers.Admin;
 
-[Authorize(AuthenticationSchemes = "Bearer")]
+[ApiController]
+[Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
 [Route("api/admin/[controller]")]
 public sealed class PublishersController : ControllerBase
 {

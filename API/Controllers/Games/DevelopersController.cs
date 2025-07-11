@@ -45,7 +45,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Developer>> AddAsync(AddDeveloperModel addDeveloperModel)
     {
         var validationResult = _addDeveloperModelValidator.Validate(addDeveloperModel);

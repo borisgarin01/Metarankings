@@ -49,7 +49,7 @@ public class MoviesGenresController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<MovieGenre>> AddAsync(MovieGenre movieGenre)
     {
         if (ModelState.IsValid)

@@ -32,7 +32,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<long>> AddAsync(AddGameModel gameModel)
     {
         var game = _mapper.Map<Game>(gameModel);

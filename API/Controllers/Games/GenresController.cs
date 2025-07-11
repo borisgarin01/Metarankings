@@ -36,7 +36,7 @@ public sealed class GenresController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Genre>> AddAsync(AddGenreModel addGenreModel)
     {
         var validationResult = _addGenreModelValidator.Validate(addGenreModel);
@@ -65,7 +65,7 @@ public sealed class GenresController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         var developer = await _genresRepository.GetAsync(id);
@@ -86,7 +86,7 @@ public sealed class GenresController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Genre>> UpdateAsync(long id, UpdateGenreModel updateGenreModel)
     {
         var validationResult = _updateGenreModelValidator.Validate(updateGenreModel);

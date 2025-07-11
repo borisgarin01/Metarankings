@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace IdentityLibrary.Repositories;
 
-public sealed class UsersStore : IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>
+public sealed class UsersStore : IUserStore<ApplicationUser>, IUserRoleStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>
 {
     private readonly string _connectionString;
 
@@ -26,6 +26,17 @@ FROM ApplicationUsers");
 
                 return users.AsQueryable();
             }
+        }
+    }
+
+    public async Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var roleId = await connection.QueryFirstOrDefaultAsync<decimal>(@"select Id from ApplicationRoles where lower(Name)=lower(@RoleName);", new { RoleName = roleName });
+
+            await connection.ExecuteAsync(@"INSERT INTO ApplicationUsersRoles(UserId, RoleId)
+VALUES(@UserId, @RoleId);", new { UserId = user.Id, RoleId = roleId });
         }
     }
 
@@ -116,6 +127,18 @@ WHERE NormalizedUserName = @normalizedUserName", new { normalizedUserName });
         return Task.FromResult(user.PasswordHash);
     }
 
+    public async Task<IList<string>> GetRolesAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            return (await connection.QueryAsync<string>(@"SELECT Name 
+FROM ApplicationRoles
+where id in (select RoleId 
+FROM ApplicationUsersRoles 
+where UserId=@UserId);", new { UserId = user.Id })).ToList();
+        }
+    }
+
     public Task<string> GetUserIdAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         return Task.FromResult(user.Id.ToString());
@@ -126,9 +149,50 @@ WHERE NormalizedUserName = @normalizedUserName", new { normalizedUserName });
         return Task.FromResult(user.UserName);
     }
 
+    public async Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            return (await connection.QueryAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled 
+FROM ApplicationUsers
+where Id in 
+(select UserId 
+from ApplicationUsersRoles
+where RoleId=(select Id from ApplicationRoles where lower(Name)=@roleName));", new { roleName })).ToList();
+        }
+    }
+
     public Task<bool> HasPasswordAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         return Task.FromResult(!string.IsNullOrWhiteSpace(user.PasswordHash));
+    }
+
+    public async Task<bool> IsInRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var userRoles = await connection.QueryAsync<string>(@"SELECT ApplicationRoles.Name 
+FROM ApplicationRoles
+INNER JOIN ApplicationUsersRoles
+ON ApplicationUsersRoles.RoleId=ApplicationRoles.Id
+INNER JOIN ApplicationUsers
+on ApplicationUsersRoles.UserId=ApplicationUsers.Id
+WHERE ApplicationUsers.Id=@Id and ApplicationRoles.Name=@roleName", new { user.Id, roleName });
+
+            return userRoles.Any();
+        }
+    }
+
+    public async Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.ExecuteAsync(@"REMOVE FROM ApplicationUsersRoles 
+WHERE UserId=@Id and RoleId=
+(SELECT Id 
+FROM ApplicationRoles 
+WHERE Name=@roleName);", new { user.Id, roleName });
+        }
     }
 
     public async Task SetEmailAsync(ApplicationUser user, string? email, CancellationToken cancellationToken)
