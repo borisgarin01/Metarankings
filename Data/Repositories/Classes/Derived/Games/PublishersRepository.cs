@@ -41,27 +41,35 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var publishers = await connection.QueryAsync<Publisher>(@"select 
-publishers.id, publishers.name 
-from publishers");
+            var publisherDictionary = new Dictionary<long, Publisher>();
 
-            if (publishers is null)
-                return null;
+            await connection.QueryAsync<Publisher, Game, Publisher>(
+                @"SELECT 
+                p.Id, p.Name,
+                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.ReleaseDate, g.Description, g.Trailer
+              FROM Publishers p
+              LEFT JOIN Games g ON g.PublisherId = p.Id",
+                (publisher, game) =>
+                {
+                    if (!publisherDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                    {
+                        publisherEntry = publisher;
+                        publisherEntry.Games = new List<Game>();
+                        publisherDictionary.Add(publisherEntry.Id, publisherEntry);
+                    }
 
-            if (!publishers.Any())
-                return publishers;
+                    if (game != null)
+                    {
+                        publisherEntry.Games.Add(game);
+                    }
 
-            foreach (var publisher in publishers)
-            {
-                var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games 
-WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+                    return publisherEntry;
+                },
+                splitOn: "Id"  // Split point between Publisher and Game columns
+            );
 
-                publisher.Games = publisherGames;
-
-            }
-
-            return publishers;
+            return publisherDictionary.Values;
         }
     }
 
@@ -69,21 +77,37 @@ WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"select 
-publishers.id, publishers.name
-from publishers 
-where Id=@id", new { id });
+            var publisherDictionary = new Dictionary<long, Publisher>();
 
-            if (publisher is null)
-                return null;
+            await connection.QueryAsync<Publisher, Game, Publisher>(
+                @"SELECT 
+                p.Id, p.Name,
+                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.ReleaseDate, g.Description, g.Trailer
+              FROM Publishers p
+              LEFT JOIN Games g ON g.PublisherId = p.Id
+              WHERE p.Id = @id",
+                (publisher, game) =>
+                {
+                    if (!publisherDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                    {
+                        publisherEntry = publisher;
+                        publisherEntry.Games = new List<Game>();
+                        publisherDictionary.Add(publisherEntry.Id, publisherEntry);
+                    }
 
-            var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games 
-WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+                    if (game != null)
+                    {
+                        publisherEntry.Games.Add(game);
+                    }
 
-            publisher.Games = publisherGames;
+                    return publisherEntry;
+                },
+                new { id },  // Correct parameter passing
+                splitOn: "Id"  // Split point between Publisher and Game columns
+            );
 
-            return publisher;
+            return publisherDictionary.Values.FirstOrDefault();
         }
     }
 
@@ -91,29 +115,41 @@ WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var publishers = await connection.QueryAsync<Publisher>(@"select 
-publishers.id, publishers.name
-from publishers
-OFFSET @offset 
-limit @limit", new { offset, limit });
+            var publisherDictionary = new Dictionary<long, Publisher>();
 
-            if (publishers is null)
-                return null;
+            await connection.QueryAsync<Publisher, Game, Publisher>(@"
+            SELECT 
+                p.Id, p.Name,
+                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.ReleaseDate, g.Description, g.Trailer
+            FROM (
+                SELECT Id, Name 
+                FROM Publishers 
+                ORDER BY Id
+                OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY
+            ) p
+            LEFT JOIN Games g ON g.PublisherId = p.Id",
+                (publisher, game) =>
+                {
+                    if (!publisherDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                    {
+                        publisherEntry = publisher;
+                        publisherEntry.Games = new List<Game>();
+                        publisherDictionary.Add(publisherEntry.Id, publisherEntry);
+                    }
 
-            if (!publishers.Any())
-                return publishers;
+                    if (game != null)
+                    {
+                        publisherEntry.Games.Add(game);
+                    }
 
-            foreach (var publisher in publishers)
-            {
-                var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games 
-WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+                    return publisherEntry;
+                },
+                new { offset, limit },
+                splitOn: "Id"
+            );
 
-                publisher.Games = publisherGames;
-
-            }
-
-            return publishers;
+            return publisherDictionary.Values;
         }
     }
 

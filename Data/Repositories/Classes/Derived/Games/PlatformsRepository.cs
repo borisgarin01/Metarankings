@@ -37,42 +37,59 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var platforms = await connection.QueryAsync<Platform>(@"select 
-platforms.id, platforms.name
-from platforms");
+            var platformDictionary = new Dictionary<long, Platform>();
+            var gameDictionary = new Dictionary<long, Game>();
 
-            if (platforms is null)
-                return null;
-
-            foreach (var platform in platforms)
-            {
-                var platformGames = await connection.QueryAsync<PlatformGame>(@"SELECT Id, GameId, PlatformId 
-from GamesPlatforms 
-where PlatformId=@platformId", new { platformId = platform.Id });
-
-                foreach (var gamePlatform in platformGames)
+            await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+            SELECT 
+                p1.Id, p1.Name,
+                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.ReleaseDate, g.Description, g.Trailer,
+                p2.Id, p2.Name
+            FROM Platforms p1
+            LEFT JOIN GamesPlatforms gp ON gp.PlatformId = p1.Id
+            LEFT JOIN Games g ON g.Id = gp.GameId
+            LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
+            LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId",
+                (platform, game, gamePlatform) =>
                 {
-                    var games = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE Id=@GameId", new { gamePlatform.GameId });
+                    // Get or create the platform
+                    if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
+                    {
+                        platformEntry = platform;
+                        platformEntry.Games = new List<Game>();
+                        platformDictionary.Add(platformEntry.Id, platformEntry);
+                    }
 
-                    platform.Games = games;
-                }
+                    if (game != null)
+                    {
+                        // Get or create the game
+                        if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
+                        {
+                            gameEntry = game;
+                            gameEntry.Platforms = new List<Platform>();
+                            gameDictionary.Add(gameEntry.Id, gameEntry);
 
-                foreach (var game in platform.Games)
-                {
-                    var gamePlatforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name
-FROM
-platforms
-INNER JOIN gamesPlatforms
-on platforms.Id=gamesPlatforms.PlatformId
-INNER JOIN games
-on games.Id=gamesPlatforms.GameId
-WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
+                            // Add game to platform if not already present
+                            if (!platformEntry.Games.Any(g => g.Id == game.Id))
+                            {
+                                platformEntry.Games.Add(gameEntry);
+                            }
+                        }
 
-                    game.Platforms = platforms.ToList();
-                }
-            }
-            return platforms;
+                        // Add platform to game if it exists and isn't already added
+                        if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
+                        {
+                            gameEntry.Platforms.Add(gamePlatform);
+                        }
+                    }
+
+                    return platformEntry;
+                },
+                splitOn: "Id,Id"
+            );
+
+            return platformDictionary.Values;
         }
     }
 
@@ -80,29 +97,61 @@ WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"select 
-platforms.id, platforms.name 
-from platforms
-WHERE platforms.Id=@id", new { id });
+            var platformDictionary = new Dictionary<long, Platform>();
+            var gameDictionary = new Dictionary<long, Game>();
 
-            if (platform is null)
-                return null;
+            await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+            SELECT 
+                p1.Id, p1.Name,
+                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.ReleaseDate, g.Description, g.Trailer,
+                p2.Id, p2.Name
+            FROM Platforms p1
+            LEFT JOIN GamesPlatforms gp ON gp.PlatformId = p1.Id
+            LEFT JOIN Games g ON g.Id = gp.GameId
+            LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
+            LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId
+            WHERE p1.Id = @id",
+                (platform, game, gamePlatform) =>
+                {
+                    // Get or create the platform
+                    if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
+                    {
+                        platformEntry = platform;
+                        platformEntry.Games = new List<Game>();
+                        platformDictionary.Add(platformEntry.Id, platformEntry);
+                    }
 
-            var platformGames = await connection.QueryAsync<PlatformGame>(@"SELECT Id, GameId, PlatformId 
-from GamesPlatforms 
-where PlatformId=@platformId", new { platformId = platform.Id });
+                    if (game != null)
+                    {
+                        // Get or create the game
+                        if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
+                        {
+                            gameEntry = game;
+                            gameEntry.Platforms = new List<Platform>();
+                            gameDictionary.Add(gameEntry.Id, gameEntry);
 
-            var games = new List<Game>();
+                            // Add game to platform if not already present
+                            if (!platformEntry.Games.Any(g => g.Id == game.Id))
+                            {
+                                platformEntry.Games.Add(gameEntry);
+                            }
+                        }
 
-            foreach (var gamePlatform in platformGames)
-            {
-                games.AddRange(await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE Id=@GameId", new { gamePlatform.GameId }));
-            }
+                        // Add platform to game if it exists and isn't already added
+                        if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
+                        {
+                            gameEntry.Platforms.Add(gamePlatform);
+                        }
+                    }
 
-            platform.Games = games;
+                    return platformEntry;
+                },
+                new { id },
+                splitOn: "Id,Id"
+            );
 
-            return platform;
+            return platformDictionary.Values.FirstOrDefault();
         }
     }
 
@@ -110,13 +159,62 @@ FROM Games WHERE Id=@GameId", new { gamePlatform.GameId }));
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var platforms = await connection.QueryAsync<Platform>(@"SELECT Id, Name 
-FROM 
-Platforms 
-OFFSET @offset
-LIMIT @limit;", new { offset, limit });
+            var platformDictionary = new Dictionary<long, Platform>();
+            var gameDictionary = new Dictionary<long, Game>();
 
-            return platforms;
+            await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+            SELECT 
+                p1.Id, p1.Name,
+                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.ReleaseDate, g.Description, g.Trailer,
+                p2.Id, p2.Name
+            FROM (
+                SELECT Id, Name 
+                FROM Platforms 
+                ORDER BY Id
+                OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY
+            ) p1
+            LEFT JOIN GamesPlatforms gp ON gp.PlatformId = p1.Id
+            LEFT JOIN Games g ON g.Id = gp.GameId
+            LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
+            LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId",
+                (platform, game, gamePlatform) =>
+                {
+                    // Get or create the platform
+                    if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
+                    {
+                        platformEntry = platform;
+                        platformEntry.Games = new List<Game>();
+                        platformDictionary.Add(platformEntry.Id, platformEntry);
+                    }
+
+                    if (game != null)
+                    {
+                        // Get or create the game
+                        if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
+                        {
+                            gameEntry = game;
+                            gameEntry.Platforms = new List<Platform>();
+                            gameDictionary.Add(gameEntry.Id, gameEntry);
+
+                            // Add game to platform if not already present
+                            platformEntry.Games.Add(gameEntry);
+                        }
+
+                        // Add platform to game if it exists and isn't already added
+                        if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
+                        {
+                            gameEntry.Platforms.Add(gamePlatform);
+                        }
+                    }
+
+                    return platformEntry;
+                },
+                new { offset, limit },
+                splitOn: "Id,Id"
+            );
+
+            return platformDictionary.Values;
         }
     }
 
