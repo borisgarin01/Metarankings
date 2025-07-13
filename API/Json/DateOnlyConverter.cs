@@ -1,8 +1,4 @@
-﻿using System.Globalization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
-namespace API.Json;
+﻿namespace API.Json;
 
 public class DateOnlyJsonConverter : JsonConverter<DateOnly>
 {

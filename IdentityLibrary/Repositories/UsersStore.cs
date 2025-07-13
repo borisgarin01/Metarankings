@@ -1,12 +1,8 @@
-﻿using Dapper;
-using IdentityLibrary.DTOs;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+﻿using IdentityLibrary.DTOs;
 
 namespace IdentityLibrary.Repositories;
 
-public sealed class UsersStore : IUserStore<ApplicationUser>, IUserRoleStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>
+public sealed class UsersStore : IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>
 {
     private readonly string _connectionString;
 
@@ -22,7 +18,7 @@ public sealed class UsersStore : IUserStore<ApplicationUser>, IUserRoleStore<App
             using (var connection = new SqlConnection(_connectionString))
             {
                 var users = connection.Query<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled 
-FROM ApplicationUsers");
+FROM ApplicationUsers;");
 
                 return users.AsQueryable();
             }
@@ -33,10 +29,12 @@ FROM ApplicationUsers");
     {
         using (var connection = new SqlConnection(_connectionString))
         {
-            var roleId = await connection.QueryFirstOrDefaultAsync<decimal>(@"select Id from ApplicationRoles where lower(Name)=lower(@RoleName);", new { RoleName = roleName });
-
-            await connection.ExecuteAsync(@"INSERT INTO ApplicationUsersRoles(UserId, RoleId)
-VALUES(@UserId, @RoleId);", new { UserId = user.Id, RoleId = roleId });
+            await connection.ExecuteAsync(@"DECLARE @RoleId int; 
+SELECT @RoleId=(SELECT Id FROM ApplicationRoles where NormalizedName=UPPER(@roleName));
+IF @RoleId is not null
+BEGIN 
+    INSERT INTO ApplicationUsersRoles (UserId, RoleId) VALUES(@UserId, @RoleId);
+END;", new { roleName, UserId = user.Id });
         }
     }
 
@@ -46,7 +44,7 @@ VALUES(@UserId, @RoleId);", new { UserId = user.Id, RoleId = roleId });
         {
             await connection.ExecuteAsync(@"INSERT INTO ApplicationUsers (UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled) 
 VALUES
-(@UserName, @NormalizedUserName, @Email, @NormalizedEmail, @EmailConfirmed, @PasswordHash, @PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled)", user);
+(@UserName, @NormalizedUserName, @Email, @NormalizedEmail, @EmailConfirmed, @PasswordHash, @PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled);", user);
 
             return IdentityResult.Success;
         }
@@ -56,7 +54,7 @@ VALUES
     {
         using (var connection = new SqlConnection(_connectionString))
         {
-            await connection.ExecuteAsync(@"DELETE FROM ApplicationUsers WHERE Id=@Id", new { user.Id });
+            await connection.ExecuteAsync(@"DELETE FROM ApplicationUsers WHERE Id=@Id;", new { user.Id });
 
             return IdentityResult.Success;
         }
@@ -72,7 +70,7 @@ VALUES
         {
             var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled
 FROM ApplicationUsers 
-WHERE NormalizedEmail = @normalizedEmail", new { normalizedEmail });
+WHERE NormalizedEmail = @normalizedEmail;", new { normalizedEmail });
 
             return applicationUser;
         }
@@ -84,7 +82,7 @@ WHERE NormalizedEmail = @normalizedEmail", new { normalizedEmail });
         {
             var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled
 FROM ApplicationUsers 
-WHERE Id = @Id", new { Id = userId });
+WHERE Id = @Id;", new { Id = userId });
 
             return applicationUser;
         }
@@ -96,7 +94,7 @@ WHERE Id = @Id", new { Id = userId });
         {
             var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled
 FROM ApplicationUsers 
-WHERE NormalizedUserName = @normalizedUserName", new { normalizedUserName });
+WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
 
             return applicationUser;
         }
@@ -132,10 +130,11 @@ WHERE NormalizedUserName = @normalizedUserName", new { normalizedUserName });
         using (var connection = new SqlConnection(_connectionString))
         {
             return (await connection.QueryAsync<string>(@"SELECT Name 
-FROM ApplicationRoles
-where id in (select RoleId 
-FROM ApplicationUsersRoles 
-where UserId=@UserId);", new { UserId = user.Id })).ToList();
+    FROM ApplicationRoles 
+    WHERE Id in 
+        (SELECT RoleId 
+            FROM ApplicationUsersRoles 
+            WHERE UserId = @Id);", new { user.Id })).ToList();
         }
     }
 
@@ -153,12 +152,19 @@ where UserId=@UserId);", new { UserId = user.Id })).ToList();
     {
         using (var connection = new SqlConnection(_connectionString))
         {
-            return (await connection.QueryAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled 
-FROM ApplicationUsers
-where Id in 
-(select UserId 
-from ApplicationUsersRoles
-where RoleId=(select Id from ApplicationRoles where lower(Name)=@roleName));", new { roleName })).ToList();
+            var applicationUsers = await connection.QueryAsync<ApplicationUser>(
+                @"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, 
+                    PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled
+                FROM ApplicationUsers
+                    WHERE Id IN
+                    (SELECT UserId
+                        FROM ApplicationUsersRoles
+                            WHERE RoleId IN
+                            (SELECT RoleId 
+                                FROM ApplicationRoles
+                                    WHERE NormalizedName = UPPER(@roleName);", new { roleName });
+
+            return applicationUsers.ToList();
         }
     }
 
@@ -171,15 +177,15 @@ where RoleId=(select Id from ApplicationRoles where lower(Name)=@roleName));", n
     {
         using (var connection = new SqlConnection(_connectionString))
         {
-            var userRoles = await connection.QueryAsync<string>(@"SELECT ApplicationRoles.Name 
-FROM ApplicationRoles
-INNER JOIN ApplicationUsersRoles
-ON ApplicationUsersRoles.RoleId=ApplicationRoles.Id
-INNER JOIN ApplicationUsers
-on ApplicationUsersRoles.UserId=ApplicationUsers.Id
-WHERE ApplicationUsers.Id=@Id and ApplicationRoles.Name=@roleName", new { user.Id, roleName });
+            var givenApplicationUserGivenApplicationRolesCount = await connection.QueryFirstAsync<long>(@"SELECT COUNT(*)
+FROM ApplicationUsersRoles
+WHERE UserId = @UserId
+    AND RoleId =
+        (SELECT Id 
+            FROM ApplicationRoles 
+                WHERE NormalizedName = UPPER(@roleName));", new { UserId = user.Id, RoleName = roleName });
 
-            return userRoles.Any();
+            return givenApplicationUserGivenApplicationRolesCount > 0;
         }
     }
 
@@ -187,11 +193,11 @@ WHERE ApplicationUsers.Id=@Id and ApplicationRoles.Name=@roleName", new { user.I
     {
         using (var connection = new SqlConnection(_connectionString))
         {
-            await connection.ExecuteAsync(@"REMOVE FROM ApplicationUsersRoles 
-WHERE UserId=@Id and RoleId=
-(SELECT Id 
-FROM ApplicationRoles 
-WHERE Name=@roleName);", new { user.Id, roleName });
+            await connection.ExecuteAsync(@"DELETE FROM ApplicationUsersRoles 
+WHERE UserId=@UserId 
+    AND RoleId = (SELECT Id 
+        FROM ApplicationRoles
+            WHERE NormalizedName = UPPER (@roleName));", new { roleName });
         }
     }
 
@@ -263,7 +269,7 @@ EmailConfirmed=@EmailConfirmed,
 PasswordHash=@PasswordHash,
 PhoneNumber=@PhoneNumber,
 PhoneNumberConfirmed=@PhoneNumberConfirmed,
-TwoFactorEnabled=@TwoFactorEnabled", new { user });
+TwoFactorEnabled=@TwoFactorEnabled WHERE Id=@Id", user);
 
             return IdentityResult.Success;
         }

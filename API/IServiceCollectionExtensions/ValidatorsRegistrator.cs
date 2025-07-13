@@ -8,7 +8,6 @@ using API.ValidationRules.RequestsModels.Genres;
 using API.ValidationRules.RequestsModels.Localizations;
 using API.ValidationRules.RequestsModels.Platforms;
 using API.ValidationRules.RequestsModels.Publishers;
-using FluentValidation;
 
 namespace API.IServiceCollectionExtensions;
 

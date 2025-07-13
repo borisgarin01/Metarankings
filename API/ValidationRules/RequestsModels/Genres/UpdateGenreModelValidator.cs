@@ -1,5 +1,4 @@
 ﻿using API.Models.RequestsModels.Games.Genres;
-using FluentValidation;
 
 namespace API.ValidationRules.RequestsModels.Genres;
 

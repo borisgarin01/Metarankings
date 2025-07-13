@@ -1,10 +1,6 @@
 ﻿using API.Models.RequestsModels.Games.Publishers;
-using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain.Games;
-using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.Games;
 

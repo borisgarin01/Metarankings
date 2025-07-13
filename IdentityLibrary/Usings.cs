@@ -1,0 +1,10 @@
+﻿global using Microsoft.AspNetCore.Identity;
+global using System.ComponentModel.DataAnnotations;
+global using FluentMigrator;
+global using System.Linq;
+global using Dapper;
+global using Microsoft.Data.SqlClient;
+global using Microsoft.Extensions.Configuration;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using System.Collections.Generic;

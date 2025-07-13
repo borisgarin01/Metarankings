@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace IdentityLibrary.DTOs;
+﻿namespace IdentityLibrary.DTOs;
 
 public class ApplicationUser
 {

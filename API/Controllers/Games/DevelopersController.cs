@@ -1,10 +1,6 @@
 ﻿using API.Models.RequestsModels.Games.Developers;
-using AutoMapper;
 using Data.Repositories.Interfaces;
 using Domain.Games;
-using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.Games;
 
@@ -74,7 +70,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         var developer = await _developersRepository.GetAsync(id);
@@ -95,7 +91,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Developer>> UpdateAsync(long id, UpdateDeveloperModel updateDeveloperModel)
     {
         var validationResult = _updateDeveloperModelValidator.Validate(updateDeveloperModel);

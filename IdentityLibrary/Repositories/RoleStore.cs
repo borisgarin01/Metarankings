@@ -1,8 +1,4 @@
-﻿using Dapper;
-using IdentityLibrary.DTOs;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+﻿using IdentityLibrary.DTOs;
 
 namespace IdentityLibrary.Repositories;
 

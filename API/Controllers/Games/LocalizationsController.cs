@@ -1,11 +1,6 @@
 ﻿using API.Models.RequestsModels.Games.Localizations;
-using AutoMapper;
-using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
-using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.Games;
 

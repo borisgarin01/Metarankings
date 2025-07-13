@@ -1,6 +1,4 @@
-﻿using FluentMigrator;
-
-namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations.Games.CreateTables;
 
 [Migration(8, "Add games developers table migration")]
 public sealed class CreateGamesDevelopersTableMigration : Migration

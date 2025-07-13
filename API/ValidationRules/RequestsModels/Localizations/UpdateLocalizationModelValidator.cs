@@ -1,5 +1,4 @@
 ﻿using API.Models.RequestsModels.Games.Localizations;
-using FluentValidation;
 
 namespace API.ValidationRules.RequestsModels.Localizations;
 

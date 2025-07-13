@@ -1,22 +1,13 @@
 using API.IServiceCollectionExtensions;
 using Data.Migrations.Games.CreateTables;
-using FluentMigrator.Runner;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+
 
 internal class Program
 {
-    private static async Task Main(string[] args)
+    private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -51,12 +42,7 @@ internal class Program
             options.SaveToken = true;
         });
 
-        builder.Services
-            .AddAuthorization(options => options
-            .AddPolicy("Admin", policy =>
-            {
-                policy.RequireRole("Admin");
-            }));
+        builder.Services.AddAuthorization(options => { options.AddPolicy("Admin", options => { options.RequireRole("Admin"); }); });
 
         builder.Services.AddSwaggerGen(options =>
         {
@@ -144,7 +130,6 @@ internal class Program
             // Put the database update into a scope to ensure
             // that all resources will be disposed.
             UpdateDatabase(scope.ServiceProvider);
-            await InitializeIdentity(scope.ServiceProvider);
         }
 
         app.UseSwagger();
@@ -184,42 +169,5 @@ internal class Program
         runner.ListMigrations();
         // Execute the migrations
         runner.MigrateUp();
-    }
-
-    private static async Task InitializeIdentity(IServiceProvider serviceProvider)
-    {
-        var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-        var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-        // Create Admin Role
-        string[] roleNames = { "Admin", "User" };
-        foreach (var roleName in roleNames)
-        {
-            var roleExist = await roleManager.RoleExistsAsync(roleName);
-            if (!roleExist)
-            {
-                await roleManager.CreateAsync(new ApplicationRole(roleName));
-            }
-        }
-
-        // Create Admin User
-        var adminUser = new ApplicationUser
-        {
-            UserName = "admin@admin.com",
-            Email = "admin@admin.com",
-            EmailConfirmed = true
-        };
-
-        string adminPassword = "Admin@123";
-        var user = await userManager.FindByEmailAsync(adminUser.Email);
-
-        if (user == null)
-        {
-            var createResult = await userManager.CreateAsync(adminUser, adminPassword);
-            if (createResult.Succeeded)
-            {
-                await userManager.AddToRoleAsync(adminUser, "Admin");
-            }
-        }
     }
 }

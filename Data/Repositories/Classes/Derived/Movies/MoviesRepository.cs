@@ -2,6 +2,10 @@
 using Data.Repositories.Interfaces;
 using Domain.Movies;
 using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 public sealed class MoviesRepository : Repository, IRepository<MovieModel>

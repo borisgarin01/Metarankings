@@ -1,6 +1,4 @@
-﻿using FluentMigrator;
-
-namespace IdentityLibrary.Migrations;
+﻿namespace IdentityLibrary.Migrations;
 
 [Migration(22, "Create application users table migration")]
 public sealed class CreateApplicationUsersTableMigration : Migration

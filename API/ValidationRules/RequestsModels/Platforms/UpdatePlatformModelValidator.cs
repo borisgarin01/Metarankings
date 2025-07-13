@@ -1,5 +1,4 @@
 ﻿using API.Models.RequestsModels.Games.Platforms;
-using FluentValidation;
 
 namespace API.ValidationRules.RequestsModels.Platforms;
 

@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace API.Models.RequestsModels.Games.Developers;
+﻿namespace API.Models.RequestsModels.Games.Developers;
 
 public sealed record UpdateDeveloperModel
 {

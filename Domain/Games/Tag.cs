@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Domain.Games;
+﻿namespace Domain.Games;
 
 public sealed record Tag
 {

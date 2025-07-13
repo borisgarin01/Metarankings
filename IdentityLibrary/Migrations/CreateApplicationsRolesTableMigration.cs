@@ -1,6 +1,4 @@
-﻿using FluentMigrator;
-
-namespace IdentityLibrary.Migrations;
+﻿namespace IdentityLibrary.Migrations;
 
 [Migration(21, "Create application roles table migration")]
 public sealed class CreateApplicationRolesTableMigration : Migration

@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-
-namespace BlazorClient.Components.PagesComponents.GameDetails;
+﻿namespace BlazorClient.Components.PagesComponents.GameDetails;
 
 public partial class AdHorizontal : ComponentBase
 {

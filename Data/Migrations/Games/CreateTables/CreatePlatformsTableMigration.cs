@@ -1,6 +1,4 @@
-﻿using FluentMigrator;
-
-namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations.Games.CreateTables;
 
 [Migration(4, "Add platforms table migration")]
 public sealed class CreatePlatformsTableMigration : Migration

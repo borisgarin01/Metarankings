@@ -1,6 +1,4 @@
-﻿using FluentMigrator;
-
-namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations.Games.CreateTables;
 
 [Migration(3, "Add localizations table migration")]
 public sealed class CreateLocalizationsTableMigration : Migration

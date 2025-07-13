@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Domain.Movies;
+﻿namespace Domain.Movies;
 
 public sealed record MovieModel
 {

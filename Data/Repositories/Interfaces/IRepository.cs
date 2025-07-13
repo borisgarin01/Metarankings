@@ -1,4 +1,7 @@
-﻿namespace Data.Repositories.Interfaces;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Data.Repositories.Interfaces;
 public interface IRepository<T>
 {
     public Task<IEnumerable<T>> GetAllAsync();

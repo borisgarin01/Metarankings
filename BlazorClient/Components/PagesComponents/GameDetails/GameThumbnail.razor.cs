@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace BlazorClient.Components.PagesComponents.GameDetails;
+﻿namespace BlazorClient.Components.PagesComponents.GameDetails;
 
 public partial class GameThumbnail : ComponentBase
 {

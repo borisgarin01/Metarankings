@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Domain.Games;
+﻿namespace Domain.Games;
 
 public sealed record Genre
 {

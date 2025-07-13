@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Domain.Movies;
+﻿namespace Domain.Movies;
 public sealed record MovieGenre
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

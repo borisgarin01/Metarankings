@@ -1,6 +1,4 @@
-﻿using FluentMigrator;
-
-namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations.Games.CreateTables;
 
 [Migration(19, "Create games tags table migration")]
 public sealed class CreateGamesTagsTableMigration : Migration

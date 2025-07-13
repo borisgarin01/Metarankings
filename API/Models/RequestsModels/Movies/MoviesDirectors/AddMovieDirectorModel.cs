@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace API.Models.RequestsModels.Movies.MoviesDirectors;
+﻿namespace API.Models.RequestsModels.Movies.MoviesDirectors;
 
 public sealed record AddMovieDirectorModel
 {

@@ -1,6 +1,4 @@
-﻿using FluentMigrator;
-
-namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations.Games.CreateTables;
 
 [Migration(10, "Add games screenshots table migration")]
 public sealed class CreateGamesScreenshotsTableMigration : Migration

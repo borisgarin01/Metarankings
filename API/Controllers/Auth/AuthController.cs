@@ -1,12 +1,5 @@
 ﻿using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace API.Controllers.Auth;
 
@@ -16,16 +9,10 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
-    private readonly RoleManager<ApplicationRole> _roleManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager,
-        RoleManager<ApplicationRole> roleManager,
-        SignInManager<ApplicationUser> signInManager)
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager)
     {
         _configuration = configuration;
         _usersManager = usersManager;
-        _roleManager = roleManager;
-        _signInManager = signInManager;
     }
 
     [HttpPost("login")]
@@ -51,11 +38,19 @@ public sealed class AuthController : ControllerBase
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
 
-        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], new List<Claim>(), expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
+        var userClaims = new List<Claim>();
+
+        if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
+            userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
+
+        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        return Ok(new { Token = tokenString });
+        return Ok(new
+        {
+            Token = tokenString
+        });
     }
 
     [HttpPost("register")]
@@ -83,22 +78,25 @@ public sealed class AuthController : ControllerBase
             TwoFactorEnabled = false,
             UserName = registerModel.UserName
         };
-        await _usersManager.CreateAsync(user);
+        var identityResult = await _usersManager.CreateAsync(user);
 
+        user = await _usersManager.FindByEmailAsync(user.Email);
 
-        if (registerModel.UserEmail == "admin@admin.com")
+        var userClaims = new List<Claim>();
+
+        if (identityResult.Succeeded && string.Equals(registerModel.UserEmail, _configuration["Auth:AdminEmail"]) && string.Equals(registerModel.Password, _configuration["Auth:AdminPassword"]))
         {
             await _usersManager.AddToRoleAsync(user, "Admin");
+            userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
         }
-        else
-        {
-            await _usersManager.AddToRoleAsync(user, "User");
-        }
+
+        await _usersManager.AddToRoleAsync(user, "User");
+        userClaims.Add(new Claim(ClaimTypes.Role, "User"));
 
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
 
-        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], new List<Claim>(), expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
+        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 

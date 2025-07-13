@@ -1,8 +1,5 @@
-﻿using Dapper;
+﻿using Domain.Games;
 using Data.Repositories.Interfaces;
-using Domain.Games;
-using Microsoft.Data.SqlClient;
-
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class DevelopersRepository : Repository, IRepository<Developer>
 {

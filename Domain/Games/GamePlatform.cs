@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-
-namespace Domain.Games;
+﻿namespace Domain.Games;
 
 [Table("gamePlatforms")]
 public sealed record GamePlatform

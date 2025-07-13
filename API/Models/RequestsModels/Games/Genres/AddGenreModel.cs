@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace API.Models.RequestsModels.Games.Genres;
+﻿namespace API.Models.RequestsModels.Games.Genres;
 
 public sealed record AddGenreModel
 {

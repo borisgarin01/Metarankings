@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace API.Models.RequestsModels.Games.Platforms;
+﻿namespace API.Models.RequestsModels.Games.Platforms;
 
 public sealed record AddPlatformModel
 {

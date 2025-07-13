@@ -1,8 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Movies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace API.Controllers.Movies;
 

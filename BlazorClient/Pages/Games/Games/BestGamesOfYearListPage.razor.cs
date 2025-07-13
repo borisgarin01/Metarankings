@@ -1,8 +1,4 @@
-﻿using Domain;
-using Domain.Games;
-using Microsoft.AspNetCore.Components;
-using System.Net.Http.Json;
-using System.Text.Json;
+﻿using Domain.Games;
 
 namespace BlazorClient.Pages.Games.Games;
 

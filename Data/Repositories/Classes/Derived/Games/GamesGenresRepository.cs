@@ -2,6 +2,8 @@
 using Data.Repositories.Interfaces;
 using Domain.Games;
 using Microsoft.Data.SqlClient;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class GamesGenresRepository : Repository, IRepository<Genre>

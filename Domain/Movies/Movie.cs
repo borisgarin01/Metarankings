@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-
-namespace Domain.Movies;
+﻿namespace Domain.Movies;
 
 [Table("Movies")]
 public sealed record Movie

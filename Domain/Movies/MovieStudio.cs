@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Domain.Movies;
+﻿namespace Domain.Movies;
 public sealed record MovieStudio
 {
     [Key]

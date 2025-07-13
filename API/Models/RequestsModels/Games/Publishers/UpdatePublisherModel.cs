@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace API.Models.RequestsModels.Games.Publishers;
+﻿namespace API.Models.RequestsModels.Games.Publishers;
 
 public sealed record UpdatePublisherModel
 {

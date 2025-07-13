@@ -1,11 +1,7 @@
 ﻿using API.Json;
 using API.Models.RequestsModels.Games;
-using AutoMapper;
 using Data.Repositories.Classes.Derived.Games;
 using Domain.Games;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace API.Controllers.Games;
 
@@ -32,7 +28,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy ="Admin")]
     public async Task<ActionResult<long>> AddAsync(AddGameModel gameModel)
     {
         var game = _mapper.Map<Game>(gameModel);
