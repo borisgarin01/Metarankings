@@ -35,65 +35,56 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var developers = await connection.QueryAsync<Developer>(@"select 
-developers.id, developers.name from developers");
+            var developersDictionary = new Dictionary<long, Developer>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
-            if (developers is null)
-                return null;
-
-            if (!developers.Any())
-                return developers;
-
-            foreach (var developer in developers)
-            {
-                var developerGames = await connection.QueryAsync<DeveloperGame>(@"SELECT Id, GameId, DeveloperId 
-from GamesDevelopers 
-where developerId=@developerId", new { developerId = developer.Id });
-
-                var games = new List<Game>();
-
-                foreach (var gameDeveloper in developerGames)
+            await connection.QueryAsync<Developer, Game, Platform, Developer>(@"
+            select 
+                developers.id, developers.name, 
+                games.Id, games.Name, games.Image, 
+                games.publisherId, games.releasedate, 
+                games.description, games.trailer,
+                platforms.id, platforms.name
+            from developers
+            left join gamesdevelopers
+                on gamesdevelopers.developerid=developers.id
+            left join games
+                on games.id=gamesdevelopers.gameid
+            left join gamesplatforms
+                on gamesplatforms.gameid=games.id
+            left join platforms 
+                on platforms.id=gamesplatforms.platformid",
+                (developer, game, platform) =>
                 {
-                    var game = await connection.QueryFirstOrDefaultAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE Id=@GameId", new { gameDeveloper.GameId });
+                    if (!developersDictionary.TryGetValue(developer.Id, out var developerEntry))
+                    {
+                        developerEntry = developer;
+                        developerEntry.Games = new List<Game>();
+                        developersDictionary.Add(developerEntry.Id, developerEntry);
+                    }
 
-                    if (games is not null)
-                        games.Add(game);
-                }
+                    if (game != null)
+                    {
+                        if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
+                        {
+                            gameEntry = game;
+                            gameEntry.Platforms = new List<Platform>();
+                            gamesDictionary.Add(gameEntry.Id, gameEntry);
+                            developerEntry.Games.Add(gameEntry);
+                        }
 
-                foreach (var game in games)
-                {
-                    var platforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name
-FROM
-platforms
-INNER JOIN gamesPlatforms
-on platforms.Id=gamesPlatforms.PlatformId
-INNER JOIN games
-on games.Id=gamesPlatforms.GameId
-WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
+                        if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                        {
+                            gameEntry.Platforms.Add(platform);
+                        }
+                    }
 
-                    if (platforms is not null)
-                        game.Platforms = platforms.ToList();
-                    else
-                        game.Platforms = new();
+                    return developerEntry;
+                },
+                splitOn: "Id,Id"  // Explicitly specify split points
+            );
 
-                    var genres = await connection.QueryAsync<Genre>(@"SELECT genres.Id, genres.Name 
-FROM
-genres
-INNER JOIN gamesGenres
-on genres.Id=gamesGenres.GenreId
-INNER JOIN games
-on games.Id=gamesGenres.GameId
-WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
-
-                    if (genres is not null)
-                        game.Genres = genres.ToList();
-                    else
-                        game.Genres = new();
-                }
-                developer.Games = games;
-            }
-            return developers;
+            return developersDictionary.Values;
         }
     }
 
@@ -101,51 +92,58 @@ WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var developer = await connection.QueryFirstOrDefaultAsync<Developer>(@"select 
-developers.id, developers.name from developers
-WHERE developers.Id=@id", new { id });
+            var developersDictionary = new Dictionary<long, Developer>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
-            if (developer is null)
-                return null;
+            await connection.QueryAsync<Developer, Game, Platform, Developer>(@"
+            select 
+                developers.id, developers.name, 
+                games.Id, games.Name, games.Image, 
+                games.publisherId, games.releasedate, 
+                games.description, games.trailer,
+                platforms.id, platforms.name
+            from developers
+            left join gamesdevelopers
+                on gamesdevelopers.developerid=developers.id
+            left join games
+                on games.id=gamesdevelopers.gameid
+            left join gamesplatforms
+                on gamesplatforms.gameid=games.id
+            left join platforms 
+                on platforms.id=gamesplatforms.platformid
+            WHERE developers.id=@id",
+                (developer, game, platform) =>
+                {
+                    if (!developersDictionary.TryGetValue(developer.Id, out var developerEntry))
+                    {
+                        developerEntry = developer;
+                        developerEntry.Games = new List<Game>();
+                        developersDictionary.Add(developerEntry.Id, developerEntry);
+                    }
 
-            var developerGames = await connection.QueryAsync<DeveloperGame>(@"SELECT Id, GameId, DeveloperId 
-from GamesDevelopers 
-where developerId=@developerId", new { developerId = developer.Id });
+                    if (game != null)
+                    {
+                        if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
+                        {
+                            gameEntry = game;
+                            gameEntry.Platforms = new List<Platform>();
+                            gamesDictionary.Add(gameEntry.Id, gameEntry);
+                            developerEntry.Games.Add(gameEntry);
+                        }
 
-            foreach (var gameDeveloper in developerGames)
-            {
-                var games = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE Id=@GameId", new { gameDeveloper.GameId });
+                        if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                        {
+                            gameEntry.Platforms.Add(platform);
+                        }
+                    }
 
-                developer.Games.AddRange(games);
-            }
+                    return developerEntry;
+                },
+                splitOn: "Id,Id", // Explicitly specify split points
+                param: new { id }
+            );
 
-            foreach (var game in developer.Games)
-            {
-                var platforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name
-FROM
-platforms
-INNER JOIN gamesPlatforms
-on platforms.Id=gamesPlatforms.PlatformId
-INNER JOIN games
-on games.Id=gamesPlatforms.GameId
-WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
-
-                game.Platforms = platforms.ToList();
-
-                var genres = await connection.QueryAsync<Genre>(@"SELECT genres.Id, genres.Name 
-FROM
-genres
-INNER JOIN gamesGenres
-on genres.Id=gamesGenres.GenreId
-INNER JOIN games
-on games.Id=gamesGenres.GameId
-WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
-
-                game.Genres = genres.ToList();
-            }
-
-            return developer;
+            return developersDictionary.Values.FirstOrDefault();
         }
     }
 
@@ -153,59 +151,58 @@ WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var developers = await connection.QueryAsync<Developer>(@"select 
-developers.id, developers.name 
-from developers
-OFFSET @offset limit @limit", new { offset, limit });
+            var developersDictionary = new Dictionary<long, Developer>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
-            if (developers is null)
-                return null;
-
-            if (!developers.Any())
-                return null;
-
-            foreach (var developer in developers)
-            {
-
-                var developerGames = await connection.QueryAsync<DeveloperGame>(@"SELECT Id, GameId, DeveloperId 
-from GamesDevelopers 
-where developerId=@developerId", new { developerId = developer.Id });
-
-                foreach (var gameDeveloper in developerGames)
+            await connection.QueryAsync<Developer, Game, Platform, Developer>(@"
+            SELECT 
+                developers.id, developers.name, 
+                games.Id, games.Name, games.Image, 
+                games.publisherId, games.releasedate, 
+                games.description, games.trailer,
+                platforms.id, platforms.name
+            FROM (
+                SELECT id, name 
+                FROM developers
+                ORDER BY id
+                OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
+            ) AS developers
+            LEFT JOIN gamesdevelopers ON gamesdevelopers.developerid = developers.id
+            LEFT JOIN games ON games.id = gamesdevelopers.gameid
+            LEFT JOIN gamesplatforms ON gamesplatforms.gameid = games.id
+            LEFT JOIN platforms ON platforms.id = gamesplatforms.platformid",
+                (developer, game, platform) =>
                 {
-                    var games = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE Id=@GameId", new { gameDeveloper.GameId });
+                    if (!developersDictionary.TryGetValue(developer.Id, out var developerEntry))
+                    {
+                        developerEntry = developer;
+                        developerEntry.Games = new List<Game>();
+                        developersDictionary.Add(developerEntry.Id, developerEntry);
+                    }
 
-                    developer.Games.AddRange(games);
-                }
+                    if (game != null)
+                    {
+                        if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
+                        {
+                            gameEntry = game;
+                            gameEntry.Platforms = new List<Platform>();
+                            gamesDictionary.Add(gameEntry.Id, gameEntry);
+                            developerEntry.Games.Add(gameEntry);
+                        }
 
+                        if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                        {
+                            gameEntry.Platforms.Add(platform);
+                        }
+                    }
 
-                foreach (var game in developer.Games)
-                {
-                    var platforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name
-FROM
-platforms
-INNER JOIN gamesPlatforms
-on platforms.Id=gamesPlatforms.PlatformId
-INNER JOIN games
-on games.Id=gamesPlatforms.GameId
-WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
+                    return developerEntry;
+                },
+                new { Offset = offset, Limit = limit },  // This is where parameters are passed
+                splitOn: "Id,Id"
+            );
 
-                    game.Platforms.AddRange(platforms);
-
-                    var genres = await connection.QueryAsync<Genre>(@"SELECT genres.Id, genres.Name 
-FROM
-genres
-INNER JOIN gamesGenres
-on genres.Id=gamesGenres.GenreId
-INNER JOIN games
-on games.Id=gamesGenres.GameId
-WHERE gamesGenres.GameId=@GameId", new { GameId = game.Id });
-
-                    game.Genres.AddRange(genres);
-                }
-            }
-            return developers;
+            return developersDictionary.Values;
         }
     }
 

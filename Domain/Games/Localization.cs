@@ -10,5 +10,5 @@ public sealed record Localization
     public string Name { get; set; }
 
     [JsonPropertyName("games")]
-    public IEnumerable<Game> Games { get; set; } = Enumerable.Empty<Game>();
+    public List<Game> Games { get; set; } = new List<Game>();
 }
