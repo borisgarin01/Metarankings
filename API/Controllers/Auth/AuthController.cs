@@ -84,6 +84,9 @@ public sealed class AuthController : ControllerBase
 
         var userClaims = new List<Claim>();
 
+        var adminEmail = _configuration["Auth:AdminEmail"];
+        var adminPassword = _configuration["Auth:AdminPassword"];
+
         if (identityResult.Succeeded && string.Equals(registerModel.UserEmail, _configuration["Auth:AdminEmail"]) && string.Equals(registerModel.Password, _configuration["Auth:AdminPassword"]))
         {
             await _usersManager.AddToRoleAsync(user, "Admin");
