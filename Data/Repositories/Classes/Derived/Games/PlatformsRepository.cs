@@ -1,5 +1,6 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -35,32 +36,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Platform>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
-        {
-            var platforms = await connection.QueryAsync<Platform, Game, Platform>(@"select Platforms.Id, Platforms.Name,
-	Games.Id, Games.Name, Games.Image, Games.LocalizationId, 
-	Games.PublisherId, Games.ReleaseDate, Games.Description,
-	Games.Trailer
-FROM Platforms
-LEFT JOIN GamesPlatforms
-	ON GamesPlatforms.PlatformId=Platforms.Id
-LEFT JOIN Games
-	ON Games.Id=GamesPlatforms.GameId", (platform, game) =>
-            {
-                platform.Games.Add(game);
-                return platform;
-
-            });
-
-            var platformsResults = platforms.GroupBy(p => p.Id).Select(g =>
-            {
-                var groupedPlatform = g.First();
-                groupedPlatform.Games = g.Select(p => p.Games.Single()).ToList();
-                return groupedPlatform;
-            });
-
-            return platformsResults;
-        }
+        throw new NotImplementedException();
     }
 
     public async Task<Platform> GetAsync(long id)
@@ -68,10 +44,10 @@ LEFT JOIN Games
         using (var connection = new SqlConnection(ConnectionString))
         {
             var platformsDictionary = new Dictionary<long, Platform>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
             var platforms = await connection.QueryAsync<Platform, Game, Platform>(@"select Platforms.Id, Platforms.Name,
-	Games.Id, Games.Name, Games.Image, Games.LocalizationId, 
-	Games.PublisherId, Games.ReleaseDate, Games.Description,
+	Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description,
 	Games.Trailer
 FROM Platforms
 LEFT JOIN GamesPlatforms
@@ -80,14 +56,14 @@ LEFT JOIN Games
 	ON Games.Id=GamesPlatforms.GameId
 WHERE Platforms.Id=@id", (platform, game) =>
             {
-                platform.Games.Add(game);
+                gamesDictionary.Add(game.Id, game);
                 return platform;
             }, new { id });
 
             var platformsResults = platforms.GroupBy(p => p.Id).Select(g =>
             {
                 var groupedPlatform = g.First();
-                groupedPlatform.Games = g.Select(p => p.Games.Single()).ToList();
+                groupedPlatform = groupedPlatform with { Games = g.Select(p => p.Games.Single()).ToList() };
                 return groupedPlatform;
             });
 
@@ -124,7 +100,6 @@ WHERE Platforms.Id=@id", (platform, game) =>
                     if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
                     {
                         platformEntry = platform;
-                        platformEntry.Games = new List<Game>();
                         platformDictionary.Add(platformEntry.Id, platformEntry);
                     }
 
@@ -135,9 +110,7 @@ WHERE Platforms.Id=@id", (platform, game) =>
                         {
                             gameEntry = game;
                             gameDictionary.Add(gameEntry.Id, gameEntry);
-
                             // Add game to platform if not already present
-                            platformEntry.Games.Add(gameEntry);
                         }
 
                         // Add platform to game if it exists and isn't already added
@@ -146,7 +119,7 @@ WHERE Platforms.Id=@id", (platform, game) =>
                             platformDictionary.Add(gamePlatform.Id, gamePlatform);
                         }
                     }
-
+                    platformEntry = platformEntry with { Games = gameDictionary.Values };
                     return platformEntry;
                 },
                 new { offset, limit },

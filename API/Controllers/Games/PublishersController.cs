@@ -46,7 +46,7 @@ public sealed class PublishersController : ControllerBase
 
         var insertedPublisherId = await _publishersRepository.AddAsync(publisher);
 
-        publisher.Id = insertedPublisherId;
+        publisher = publisher with { Id = insertedPublisherId };
 
         return Created($"api/publishers/{publisher.Id}", publisher);
     }

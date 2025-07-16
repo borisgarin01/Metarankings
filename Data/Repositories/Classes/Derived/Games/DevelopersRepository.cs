@@ -1,5 +1,6 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
+using System.Runtime.InteropServices;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -106,6 +107,9 @@ from developers
     WHERE Developers.Id=@id";
 
             var developersDictionary = new Dictionary<long, Developer>();
+            var platformsDictionary = new Dictionary<long, Platform>();
+            var genresDictionary = new Dictionary<long, Genre>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
             var query = await connection.QueryAsync<Developer, Game, Platform, Genre, Developer>(
                 sql,
@@ -117,16 +121,14 @@ from developers
                         developersDictionary.Add(developer.Id, developerEntry);
                     }
 
-                    if (game is not null && !developerEntry.Games.Any(d => d.Id == game.Id))
-                        developerEntry.Games.Add(game);
+                    if (game is not null && !gamesDictionary.TryGetValue(game.Id, out var gam))
+                        gamesDictionary.Add(game.Id, game);
 
-                    if (genre is not null && !game.Genres.Any(g => g.Id == genre.Id))
-                        game.Genres.Add(genre);
+                    if (genre is not null && !genresDictionary.TryGetValue(genre.Id, out var genr))
+                        genresDictionary.Add(genre.Id, genre);
 
-                    if (platform is not null && !game.Platforms.Any(p => p.Id == platform.Id))
-                        game.Platforms.Add(platform);
-
-                    developerEntry.Games.Add(game);
+                    if (platform is not null && !platformsDictionary.TryGetValue(platform.Id, out var platf))
+                        platformsDictionary.Add(platform.Id, platform);
 
                     return developerEntry;
                 },
@@ -145,6 +147,9 @@ from developers
         using (var connection = new SqlConnection(ConnectionString))
         {
             var developersDictionary = new Dictionary<long, Developer>();
+            var platformsDictionary = new Dictionary<long, Platform>();
+            var genresDictionary = new Dictionary<long, Genre>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
             var developers = await connection.QueryAsync<Developer, Game, Platform, Genre, Developer>(@"
 select developers.id, developers.name,
@@ -173,12 +178,12 @@ from developers
             OFFSET @offset ROWS
             FETCH NEXT @limit ROWS ONLY);", (developer, game, platform, genre) =>
             {
-                if (!developer.Games.Any(g => g.Id == game.Id))
-                    developer.Games.Add(game);
-                if (!game.Genres.Any(b => b.Id == genre.Id))
-                    game.Genres.Add(genre);
-                if (!developer.Games.Any(b => b.Id == game.Id))
-                    developer.Games.Add(game);
+                if (!platformsDictionary.TryGetValue(platform.Id, out var platf))
+                    platformsDictionary.Add(platform.Id, platform);
+                if (!genresDictionary.TryGetValue(genre.Id, out var genr))
+                    genresDictionary.Add(genre.Id, genre);
+                if (!gamesDictionary.TryGetValue(game.Id, out var gam))
+                    gamesDictionary.Add(game.Id, game);
 
                 if (!developersDictionary.TryGetValue(developer.Id, out var dev))
                     developersDictionary.Add(developer.Id, developer);

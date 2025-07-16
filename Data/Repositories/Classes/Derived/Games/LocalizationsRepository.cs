@@ -83,7 +83,6 @@ left join Publishers
             Platforms = platformsDictionary.Values,
             Developers = developersDictionary.Values,
             Publisher = publisher is not null && game.Publisher is null ? publisher : null,
-            PublisherId = publisher is not null && game.Publisher is null ? publisher.Id : 0,
             Localization = localization
         };
 
@@ -149,7 +148,6 @@ WHERE Localizations.Id=@Id;",
             Platforms = platformsDictionary.Values,
             Developers = developersDictionary.Values,
             Publisher = publisher is not null && game.Publisher is null ? publisher : null,
-            PublisherId = publisher is not null && game.Publisher is null ? publisher.Id : 0,
             Localization = localization
         };
 
@@ -215,7 +213,6 @@ WHERE Games.LocalizationId=@Id
                     Platforms = platformsDictionary.Values,
                     Developers = developersDictionary.Values,
                     Publisher = publisher is not null && game.Publisher is null ? publisher : null,
-                    PublisherId = publisher is not null && game.Publisher is null ? publisher.Id : 0,
                     Localization = localization
                 };
 

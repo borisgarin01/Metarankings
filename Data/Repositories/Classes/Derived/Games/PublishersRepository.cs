@@ -1,5 +1,6 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class PublishersRepository : Repository, IRepository<Publisher>
@@ -37,6 +38,7 @@ VALUES (@Name);"
         using (var connection = new SqlConnection(ConnectionString))
         {
             var publishersDictionary = new Dictionary<long, Publisher>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
             var publisher = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
 	publishers.Id, publishers.Name,
@@ -50,12 +52,11 @@ VALUES (@Name);"
                 if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
                 {
                     publisherEntry = publisher;
-                    publisherEntry.Games = new List<Game>();
                     publishersDictionary.Add(publisher.Id, publisherEntry);
                 }
 
-                if (game is not null && !publisherEntry.Games.Any(d => d.Id == publisher.Id))
-                    publisherEntry.Games.Add(game);
+                if (game is not null && !gamesDictionary.TryGetValue(game.Id, out var g))
+                    gamesDictionary.Add(game.Id, game);
 
                 return publisherEntry;
             });
@@ -69,6 +70,7 @@ VALUES (@Name);"
         using (var connection = new SqlConnection(ConnectionString))
         {
             var publishersDictionary = new Dictionary<long, Publisher>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
             var publisher = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
 	publishers.Id, publishers.Name,
@@ -83,13 +85,13 @@ WHERE PublisherId=@PublisherId", (publisher, game) =>
                 if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
                 {
                     publisherEntry = publisher;
-                    publisherEntry.Games = new List<Game>();
                     publishersDictionary.Add(publisher.Id, publisherEntry);
                 }
 
-                if (game is not null && !publisherEntry.Games.Any(d => d.Id == publisher.Id))
-                    publisherEntry.Games.Add(game);
+                if (game is not null && !gamesDictionary.TryGetValue(game.Id, out Game g))
+                    gamesDictionary.Add(game.Id, game);
 
+                publisherEntry = publisherEntry with { Games = gamesDictionary.Values };
                 return publisherEntry;
             }, new { PublisherId = id });
 
@@ -102,6 +104,7 @@ WHERE PublisherId=@PublisherId", (publisher, game) =>
         using (var connection = new SqlConnection(ConnectionString))
         {
             var publishersDictionary = new Dictionary<long, Publisher>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
             var publisher = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
 	publishers.Id, publishers.Name,
@@ -118,12 +121,11 @@ WHERE PublisherId=@PublisherId", (publisher, game) =>
                 if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
                 {
                     publisherEntry = publisher;
-                    publisherEntry.Games = new List<Game>();
                     publishersDictionary.Add(publisher.Id, publisherEntry);
                 }
 
-                if (game is not null && !publisherEntry.Games.Any(d => d.Id == publisher.Id))
-                    publisherEntry.Games.Add(game);
+                if (game is not null && !gamesDictionary.TryGetValue(game.Id, out var g))
+                    gamesDictionary.Add(game.Id, game);
 
                 return publisherEntry;
             });
