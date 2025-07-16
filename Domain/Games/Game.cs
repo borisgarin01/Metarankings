@@ -34,7 +34,7 @@ public sealed record Game
 
     [JsonPropertyName("developers")]
     public required List<Developer> Developers { get; set; } = new();
-    
+
     [JsonPropertyName("gameScreenshots")]
     public required List<GameScreenshot> Screenshots { get; set; } = new();
 

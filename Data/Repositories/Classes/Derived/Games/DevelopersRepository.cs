@@ -1,6 +1,8 @@
-﻿using Domain.Games;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
+using Domain.Games;
+
 namespace Data.Repositories.Classes.Derived.Games;
+
 public sealed class DevelopersRepository : Repository, IRepository<Developer>
 {
     public DevelopersRepository(string connectionString) : base(connectionString)
@@ -11,14 +13,15 @@ public sealed class DevelopersRepository : Repository, IRepository<Developer>
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Developers
-(Name)
+            var id = await connection.QueryFirstAsync<long>(@"
+INSERT INTO Developers
+    (Name)
 OUTPUT inserted.Id
 VALUES (@Name);"
- , new
- {
-     developer.Name
- });
+    , new
+    {
+        developer.Name
+    });
             return id;
         }
     }
@@ -77,7 +80,8 @@ from developers
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var sql = @"select developers.id, developers.name,
+            var sql = @"
+select developers.id, developers.name,
 	games.Id, games.Name, games.Image, Games.LocalizationId, 
 	Games.PublisherId, Games.ReleaseDate, Games.Description,
 	Games.Trailer,

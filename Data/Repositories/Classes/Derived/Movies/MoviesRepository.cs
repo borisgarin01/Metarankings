@@ -1,11 +1,5 @@
-﻿using Dapper;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
 using Domain.Movies;
-using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 public sealed class MoviesRepository : Repository, IRepository<MovieModel>
@@ -96,21 +90,21 @@ VALUES
             {
                 await connection.ExecuteAsync(@"INSERT INTO MoviesMoviesGenres (MovieId, MovieGenreId)
 VALUES (@MovieId, @MovieGenreId);",
-new { MovieId = insertedMovie.Id, MovieGenreId = movieGenre.Id });
+    new { MovieId = insertedMovie.Id, MovieGenreId = movieGenre.Id });
             }
 
             foreach (var movieStudio in insertedMovieStudios)
             {
                 await connection.ExecuteAsync(@"INSERT INTO MoviesMoviesStudios (MovieId, MovieStudioId)
 VALUES (@MovieId, @MovieStudioId);",
-new { MovieId = insertedMovie.Id, MovieStudioId = movieStudio.Id });
+    new { MovieId = insertedMovie.Id, MovieStudioId = movieStudio.Id });
             }
 
             foreach (var insertedMovieDirector in insertedMovieDirectors)
             {
                 await connection.ExecuteAsync(@"INSERT INTO MoviesMoviesDirectors (MovieId, MovieDirectorId)
 VALUES (@MovieId, @MovieDirectorId);",
-new { MovieId = insertedMovie.Id, MovieDirectorId = insertedMovieDirector.Id });
+    new { MovieId = insertedMovie.Id, MovieDirectorId = insertedMovieDirector.Id });
             }
 
             return insertedMovie.Id;

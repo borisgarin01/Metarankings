@@ -17,10 +17,10 @@ INSERT INTO Genres
     (Name)
 OUTPUT inserted.Id
 VALUES (@Name);"
- , new
- {
-     genre.Name
- });
+    , new
+    {
+        genre.Name
+    });
             return id;
         }
     }

@@ -1,7 +1,5 @@
 ﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
-using System;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -19,10 +17,10 @@ public sealed class LocalizationsRepository : Repository, ILocalizationsReposito
 (Name)
 output inserted.id
 VALUES (@Name);"
- , new
- {
-     localization.Name,
- });
+    , new
+    {
+        localization.Name,
+    });
             return id;
         }
     }
@@ -282,10 +280,8 @@ WHERE Localizations.Id in
     public async Task RemoveAsync(long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
-        {
             await connection.ExecuteAsync(@"DELETE FROM 
 Localizations WHERE Id=@id", new { id });
-        }
     }
 
     public async Task RemoveRangeAsync(IEnumerable<long> ids)

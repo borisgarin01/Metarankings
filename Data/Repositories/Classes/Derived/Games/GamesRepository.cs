@@ -1,6 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
-using System;
 using System.Text;
 
 namespace Data.Repositories.Classes.Derived.Games;
@@ -16,7 +15,7 @@ public sealed class GamesRepository : Repository, IRepository<Game>
         {
             connection.Open();
 
-            using (var transaction = connection.BeginTransaction())
+            using (SqlTransaction transaction = connection.BeginTransaction())
             {
                 List<Developer> insertedDevelopers = new();
                 List<Genre> insertedGenres = new();

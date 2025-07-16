@@ -16,10 +16,10 @@ public sealed class PublishersRepository : Repository, IRepository<Publisher>
 (Name)
 output inserted.id
 VALUES (@Name);"
- , new
- {
-     publisher.Name
- });
+    , new
+    {
+        publisher.Name
+    });
             return id;
         }
     }
@@ -135,10 +135,8 @@ WHERE PublisherId=@PublisherId", (publisher, game) =>
     public async Task RemoveAsync(long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
-        {
             await connection.ExecuteAsync(@"DELETE FROM 
 Publishers WHERE Id=@id", new { id });
-        }
     }
 
     public async Task RemoveRangeAsync(IEnumerable<long> ids)

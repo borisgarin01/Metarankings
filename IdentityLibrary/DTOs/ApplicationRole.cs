@@ -1,5 +1,5 @@
 ﻿namespace IdentityLibrary.DTOs;
 
-public class ApplicationRole:IdentityRole
+public class ApplicationRole : IdentityRole
 {
 }

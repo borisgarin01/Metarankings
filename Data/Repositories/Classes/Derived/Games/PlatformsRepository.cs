@@ -17,10 +17,10 @@ public sealed class PlatformsRepository : Repository, IRepository<Platform>
 (Name)
 output inserted.id
 VALUES (@Name);"
- , new
- {
-     platform.Name
- });
+    , new
+    {
+        platform.Name
+    });
             return id;
         }
     }
@@ -49,6 +49,7 @@ LEFT JOIN Games
             {
                 platform.Games.Add(game);
                 return platform;
+
             });
 
             var platformsResults = platforms.GroupBy(p => p.Id).Select(g =>
@@ -111,10 +112,8 @@ LIMIT @limit;", new { offset, limit });
     public async Task RemoveAsync(long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
-        {
             await connection.ExecuteAsync(@"DELETE FROM 
 Platforms WHERE Id=@id", new { id });
-        }
     }
 
     public async Task RemoveRangeAsync(IEnumerable<long> ids)
