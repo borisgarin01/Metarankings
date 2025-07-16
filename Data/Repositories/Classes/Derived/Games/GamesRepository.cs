@@ -231,10 +231,10 @@ WHERE g.Id IN(SELECT Id FROM games ORDER BY Id ASC OFFSET @offset ROWS
                         {
                             Publisher = publisher,
                             Localization = localization,
-                            Developers = developersDictionary.Values,
-                            Genres = genresDictionary.Values,
-                            Platforms = platformsDictionary.Values,
-                            Screenshots = screenshotsDictionary.Values
+                            Developers = developersDictionary.Values.ToList(),
+                            Genres = genresDictionary.Values.ToList(),
+                            Platforms = platformsDictionary.Values.ToList(),
+                            Screenshots = screenshotsDictionary.Values.ToList(),
                         };
 
                     return gameEntry;
@@ -302,12 +302,12 @@ gs.id, gs.gameid
 
                     gameEntry = gameEntry with
                     {
-                        Developers = developersDictionary.Values,
-                        Genres = genresDictionary.Values,
+                        Developers = developersDictionary.Values.ToList(),
+                        Genres = genresDictionary.Values.ToList(),
                         Localization = (localization is not null && gameEntry.Localization == null) ? localization : null,
-                        Platforms = platformsDictionary.Values,
+                        Platforms = platformsDictionary.Values.ToList(),
                         Publisher = (publisher is not null && gameEntry.Publisher == null) ? publisher : null,
-                        Screenshots = gamesScreenshotsDictionary.Values
+                        Screenshots = gamesScreenshotsDictionary.Values.ToList()
                     };
 
                     return gameEntry;
@@ -375,12 +375,12 @@ WHERE g.Id=@id";
 
                     gameEntry = gameEntry with
                     {
-                        Developers = developersDictionary.Values,
-                        Genres = genresDictionary.Values,
+                        Developers = developersDictionary.Values.ToList(),
+                        Genres = genresDictionary.Values.ToList(),
                         Localization = (localization is not null && gameEntry.Localization == null) ? localization : null,
-                        Platforms = platformsDictionary.Values,
+                        Platforms = platformsDictionary.Values.ToList(),
                         Publisher = (publisher is not null && gameEntry.Publisher == null) ? publisher : null,
-                        Screenshots = screenshotsDictionary.Values
+                        Screenshots = screenshotsDictionary.Values.ToList(),
                     };
 
                     return gameEntry;
@@ -449,12 +449,12 @@ WHERE gen.Id=@genreId";
 
                     gameEntry = gameEntry with
                     {
-                        Developers = developersDictionary.Values,
-                        Genres = genresDictionary.Values,
+                        Developers = developersDictionary.Values.ToList(),
+                        Genres = genresDictionary.Values.ToList(),
                         Localization = (localization is not null && gameEntry.Localization == null) ? localization : null,
-                        Platforms = platformsDictionary.Values,
+                        Platforms = platformsDictionary.Values.ToList(),
                         Publisher = (publisher is not null && gameEntry.Publisher == null) ? publisher : null,
-                        Screenshots = gamesScreenshotsDictionary.Values
+                        Screenshots = gamesScreenshotsDictionary.Values.ToList(),
                     };
 
                     return gameEntry;
@@ -523,12 +523,12 @@ WHERE plat.Id=@platformId";
 
                     gameEntry = gameEntry with
                     {
-                        Developers = developersDictionary.Values,
-                        Genres = genresDictionary.Values,
+                        Developers = developersDictionary.Values.ToList(),
+                        Genres = genresDictionary.Values.ToList(),
                         Localization = (localization is not null && gameEntry.Localization == null) ? localization : null,
-                        Platforms = platformsDictionary.Values,
+                        Platforms = platformsDictionary.Values.ToList(),
                         Publisher = (publisher is not null && gameEntry.Publisher == null) ? publisher : null,
-                        Screenshots = gamesScreenshotsDictionary.Values
+                        Screenshots = gamesScreenshotsDictionary.Values.ToList(),
                     };
 
                     return gameEntry;
@@ -597,12 +597,12 @@ WHERE gd.developerid = @developerId";
 
                     gameEntry = gameEntry with
                     {
-                        Developers = developersDictionary.Values,
-                        Genres = genresDictionary.Values,
+                        Developers = developersDictionary.Values.ToList(),
+                        Genres = genresDictionary.Values.ToList(),
                         Localization = (localization is not null && gameEntry.Localization == null) ? localization : null,
-                        Platforms = platformsDictionary.Values,
+                        Platforms = platformsDictionary.Values.ToList(),
                         Publisher = (publisher is not null && gameEntry.Publisher == null) ? publisher : null,
-                        Screenshots = gamesScreenshotsDictionary.Values
+                        Screenshots = gamesScreenshotsDictionary.Values.ToList(),
                     };
 
                     return gameEntry;
@@ -672,12 +672,12 @@ WHERE p.Id = @publisherId";
 
                     gameEntry = gameEntry with
                     {
-                        Developers = developersDictionary.Values,
-                        Genres = genresDictionary.Values,
+                        Developers = developersDictionary.Values.ToList(),
+                        Genres = genresDictionary.Values.ToList(),
                         Localization = (localization is not null && gameEntry.Localization == null) ? localization : null,
-                        Platforms = platformsDictionary.Values,
+                        Platforms = platformsDictionary.Values.ToList(),
                         Publisher = (publisher is not null && gameEntry.Publisher == null) ? publisher : null,
-                        Screenshots = gamesScreenshotsDictionary.Values
+                        Screenshots = gamesScreenshotsDictionary.Values.ToList(),
                     };
 
                     return gameEntry;
@@ -753,12 +753,12 @@ WHERE g.Id in
 
                     gameEntry = gameEntry with
                     {
-                        Developers = developersDictionary.Values,
-                        Genres = genresDictionary.Values,
+                        Developers = developersDictionary.Values.ToList(),
+                        Genres = genresDictionary.Values.ToList(),
                         Localization = (localization is not null && gameEntry.Localization == null) ? localization : null,
-                        Platforms = platformsDictionary.Values,
+                        Platforms = platformsDictionary.Values.ToList(),
                         Publisher = (publisher is not null && gameEntry.Publisher == null) ? publisher : null,
-                        Screenshots = gamesScreenshotsDictionary.Values
+                        Screenshots = gamesScreenshotsDictionary.Values.ToList(),
                     };
 
                     return gameEntry;
@@ -848,12 +848,12 @@ ORDER BY g.id, gen.id;";
 
                     gameEntry = gameEntry with
                     {
-                        Developers = developersDictionary.Values,
-                        Genres = genresDictionary.Values,
+                        Developers = developersDictionary.Values.ToList(),
+                        Genres = genresDictionary.Values.ToList(),
                         Localization = (localization is not null && gameEntry.Localization == null) ? localization : null,
-                        Platforms = platformsDictionary.Values,
+                        Platforms = platformsDictionary.Values.ToList(),
                         Publisher = (publisher is not null && gameEntry.Publisher == null) ? publisher : null,
-                        Screenshots = gamesScreenshotsDictionary.Values
+                        Screenshots = gamesScreenshotsDictionary.Values.ToList(),
                     };
 
                     return gameEntry;
@@ -976,12 +976,12 @@ WHERE 1=1
 
                     gameEntry = gameEntry with
                     {
-                        Developers = developersDictionary.Values,
-                        Genres = genresDictionary.Values,
+                        Developers = developersDictionary.Values.ToList(),
+                        Genres = genresDictionary.Values.ToList(),
                         Localization = (localization is not null && gameEntry.Localization == null) ? localization : null,
-                        Platforms = platformsDictionary.Values,
+                        Platforms = platformsDictionary.Values.ToList(),
                         Publisher = (publisher is not null && gameEntry.Publisher == null) ? publisher : null,
-                        Screenshots = gamesScreenshotsDictionary.Values
+                        Screenshots = gamesScreenshotsDictionary.Values.ToList(),
                     };
 
                     return gameEntry;

@@ -39,44 +39,60 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var developersDictionary = new Dictionary<long, Developer>();
-            var platformsDictionary = new Dictionary<long, Platform>();
-            var genresDictionary = new Dictionary<long, Genre>();
-            var gamesDictionary = new Dictionary<long, Game>();
-
-            var developers = await connection.QueryAsync<Developer, Game, Platform, Genre, Developer>(@"
-select developers.id, developers.name,
-	games.Id, games.Name, games.Image, Games.LocalizationId, 
-	Games.PublisherId, Games.ReleaseDate, Games.Description,
-	Games.Trailer,
-	Platforms.Id, Platforms.Name,
-	Genres.Id, Genres.Name
-from developers
-	left join GamesDevelopers
-		on GamesDevelopers.DeveloperId=Developers.Id
-	left join Games 
-		on Games.Id=GamesDevelopers.GameId
-	left join GamesPlatforms
-		on GamesPlatforms.GameId=Games.Id
-	left join Platforms
-		on Platforms.Id=GamesPlatforms.Id
-	left join GamesGenres
-		on GamesGenres.GameId=Games.Id
-	left join Genres
-		on Genres.Id=GamesGenres.GenreId", (developer, game, platform, genre) =>
+            var developers = await connection.QueryAsync<Developer, Game, Publisher, Platform, Developer>(@"SELECT Developers.Id, Developers.Name,
+Games.Id, Games.Name, Games.Image,
+Publishers.Id, Publishers.Name,
+Platforms.Id, Platforms.Name
+FROM Developers
+LEFT JOIN 
+GamesDevelopers 
+    on Developers.Id=GamesDevelopers.DeveloperID
+LEFT JOIN Games 
+    ON Games.Id=GamesDevelopers.GameId
+LEFT JOIN Publishers
+    ON Publishers.Id=Games.PublisherId
+LEFT JOIN GamesPlatforms
+    ON GamesPlatforms.GameId=Games.Id
+LEFT JOIN Platforms
+    ON GamesPlatforms.PlatformId=Platforms.Id", (developer, game, publisher, platform) =>
             {
-                if (!platformsDictionary.TryGetValue(platform.Id, out var platf))
-                    platformsDictionary.Add(platform.Id, platform);
-                if (!genresDictionary.TryGetValue(genre.Id, out var genr))
-                    genresDictionary.Add(genre.Id, genre);
-                if (!gamesDictionary.TryGetValue(game.Id, out var gam))
-                    gamesDictionary.Add(game.Id, game);
+                if (game is not null)
+                {
+                    if (publisher is not null)
+                    {
+                        game.Publisher = publisher;
+                    }
 
-                if (!developersDictionary.TryGetValue(developer.Id, out var dev))
-                    developersDictionary.Add(developer.Id, developer);
+                    game.Platforms.Add(platform);
+                    developer.Games.Add(game);
+                }
                 return developer;
             });
-            return developersDictionary.Values;
+
+            var developersResult = developers.GroupBy(p => p.Id).Select(g =>
+            {
+                var groupedDeveloper = g.First();
+
+                groupedDeveloper = groupedDeveloper with
+                {
+                    Games = g.SelectMany(d => d.Games)
+                    .GroupBy(g => g.Id)
+                    .Select(gameGroup =>
+                    {
+                        var game = gameGroup.First();
+                        game = game with
+                        {
+                            Platforms = gameGroup.SelectMany(g => g.Platforms)
+                        .DistinctBy(p => p.Id).ToList()
+                        };
+                        return game;
+                    }).ToList()
+                };
+
+                return groupedDeveloper;
+            });
+
+            return Enumerable.Empty<Developer>();
         }
     }
 

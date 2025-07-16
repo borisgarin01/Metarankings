@@ -80,8 +80,8 @@ left join Publishers
 
         game = game with
         {
-            Platforms = platformsDictionary.Values,
-            Developers = developersDictionary.Values,
+            Platforms = platformsDictionary.Values.ToList(),
+            Developers = developersDictionary.Values.ToList(),
             Publisher = publisher is not null && game.Publisher is null ? publisher : null,
             Localization = localization
         };
@@ -145,8 +145,8 @@ WHERE Localizations.Id=@Id;",
 
         game = game with
         {
-            Platforms = platformsDictionary.Values,
-            Developers = developersDictionary.Values,
+            Platforms = platformsDictionary.Values.ToList(),
+            Developers = developersDictionary.Values.ToList(),
             Publisher = publisher is not null && game.Publisher is null ? publisher : null,
             Localization = localization
         };
@@ -210,8 +210,8 @@ WHERE Games.LocalizationId=@Id
 
                 game = game with
                 {
-                    Platforms = platformsDictionary.Values,
-                    Developers = developersDictionary.Values,
+                    Platforms = platformsDictionary.Values.ToList(),
+                    Developers = developersDictionary.Values.ToList(),
                     Publisher = publisher is not null && game.Publisher is null ? publisher : null,
                     Localization = localization
                 };
@@ -279,8 +279,8 @@ WHERE Localizations.Id in
 
                 game = game with
                 {
-                    Developers = developersDictionary.Values,
-                    Platforms = platformsDictionary.Values,
+                    Developers = developersDictionary.Values.ToList(),
+                    Platforms = platformsDictionary.Values.ToList(),
                     Localization = localization
                 };
 
