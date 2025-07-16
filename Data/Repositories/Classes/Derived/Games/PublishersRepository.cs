@@ -1,10 +1,5 @@
-﻿using Dapper;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
 using Domain.Games;
-using Microsoft.Data.SqlClient;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class PublishersRepository : Repository, IRepository<Publisher>
@@ -41,27 +36,31 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var publishers = await connection.QueryAsync<Publisher>(@"select 
-publishers.id, publishers.name 
-from publishers");
+            var publishersDictionary = new Dictionary<long, Publisher>();
 
-            if (publishers is null)
-                return null;
-
-            if (!publishers.Any())
-                return publishers;
-
-            foreach (var publisher in publishers)
+            var publisher = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
+	publishers.Id, publishers.Name,
+	games.Id, games.Name, games.Image, games.LocalizationId,
+	games.PublisherId,games.ReleaseDate, games.Description,
+	games.Trailer
+	FROM Publishers 
+		LEFT JOIN Games 
+			ON Games.PublisherId=Publishers.Id", (publisher, game) =>
             {
-                var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games 
-WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+                if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                {
+                    publisherEntry = publisher;
+                    publisherEntry.Games = new List<Game>();
+                    publishersDictionary.Add(publisher.Id, publisherEntry);
+                }
 
-                publisher.Games = publisherGames;
+                if (game is not null && !publisherEntry.Games.Any(d => d.Id == publisher.Id))
+                    publisherEntry.Games.Add(game);
 
-            }
+                return publisherEntry;
+            });
 
-            return publishers;
+            return publishersDictionary.Values;
         }
     }
 
@@ -69,21 +68,32 @@ WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var publisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"select 
-publishers.id, publishers.name
-from publishers 
-where Id=@id", new { id });
+            var publishersDictionary = new Dictionary<long, Publisher>();
 
-            if (publisher is null)
-                return null;
+            var publisher = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
+	publishers.Id, publishers.Name,
+	games.Id, games.Name, games.Image, games.LocalizationId,
+	games.PublisherId,games.ReleaseDate, games.Description,
+	games.Trailer
+	FROM Publishers 
+		LEFT JOIN Games 
+			ON Games.PublisherId=Publishers.Id
+WHERE PublisherId=@PublisherId", (publisher, game) =>
+            {
+                if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                {
+                    publisherEntry = publisher;
+                    publisherEntry.Games = new List<Game>();
+                    publishersDictionary.Add(publisher.Id, publisherEntry);
+                }
 
-            var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games 
-WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+                if (game is not null && !publisherEntry.Games.Any(d => d.Id == publisher.Id))
+                    publisherEntry.Games.Add(game);
 
-            publisher.Games = publisherGames;
+                return publisherEntry;
+            }, new { PublisherId = id });
 
-            return publisher;
+            return publishersDictionary.Values.FirstOrDefault();
         }
     }
 
@@ -91,29 +101,34 @@ WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var publishers = await connection.QueryAsync<Publisher>(@"select 
-publishers.id, publishers.name
-from publishers
-OFFSET @offset 
-limit @limit", new { offset, limit });
+            var publishersDictionary = new Dictionary<long, Publisher>();
 
-            if (publishers is null)
-                return null;
-
-            if (!publishers.Any())
-                return publishers;
-
-            foreach (var publisher in publishers)
+            var publisher = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
+	publishers.Id, publishers.Name,
+	games.Id, games.Name, games.Image, games.LocalizationId,
+	games.PublisherId,games.ReleaseDate, games.Description,
+	games.Trailer
+	FROM Publishers 
+		LEFT JOIN Games 
+			ON Games.PublisherId=Publishers.Id
+    WHERE Publishers.Id IN 
+        IN(SELECT Id FROM Publishers ORDER BY Id ASC OFFSET @offset ROWS
+            FETCH NEXT @limit ROWS ONLY)", (publisher, game) =>
             {
-                var publisherGames = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games 
-WHERE PublisherId=@PublisherId", new { PublisherId = publisher.Id });
+                if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                {
+                    publisherEntry = publisher;
+                    publisherEntry.Games = new List<Game>();
+                    publishersDictionary.Add(publisher.Id, publisherEntry);
+                }
 
-                publisher.Games = publisherGames;
+                if (game is not null && !publisherEntry.Games.Any(d => d.Id == publisher.Id))
+                    publisherEntry.Games.Add(game);
 
-            }
+                return publisherEntry;
+            });
 
-            return publishers;
+            return publishersDictionary.Values;
         }
     }
 

@@ -37,42 +37,28 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var platforms = await connection.QueryAsync<Platform>(@"select 
-platforms.id, platforms.name
-from platforms");
-
-            if (platforms is null)
-                return null;
-
-            foreach (var platform in platforms)
+            var platforms = await connection.QueryAsync<Platform, Game, Platform>(@"select Platforms.Id, Platforms.Name,
+	Games.Id, Games.Name, Games.Image, Games.LocalizationId, 
+	Games.PublisherId, Games.ReleaseDate, Games.Description,
+	Games.Trailer
+FROM Platforms
+LEFT JOIN GamesPlatforms
+	ON GamesPlatforms.PlatformId=Platforms.Id
+LEFT JOIN Games
+	ON Games.Id=GamesPlatforms.GameId", (platform, game) =>
             {
-                var platformGames = await connection.QueryAsync<PlatformGame>(@"SELECT Id, GameId, PlatformId 
-from GamesPlatforms 
-where PlatformId=@platformId", new { platformId = platform.Id });
+                platform.Games.Add(game);
+                return platform;
+            });
 
-                foreach (var gamePlatform in platformGames)
-                {
-                    var games = await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE Id=@GameId", new { gamePlatform.GameId });
+            var platformsResults = platforms.GroupBy(p => p.Id).Select(g =>
+            {
+                var groupedPlatform = g.First();
+                groupedPlatform.Games = g.Select(p => p.Games.Single()).ToList();
+                return groupedPlatform;
+            });
 
-                    platform.Games = games;
-                }
-
-                foreach (var game in platform.Games)
-                {
-                    var gamePlatforms = await connection.QueryAsync<Platform>(@"SELECT platforms.Id, platforms.Name
-FROM
-platforms
-INNER JOIN gamesPlatforms
-on platforms.Id=gamesPlatforms.PlatformId
-INNER JOIN games
-on games.Id=gamesPlatforms.GameId
-WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
-
-                    game.Platforms = platforms.ToList();
-                }
-            }
-            return platforms;
+            return platformsResults;
         }
     }
 
@@ -80,29 +66,31 @@ WHERE gamesPlatforms.GameId=@GameId", new { GameId = game.Id });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var platform = await connection.QueryFirstOrDefaultAsync<Platform>(@"select 
-platforms.id, platforms.name 
-from platforms
-WHERE platforms.Id=@id", new { id });
+            var platformsDictionary = new Dictionary<long, Platform>();
 
-            if (platform is null)
-                return null;
-
-            var platformGames = await connection.QueryAsync<PlatformGame>(@"SELECT Id, GameId, PlatformId 
-from GamesPlatforms 
-where PlatformId=@platformId", new { platformId = platform.Id });
-
-            var games = new List<Game>();
-
-            foreach (var gamePlatform in platformGames)
+            var platforms = await connection.QueryAsync<Platform, Game, Platform>(@"select Platforms.Id, Platforms.Name,
+	Games.Id, Games.Name, Games.Image, Games.LocalizationId, 
+	Games.PublisherId, Games.ReleaseDate, Games.Description,
+	Games.Trailer
+FROM Platforms
+LEFT JOIN GamesPlatforms
+	ON GamesPlatforms.PlatformId=Platforms.Id
+LEFT JOIN Games
+	ON Games.Id=GamesPlatforms.GameId
+WHERE Platforms.Id=@id", (platform, game) =>
             {
-                games.AddRange(await connection.QueryAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE Id=@GameId", new { gamePlatform.GameId }));
-            }
+                platform.Games.Add(game);
+                return platform;
+            }, new { id });
 
-            platform.Games = games;
+            var platformsResults = platforms.GroupBy(p => p.Id).Select(g =>
+            {
+                var groupedPlatform = g.First();
+                groupedPlatform.Games = g.Select(p => p.Games.Single()).ToList();
+                return groupedPlatform;
+            });
 
-            return platform;
+            return platformsResults.FirstOrDefault();
         }
     }
 
