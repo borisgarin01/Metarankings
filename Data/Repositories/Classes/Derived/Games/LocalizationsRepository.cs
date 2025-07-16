@@ -36,6 +36,10 @@ VALUES (@Name);"
         using (var connection = new SqlConnection(ConnectionString))
         {
             var localizationsDictionary = new Dictionary<long, Localization>();
+            var gamesDictionary = new Dictionary<long, Game>();
+            var platformsDictionary = new Dictionary<long, Platform>();
+            var developersDictionary = new Dictionary<long, Developer>();
+            var publishersDictionary = new Dictionary<long, Publisher>();
 
             var localizations = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
 SELECT Localizations.Id, Localizations.Name,
@@ -62,24 +66,28 @@ left join Publishers
         if (!localizationsDictionary.TryGetValue(localization.Id, out var localizationEntry))
         {
             localizationEntry = localization;
-            localizationEntry.Games = new List<Game>();
             localizationsDictionary.Add(localization.Id, localization);
         }
 
-        if (game is not null && !localizationEntry.Games.Any(g => g.Id == game.Id))
-            localizationEntry.Games.Add(game);
+        if (game is not null && !gamesDictionary.TryGetValue(game.Id, out var gam))
+            gamesDictionary.Add(game.Id, game);
 
-        if (platform is not null && !game.Platforms.Any(p => p.Id == platform.Id))
-            game.Platforms.Add(platform);
+        if (platform is not null && !platformsDictionary.TryGetValue(platform.Id, out var platf))
+            platformsDictionary.Add(platform.Id, platform);
 
-        if (developer is not null && !game.Developers.Any(d => d.Id == developer.Id))
-            game.Developers.Add(developer);
+        if (developer is not null && !developersDictionary.TryGetValue(developer.Id, out var dev))
+            developersDictionary.Add(developer.Id, developer);
 
-        if (publisher is not null && game.Publisher is null)
+        game = game with
         {
-            game.Publisher = publisher;
-            game.PublisherId = publisher.Id;
-        }
+            Platforms = platformsDictionary.Values,
+            Developers = developersDictionary.Values,
+            Publisher = publisher is not null && game.Publisher is null ? publisher : null,
+            PublisherId = publisher is not null && game.Publisher is null ? publisher.Id : 0,
+            Localization = localization
+        };
+
+        localization = localization with { Games = gamesDictionary.Values };
 
         return localization;
     });
@@ -93,6 +101,10 @@ left join Publishers
         using (var connection = new SqlConnection(ConnectionString))
         {
             var localizationsDictionary = new Dictionary<long, Localization>();
+            var gamesDictionary = new Dictionary<long, Game>();
+            var platformsDictionary = new Dictionary<long, Platform>();
+            var developersDictionary = new Dictionary<long, Developer>();
+            var publishersDictionary = new Dictionary<long, Publisher>();
 
             var localizations = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
 SELECT Localizations.Id, Localizations.Name,
@@ -120,28 +132,31 @@ WHERE Localizations.Id=@Id;",
         if (!localizationsDictionary.TryGetValue(localization.Id, out var localizationEntry))
         {
             localizationEntry = localization;
-            localizationEntry.Games = new List<Game>();
             localizationsDictionary.Add(localization.Id, localization);
         }
 
-        if (game is not null && !localizationEntry.Games.Any(g => g.Id == game.Id))
-            localizationEntry.Games.Add(game);
+        if (game is not null && !gamesDictionary.TryGetValue(game.Id, out var gam))
+            gamesDictionary.Add(game.Id, game);
 
-        if (platform is not null && !game.Platforms.Any(p => p.Id == platform.Id))
-            game.Platforms.Add(platform);
+        if (platform is not null && !platformsDictionary.TryGetValue(platform.Id, out var platf))
+            platformsDictionary.Add(platform.Id, platform);
 
-        if (developer is not null && !game.Developers.Any(d => d.Id == developer.Id))
-            game.Developers.Add(developer);
+        if (developer is not null && !developersDictionary.TryGetValue(developer.Id, out var dev))
+            developersDictionary.Add(developer.Id, developer);
 
-        if (publisher is not null && game.Publisher is null)
+        game = game with
         {
-            game.Publisher = publisher;
-            game.PublisherId = publisher.Id;
-        }
+            Platforms = platformsDictionary.Values,
+            Developers = developersDictionary.Values,
+            Publisher = publisher is not null && game.Publisher is null ? publisher : null,
+            PublisherId = publisher is not null && game.Publisher is null ? publisher.Id : 0,
+            Localization = localization
+        };
+
+        localization = localization with { Games = gamesDictionary.Values };
 
         return localization;
-    },
-    new { Id = id });
+    }, new { id });
 
             return localizationsDictionary.Values.FirstOrDefault();
         }
@@ -152,6 +167,10 @@ WHERE Localizations.Id=@Id;",
         using (var connection = new SqlConnection(ConnectionString))
         {
             var localizationsDictionary = new Dictionary<long, Localization>();
+            var gamesDictionary = new Dictionary<long, Game>();
+            var platformsDictionary = new Dictionary<long, Platform>();
+            var developersDictionary = new Dictionary<long, Developer>();
+            var publishersDictionary = new Dictionary<long, Publisher>();
 
             var localization = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
 SELECT Localizations.Id, Localizations.Name,
@@ -175,36 +194,35 @@ left join Publishers
 	on Games.PublisherId=Publishers.Id
 WHERE Games.LocalizationId=@Id
     AND Platforms.Id=@PlatformId", (localization, game, platform, developer, publisher) =>
-    {
-        if (!localizationsDictionary.TryGetValue(localization.Id, out var localizationEntry))
-        {
-            localizationEntry = localization;
-            localizationEntry.Games = new List<Game>();
-            localizationsDictionary.Add(localization.Id, localization);
-        }
+            {
+                if (!localizationsDictionary.TryGetValue(localization.Id, out var localizationEntry))
+                {
+                    localizationEntry = localization;
+                    localizationsDictionary.Add(localization.Id, localization);
+                }
 
-        if (game is not null && !localizationEntry.Games.Any(g => g.Id == game.Id))
-            localizationEntry.Games.Add(game);
+                if (game is not null && !gamesDictionary.TryGetValue(game.Id, out var gam))
+                    gamesDictionary.Add(game.Id, game);
 
-        if (platform is not null && !game.Platforms.Any(p => p.Id == platform.Id))
-            game.Platforms.Add(platform);
+                if (platform is not null && !platformsDictionary.TryGetValue(platform.Id, out var platf))
+                    platformsDictionary.Add(platform.Id, platform);
 
-        if (developer is not null && !game.Developers.Any(d => d.Id == developer.Id))
-            game.Developers.Add(developer);
+                if (developer is not null && !developersDictionary.TryGetValue(developer.Id, out var dev))
+                    developersDictionary.Add(developer.Id, developer);
 
-        if (publisher is not null && game.Publisher is null)
-        {
-            game.Publisher = publisher;
-            game.PublisherId = publisher.Id;
-        }
+                game = game with
+                {
+                    Platforms = platformsDictionary.Values,
+                    Developers = developersDictionary.Values,
+                    Publisher = publisher is not null && game.Publisher is null ? publisher : null,
+                    PublisherId = publisher is not null && game.Publisher is null ? publisher.Id : 0,
+                    Localization = localization
+                };
 
-        return localization;
-    },
-    new
-    {
-        Id = id,
-        PlatformId = platformId
-    });
+                localization = localization with { Games = gamesDictionary.Values };
+
+                return localization;
+            }, new { id });
 
             return localizationsDictionary.Values.FirstOrDefault();
         }
@@ -215,6 +233,9 @@ WHERE Games.LocalizationId=@Id
         using (var connection = new SqlConnection(ConnectionString))
         {
             var localizationsDictionary = new Dictionary<long, Localization>();
+            var gamesDictionary = new Dictionary<long, Game>();
+            var platformsDictionary = new Dictionary<long, Platform>();
+            var developersDictionary = new Dictionary<long, Developer>();
 
             var localization = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
 SELECT Localizations.Id, Localizations.Name,
@@ -250,20 +271,21 @@ WHERE Localizations.Id in
                     localizationsDictionary.Add(localization.Id, localization);
                 }
 
-                if (game is not null && !localizationEntry.Games.Any(g => g.Id == game.Id))
-                    localizationEntry.Games.Add(game);
+                if (game is not null && !gamesDictionary.TryGetValue(game.Id, out var g))
+                    gamesDictionary.Add(game.Id, game);
 
-                if (platform is not null && !game.Platforms.Any(p => p.Id == platform.Id))
-                    game.Platforms.Add(platform);
+                if (platform is not null && !platformsDictionary.TryGetValue(platform.Id, out var platf))
+                    platformsDictionary.Add(platform.Id, platform);
 
                 if (developer is not null && !game.Developers.Any(d => d.Id == developer.Id))
-                    game.Developers.Add(developer);
+                    developersDictionary.Add(developer.Id, developer);
 
-                if (publisher is not null && game.Publisher is null)
+                game = game with
                 {
-                    game.Publisher = publisher;
-                    game.PublisherId = publisher.Id;
-                }
+                    Developers = developersDictionary.Values,
+                    Platforms = platformsDictionary.Values,
+                    Localization = localization
+                };
 
                 return localization;
             },

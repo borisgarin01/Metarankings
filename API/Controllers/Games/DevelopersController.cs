@@ -55,7 +55,8 @@ public sealed class DevelopersController : ControllerBase
 
         var insertedDeveloperId = await _developersRepository.AddAsync(developer);
 
-        developer.Id = insertedDeveloperId;
+        developer = developer with { Id = insertedDeveloperId };
+
         return Created($"api/developers/{developer.Id}", developer);
     }
 

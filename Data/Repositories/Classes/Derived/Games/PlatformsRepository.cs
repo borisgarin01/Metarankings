@@ -134,7 +134,6 @@ WHERE Platforms.Id=@id", (platform, game) =>
                         if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
                         {
                             gameEntry = game;
-                            gameEntry.Platforms = new List<Platform>();
                             gameDictionary.Add(gameEntry.Id, gameEntry);
 
                             // Add game to platform if not already present
@@ -142,9 +141,9 @@ WHERE Platforms.Id=@id", (platform, game) =>
                         }
 
                         // Add platform to game if it exists and isn't already added
-                        if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
+                        if (gamePlatform is not null && !platformDictionary.TryGetValue(gamePlatform.Id, out var gamePlatf))
                         {
-                            gameEntry.Platforms.Add(gamePlatform);
+                            platformDictionary.Add(gamePlatform.Id, gamePlatform);
                         }
                     }
 

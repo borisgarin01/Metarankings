@@ -1,7 +1,3 @@
 ﻿namespace IdentityLibrary.Models;
 
-public sealed record LoginModel
-{
-    public string Email { get; set; }
-    public string Password { get; set; }
-}
+public sealed record LoginModel(string Email, string Password);

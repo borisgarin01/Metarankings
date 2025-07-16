@@ -44,9 +44,9 @@ public sealed class PlatformsController : ControllerBase
 
         var platform = _mapper.Map<Platform>(addPlatformModel);
 
-        var insertedGenreId = await _platformsRepository.AddAsync(platform);
+        var insertedPlatformId = await _platformsRepository.AddAsync(platform);
 
-        platform.Id = insertedGenreId;
+        platform = platform with { Id = insertedPlatformId };
         return Created($"api/developers/{platform.Id}", platform);
     }
 

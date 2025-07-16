@@ -39,6 +39,9 @@ VALUES (@Name);"
         using (var connection = new SqlConnection(ConnectionString))
         {
             var developersDictionary = new Dictionary<long, Developer>();
+            var platformsDictionary = new Dictionary<long, Platform>();
+            var genresDictionary = new Dictionary<long, Genre>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
             var developers = await connection.QueryAsync<Developer, Game, Platform, Genre, Developer>(@"
 select developers.id, developers.name,
@@ -61,12 +64,12 @@ from developers
 	left join Genres
 		on Genres.Id=GamesGenres.GenreId", (developer, game, platform, genre) =>
             {
-                if (!game.Platforms.Any(b => b.Id == platform.Id))
-                    game.Platforms.Add(platform);
-                if (!game.Genres.Any(b => b.Id == genre.Id))
-                    game.Genres.Add(genre);
-                if (!developer.Games.Any(b => b.Id == game.Id))
-                    developer.Games.Add(game);
+                if (!platformsDictionary.TryGetValue(platform.Id, out var platf))
+                    platformsDictionary.Add(platform.Id, platform);
+                if (!genresDictionary.TryGetValue(genre.Id, out var genr))
+                    genresDictionary.Add(genre.Id, genre);
+                if (!gamesDictionary.TryGetValue(game.Id, out var gam))
+                    gamesDictionary.Add(game.Id, game);
 
                 if (!developersDictionary.TryGetValue(developer.Id, out var dev))
                     developersDictionary.Add(developer.Id, developer);
@@ -110,8 +113,7 @@ from developers
                 {
                     if (!developersDictionary.TryGetValue(developer.Id, out var developerEntry))
                     {
-                        developerEntry = developer;
-                        developerEntry.Games = new List<Game>();
+                        developerEntry = developer with { Games = new List<Game>() };
                         developersDictionary.Add(developer.Id, developerEntry);
                     }
 
