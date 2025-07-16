@@ -1,6 +1,8 @@
-﻿using Domain.Games;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
+using Domain.Games;
+
 namespace Data.Repositories.Classes.Derived.Games;
+
 public sealed class DevelopersRepository : Repository, IRepository<Developer>
 {
     public DevelopersRepository(string connectionString) : base(connectionString)
@@ -11,14 +13,15 @@ public sealed class DevelopersRepository : Repository, IRepository<Developer>
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Developers
-(Name)
+            var id = await connection.QueryFirstAsync<long>(@"
+INSERT INTO Developers
+    (Name)
 OUTPUT inserted.Id
 VALUES (@Name);"
- , new
- {
-     developer.Name
- });
+    , new
+    {
+        developer.Name
+    });
             return id;
         }
     }
@@ -35,59 +38,41 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            IEnumerable<Developer> developers = await connection.QueryAsync<Developer, Game, Platform, Developer>(@"
-            select 
-                developers.id, developers.name, 
-                games.Id, games.Name, games.Image, 
-                games.publisherId, games.releasedate, 
-                games.description, games.trailer,
-                platforms.id, platforms.name
-            from developers
-            left join gamesdevelopers
-                on gamesdevelopers.developerid=developers.id
-            left join games
-                on games.id=gamesdevelopers.gameid
-            left join gamesplatforms
-                on gamesplatforms.gameid=games.id
-            left join platforms 
-                on platforms.id=gamesplatforms.platformid",
-                 (developerEntry, game, platform) =>
-                 {
-                     game.Platforms.Add(platform);
-                     developerEntry.Games.Add(game);
-                     return developerEntry;
-                 });
+            var developersDictionary = new Dictionary<long, Developer>();
 
-            var developersResult = developers
-   .GroupBy(d => d.Id)
-   .Select(g =>
-   {
-       var groupedDeveloper = g.First();
+            var developers = await connection.QueryAsync<Developer, Game, Platform, Genre, Developer>(@"
+select developers.id, developers.name,
+	games.Id, games.Name, games.Image, Games.LocalizationId, 
+	Games.PublisherId, Games.ReleaseDate, Games.Description,
+	Games.Trailer,
+	Platforms.Id, Platforms.Name,
+	Genres.Id, Genres.Name
+from developers
+	left join GamesDevelopers
+		on GamesDevelopers.DeveloperId=Developers.Id
+	left join Games 
+		on Games.Id=GamesDevelopers.GameId
+	left join GamesPlatforms
+		on GamesPlatforms.GameId=Games.Id
+	left join Platforms
+		on Platforms.Id=GamesPlatforms.Id
+	left join GamesGenres
+		on GamesGenres.GameId=Games.Id
+	left join Genres
+		on Genres.Id=GamesGenres.GenreId", (developer, game, platform, genre) =>
+            {
+                if (!game.Platforms.Any(b => b.Id == platform.Id))
+                    game.Platforms.Add(platform);
+                if (!game.Genres.Any(b => b.Id == genre.Id))
+                    game.Genres.Add(genre);
+                if (!developer.Games.Any(b => b.Id == game.Id))
+                    developer.Games.Add(game);
 
-       // Process games and platforms
-       groupedDeveloper.Games = g
-           .SelectMany(d => d.Games) // Flatten all games from all developer records
-           .GroupBy(game => game.Id)  // Group games by ID
-           .Select(gameGroup =>
-           {
-               var groupedGame = gameGroup.First();
-
-               // Process platforms for this game
-               groupedGame.Platforms = gameGroup
-                   .SelectMany(g => g.Platforms) // Flatten all platforms
-                   .GroupBy(p => p.Id)           // Group platforms by ID
-                   .Select(p => p.First())        // Take first platform from each group
-                   .ToList();
-
-               return groupedGame;
-           })
-           .ToList();
-
-       return groupedDeveloper;
-   })
-   .ToList();
-
-            return developersResult;
+                if (!developersDictionary.TryGetValue(developer.Id, out var dev))
+                    developersDictionary.Add(developer.Id, developer);
+                return developer;
+            });
+            return developersDictionary.Values;
         }
     }
 
@@ -95,60 +80,61 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            IEnumerable<Developer> developers = await connection.QueryAsync<Developer, Game, Platform, Developer>(@"
-            select 
-                developers.id, developers.name, 
-                games.Id, games.Name, games.Image, 
-                games.publisherId, games.releasedate, 
-                games.description, games.trailer,
-                platforms.id, platforms.name
-            from developers
-            left join gamesdevelopers
-                on gamesdevelopers.developerid=developers.id
-            left join games
-                on games.id=gamesdevelopers.gameid
-            left join gamesplatforms
-                on gamesplatforms.gameid=games.id
-            left join platforms 
-                on platforms.id=gamesplatforms.platformid
-            WHERE developers.id=@Id",
-                 (developerEntry, game, platform) =>
-                 {
-                     game.Platforms.Add(platform);
-                     developerEntry.Games.Add(game);
-                     return developerEntry;
-                 }, new { id });
+            var sql = @"
+select developers.id, developers.name,
+	games.Id, games.Name, games.Image, Games.LocalizationId, 
+	Games.PublisherId, Games.ReleaseDate, Games.Description,
+	Games.Trailer,
+	Platforms.Id, Platforms.Name,
+	Genres.Id, Genres.Name
+from developers
+	left join GamesDevelopers
+		on GamesDevelopers.DeveloperId=Developers.Id
+	left join Games 
+		on Games.Id=GamesDevelopers.GameId
+	left join GamesPlatforms
+		on GamesPlatforms.GameId=Games.Id
+	left join Platforms
+		on Platforms.Id=GamesPlatforms.Id
+	left join GamesGenres
+		on GamesGenres.GameId=Games.Id
+	left join Genres
+		on Genres.Id=GamesGenres.GenreId
+    WHERE Developers.Id=@id";
 
-            var developersResult = developers
-   .GroupBy(d => d.Id)
-   .Select(g =>
-   {
-       var groupedDeveloper = g.First();
+            var developersDictionary = new Dictionary<long, Developer>();
 
-       // Process games and platforms
-       groupedDeveloper.Games = g
-           .SelectMany(d => d.Games) // Flatten all games from all developer records
-           .GroupBy(game => game.Id)  // Group games by ID
-           .Select(gameGroup =>
-           {
-               var groupedGame = gameGroup.First();
+            var query = await connection.QueryAsync<Developer, Game, Platform, Genre, Developer>(
+                sql,
+                (developer, game, platform, genre) =>
+                {
+                    if (!developersDictionary.TryGetValue(developer.Id, out var developerEntry))
+                    {
+                        developerEntry = developer;
+                        developerEntry.Games = new List<Game>();
+                        developersDictionary.Add(developer.Id, developerEntry);
+                    }
 
-               // Process platforms for this game
-               groupedGame.Platforms = gameGroup
-                   .SelectMany(g => g.Platforms) // Flatten all platforms
-                   .GroupBy(p => p.Id)           // Group platforms by ID
-                   .Select(p => p.First())        // Take first platform from each group
-                   .ToList();
+                    if (game is not null && !developerEntry.Games.Any(d => d.Id == game.Id))
+                        developerEntry.Games.Add(game);
 
-               return groupedGame;
-           })
-           .ToList();
+                    if (genre is not null && !game.Genres.Any(g => g.Id == genre.Id))
+                        game.Genres.Add(genre);
 
-       return groupedDeveloper;
-   })
-   .ToList();
+                    if (platform is not null && !game.Platforms.Any(p => p.Id == platform.Id))
+                        game.Platforms.Add(platform);
 
-            return developersResult.FirstOrDefault();
+                    developerEntry.Games.Add(game);
+
+                    return developerEntry;
+                },
+                new { id }, // Parameter passed here
+                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+            );
+
+            var result = developersDictionary.Values.FirstOrDefault();
+
+            return result;
         }
     }
 
@@ -156,64 +142,47 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            IEnumerable<Developer> developers = await connection.QueryAsync<Developer, Game, Platform, Developer>(@"
-            select 
-                devs.id, devs.name, 
-                games.Id, games.Name, games.Image, 
-                games.publisherId, games.releasedate, 
-                games.description, games.trailer,
-                platforms.id, platforms.name
-            FROM (
-                SELECT Id, Name 
-                FROM Developers 
-                ORDER BY Id
-                OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY
-            ) devs
-            left join gamesdevelopers
-                on gamesdevelopers.developerid=devs.id
-            left join games
-                on games.id=gamesdevelopers.gameid
-            left join gamesplatforms
-                on gamesplatforms.gameid=games.id
-            left join platforms 
-                on platforms.id=gamesplatforms.platformid",
-                 (developerEntry, game, platform) =>
-                 {
-                     game.Platforms.Add(platform);
-                     developerEntry.Games.Add(game);
-                     return developerEntry;
-                 }, new { offset, limit });
+            var developersDictionary = new Dictionary<long, Developer>();
 
-            var developersResult = developers
-   .GroupBy(d => d.Id)
-   .Select(g =>
-   {
-       var groupedDeveloper = g.First();
+            var developers = await connection.QueryAsync<Developer, Game, Platform, Genre, Developer>(@"
+select developers.id, developers.name,
+	games.Id, games.Name, games.Image, Games.LocalizationId, 
+	Games.PublisherId, Games.ReleaseDate, Games.Description,
+	Games.Trailer,
+	Platforms.Id, Platforms.Name,
+	Genres.Id, Genres.Name
+from developers
+	left join GamesDevelopers
+		on GamesDevelopers.DeveloperId=Developers.Id
+	left join Games 
+		on Games.Id=GamesDevelopers.GameId
+	left join GamesPlatforms
+		on GamesPlatforms.GameId=Games.Id
+	left join Platforms
+		on Platforms.Id=GamesPlatforms.Id
+	left join GamesGenres
+		on GamesGenres.GameId=Games.Id
+	left join Genres
+		on Genres.Id=GamesGenres.GenreId
+    WHERE Developers.Id IN 
+        (SELECT Developers.id 
+            FROM Developers
+            ORDER BY Id ASC
+            OFFSET @offset ROWS
+            FETCH NEXT @limit ROWS ONLY);", (developer, game, platform, genre) =>
+            {
+                if (!developer.Games.Any(g => g.Id == game.Id))
+                    developer.Games.Add(game);
+                if (!game.Genres.Any(b => b.Id == genre.Id))
+                    game.Genres.Add(genre);
+                if (!developer.Games.Any(b => b.Id == game.Id))
+                    developer.Games.Add(game);
 
-       // Process games and platforms
-       groupedDeveloper.Games = g
-           .SelectMany(d => d.Games) // Flatten all games from all developer records
-           .GroupBy(game => game.Id)  // Group games by ID
-           .Select(gameGroup =>
-           {
-               var groupedGame = gameGroup.First();
-
-               // Process platforms for this game
-               groupedGame.Platforms = gameGroup
-                   .SelectMany(g => g.Platforms) // Flatten all platforms
-                   .GroupBy(p => p.Id)           // Group platforms by ID
-                   .Select(p => p.First())        // Take first platform from each group
-                   .ToList();
-
-               return groupedGame;
-           })
-           .ToList();
-
-       return groupedDeveloper;
-   })
-   .ToList();
-
-            return developersResult;
+                if (!developersDictionary.TryGetValue(developer.Id, out var dev))
+                    developersDictionary.Add(developer.Id, developer);
+                return developer;
+            }, new { offset, limit });
+            return developersDictionary.Values;
         }
     }
 

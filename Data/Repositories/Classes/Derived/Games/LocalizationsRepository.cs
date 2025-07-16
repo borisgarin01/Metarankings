@@ -1,9 +1,5 @@
-﻿using Dapper;
-using Data.Repositories.Interfaces.Derived;
+﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
-using Microsoft.Data.SqlClient;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -21,10 +17,10 @@ public sealed class LocalizationsRepository : Repository, ILocalizationsReposito
 (Name)
 output inserted.id
 VALUES (@Name);"
- , new
- {
-     localization.Name,
- });
+    , new
+    {
+        localization.Name,
+    });
             return id;
         }
     }
@@ -39,76 +35,56 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var localizationsDictionary = new Dictionary<string, Localization>();
-            var gamesDictionary = new Dictionary<long, Game>();
+            var localizationsDictionary = new Dictionary<long, Localization>();
 
-            await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
-            SELECT 
-                Localizations.Id, Localizations.Name,
-                Games.Id, Games.Name, Games.Image, Games.LocalizationId, Games.PublisherId,
-                Games.ReleaseDate, Games.Description, Games.Trailer,
-                Platforms.Id, Platforms.Name,
-                Developers.Id, Developers.Name,
-                Publishers.Id, Publishers.Name
-            FROM Localizations
-                LEFT JOIN Games ON Games.LocalizationId = Localizations.Id
-                LEFT JOIN GamesPlatforms ON GamesPlatforms.GameId = Games.Id
-                LEFT JOIN Platforms ON Platforms.Id = GamesPlatforms.PlatformId
-                LEFT JOIN GamesDevelopers ON GamesDevelopers.GameId = Games.Id
-                LEFT JOIN Developers ON Developers.Id = GamesDevelopers.DeveloperId
-                LEFT JOIN Publishers ON Publishers.Id = Games.PublisherId",
-                (localization, game, platform, developer, publisher) =>
-                {
-                    // Get or create the localization entry
-                    if (!localizationsDictionary.TryGetValue(localization.Name, out var localizationEntry))
-                    {
-                        localizationEntry = localization;
-                        localizationEntry.Games = new List<Game>();
-                        localizationsDictionary.Add(localization.Name, localizationEntry);
-                    }
+            var localizations = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
+SELECT Localizations.Id, Localizations.Name,
+	Games.Id, Games.Name, Games.Image, Games.ReleaseDate, 
+		Games.Description, Games.Trailer,
+	Platforms.Id, Platforms.Name,
+	Developers.Id, Developers.Name,
+	Publishers.Id, Publishers.Name
+FROM Localizations
+left join Games 
+	on Localizations.Id=Games.LocalizationId
+left join GamesPlatforms
+	on GamesPlatforms.GameId=Games.Id
+left join Platforms
+	on Platforms.Id=GamesPlatforms.PlatformId
+left join GamesDevelopers
+	on GamesDevelopers.GameId=Games.Id
+left join Developers
+	on GamesDevelopers.DeveloperId=Developers.Id
+left join Publishers
+	on Games.PublisherId=Publishers.Id;",
+    (localization, game, platform, developer, publisher) =>
+    {
+        if (!localizationsDictionary.TryGetValue(localization.Id, out var localizationEntry))
+        {
+            localizationEntry = localization;
+            localizationEntry.Games = new List<Game>();
+            localizationsDictionary.Add(localization.Id, localization);
+        }
 
-                    if (game != null)
-                    {
-                        // Get or create the game entry
-                        if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
-                        {
-                            gameEntry = game;
-                            gameEntry.Platforms = new List<Platform>();
-                            gameEntry.Developers = new List<Developer>();
-                            gamesDictionary.Add(game.Id, gameEntry);
+        if (game is not null && !localizationEntry.Games.Any(g => g.Id == game.Id))
+            localizationEntry.Games.Add(game);
 
-                            // Add game to localization if not already present
-                            if (!localizationEntry.Games.Any(g => g.Id == game.Id))
-                            {
-                                localizationEntry.Games.Add(gameEntry);
-                            }
-                        }
+        if (platform is not null && !game.Platforms.Any(p => p.Id == platform.Id))
+            game.Platforms.Add(platform);
 
-                        // Add platform if it exists and isn't already added
-                        if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        {
-                            gameEntry.Platforms.Add(platform);
-                        }
+        if (developer is not null && !game.Developers.Any(d => d.Id == developer.Id))
+            game.Developers.Add(developer);
 
-                        // Add developer if it exists and isn't already added
-                        if (developer != null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        {
-                            gameEntry.Developers.Add(developer);
-                        }
+        if (publisher is not null && game.Publisher is null)
+        {
+            game.Publisher = publisher;
+            game.PublisherId = publisher.Id;
+        }
 
-                        // Set publisher if it exists and isn't already set
-                        if (publisher != null && gameEntry.Publisher == null)
-                        {
-                            gameEntry.Publisher = publisher;
-                        }
-                    }
+        return localization;
+    });
 
-                    return localizationEntry;
-                },
-                splitOn: "Id,Id,Id,Id"  // Split points for each entity type
-            );
-
-            return localizationsDictionary.Values;
+            return localizationsDictionary.Values.ToList();
         }
     }
 
@@ -116,76 +92,58 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var localizationDictionary = new Dictionary<long, Localization>();
-            var gamesDictionary = new Dictionary<long, Game>();
-            var platformsDictionary = new Dictionary<long, Platform>();
-            var developersDictionary = new Dictionary<long, Developer>();
-            var publishersDictionary = new Dictionary<long, Publisher>();
+            var localizationsDictionary = new Dictionary<long, Localization>();
 
-            var localization = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
-            SELECT 
-                loc.Id, loc.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
-                g.ReleaseDate, g.Description, g.Trailer,
-                p.Id, p.Name,
-                d.Id, d.Name,
-                pub.Id, pub.Name
-            FROM Localizations loc
-            LEFT JOIN Games g ON g.LocalizationId = loc.Id
-            LEFT JOIN GamesPlatforms gp ON gp.GameId = g.Id
-            LEFT JOIN Platforms p ON p.Id = gp.PlatformId
-            LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
-            LEFT JOIN Developers d ON d.Id = gd.DeveloperId
-            LEFT JOIN Publishers pub ON pub.Id = g.PublisherId
-            WHERE loc.Id = @id",
-                (loc, game, platform, developer, publisher) =>
-                {
-                    // Get or create localization
-                    if (!localizationDictionary.TryGetValue(loc.Id, out var locEntry))
-                    {
-                        locEntry = loc;
-                        locEntry.Games = new List<Game>();
-                        localizationDictionary.Add(loc.Id, locEntry);
-                    }
+            var localizations = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
+SELECT Localizations.Id, Localizations.Name,
+	Games.Id, Games.Name, Games.Image, Games.ReleaseDate, 
+		Games.Description, Games.Trailer,
+	Platforms.Id, Platforms.Name,
+	Developers.Id, Developers.Name,
+	Publishers.Id, Publishers.Name
+FROM Localizations
+left join Games 
+	on Localizations.Id=Games.LocalizationId
+left join GamesPlatforms
+	on GamesPlatforms.GameId=Games.Id
+left join Platforms
+	on Platforms.Id=GamesPlatforms.PlatformId
+left join GamesDevelopers
+	on GamesDevelopers.GameId=Games.Id
+left join Developers
+	on GamesDevelopers.DeveloperId=Developers.Id
+left join Publishers
+	on Games.PublisherId=Publishers.Id
+WHERE Localizations.Id=@Id;",
+    (localization, game, platform, developer, publisher) =>
+    {
+        if (!localizationsDictionary.TryGetValue(localization.Id, out var localizationEntry))
+        {
+            localizationEntry = localization;
+            localizationEntry.Games = new List<Game>();
+            localizationsDictionary.Add(localization.Id, localization);
+        }
 
-                    if (game != null)
-                    {
-                        // Get or create game
-                        if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
-                        {
-                            gameEntry = game;
-                            gameEntry.Platforms = new List<Platform>();
-                            gameEntry.Developers = new List<Developer>();
-                            gamesDictionary.Add(game.Id, gameEntry);
-                            locEntry.Games.Add(gameEntry);
-                        }
+        if (game is not null && !localizationEntry.Games.Any(g => g.Id == game.Id))
+            localizationEntry.Games.Add(game);
 
-                        // Add platform if exists
-                        if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        {
-                            gameEntry.Platforms.Add(platform);
-                        }
+        if (platform is not null && !game.Platforms.Any(p => p.Id == platform.Id))
+            game.Platforms.Add(platform);
 
-                        // Add developer if exists
-                        if (developer != null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        {
-                            gameEntry.Developers.Add(developer);
-                        }
+        if (developer is not null && !game.Developers.Any(d => d.Id == developer.Id))
+            game.Developers.Add(developer);
 
-                        // Set publisher if exists and not set
-                        if (publisher != null && gameEntry.Publisher == null)
-                        {
-                            gameEntry.Publisher = publisher;
-                        }
-                    }
+        if (publisher is not null && game.Publisher is null)
+        {
+            game.Publisher = publisher;
+            game.PublisherId = publisher.Id;
+        }
 
-                    return locEntry;
-                },
-                new { id },
-                splitOn: "Id,Id,Id,Id"
-            );
+        return localization;
+    },
+    new { Id = id });
 
-            return localizationDictionary.Values.FirstOrDefault();
+            return localizationsDictionary.Values.FirstOrDefault();
         }
     }
 
@@ -193,79 +151,62 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var localizationDictionary = new Dictionary<long, Localization>();
-            var gamesDictionary = new Dictionary<long, Game>();
-            var platformsDictionary = new Dictionary<long, Platform>();
-            var developersDictionary = new Dictionary<long, Developer>();
-            var publishersDictionary = new Dictionary<long, Publisher>();
+            var localizationsDictionary = new Dictionary<long, Localization>();
 
-            var result = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
-            SELECT 
-                loc.Id, loc.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
-                g.ReleaseDate, g.Description, g.Trailer,
-                p.Id, p.Name,
-                d.Id, d.Name,
-                pub.Id, pub.Name
-            FROM Localizations loc
-            LEFT JOIN Games g ON g.LocalizationId = loc.Id AND g.Id IN (
-                SELECT GameId FROM GamesPlatforms WHERE PlatformId = @platformId
-            )
-            LEFT JOIN GamesPlatforms gp ON gp.GameId = g.Id
-            LEFT JOIN Platforms p ON p.Id = gp.PlatformId
-            LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
-            LEFT JOIN Developers d ON d.Id = gd.DeveloperId
-            LEFT JOIN Publishers pub ON pub.Id = g.PublisherId
-            WHERE loc.Id = @id",
-                (loc, game, platform, developer, publisher) =>
-                {
-                    // Get or create localization
-                    if (!localizationDictionary.TryGetValue(loc.Id, out var locEntry))
-                    {
-                        locEntry = loc;
-                        locEntry.Games = new List<Game>();
-                        localizationDictionary.Add(loc.Id, locEntry);
-                    }
+            var localization = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
+SELECT Localizations.Id, Localizations.Name,
+	Games.Id, Games.Name, Games.Image, Games.ReleaseDate, 
+		Games.Description, Games.Trailer,
+	Platforms.Id, Platforms.Name,
+	Developers.Id, Developers.Name,
+	Publishers.Id, Publishers.Name
+FROM Localizations
+left join Games 
+	on Localizations.Id=Games.LocalizationId
+left join GamesPlatforms
+	on GamesPlatforms.GameId=Games.Id
+left join Platforms
+	on Platforms.Id=GamesPlatforms.PlatformId
+left join GamesDevelopers
+	on GamesDevelopers.GameId=Games.Id
+left join Developers
+	on GamesDevelopers.DeveloperId=Developers.Id
+left join Publishers
+	on Games.PublisherId=Publishers.Id
+WHERE Games.LocalizationId=@Id
+    AND Platforms.Id=@PlatformId", (localization, game, platform, developer, publisher) =>
+    {
+        if (!localizationsDictionary.TryGetValue(localization.Id, out var localizationEntry))
+        {
+            localizationEntry = localization;
+            localizationEntry.Games = new List<Game>();
+            localizationsDictionary.Add(localization.Id, localization);
+        }
 
-                    if (game != null)
-                    {
-                        // Get or create game
-                        if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
-                        {
-                            gameEntry = game;
-                            gameEntry.Platforms = new List<Platform>();
-                            gameEntry.Developers = new List<Developer>();
-                            gamesDictionary.Add(game.Id, gameEntry);
-                            locEntry.Games.Add(gameEntry);
-                        }
+        if (game is not null && !localizationEntry.Games.Any(g => g.Id == game.Id))
+            localizationEntry.Games.Add(game);
 
-                        // Add platform if exists and matches our filter
-                        if (platform != null && platform.Id == platformId &&
-                            !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        {
-                            gameEntry.Platforms.Add(platform);
-                        }
+        if (platform is not null && !game.Platforms.Any(p => p.Id == platform.Id))
+            game.Platforms.Add(platform);
 
-                        // Add developer if exists
-                        if (developer != null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        {
-                            gameEntry.Developers.Add(developer);
-                        }
+        if (developer is not null && !game.Developers.Any(d => d.Id == developer.Id))
+            game.Developers.Add(developer);
 
-                        // Set publisher if exists and not set
-                        if (publisher != null && gameEntry.Publisher == null)
-                        {
-                            gameEntry.Publisher = publisher;
-                        }
-                    }
+        if (publisher is not null && game.Publisher is null)
+        {
+            game.Publisher = publisher;
+            game.PublisherId = publisher.Id;
+        }
 
-                    return locEntry;
-                },
-                new { id, platformId },
-                splitOn: "Id,Id,Id,Id"
-            );
+        return localization;
+    },
+    new
+    {
+        Id = id,
+        PlatformId = platformId
+    });
 
-            return localizationDictionary.Values.FirstOrDefault();
+            return localizationsDictionary.Values.FirstOrDefault();
         }
     }
 
@@ -273,85 +214,74 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var localizationDictionary = new Dictionary<long, Localization>();
-            var gamesDictionary = new Dictionary<long, Game>();
-            var platformsDictionary = new Dictionary<long, Platform>();
-            var developersDictionary = new Dictionary<long, Developer>();
-            var publishersDictionary = new Dictionary<long, Publisher>();
+            var localizationsDictionary = new Dictionary<long, Localization>();
 
-            await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
-            SELECT 
-                loc.Id, loc.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
-                g.ReleaseDate, g.Description, g.Trailer,
-                p.Id, p.Name,
-                d.Id, d.Name,
-                pub.Id, pub.Name
-            FROM (
-                SELECT Id, Name 
-                FROM Localizations 
-                ORDER BY Id
-                OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY
-            ) loc
-            LEFT JOIN Games g ON g.LocalizationId = loc.Id
-            LEFT JOIN GamesPlatforms gp ON gp.GameId = g.Id
-            LEFT JOIN Platforms p ON p.Id = gp.PlatformId
-            LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
-            LEFT JOIN Developers d ON d.Id = gd.DeveloperId
-            LEFT JOIN Publishers pub ON pub.Id = g.PublisherId",
-                (loc, game, platform, developer, publisher) =>
+            var localization = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
+SELECT Localizations.Id, Localizations.Name,
+	Games.Id, Games.Name, Games.Image, Games.ReleaseDate, 
+		Games.Description, Games.Trailer,
+	Platforms.Id, Platforms.Name,
+	Developers.Id, Developers.Name,
+	Publishers.Id, Publishers.Name
+FROM Localizations
+left join Games 
+	on Localizations.Id=Games.LocalizationId
+left join GamesPlatforms
+	on GamesPlatforms.GameId=Games.Id
+left join Platforms
+	on Platforms.Id=GamesPlatforms.PlatformId
+left join GamesDevelopers
+	on GamesDevelopers.GameId=Games.Id
+left join Developers
+	on GamesDevelopers.DeveloperId=Developers.Id
+left join Publishers
+	on Games.PublisherId=Publishers.Id
+WHERE Localizations.Id in 
+(SELECT Localizations.id 
+    FROM Localizations
+    ORDER BY Id ASC
+    OFFSET @offset ROWS
+    FETCH NEXT @limit ROWS ONLY);", (localization, game, platform, developer, publisher) =>
+            {
+                if (!localizationsDictionary.TryGetValue(localization.Id, out var localizationEntry))
                 {
-                    if (!localizationDictionary.TryGetValue(loc.Id, out var locEntry))
-                    {
-                        locEntry = loc;
-                        locEntry.Games = new List<Game>();
-                        localizationDictionary.Add(loc.Id, locEntry);
-                    }
+                    localizationEntry = localization;
+                    localizationEntry.Games = new List<Game>();
+                    localizationsDictionary.Add(localization.Id, localization);
+                }
 
-                    if (game != null)
-                    {
-                        if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
-                        {
-                            gameEntry = game;
-                            gameEntry.Platforms = new List<Platform>();
-                            gameEntry.Developers = new List<Developer>();
-                            gamesDictionary.Add(game.Id, gameEntry);
-                            locEntry.Games.Add(gameEntry);
-                        }
+                if (game is not null && !localizationEntry.Games.Any(g => g.Id == game.Id))
+                    localizationEntry.Games.Add(game);
 
-                        if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        {
-                            gameEntry.Platforms.Add(platform);
-                        }
+                if (platform is not null && !game.Platforms.Any(p => p.Id == platform.Id))
+                    game.Platforms.Add(platform);
 
-                        if (developer != null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        {
-                            gameEntry.Developers.Add(developer);
-                        }
+                if (developer is not null && !game.Developers.Any(d => d.Id == developer.Id))
+                    game.Developers.Add(developer);
 
-                        if (publisher != null && gameEntry.Publisher == null)
-                        {
-                            gameEntry.Publisher = publisher;
-                        }
-                    }
+                if (publisher is not null && game.Publisher is null)
+                {
+                    game.Publisher = publisher;
+                    game.PublisherId = publisher.Id;
+                }
 
-                    return locEntry;
-                },
-                new { offset, limit },
-                splitOn: "Id,Id,Id,Id"
-            );
+                return localization;
+            },
+    new
+    {
+        offset,
+        limit
+    });
 
-            return localizationDictionary.Values;
+            return localizationsDictionary.Values;
         }
     }
 
     public async Task RemoveAsync(long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
-        {
             await connection.ExecuteAsync(@"DELETE FROM 
 Localizations WHERE Id=@id", new { id });
-        }
     }
 
     public async Task RemoveRangeAsync(IEnumerable<long> ids)

@@ -1,9 +1,5 @@
-﻿using Dapper;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
 using Domain.Movies;
-using Microsoft.Data.SqlClient;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 public sealed class MoviesStudiosRepository : Repository, IRepository<MovieStudio>
@@ -74,10 +70,8 @@ LIMIT @limit;", new { offset, limit });
     public async Task RemoveAsync(long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
-        {
             await connection.ExecuteAsync(@"DELETE FROM MoviesStudios
 WHERE Id=@id", new { id });
-        }
     }
 
     public async Task RemoveRangeAsync(IEnumerable<long> ids)

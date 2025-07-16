@@ -10,7 +10,7 @@ public sealed class MoviesController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly IRepository<MovieModel> _moviesModelsRepository;
 
-    JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
+    private JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
     public MoviesController(IConfiguration configuration, IRepository<MovieModel> moviesModelsRepository)
     {

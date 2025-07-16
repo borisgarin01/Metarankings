@@ -5,7 +5,6 @@ using API.Models.RequestsModels.Games.Localizations;
 using API.Models.RequestsModels.Games.Platforms;
 using API.Models.RequestsModels.Games.Publishers;
 using API.Models.RequestsModels.Movies.MoviesDirectors;
-using AutoMapper;
 using Domain.Games;
 using Domain.Movies;
 

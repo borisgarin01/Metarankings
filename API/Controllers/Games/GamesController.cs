@@ -9,7 +9,7 @@ namespace API.Controllers.Games;
 [Route("api/[controller]")]
 public sealed class GamesController : ControllerBase
 {
-    JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
+    private JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
     private readonly IMapper _mapper;
     private readonly GamesRepository _gamesRepository;
 
@@ -28,7 +28,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy ="Admin")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<long>> AddAsync(AddGameModel gameModel)
     {
         var game = _mapper.Map<Game>(gameModel);
