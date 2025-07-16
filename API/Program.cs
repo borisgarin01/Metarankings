@@ -1,5 +1,6 @@
 using API.IServiceCollectionExtensions;
 using Data.Migrations.Games.CreateTables;
+using FilesManagement;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
@@ -76,6 +77,8 @@ internal class Program
                 }
             });
         });
+
+        builder.Services.AddScoped<ContentTypeGetter>();
 
         builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
             .AddJsonOptions(options =>
