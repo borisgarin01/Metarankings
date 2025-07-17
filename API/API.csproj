@@ -54,7 +54,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Images\" />
     <Folder Include="Models\RequestsModels\Movies\MoviesGenres\" />
     <Folder Include="Models\RequestsModels\Movies\MoviesStudios\" />
   </ItemGroup>

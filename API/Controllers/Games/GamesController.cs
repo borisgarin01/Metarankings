@@ -57,7 +57,7 @@ public sealed class GamesController : ControllerBase
     [HttpGet("images/uploads/{year:int}/{month:int}/{image}")]
     public async Task<IActionResult> GetImage(int year, int month, string image)
     {
-        var file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{(month < 10 ? $"0{month}" : $"{month}")}/{image}");
+        var file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{month}/{image}");
         if (file is null)
             return NotFound();
         return File(file, "image/jpeg");

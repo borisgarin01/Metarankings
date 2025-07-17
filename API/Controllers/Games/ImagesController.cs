@@ -47,9 +47,9 @@ public class ImagesController : ControllerBase
         {
             string pathToImage;
             if (year is not null && month is not null)
-                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Images/{year}/{month}/{formFile.FileName}";
+                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Images/Uploads/{year}/{month}/{formFile.FileName}";
             else
-                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Images/{formFile.FileName}";
+                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Images/Uploads/{formFile.FileName}";
 
             string imageFolder = Path.GetDirectoryName(pathToImage);
 
