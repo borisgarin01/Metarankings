@@ -52,7 +52,20 @@ Genres
                 genre.Games.Add(game);
                 return genre;
             });
-            return genres;
+
+            var genresResult = genres
+                            .GroupBy(d => d.Id)
+                            .Select(g =>
+                            {
+                                Genre groupedGenre = g.First() with
+                                {
+                                    Games = g.SelectMany(d => d.Games).ToList()
+                                };
+
+                                return groupedGenre;
+                            });
+
+            return genresResult;
         }
     }
 
@@ -76,7 +89,20 @@ WHERE Genres.Id=@id", (genre, game) =>
                 genre.Games.Add(game);
                 return genre;
             }, new { id });
-            return genres.FirstOrDefault();
+
+            var genresResult = genres
+                            .GroupBy(d => d.Id)
+                            .Select(g =>
+                            {
+                                Genre groupedGenre = g.First() with
+                                {
+                                    Games = g.SelectMany(d => d.Games).ToList()
+                                };
+
+                                return groupedGenre;
+                            });
+
+            return genresResult.FirstOrDefault();
         }
     }
 

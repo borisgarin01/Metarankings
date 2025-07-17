@@ -355,14 +355,31 @@ WHERE g.Id=@id";
                 {
                     Developers = gr.SelectMany(g => g.Developers)
                     .GroupBy(d => d.Id)
-                    .Select(devGroup =>
+                    .Select(devsGroup =>
                     {
-                        var dev = devGroup.First();
-                        dev = dev with
-                        {
-                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
-                        };
+                        var dev = devsGroup.First();
                         return dev;
+                    }).ToList(),
+                    Platforms = gr.SelectMany(g => g.Platforms)
+                    .GroupBy(d => d.Id)
+                    .Select(platformsGroup =>
+                    {
+                        Platform platform = platformsGroup.First();
+                        return platform;
+                    }).ToList(),
+                    Genres = gr.SelectMany(g => g.Genres)
+                    .GroupBy(d => d.Id)
+                    .Select(genresGroup =>
+                    {
+                        Genre genre = genresGroup.First();
+                        return genre;
+                    }).ToList(),
+                    Screenshots = gr.SelectMany(g => g.Screenshots)
+                    .GroupBy(s => s.Url)
+                    .Select(screenGroup =>
+                    {
+                        GameScreenshot screenshot = screenGroup.First();
+                        return screenshot;
                     }).ToList()
                 };
 

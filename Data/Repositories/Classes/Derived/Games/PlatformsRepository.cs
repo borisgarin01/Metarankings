@@ -1,6 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -97,7 +96,8 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var platforms = await connection.QueryAsync<Platform, Game, Platform>(@"select Platforms.Id, Platforms.Name,
+            var platforms = await connection.QueryAsync<Platform, Game, Platform>(@"
+select Platforms.Id, Platforms.Name,
 	Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description,
 	Games.Trailer
 FROM Platforms
@@ -111,14 +111,19 @@ WHERE Platforms.Id=@id", (platform, game) =>
                 return platform;
             }, new { id });
 
-            var platformsResults = platforms.GroupBy(p => p.Id).Select(g =>
-            {
-                var groupedPlatform = g.First();
-                groupedPlatform = groupedPlatform with { Games = g.Select(p => p.Games.Single()).ToList() };
-                return groupedPlatform;
-            });
+            var platformsResult = platforms
+                .GroupBy(d => d.Id)
+                .Select(g =>
+                {
+                    Platform groupedPlatform = g.First() with
+                    {
+                        Games = g.SelectMany(d => d.Games).ToList()
+                    };
 
-            return platformsResults.FirstOrDefault();
+                    return groupedPlatform;
+                });
+
+            return platformsResult.FirstOrDefault();
         }
     }
 
