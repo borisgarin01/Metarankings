@@ -46,7 +46,7 @@ public sealed class LocalizationsController : ControllerBase
 
         var insertedLocalizationId = await _localizationsRepository.AddAsync(localization);
 
-        localization.Id = insertedLocalizationId;
+        localization = localization with { Id = insertedLocalizationId };
         return Created($"api/developers/{localization.Id}", localization);
     }
 

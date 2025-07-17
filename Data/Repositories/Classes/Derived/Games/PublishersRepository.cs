@@ -1,6 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class PublishersRepository : Repository, IRepository<Publisher>
@@ -37,10 +36,7 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var publishersDictionary = new Dictionary<long, Publisher>();
-            var gamesDictionary = new Dictionary<long, Game>();
-
-            var publisher = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
+            var publishers = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
 	publishers.Id, publishers.Name,
 	games.Id, games.Name, games.Image, games.LocalizationId,
 	games.PublisherId,games.ReleaseDate, games.Description,
@@ -49,19 +45,27 @@ VALUES (@Name);"
 		LEFT JOIN Games 
 			ON Games.PublisherId=Publishers.Id", (publisher, game) =>
             {
-                if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                if (game is not null)
                 {
-                    publisherEntry = publisher;
-                    publishersDictionary.Add(publisher.Id, publisherEntry);
+                    publisher.Games.Add(game);
                 }
 
-                if (game is not null && !gamesDictionary.TryGetValue(game.Id, out var g))
-                    gamesDictionary.Add(game.Id, game);
-
-                return publisherEntry;
+                return publisher;
             });
 
-            return publishersDictionary.Values;
+            var publishersResult = publishers.GroupBy(g => g.Id).Select(gr =>
+            {
+                Publisher groupedPublisher = gr.First();
+
+                groupedPublisher = groupedPublisher with
+                {
+                    Games = gr.SelectMany(g => g.Games).DistinctBy(g => g.Id).ToList()
+                };
+
+                return groupedPublisher;
+            });
+
+            return publishersResult;
         }
     }
 
@@ -69,10 +73,7 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var publishersDictionary = new Dictionary<long, Publisher>();
-            var gamesDictionary = new Dictionary<long, Game>();
-
-            var publisher = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
+            var publishers = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
 	publishers.Id, publishers.Name,
 	games.Id, games.Name, games.Image, games.LocalizationId,
 	games.PublisherId,games.ReleaseDate, games.Description,
@@ -82,20 +83,27 @@ VALUES (@Name);"
 			ON Games.PublisherId=Publishers.Id
 WHERE PublisherId=@PublisherId", (publisher, game) =>
             {
-                if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                if (game is not null)
                 {
-                    publisherEntry = publisher;
-                    publishersDictionary.Add(publisher.Id, publisherEntry);
+                    publisher.Games.Add(game);
                 }
 
-                if (game is not null && !gamesDictionary.TryGetValue(game.Id, out Game g))
-                    gamesDictionary.Add(game.Id, game);
-
-                publisherEntry = publisherEntry with { Games = gamesDictionary.Values };
-                return publisherEntry;
+                return publisher;
             }, new { PublisherId = id });
 
-            return publishersDictionary.Values.FirstOrDefault();
+            var publishersResult = publishers.GroupBy(g => g.Id).Select(gr =>
+            {
+                Publisher groupedPublisher = gr.First();
+
+                groupedPublisher = groupedPublisher with
+                {
+                    Games = gr.SelectMany(g => g.Games).DistinctBy(g => g.Id).ToList()
+                };
+
+                return groupedPublisher;
+            });
+
+            return publishersResult.FirstOrDefault();
         }
     }
 
@@ -106,7 +114,7 @@ WHERE PublisherId=@PublisherId", (publisher, game) =>
             var publishersDictionary = new Dictionary<long, Publisher>();
             var gamesDictionary = new Dictionary<long, Game>();
 
-            var publisher = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
+            var publishers = await connection.QueryAsync<Publisher, Game, Publisher>(@"select 
 	publishers.Id, publishers.Name,
 	games.Id, games.Name, games.Image, games.LocalizationId,
 	games.PublisherId,games.ReleaseDate, games.Description,
@@ -118,19 +126,27 @@ WHERE PublisherId=@PublisherId", (publisher, game) =>
         IN(SELECT Id FROM Publishers ORDER BY Id ASC OFFSET @offset ROWS
             FETCH NEXT @limit ROWS ONLY)", (publisher, game) =>
             {
-                if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                if (game is not null)
                 {
-                    publisherEntry = publisher;
-                    publishersDictionary.Add(publisher.Id, publisherEntry);
+                    publisher.Games.Add(game);
                 }
 
-                if (game is not null && !gamesDictionary.TryGetValue(game.Id, out var g))
-                    gamesDictionary.Add(game.Id, game);
+                return publisher;
+            }, new { offset, limit });
 
-                return publisherEntry;
+            var publishersResult = publishers.GroupBy(g => g.Id).Select(gr =>
+            {
+                Publisher groupedPublisher = gr.First();
+
+                groupedPublisher = groupedPublisher with
+                {
+                    Games = gr.SelectMany(g => g.Games).DistinctBy(g => g.Id).ToList()
+                };
+
+                return groupedPublisher;
             });
 
-            return publishersDictionary.Values;
+            return publishersResult;
         }
     }
 

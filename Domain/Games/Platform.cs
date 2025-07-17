@@ -10,5 +10,5 @@ public sealed record Platform
     public string Name { get; set; }
 
     [JsonPropertyName("games")]
-    public IEnumerable<Game> Games { get; set; }
+    public List<Game> Games { get; set; } = new();
 }

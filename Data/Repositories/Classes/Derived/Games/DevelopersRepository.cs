@@ -39,7 +39,7 @@ VALUES (@Name);"
         using (var connection = new SqlConnection(ConnectionString))
         {
             var developers = await connection.QueryAsync<Developer, Game, Publisher, Platform, Developer>(@"SELECT Developers.Id, Developers.Name,
-Games.Id, Games.Name, Games.Image,
+Games.Id, Games.Name, Games.Image, Games.ReleaseDate,
 Publishers.Id, Publishers.Name,
 Platforms.Id, Platforms.Name
 FROM Developers
@@ -68,9 +68,9 @@ LEFT JOIN Platforms
                 return developer;
             });
 
-            var developersResult = developers.GroupBy(p => p.Id).Select(g =>
+            var developersResult = developers.GroupBy(d => d.Id).Select(g =>
             {
-                var groupedDeveloper = g.First();
+                Developer groupedDeveloper = g.First();
 
                 groupedDeveloper = groupedDeveloper with
                 {
@@ -100,7 +100,7 @@ LEFT JOIN Platforms
         using (var connection = new SqlConnection(ConnectionString))
         {
             var developers = await connection.QueryAsync<Developer, Game, Publisher, Platform, Developer>(@"SELECT Developers.Id, Developers.Name,
-Games.Id, Games.Name, Games.Image,
+Games.Id, Games.Name, Games.Image, Games.ReleaseDate,
 Publishers.Id, Publishers.Name,
 Platforms.Id, Platforms.Name
 FROM Developers

@@ -4,11 +4,11 @@
 public sealed record Localization
 {
     [JsonPropertyName("id")]
-    public long Id { get; set; }
+    public long Id { get; init; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public string Name { get; init; }
 
     [JsonPropertyName("games")]
-    public IEnumerable<Game> Games { get; set; }
+    public List<Game> Games { get; init; } = new();
 }

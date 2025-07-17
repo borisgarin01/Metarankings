@@ -36,16 +36,67 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Platform>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        using (var connection = new SqlConnection(ConnectionString))
+        {
+            var platforms = await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+            SELECT 
+                p1.Id, p1.Name,
+                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.ReleaseDate, g.Description, g.Trailer,
+                p2.Id, p2.Name
+            FROM (
+                SELECT Id, Name 
+                FROM Platforms 
+                ORDER BY Id
+                OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY
+            ) p1
+            LEFT JOIN GamesPlatforms gp ON gp.PlatformId = p1.Id
+            LEFT JOIN Games g ON g.Id = gp.GameId
+            LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
+            LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId",
+                 (platform, game, gamePlatform) =>
+                 {
+                     // Get or create the platform
+                     if (game is not null)
+                     {
+                         if (gamePlatform is not null)
+                             game.Platforms.Add(gamePlatform);
+                         platform.Games.Add(game);
+                     }
+                     return platform;
+                 });
+
+            var platformsResult = platforms.GroupBy(d => d.Id).Select(g =>
+            {
+                Platform groupedPlatform = g.First();
+
+                groupedPlatform = groupedPlatform with
+                {
+                    Games = g.SelectMany(d => d.Games)
+                    .GroupBy(g => g.Id)
+                    .Select(gameGroup =>
+                    {
+                        var game = gameGroup.First();
+                        game = game with
+                        {
+                            Platforms = gameGroup.SelectMany(g => g.Platforms)
+                        .DistinctBy(p => p.Id).ToList()
+                        };
+                        return game;
+                    }).ToList()
+                };
+
+                return groupedPlatform;
+            });
+
+            return platformsResult;
+        }
     }
 
     public async Task<Platform> GetAsync(long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var platformsDictionary = new Dictionary<long, Platform>();
-            var gamesDictionary = new Dictionary<long, Game>();
-
             var platforms = await connection.QueryAsync<Platform, Game, Platform>(@"select Platforms.Id, Platforms.Name,
 	Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description,
 	Games.Trailer
@@ -56,7 +107,7 @@ LEFT JOIN Games
 	ON Games.Id=GamesPlatforms.GameId
 WHERE Platforms.Id=@id", (platform, game) =>
             {
-                gamesDictionary.Add(game.Id, game);
+                platform.Games.Add(game);
                 return platform;
             }, new { id });
 
@@ -75,10 +126,7 @@ WHERE Platforms.Id=@id", (platform, game) =>
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var platformDictionary = new Dictionary<long, Platform>();
-            var gameDictionary = new Dictionary<long, Game>();
-
-            await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+            var platforms = await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
             SELECT 
                 p1.Id, p1.Name,
                 g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
@@ -94,39 +142,42 @@ WHERE Platforms.Id=@id", (platform, game) =>
             LEFT JOIN Games g ON g.Id = gp.GameId
             LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
             LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId",
-                (platform, game, gamePlatform) =>
+                 (platform, game, gamePlatform) =>
+                 {
+                     // Get or create the platform
+                     if (game is not null)
+                     {
+                         if (gamePlatform is not null)
+                             game.Platforms.Add(gamePlatform);
+                         platform.Games.Add(game);
+                     }
+                     return platform;
+                 }, new { offset, limit });
+
+            var platformsResult = platforms
+                .GroupBy(d => d.Id)
+                .Select(g =>
+            {
+                Platform groupedPlatform = g.First() with
                 {
-                    // Get or create the platform
-                    if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
+                    Games = g.SelectMany(d => d.Games)
+                    .GroupBy(g => g.Id)
+                    .Select(gameGroup =>
                     {
-                        platformEntry = platform;
-                        platformDictionary.Add(platformEntry.Id, platformEntry);
-                    }
-
-                    if (game != null)
-                    {
-                        // Get or create the game
-                        if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
+                        var game = gameGroup.First();
+                        game = game with
                         {
-                            gameEntry = game;
-                            gameDictionary.Add(gameEntry.Id, gameEntry);
-                            // Add game to platform if not already present
-                        }
+                            Platforms = gameGroup.SelectMany(g => g.Platforms)
+                        .DistinctBy(p => p.Id).ToList()
+                        };
+                        return game;
+                    }).ToList()
+                };
 
-                        // Add platform to game if it exists and isn't already added
-                        if (gamePlatform is not null && !platformDictionary.TryGetValue(gamePlatform.Id, out var gamePlatf))
-                        {
-                            platformDictionary.Add(gamePlatform.Id, gamePlatform);
-                        }
-                    }
-                    platformEntry = platformEntry with { Games = gameDictionary.Values };
-                    return platformEntry;
-                },
-                new { offset, limit },
-                splitOn: "Id,Id"
-            );
+                return groupedPlatform;
+            });
 
-            return platformDictionary.Values;
+            return platformsResult;
         }
     }
 

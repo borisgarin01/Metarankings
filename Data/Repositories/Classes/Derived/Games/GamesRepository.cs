@@ -1,9 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.Marshalling;
-using System.Text;
 
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class GamesRepository : Repository, IRepository<Game>
@@ -224,14 +220,14 @@ WHERE g.Id IN(SELECT Id FROM games ORDER BY Id ASC OFFSET @offset ROWS
                 {
                     Developers = gr.SelectMany(g => g.Developers)
                     .GroupBy(d => d.Id)
-                    .Select(devGroup =>
+                    .Select(developersGroup =>
                     {
-                        var dev = devGroup.First();
-                        dev = dev with
+                        Developer developer = developersGroup.First();
+                        developer = developer with
                         {
-                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                            Games = developersGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
                         };
-                        return dev;
+                        return developer;
                     }).ToList()
                 };
 
