@@ -1,4 +1,4 @@
-﻿namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations;
 
 [Migration(19, "Create games tags table migration")]
 public sealed class CreateGamesTagsTableMigration : Migration

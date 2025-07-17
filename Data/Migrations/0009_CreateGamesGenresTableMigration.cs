@@ -1,4 +1,4 @@
-﻿namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations;
 
 [Migration(9, "Add games genres table migration")]
 public sealed class CreateGamesGenresTableMigration : Migration

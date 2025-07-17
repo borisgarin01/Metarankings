@@ -1,4 +1,4 @@
-﻿namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations;
 
 [Migration(8, "Add games developers table migration")]
 public sealed class CreateGamesDevelopersTableMigration : Migration

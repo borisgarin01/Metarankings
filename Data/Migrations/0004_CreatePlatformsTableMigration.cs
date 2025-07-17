@@ -1,4 +1,4 @@
-﻿namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations;
 
 [Migration(4, "Add platforms table migration")]
 public sealed class CreatePlatformsTableMigration : Migration

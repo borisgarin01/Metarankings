@@ -1,4 +1,4 @@
-﻿namespace Data.Migrations.Movies.CreateTables;
+﻿namespace Data.Migrations;
 
 [Migration(20, "Create movies tags table migration")]
 public sealed class CreateMoviesTagsTableMigration : Migration

@@ -1,4 +1,4 @@
-﻿namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations;
 
 [Migration(5, "Add publishers table migration")]
 public sealed class CreatePublishersTableMigration : Migration

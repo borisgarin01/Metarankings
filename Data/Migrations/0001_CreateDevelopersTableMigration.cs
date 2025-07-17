@@ -1,4 +1,4 @@
-﻿namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations;
 
 [Migration(1, "Add developers table migration")]
 public sealed class CreateDevelopersTableMigration : Migration
@@ -12,6 +12,7 @@ public sealed class CreateDevelopersTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE Developers
 (Id bigint not null primary key identity(1,1),
-Name nvarchar(511) not null unique);");
+Name nvarchar(511) not null unique,
+ADD CONSTRAINT UNIQUE_NAME UNIQUE(Name));");
     }
 }

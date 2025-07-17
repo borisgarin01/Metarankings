@@ -1,4 +1,4 @@
-﻿namespace Data.Migrations.Games.CreateTables;
+﻿namespace Data.Migrations;
 
 [Migration(3, "Add localizations table migration")]
 public sealed class CreateLocalizationsTableMigration : Migration
