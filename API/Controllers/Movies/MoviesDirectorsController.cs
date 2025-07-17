@@ -60,7 +60,7 @@ public class MoviesDirectorsController : ControllerBase
             {
                 var insertedId = await _moviesDirectorsRepository.AddAsync(movieDirector);
 
-                movieDirector.Id = insertedId;
+                movieDirector = movieDirector with { Id = insertedId };
 
                 return Ok(movieDirector);
             }

@@ -1,7 +1,6 @@
 ﻿namespace API.Models.RequestsModels.Games.Genres;
 
 public sealed record UpdateGenreModel
-{
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
-}
+([property: JsonPropertyName("name")]
+string Name
+);

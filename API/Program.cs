@@ -1,5 +1,5 @@
 using API.IServiceCollectionExtensions;
-using Data.Migrations.Games.CreateTables;
+using Data.Migrations;
 using FilesManagement;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;

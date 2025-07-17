@@ -56,7 +56,7 @@ public class MoviesGenresController : ControllerBase
             {
                 var insertedId = await _moviesGenresRepository.AddAsync(movieGenre);
 
-                movieGenre.Id = insertedId;
+                movieGenre = movieGenre with { Id = insertedId };
 
                 return Ok(movieGenre);
             }

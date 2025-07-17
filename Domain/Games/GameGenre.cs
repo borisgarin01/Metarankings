@@ -1,17 +1,16 @@
 ﻿namespace Domain.Games;
 
 [Table("GamesGenres")]
-public sealed record GameGenre
-{
-    [JsonPropertyName("gameId")]
-    public long GameId { get; set; }
+public sealed record GameGenre(
+    [property: JsonPropertyName("gameId")]
+    long GameId,
 
-    [JsonPropertyName("game")]
-    public Game Game { get; set; }
+    [property: JsonPropertyName("game")]
+    Game Game,
 
-    [JsonPropertyName("genreId")]
-    public long GenreId { get; set; }
+    [property: JsonPropertyName("genreId")]
+    long GenreId,
 
-    [JsonPropertyName("genre")]
-    public Genre Genre { get; set; }
-}
+    [property: JsonPropertyName("genre")]
+    Genre Genre
+    );
