@@ -4,7 +4,7 @@ namespace BlazorClient.Pages.Games.Games;
 
 public partial class GameDetails : ComponentBase
 {
-    public GameModel Game { get; set; }
+    public Game Game { get; set; }
 
     [Parameter]
     public long Id { get; set; }
@@ -18,7 +18,7 @@ public partial class GameDetails : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Game = await HttpClient.GetFromJsonAsync<GameModel>($"/api/Games/{Id}");
+        Game = await HttpClient.GetFromJsonAsync<Game>($"/api/Games/{Id}");
         SetRatingPreview(0);
     }
 

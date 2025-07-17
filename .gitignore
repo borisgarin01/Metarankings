@@ -19,3 +19,4 @@ API/appsettings.json
 API/appsettings.Production.json
 FilesManagement/bin
 FilesManagement/obj
+IdentityLibrary/Migrations/0025_InsertAdminAccountMigration.cs

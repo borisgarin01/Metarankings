@@ -5,8 +5,8 @@ public sealed record GameScreenshot
     long Id,
 
     [property: Required]
-    [property: JsonPropertyName("url")]
-    string Url,
+    [property: JsonPropertyName("imageUrl")]
+    string ImageUrl,
 
     [property: Required]
     [property: JsonPropertyName("gameId")]

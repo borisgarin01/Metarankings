@@ -180,7 +180,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -249,7 +249,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -316,7 +316,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -375,7 +375,7 @@ WHERE g.Id=@id";
                         return genre;
                     }).ToList(),
                     Screenshots = gr.SelectMany(g => g.Screenshots)
-                    .GroupBy(s => s.Url)
+                    .GroupBy(s => s.ImageUrl)
                     .Select(screenGroup =>
                     {
                         GameScreenshot screenshot = screenGroup.First();
@@ -401,7 +401,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -469,7 +469,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -537,7 +537,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -606,7 +606,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -674,7 +674,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -769,7 +769,7 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.id, gs.imageurl, gs.gameid
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -838,7 +838,7 @@ ORDER BY g.id, gen.id;";
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.id, gs.imageurl, gs.gameid
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
