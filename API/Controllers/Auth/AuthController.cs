@@ -21,11 +21,10 @@ public sealed class AuthController : ControllerBase
         if (loginModel is null)
             return BadRequest("Неверный логин");
 
-
-        if (string.IsNullOrWhiteSpace(loginModel.Email) || string.IsNullOrWhiteSpace(loginModel.Password))
+        if (string.IsNullOrWhiteSpace(loginModel.UserEmail) || string.IsNullOrWhiteSpace(loginModel.Password))
             return BadRequest("Email и пароль должны быть указаны");
 
-        var userToCheckExistance = await _usersManager.FindByEmailAsync(loginModel.Email);
+        var userToCheckExistance = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
 
         if (userToCheckExistance is null)
             return NotFound("Пользователь не зарегистрирован");
