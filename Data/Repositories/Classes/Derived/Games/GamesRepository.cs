@@ -220,15 +220,24 @@ WHERE g.Id IN(SELECT Id FROM games ORDER BY Id ASC OFFSET @offset ROWS
                 {
                     Developers = gr.SelectMany(g => g.Developers)
                     .GroupBy(d => d.Id)
-                    .Select(developersGroup =>
+                    .Select(devGroup =>
                     {
-                        Developer developer = developersGroup.First();
-                        developer = developer with
+                        var dev = devGroup.First();
+                        dev = dev with
                         {
-                            Games = developersGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
                         };
-                        return developer;
-                    }).ToList()
+                        return dev;
+                    }).ToList(),
+                    Platforms = gr.SelectMany(g => g.Platforms)
+                    .GroupBy(d => d.Id)
+                    .Select(platfGroup => { return platfGroup.First(); }).ToList(),
+                    Genres = gr.SelectMany(g => g.Genres)
+                    .GroupBy(d => d.Id)
+                    .Select(genreGroup => { return genreGroup.First(); }).ToList(),
+                    Screenshots = gr.SelectMany(g => g.Screenshots)
+                    .GroupBy(d => d.Id)
+                    .Select(screenGroup => { return screenGroup.First(); }).ToList(),
                 };
 
                 return groupedGame;
@@ -295,7 +304,16 @@ gs.id, gs.imageurl, gs.gameid
                             Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
                         };
                         return dev;
-                    }).ToList()
+                    }).ToList(),
+                    Platforms = gr.SelectMany(g => g.Platforms)
+                    .GroupBy(d => d.Id)
+                    .Select(platfGroup => { return platfGroup.First(); }).ToList(),
+                    Genres = gr.SelectMany(g => g.Genres)
+                    .GroupBy(d => d.Id)
+                    .Select(genreGroup => { return genreGroup.First(); }).ToList(),
+                    Screenshots = gr.SelectMany(g => g.Screenshots)
+                    .GroupBy(d => d.Id)
+                    .Select(screenGroup => { return screenGroup.First(); }).ToList(),
                 };
 
                 return groupedGame;
