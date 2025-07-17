@@ -1,6 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
-using System.Runtime.InteropServices;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -60,7 +59,7 @@ LEFT JOIN Platforms
                 {
                     if (publisher is not null)
                     {
-                        game.Publisher = publisher;
+                        game = game with { Publisher = publisher };
                     }
 
                     game.Platforms.Add(platform);
@@ -122,7 +121,7 @@ WHERE Developers.Id=@id", (developer, game, publisher, platform) =>
                 {
                     if (publisher is not null)
                     {
-                        game.Publisher = publisher;
+                        game = game with { Publisher = publisher };
                     }
 
                     game.Platforms.Add(platform);
@@ -162,12 +161,7 @@ WHERE Developers.Id=@id", (developer, game, publisher, platform) =>
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var developersDictionary = new Dictionary<long, Developer>();
-            var platformsDictionary = new Dictionary<long, Platform>();
-            var genresDictionary = new Dictionary<long, Genre>();
-            var gamesDictionary = new Dictionary<long, Game>();
-
-            var developers = await connection.QueryAsync<Developer, Game, Platform, Genre, Developer>(@"
+            IEnumerable<Developer> developers = await connection.QueryAsync<Developer, Game, Platform, Genre, Developer>(@"
 select developers.id, developers.name,
 	games.Id, games.Name, games.Image, Games.LocalizationId, 
 	Games.PublisherId, Games.ReleaseDate, Games.Description,
@@ -194,18 +188,43 @@ from developers
             OFFSET @offset ROWS
             FETCH NEXT @limit ROWS ONLY);", (developer, game, platform, genre) =>
             {
-                if (!platformsDictionary.TryGetValue(platform.Id, out var platf))
-                    platformsDictionary.Add(platform.Id, platform);
-                if (!genresDictionary.TryGetValue(genre.Id, out var genr))
-                    genresDictionary.Add(genre.Id, genre);
-                if (!gamesDictionary.TryGetValue(game.Id, out var gam))
-                    gamesDictionary.Add(game.Id, game);
+                if (game is not null)
+                {
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
 
-                if (!developersDictionary.TryGetValue(developer.Id, out var dev))
-                    developersDictionary.Add(developer.Id, developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+
+                    developer.Games.Add(game);
+                }
                 return developer;
             }, new { offset, limit });
-            return developersDictionary.Values;
+
+            IEnumerable<Developer> developersResult = developers.GroupBy(p => p.Id).Select(dg =>
+            {
+                Developer groupedDeveloper = dg.First();
+
+                groupedDeveloper = groupedDeveloper with
+                {
+                    Games = dg.SelectMany(d => d.Games)
+                    .GroupBy(g => g.Id)
+                    .Select(gameGroup =>
+                    {
+                        var game = gameGroup.First();
+                        game = game with
+                        {
+                            Platforms = gameGroup.SelectMany(g => g.Platforms)
+                        .DistinctBy(p => p.Id).ToList()
+                        };
+                        return game;
+                    }).ToList()
+                };
+
+                return groupedDeveloper;
+            });
+
+            return developersResult;
         }
     }
 
