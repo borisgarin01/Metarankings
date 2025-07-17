@@ -13,7 +13,7 @@ public sealed class CreateGamesScreenshotsTableMigration : Migration
         Execute.Sql(@"CREATE TABLE GamesScreenshots 
 (Id bigint not null primary key identity(1,1),
 GameId bigint not null,
-ImageUrl nvarchar(1023) not null unique,
+ImageUrl nvarchar(1023) not null,
 FOREIGN KEY(GameId) 
 REFERENCES Games(Id) 
 ON DELETE CASCADE 

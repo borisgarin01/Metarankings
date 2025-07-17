@@ -13,6 +13,6 @@ public sealed class CreateDevelopersTableMigration : Migration
         Execute.Sql(@"CREATE TABLE Developers
 (Id bigint not null primary key identity(1,1),
 Name nvarchar(511) not null unique,
-ADD CONSTRAINT UNIQUE_NAME UNIQUE(Name));");
+CONSTRAINT UNIQUE_NAME UNIQUE(Name));");
     }
 }

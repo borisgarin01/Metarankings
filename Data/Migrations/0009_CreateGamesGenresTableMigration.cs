@@ -13,7 +13,7 @@ public sealed class CreateGamesGenresTableMigration : Migration
         Execute.Sql(@"CREATE TABLE GamesGenres(Id bigint primary key not null identity(1,1),
 GameId bigint not null, 
 GenreId bigint not null,
-UNIQUE(GameId, GenreId),
+CONSTRAINT UNIQUE_GameId_GenreId UNIQUE(GameId, GenreId),
 FOREIGN KEY(GameId) REFERENCES Games(Id) ON UPDATE CASCADE ON DELETE CASCADE,
 FOREIGN KEY(GenreId) REFERENCES Genres(Id) ON UPDATE CASCADE ON DELETE CASCADE
 );");
