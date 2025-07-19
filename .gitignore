@@ -17,3 +17,7 @@ IdentityLibrary/obj
 API/appsettings.Development.json
 API/appsettings.json
 API/appsettings.Production.json
+ExcelProcessors/bin
+ExcelProcessors/obj
+FilesManagement/obj
+FilesManagement/bin

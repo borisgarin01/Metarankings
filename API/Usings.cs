@@ -1,15 +1,11 @@
 ﻿global using System;
-global using System.Collections;
 global using System.Collections.Generic;
 global using System.Threading;
 global using System.Threading.Tasks;
 global using Microsoft.Extensions.DependencyInjection;
-global using FluentMigrator;
 global using Microsoft.Extensions.Configuration;
-global using Microsoft.Extensions.Configuration.Json;
 global using System.Text;
 global using System.Text.Json;
-global using System.Text.Encodings;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Identity;

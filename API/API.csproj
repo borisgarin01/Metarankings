@@ -39,6 +39,7 @@
     <ProjectReference Include="..\blazorclient\BlazorClient.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\ExcelProcessors\ExcelProcessors.csproj" />
     <ProjectReference Include="..\IdentityLibrary\IdentityLibrary.csproj" />
   </ItemGroup>
 
