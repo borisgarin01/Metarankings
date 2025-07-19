@@ -94,7 +94,6 @@ internal class Program
         });
 
         builder.Services.RegisterRepositories(builder.Configuration);
-        builder.Services.RegisterValidators();
         builder.Services.RegisterFilesDataReaders();
 
         builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()

@@ -12,15 +12,10 @@ public sealed class GenresController : ControllerBase
 
     private readonly IRepository<Genre> _genresRepository;
 
-    private readonly IValidator<AddGenreModel> _addGenreModelValidator;
-    private readonly IValidator<UpdateGenreModel> _updateGenreModelValidator;
-
-    public GenresController(IMapper mapper, IRepository<Genre> genresRepository, IValidator<AddGenreModel> addGenreModelValidator, IValidator<UpdateGenreModel> updateGenreModelValidator)
+    public GenresController(IMapper mapper, IRepository<Genre> genresRepository)
     {
         _mapper = mapper;
         _genresRepository = genresRepository;
-        _addGenreModelValidator = addGenreModelValidator;
-        _updateGenreModelValidator = updateGenreModelValidator;
     }
 
     [HttpGet]
@@ -35,11 +30,9 @@ public sealed class GenresController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Genre>> AddAsync(AddGenreModel addGenreModel)
     {
-        var validationResult = _addGenreModelValidator.Validate(addGenreModel);
-
-        if (!validationResult.IsValid)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(validationResult);
+            return BadRequest(addGenreModel);
         }
 
         var genre = _mapper.Map<Genre>(addGenreModel);
@@ -85,11 +78,9 @@ public sealed class GenresController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Genre>> UpdateAsync(long id, UpdateGenreModel updateGenreModel)
     {
-        var validationResult = _updateGenreModelValidator.Validate(updateGenreModel);
-
-        if (!validationResult.IsValid)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(validationResult);
+            return BadRequest(ModelState);
         }
 
         var genreToUpdate = await _genresRepository.GetAsync(id);

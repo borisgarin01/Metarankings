@@ -2,9 +2,6 @@
 using Data.Repositories.Interfaces;
 using Domain.Games;
 using ExcelProcessors;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 
 namespace API.Controllers.Games;
 
@@ -16,21 +13,16 @@ public sealed class PublishersController : ControllerBase
 
     private readonly IRepository<Publisher> _publishersRepository;
 
-    private readonly IValidator<AddPublisherModel> _addPublisherValidator;
-    private readonly IValidator<UpdatePublisherModel> _updatePublisherValidator;
-
     private readonly IExcelDataReader<Publisher> _publishersExcelDataReader;
 
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     private readonly ILogger<PublishersController> _logger;
 
-    public PublishersController(IMapper mapper, IRepository<Publisher> publishersRepository, IValidator<AddPublisherModel> addPublisherValidator, IValidator<UpdatePublisherModel> pdatePublisherValidator, IExcelDataReader<Publisher> publishersExcelDataReader, IWebHostEnvironment webHostEnvironment, ILogger<PublishersController> logger)
+    public PublishersController(IMapper mapper, IRepository<Publisher> publishersRepository, IExcelDataReader<Publisher> publishersExcelDataReader, IWebHostEnvironment webHostEnvironment, ILogger<PublishersController> logger)
     {
         _mapper = mapper;
         _publishersRepository = publishersRepository;
-        _addPublisherValidator = addPublisherValidator;
-        _updatePublisherValidator = pdatePublisherValidator;
         _publishersExcelDataReader = publishersExcelDataReader;
         _webHostEnvironment = webHostEnvironment;
         _logger = logger;
@@ -49,11 +41,9 @@ public sealed class PublishersController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Publisher>> AddAsync(AddPublisherModel addPublisherModel)
     {
-        var validationResult = _addPublisherValidator.Validate(addPublisherModel);
-
-        if (!validationResult.IsValid)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(validationResult);
+            return BadRequest(ModelState);
         }
 
         var publisher = _mapper.Map<Publisher>(addPublisherModel);
@@ -185,11 +175,9 @@ public sealed class PublishersController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Publisher>> UpdateAsync(long id, UpdatePublisherModel updatePublisherModel)
     {
-        var validationResult = _updatePublisherValidator.Validate(updatePublisherModel);
-
-        if (!validationResult.IsValid)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(validationResult);
+            return BadRequest(ModelState);
         }
 
         var publisherToUpdate = await _publishersRepository.GetAsync(id);

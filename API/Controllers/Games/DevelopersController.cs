@@ -2,9 +2,6 @@
 using Data.Repositories.Interfaces;
 using Domain.Games;
 using ExcelProcessors;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 
 namespace API.Controllers.Games;
 
@@ -15,23 +12,17 @@ public sealed class DevelopersController : ControllerBase
     private readonly IMapper _mapper;
 
     private readonly IRepository<Developer> _developersRepository;
-
-    private readonly IValidator<AddDeveloperModel> _addDeveloperModelValidator;
-    private readonly IValidator<UpdateDeveloperModel> _updateDeveloperModelValidator;
-
     private readonly IExcelDataReader<Developer> _developersExcelDataReader;
 
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     private readonly ILogger<DevelopersController> _logger;
 
-    public DevelopersController(IMapper mapper, IRepository<Developer> developersRepository, IValidator<AddDeveloperModel> addDeveloperModelValidator, IValidator<UpdateDeveloperModel> updateDeveloperModelValidator, ILogger<DevelopersController> logger, IExcelDataReader<Developer> developersExcelDataReader)
+    public DevelopersController(IMapper mapper, IRepository<Developer> developersRepository, ILogger<DevelopersController> logger, IExcelDataReader<Developer> developersExcelDataReader)
     {
         _mapper = mapper;
 
         _developersRepository = developersRepository;
-        _addDeveloperModelValidator = addDeveloperModelValidator;
-        _updateDeveloperModelValidator = updateDeveloperModelValidator;
         _developersExcelDataReader = developersExcelDataReader;
 
         _logger = logger;
@@ -57,11 +48,9 @@ public sealed class DevelopersController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Developer>> AddAsync(AddDeveloperModel addDeveloperModel)
     {
-        var validationResult = _addDeveloperModelValidator.Validate(addDeveloperModel);
-
-        if (!validationResult.IsValid)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(validationResult);
+            return BadRequest(ModelState);
         }
 
         var developer = _mapper.Map<Developer>(addDeveloperModel);
@@ -107,11 +96,9 @@ public sealed class DevelopersController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Developer>> UpdateAsync(long id, UpdateDeveloperModel updateDeveloperModel)
     {
-        var validationResult = _updateDeveloperModelValidator.Validate(updateDeveloperModel);
-
-        if (!validationResult.IsValid)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(validationResult);
+            return BadRequest(ModelState);
         }
 
         var developerToUpdate = await _developersRepository.GetAsync(id);

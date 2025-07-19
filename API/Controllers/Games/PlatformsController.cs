@@ -12,15 +12,10 @@ public sealed class PlatformsController : ControllerBase
 
     private readonly IRepository<Platform> _platformsRepository;
 
-    private readonly IValidator<AddPlatformModel> _addPlatformValidator;
-    private readonly IValidator<UpdatePlatformModel> _updatePlatformValidator;
-
-    public PlatformsController(IMapper mapper, IRepository<Platform> platformsRepository, IValidator<AddPlatformModel> addPlatformValidator, IValidator<UpdatePlatformModel> updatePlatformValidator)
+    public PlatformsController(IMapper mapper, IRepository<Platform> platformsRepository)
     {
         _mapper = mapper;
         _platformsRepository = platformsRepository;
-        _addPlatformValidator = addPlatformValidator;
-        _updatePlatformValidator = updatePlatformValidator;
     }
 
     [HttpGet]
@@ -35,11 +30,9 @@ public sealed class PlatformsController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Platform>> AddAsync(AddPlatformModel addPlatformModel)
     {
-        var validationResult = _addPlatformValidator.Validate(addPlatformModel);
-
-        if (!validationResult.IsValid)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(validationResult);
+            return BadRequest(ModelState);
         }
 
         var platform = _mapper.Map<Platform>(addPlatformModel);
@@ -85,11 +78,9 @@ public sealed class PlatformsController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Platform>> UpdateAsync(long id, UpdatePlatformModel updatePlatformModel)
     {
-        var validationResult = _updatePlatformValidator.Validate(updatePlatformModel);
-
-        if (!validationResult.IsValid)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(validationResult);
+            return BadRequest(ModelState);
         }
 
         var platformToUpdate = await _platformsRepository.GetAsync(id);
