@@ -1,6 +1,10 @@
 ﻿using API.Models.RequestsModels.Games.Developers;
 using Data.Repositories.Interfaces;
 using Domain.Games;
+using ExcelProcessors;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace API.Controllers.Games;
 
@@ -15,13 +19,22 @@ public sealed class DevelopersController : ControllerBase
     private readonly IValidator<AddDeveloperModel> _addDeveloperModelValidator;
     private readonly IValidator<UpdateDeveloperModel> _updateDeveloperModelValidator;
 
-    public DevelopersController(IMapper mapper, IRepository<Developer> developersRepository, IValidator<AddDeveloperModel> addDeveloperModelValidator, IValidator<UpdateDeveloperModel> updateDeveloperModelValidator)
+    private readonly IExcelDataReader<Developer> _developersExcelDataReader;
+
+    private readonly IWebHostEnvironment _webHostEnvironment;
+
+    private readonly ILogger<DevelopersController> _logger;
+
+    public DevelopersController(IMapper mapper, IRepository<Developer> developersRepository, IValidator<AddDeveloperModel> addDeveloperModelValidator, IValidator<UpdateDeveloperModel> updateDeveloperModelValidator, ILogger<DevelopersController> logger, IExcelDataReader<Developer> developersExcelDataReader)
     {
         _mapper = mapper;
 
         _developersRepository = developersRepository;
         _addDeveloperModelValidator = addDeveloperModelValidator;
         _updateDeveloperModelValidator = updateDeveloperModelValidator;
+        _developersExcelDataReader = developersExcelDataReader;
+
+        _logger = logger;
     }
 
     [HttpGet]
@@ -112,5 +125,89 @@ public sealed class DevelopersController : ControllerBase
         var updatedDeveloper = await _developersRepository.UpdateAsync(developerToGetAfterUpdate, id);
 
         return Ok(updatedDeveloper);
+    }
+
+    [HttpPost("upload-developers-from-json")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    public async Task<ActionResult> AddFromJsonAsync(IEnumerable<Developer> developers)
+    {
+        if (developers is null)
+            return Problem("Developers don't set", null, 400);
+
+        if (!developers.Any())
+            return Problem("Developers array is empty", null, 400);
+
+        try
+        {
+            await _developersRepository.AddRangeAsync(developers);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            if (_webHostEnvironment.IsDevelopment())
+            {
+                return StatusCode(500, ex);
+            }
+            else
+            {
+                _logger.LogError(ex.Message, ex.StackTrace);
+                return StatusCode(500, new { Message = "Something goes wrong" });
+            }
+        }
+    }
+
+    [HttpPost("developers-excel-upload")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    public async Task<ActionResult<IEnumerable<Developer>>> AddFromExcelAsync(IFormFile excelFileWithPublishers)
+    {
+        if (excelFileWithPublishers is null)
+            return Problem("File hasn't set", null, 400);
+
+        if (!excelFileWithPublishers.FileName.EndsWith(".xlsx") && !excelFileWithPublishers.FileName.EndsWith(".xlsx"))
+            return Problem("This is not an Excel file", null, 400);
+
+        try
+        {
+            string uploadsFolderPath = $"{Directory.GetCurrentDirectory()}\\Uploads";
+
+            if (!Directory.Exists(uploadsFolderPath))
+                Directory.CreateDirectory(uploadsFolderPath);
+
+            string filePath = Path.Combine(uploadsFolderPath, excelFileWithPublishers.FileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await excelFileWithPublishers.CopyToAsync(fileStream);
+            }
+
+            IEnumerable<Developer> developersToUpload = _developersExcelDataReader.GetFromExcel(filePath);
+
+            try
+            {
+                await _developersRepository.AddRangeAsync(developersToUpload);
+
+                System.IO.File.Delete(filePath);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                if (_webHostEnvironment.IsDevelopment())
+                {
+                    return StatusCode(500, ex);
+                }
+                else
+                {
+                    _logger.LogError(ex.Message, ex.StackTrace);
+                    return StatusCode(500, new { Message = "Something goes wrong" });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message, ex.StackTrace);
+            return StatusCode(500, new { Message = "Something goes wrong" });
+        }
     }
 }
