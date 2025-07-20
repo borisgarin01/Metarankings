@@ -1,6 +1,6 @@
-﻿using API.Models.RequestsModels.Games.Developers;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
 using Domain.Games;
+using Domain.RequestsModels.Games.Developers;
 using ExcelProcessors;
 
 namespace API.Controllers.Games;

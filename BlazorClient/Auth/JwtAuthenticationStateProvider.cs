@@ -1,10 +1,4 @@
-﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Logging;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-
-namespace BlazorClient.Auth;
+﻿namespace BlazorClient.Auth;
 
 public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 {

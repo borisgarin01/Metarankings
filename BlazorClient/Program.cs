@@ -1,6 +1,4 @@
 using BlazorClient.Auth;
-using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorClient;
 internal class Program

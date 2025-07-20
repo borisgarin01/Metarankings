@@ -13,3 +13,5 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Blazored.LocalStorage;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using System.Net.Http.Headers;
+global using Microsoft.Extensions.Logging;
+global using System.Security.Claims;

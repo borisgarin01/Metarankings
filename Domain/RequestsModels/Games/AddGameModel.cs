@@ -1,10 +1,10 @@
-﻿using API.Models.RequestsModels.Games.Developers;
-using API.Models.RequestsModels.Games.Genres;
-using API.Models.RequestsModels.Games.Localizations;
-using API.Models.RequestsModels.Games.Platforms;
-using API.Models.RequestsModels.Games.Publishers;
+﻿using Domain.RequestsModels.Games.Developers;
+using Domain.RequestsModels.Games.Genres;
+using Domain.RequestsModels.Games.Localizations;
+using Domain.RequestsModels.Games.Platforms;
+using Domain.RequestsModels.Games.Publishers;
 
-namespace API.Models.RequestsModels.Games;
+namespace Domain.RequestsModels.Games;
 
 public sealed record AddGameModel
 {

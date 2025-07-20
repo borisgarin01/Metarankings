@@ -4,7 +4,6 @@ using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 
-
 internal class Program
 {
     private static void Main(string[] args)

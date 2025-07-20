@@ -1,6 +1,6 @@
-﻿using API.Models.RequestsModels.Games.Platforms;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
 using Domain.Games;
+using Domain.RequestsModels.Games.Platforms;
 
 namespace API.Controllers.Games;
 

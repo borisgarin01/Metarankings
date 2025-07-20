@@ -1,6 +1,6 @@
-﻿using API.Models.RequestsModels.Movies.MoviesDirectors;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
 using Domain.Movies;
+using Domain.RequestsModels.Movies.MoviesDirectors;
 
 namespace API.Controllers.Movies;
 

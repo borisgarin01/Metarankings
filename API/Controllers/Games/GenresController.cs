@@ -1,6 +1,6 @@
-﻿using API.Models.RequestsModels.Games.Genres;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
 using Domain.Games;
+using Domain.RequestsModels.Games.Genres;
 
 namespace API.Controllers.Games;
 

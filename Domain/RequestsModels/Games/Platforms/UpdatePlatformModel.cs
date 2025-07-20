@@ -1,4 +1,4 @@
-﻿namespace API.Models.RequestsModels.Games.Platforms;
+﻿namespace Domain.RequestsModels.Games.Platforms;
 
 public sealed record UpdatePlatformModel
     ([Required(ErrorMessage = "Name is required")]

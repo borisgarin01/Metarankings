@@ -1,6 +1,6 @@
-﻿using API.Models.RequestsModels.Games.Localizations;
-using Data.Repositories.Interfaces.Derived;
+﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
+using Domain.RequestsModels.Games.Localizations;
 
 namespace API.Controllers.Games;
 
