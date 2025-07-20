@@ -12,11 +12,12 @@ internal class Program
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
         builder.Services.AddBlazoredLocalStorage();
-        builder.Services.AddOptions();
-        builder.Services.AddAuthorizationCore();
-
-        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddAuthorizationCore(options =>
+        {
+            options.AddPolicy("Admin", options => { options.RequireRole("Admin"); });
+        });
         builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
 
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://192.168.1.101:5001") });
 

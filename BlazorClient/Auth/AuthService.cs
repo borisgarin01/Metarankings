@@ -1,52 +1,56 @@
-﻿using Blazored.LocalStorage;
-using IdentityLibrary.Models;
-using Microsoft.AspNetCore.Components.Authorization;
-using System.Net.Http.Headers;
+﻿using IdentityLibrary.Models;
 
 namespace BlazorClient.Auth;
 
-public sealed class AuthService : IAuthService
+public class AuthService : IAuthService
 {
     private readonly HttpClient _httpClient;
+    private readonly ILocalStorageService _localStorage;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
-    private readonly ILocalStorageService _localStorageService;
 
-    public AuthService(HttpClient httpClient, AuthenticationStateProvider authenticationStateProvider, ILocalStorageService localStorageService)
+    public AuthService(HttpClient httpClient,
+                      ILocalStorageService localStorage,
+                      AuthenticationStateProvider authenticationStateProvider)
     {
         _httpClient = httpClient;
+        _localStorage = localStorage;
         _authenticationStateProvider = authenticationStateProvider;
-        _localStorageService = localStorageService;
     }
 
     public async Task<string> LoginAsync(LoginModel loginModel)
     {
-        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync<LoginModel>($"/api/Auth/Login", loginModel);
-        return await TrySaveAuthToken(loginModel.UserEmail, httpResponseMessage);
+        var response = await _httpClient.PostAsJsonAsync("api/auth/login", loginModel);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+
+        var token = await response.Content.ReadAsStringAsync();
+        await _localStorage.SetItemAsync("authToken", token);
+
+        ((JwtAuthenticationStateProvider)_authenticationStateProvider)
+            .MarkUserAsAuthenticated(loginModel.UserEmail);
+
+        return token;
+    }
+
+    public async Task LogoutAsync()
+    {
+        await _localStorage.RemoveItemAsync("authToken");
+        ((JwtAuthenticationStateProvider)_authenticationStateProvider)
+            .MarkUserAsLoggedOut();
     }
 
     public async Task<string> RegisterAsync(RegisterModel registerModel)
     {
-        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync<RegisterModel>($"/api/Auth/Register", registerModel);
-        return await TrySaveAuthToken(registerModel.UserEmail, httpResponseMessage);
-    }
+        var response = await _httpClient.PostAsJsonAsync("api/auth/register", registerModel);
 
-    private async Task<string> TrySaveAuthToken(string email, HttpResponseMessage httpResponseMessage)
-    {
-        if (httpResponseMessage.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode)
         {
-            string authJwt = await httpResponseMessage.Content.ReadAsStringAsync();
-            await _localStorageService.SetItemAsync<string>("token", authJwt);
-            ((JwtAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(email);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authJwt);
-            return authJwt;
+            return null;
         }
-        return string.Empty;
-    }
 
-    public async Task Logout()
-    {
-        await _localStorageService.RemoveItemAsync("token");
-        ((JwtAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
-        _httpClient.DefaultRequestHeaders.Authorization = null;
+        return await response.Content.ReadAsStringAsync();
     }
 }

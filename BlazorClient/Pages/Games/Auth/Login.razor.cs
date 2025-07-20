@@ -11,6 +11,9 @@ public partial class Login : ComponentBase
     [Inject]
     public IAuthService AuthService { get; set; }
 
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
     public LoginModel LoginModel { get; } = new LoginModel();
 
     [Inject]
@@ -24,8 +27,10 @@ public partial class Login : ComponentBase
         {
             string jsonToken = await AuthService.LoginAsync(LoginModel);
             if (!string.IsNullOrWhiteSpace(jsonToken))
+            {
+                await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 NavigationManager.NavigateTo("/");
-
+            }
         }
         catch (Exception ex)
         {

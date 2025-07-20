@@ -1,7 +1,10 @@
 ﻿@page "/admin/add-developer"
 
-<h3>AddDeveloperComponent</h3>
-
-@code {
-
-}
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        Добавь разраба здесь
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a>, чтобы добавить разраба
+    </NotAuthorized>
+</AuthorizeView>

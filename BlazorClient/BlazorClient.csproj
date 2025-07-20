@@ -5,18 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Pages\NewFolder\**" />
-    <Content Remove="Pages\NewFolder\**" />
-    <EmbeddedResource Remove="Pages\NewFolder\**" />
-    <None Remove="Pages\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="App.razor~RF1ce0008.TMP" />
-    <None Remove="Program.cs~RF1242d8b.TMP" />
-  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />

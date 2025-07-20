@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 
@@ -8,39 +9,70 @@ namespace BlazorClient.Auth;
 public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 {
     private readonly HttpClient _httpClient;
-    private readonly ILocalStorageService _localStorageService;
+    private readonly ILocalStorageService _localStorage;
+    private readonly ILogger<JwtAuthenticationStateProvider> _logger;
 
-    public JwtAuthenticationStateProvider(HttpClient httpClient, ILocalStorageService localStorageService)
+    public JwtAuthenticationStateProvider(
+        HttpClient httpClient,
+        ILocalStorageService localStorage,
+        ILogger<JwtAuthenticationStateProvider> logger)
     {
         _httpClient = httpClient;
-        _localStorageService = localStorageService;
+        _localStorage = localStorage;
+        _logger = logger;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        string savedToken = await _localStorageService.GetItemAsync<string>("tokenString");
+        var savedToken = await _localStorage.GetItemAsync<string>("authToken");
 
         if (string.IsNullOrWhiteSpace(savedToken))
+        {
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        }
 
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", savedToken);
+        try
+        {
+            var claims = ParseClaimsFromJwt(savedToken);
+            var expiry = claims.FirstOrDefault(c => c.Type == "exp")?.Value;
 
-        return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(savedToken), "jwt")));
+            if (expiry == null || DateTimeOffset.FromUnixTimeSeconds(long.Parse(expiry)) < DateTimeOffset.UtcNow)
+            {
+                await _localStorage.RemoveItemAsync("authToken");
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
+
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", savedToken);
+
+            return new AuthenticationState(user);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error parsing JWT");
+            await _localStorage.RemoveItemAsync("authToken");
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        }
     }
 
     public void MarkUserAsAuthenticated(string email)
     {
-        var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, email) }, "apiauth"));
-        var authenticationState = Task.FromResult(new AuthenticationState(authenticatedUser));
-        NotifyAuthenticationStateChanged(authenticationState);
+        var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.Name, email)
+        }, "apiauth"));
+
+        var authState = Task.FromResult(new AuthenticationState(authenticatedUser));
+        NotifyAuthenticationStateChanged(authState);
     }
 
     public void MarkUserAsLoggedOut()
     {
         var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
-        var authenticationState = Task.FromResult(new AuthenticationState(anonymousUser));
-        NotifyAuthenticationStateChanged(authenticationState);
+        var authState = Task.FromResult(new AuthenticationState(anonymousUser));
+        NotifyAuthenticationStateChanged(authState);
     }
+
 
     private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
     {
