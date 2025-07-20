@@ -1,0 +1,27 @@
+﻿@page "/auth/login"
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card=title">Please enter your details</h5>
+        <EditForm Model="LoginModel" OnValidSubmit="LoginAsync">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label for="userEmail">Email</label>
+                <InputText Id="userEmail" class="form-control" @bind-Value="LoginModel.UserEmail" />
+                <ValidationMessage For="@(() => LoginModel.UserEmail)" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <InputText Id="password" class="form-control" @bind-Value="LoginModel.Password" />
+                <ValidationMessage For="@(() => LoginModel.Password)" />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" class="form-control" value="Login">
+            </div>
+        </EditForm>
+    </div>
+</div>
