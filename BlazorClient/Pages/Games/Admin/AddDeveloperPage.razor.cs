@@ -20,7 +20,7 @@ public partial class AddDeveloperPage : ComponentBase
     {
         HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddDeveloperModel>("/api/Developers", AddDeveloperModel);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/admin/list-developers");
 
     }
 }
