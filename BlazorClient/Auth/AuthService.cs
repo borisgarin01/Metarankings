@@ -51,6 +51,12 @@ public class AuthService : IAuthService
             return null;
         }
 
-        return await response.Content.ReadAsStringAsync();
+        var token = await response.Content.ReadAsStringAsync();
+        await _localStorage.SetItemAsync("authToken", token);
+
+        ((JwtAuthenticationStateProvider)_authenticationStateProvider)
+            .MarkUserAsAuthenticated(registerModel.UserEmail);
+
+        return token;
     }
 }
