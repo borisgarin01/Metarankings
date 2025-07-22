@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="IExcelDataReader.cs~RFb4f4e3.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="NPOI" Version="2.7.4" />
   </ItemGroup>
 
