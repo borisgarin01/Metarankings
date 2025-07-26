@@ -25,16 +25,17 @@ public partial class Login : ComponentBase
 
         try
         {
-            string jsonToken = await AuthService.LoginAsync(LoginModel);
-            if (!string.IsNullOrWhiteSpace(jsonToken))
+            string token = await AuthService.LoginAsync(LoginModel);
+            if (!string.IsNullOrWhiteSpace(token))
             {
-                await AuthenticationStateProvider.GetAuthenticationStateAsync();
-                NavigationManager.NavigateTo("/");
+                // No need to call GetAuthenticationStateAsync here
+                NavigationManager.NavigateTo("/", forceLoad: true); // forceLoad ensures full state refresh
             }
         }
         catch (Exception ex)
         {
             showErrors = true;
+            errors = new[] { "Login failed" };
         }
     }
 }

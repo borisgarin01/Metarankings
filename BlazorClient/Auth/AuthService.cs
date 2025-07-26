@@ -30,7 +30,7 @@ public class AuthService : IAuthService
         await _localStorage.SetItemAsync("authToken", token);
 
         ((JwtAuthenticationStateProvider)_authenticationStateProvider)
-            .MarkUserAsAuthenticated(loginModel.UserEmail);
+            .MarkUserAsAuthenticated(token); // Pass the token instead of email
 
         return token;
     }

@@ -49,15 +49,23 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
         }
     }
 
-    public void MarkUserAsAuthenticated(string email)
+    public void MarkUserAsAuthenticated(string token)
     {
-        var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        try
         {
-            new Claim(ClaimTypes.Name, email)
-        }, "apiauth"));
+            var claims = ParseClaimsFromJwt(token);
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
+            var authState = Task.FromResult(new AuthenticationState(user));
+            NotifyAuthenticationStateChanged(authState);
 
-        var authState = Task.FromResult(new AuthenticationState(authenticatedUser));
-        NotifyAuthenticationStateChanged(authState);
+            // Also update HttpClient header
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error marking user as authenticated");
+            MarkUserAsLoggedOut();
+        }
     }
 
     public void MarkUserAsLoggedOut()
