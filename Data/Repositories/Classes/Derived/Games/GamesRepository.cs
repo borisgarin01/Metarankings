@@ -1,6 +1,7 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
 using System;
+using System.Linq;
 using System.Text;
 
 namespace Data.Repositories.Classes.Derived.Games;
@@ -176,70 +177,71 @@ VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = ex
         using (var connection = new SqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
-    g.Id as GameId, g.name as GameName, g.image as GameImage, g.releasedate as GameReleaseDate, g.description as GameDescription, g.trailer as GameTrailer,
-    d.id as DeveloperId, d.name as DeveloperName, 
-    p.id as PublisherId, p.name as PublisherName, 
-    gen.id as GenreId, gen.name as GenreName,
-    l.id as LocalizationId, l.name as LocalizationName, 
-    plat.id as PlatformId, plat.name as PlatformName, 
-    gs.id as GameScreenshotId, gs.gameid as GameScreenshotGameId
-FROM (
-    SELECT g.Id, g.name, g.image, g.releasedate, g.description, g.trailer, g.publisherid, g.localizationid
-    FROM games g
-) g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-LEFT JOIN gamestags gt on gt.gameId=g.id
-LEFT JOIN tags t on gt.tagid=t.id";
+g.Id, g.name, g.image, g.releasedate, g.description,
+d.id, d.name, 
+p.id, p.name, 
+gen.id, gen.name, 
+l.id, l.name,
+plat.id, plat.name, 
+gs.id, gs.gameid
+    FROM (select Id, Name, Image, ReleaseDate, Description, PublisherId, LocalizationId 
+        from Games ORDER BY id
+        OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN publishers p ON p.id = g.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id";
 
-            var gameRows = await connection.QueryAsync<GameRow>(
+            var gameDictionary = new Dictionary<long, Game>();
+
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
-                new { offset, limit }
+                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                {
+                    if (!gameDictionary.TryGetValue(game.Id, out Game? gameEntry))
+                    {
+                        gameEntry = game;
+                        gameEntry.Developers = new List<Developer>();
+                        gameEntry.Genres = new List<Genre>();
+                        gameEntry.Platforms = new List<Platform>();
+                        gameEntry.Screenshots = new List<GameScreenshot>();
+                        gameDictionary.Add(gameEntry.Id, gameEntry);
+                    }
+
+                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
+                        gameEntry.Developers.Add(developer);
+
+                    if (publisher is not null && gameEntry.Publisher == null)
+                        gameEntry.Publisher = publisher;
+
+                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
+                        gameEntry.Genres.Add(genre);
+
+                    if (localization is not null && gameEntry.Localization == null)
+                        gameEntry.Localization = localization;
+
+                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                        gameEntry.Platforms.Add(platform);
+
+                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
+                        gameEntry.Screenshots.Add(screenshot);
+
+                    return gameEntry;
+                }, new { offset, limit },
+                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
             );
 
-            var games = gameRows.GroupBy(b => new { b.GameId, b.GameName, b.GameImage, b.GameReleaseDate, b.GameDescription, b.GameTrailer })
-                .Select(b => new Game
-                {
-                    Description = b.Key.GameDescription,
-                    Id = b.Key.GameId,
-                    Image = b.Key.GameImage,
-                    Name = b.Key.GameName,
-                    ReleaseDate = Convert.ToDateTime(b.Key.GameReleaseDate),
-                    Trailer = b.Key.GameTrailer,
-                    Developers =
-                        gameRows.Where(c => c.GameId == b.Key.GameId).Select(b => new Developer { Id = b.DeveloperId, Name = b.DeveloperName }).ToList(),
-                    Genres =
-                        gameRows.Where(c => c.GameId == b.Key.GameId).Select(b => new Genre { Id = b.GenreId, Name = b.GenreName }).ToList(),
-                    Localization = new Localization
-                    {
-                        Id = gameRows.First(c => c.GameId == b.Key.GameId).GameId,
-                        Name = gameRows.First(c => c.GameId == b.Key.GameId).GameName
-                    },
-                    Platforms = gameRows.Select(e => new Platform
-                    {
-                        Id = gameRows.First(c => c.GameId == b.Key.GameId).PlatformId,
-                        Name = gameRows.First(c => c.GameId == b.Key.GameId).GameName
-                    }).ToList(),
-                    PublisherId = gameRows.First(c => c.GameId == b.Key.GameId).PublisherId,
-                    Publisher = new Publisher
-                    {
-                        Id = gameRows.First(c => c.GameId == b.Key.GameId).PublisherId,
-                        Name = gameRows.First(c => c.GameId == b.Key.GameId).PublisherName
-                    },
-                    Screenshots = new()
-                }
-                );
+            var result = gameDictionary.Values.ToList();
 
-            return games;
+            return result;
         }
     }
+
 
     public async Task<IEnumerable<Game>> GetAllAsync()
     {

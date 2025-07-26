@@ -40,4 +40,7 @@ public sealed record Game
 
     [JsonPropertyName("localization")]
     public required Localization Localization { get; set; }
+
+    [JsonPropertyName("localizationId")]
+    public long LocalizationId { get; set; }
 }
