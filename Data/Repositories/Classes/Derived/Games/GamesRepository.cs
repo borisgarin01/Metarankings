@@ -103,7 +103,9 @@ VALUES
 
                 foreach (var gameGenre in insertedGenres)
                 {
-                    var gameGenreToFind = await connection.QueryFirstOrDefaultAsync(@"SELECT Id, GameId, GenreId FROM GamesGenres WHERE GenreId=@GenreId and GameId=@GameId",
+                    var gameGenreToFind = await connection.QueryFirstOrDefaultAsync(@"SELECT Id, GameId, GenreId 
+FROM GamesGenres 
+WHERE GenreId=@GenreId and GameId=@GameId",
                         new
                         {
                             GenreId = gameGenre.Id,

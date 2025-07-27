@@ -41,7 +41,13 @@ internal class Program
             options.SaveToken = true;
         });
 
-        builder.Services.AddAuthorization(options => { options.AddPolicy("Admin", options => { options.RequireRole("Admin"); }); });
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Admin", options =>
+            {
+                options.RequireRole("Admin");
+            });
+        });
 
         builder.Services.AddSwaggerGen(options =>
         {
