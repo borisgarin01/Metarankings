@@ -5,8 +5,8 @@ namespace BlazorClient.Pages.Games.Auth;
 
 public partial class Login : ComponentBase
 {
-    private bool showErrors = false;
-    private IEnumerable<string> errors;
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
 
     [Inject]
     public IAuthService AuthService { get; set; }
@@ -21,8 +21,6 @@ public partial class Login : ComponentBase
 
     public async Task LoginAsync()
     {
-        showErrors = false;
-
         try
         {
             string token = await AuthService.LoginAsync(LoginModel);
@@ -31,11 +29,14 @@ public partial class Login : ComponentBase
                 // No need to call GetAuthenticationStateAsync here
                 NavigationManager.NavigateTo("/", forceLoad: true); // forceLoad ensures full state refresh
             }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Неверный логин или пароль");
+            }
         }
         catch (Exception ex)
         {
-            showErrors = true;
-            errors = new[] { "Login failed" };
+            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
         }
     }
 }

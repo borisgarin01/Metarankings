@@ -1,4 +1,5 @@
 ﻿using IdentityLibrary.Models;
+using System.Net;
 
 namespace BlazorClient.Auth;
 
@@ -23,7 +24,9 @@ public class AuthService : IAuthService
 
         if (!response.IsSuccessStatusCode)
         {
-            return null;
+            if (response.StatusCode == HttpStatusCode.BadRequest
+                ^ response.StatusCode == HttpStatusCode.NotFound)
+                throw new Exception(await response.Content.ReadAsStringAsync());
         }
 
         var token = await response.Content.ReadAsStringAsync();
