@@ -5,8 +5,9 @@ namespace BlazorClient.Pages.Games.Auth;
 
 public partial class Register : ComponentBase
 {
-    private bool showErrors = false;
-    private IEnumerable<string> errors;
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
 
     [Inject]
     public IAuthService AuthService { get; set; }
@@ -18,16 +19,17 @@ public partial class Register : ComponentBase
 
     public async Task RegisterAsync()
     {
-        showErrors = false;
-
         try
         {
             string jsonToken = await AuthService.RegisterAsync(RegisterModel);
-            NavigationManager.NavigateTo("/");
+            if (!string.IsNullOrWhiteSpace(jsonToken))
+                NavigationManager.NavigateTo("/");
+            else
+                await JSRuntime.InvokeVoidAsync("alert", "Непредвиденная ошибка при регистрации");
         }
         catch (Exception ex)
         {
-            showErrors = true;
+            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
         }
     }
 }

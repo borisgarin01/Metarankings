@@ -49,10 +49,8 @@ public class AuthService : IAuthService
     {
         var response = await _httpClient.PostAsJsonAsync("api/auth/register", registerModel);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            return null;
-        }
+        if (response.StatusCode == HttpStatusCode.BadRequest ^ response.StatusCode == HttpStatusCode.NotFound)
+            throw new Exception(await response.Content.ReadAsStringAsync());
 
         var token = await response.Content.ReadAsStringAsync();
         await _localStorage.SetItemAsync("authToken", token);
