@@ -1,0 +1,34 @@
+﻿@using BlazorClient.Components.PagesComponents.GamesList
+@using BlazorClient.Pages.Games.Developers
+
+<div class="post clear">
+    <a href="/games/details/@Game.Id" title="Игра «@Game.Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/uploads/{Game.ReleaseDate.Value.Year}/{Game.ReleaseDate.Value.Month}/{Game.Image}")" alt="@Game.Name"></a>
+    <div class="best-prod">
+        <div class="counter">@(Order)</div>
+        <span class="star">★</span>
+    </div>
+    <a class="name" href="/games/Details/@Game.Id">@Game.Name</a>
+    <div class="post-meta"><p>@string.Join(", ", Game.Genres.Select(a => a.Name))</p></div><div class="post-meta"><p>@string.Join(", ", Game.Platforms.Select(a => a.Name))</p></div>
+    <div class="post-meta"><p>Дата выхода: @Game.ReleaseDate.Value.ToString("dd MM yyyy") года</p></div>
+    <div class="post-meta">Входит в лучшие по мнению 83% пользователей</div>
+    <div class="post-content">@Game.Description</div>
+    <div class="trailer" data-video="@Game.Trailer"></div>
+    <div class="ratings-graph">
+        <div class="graph-critic">
+            <div class="graph">
+                <div class="small-score mark-9">9</div>
+                Рейтинг критиков
+                <div class="graph-body"><div style="width:90%" class="rating-graph mark-9"></div></div>
+            </div>
+        </div>
+        <div class="graph-critic">
+            <div class="graph">
+                <div class="small-score mark-8">7.6</div>
+                Игроки
+                <div class="graph-body">
+                    <div class="rating-graph mark-8" style="width:76%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

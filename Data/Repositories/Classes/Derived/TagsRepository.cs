@@ -1,8 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Data.Repositories.Classes.Derived;
 

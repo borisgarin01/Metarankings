@@ -1,11 +1,11 @@
 ﻿namespace Domain.Movies;
-public sealed record MovieGenre
-{
-    [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long Id { get; set; }
+public sealed record MovieGenre(
+    [property:Key]
+    [property:DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    long Id,
 
-    [Required(ErrorMessage = "Name is required")]
-    [MaxLength(255, ErrorMessage = "Name max length is 255")]
-    [MinLength(1, ErrorMessage = "Name should be not empty")]
-    public string Name { get; set; }
-}
+    [property:Required(ErrorMessage = "Name is required")]
+    [property:MaxLength(255, ErrorMessage = "Name max length is 255")]
+    [property:MinLength(1, ErrorMessage = "Name should be not empty")]
+    string Name
+);

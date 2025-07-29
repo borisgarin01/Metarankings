@@ -59,7 +59,7 @@ VALUES (@Name);"
                     if (!developersDictionary.TryGetValue(developer.Id, out var developerEntry))
                     {
                         developerEntry = developer;
-                        developerEntry.Games = new List<Game>();
+                        developerEntry = developerEntry with { Games = new List<Game>() };
                         developersDictionary.Add(developerEntry.Id, developerEntry);
                     }
 
@@ -117,7 +117,7 @@ VALUES (@Name);"
                     if (!developersDictionary.TryGetValue(developer.Id, out var developerEntry))
                     {
                         developerEntry = developer;
-                        developerEntry.Games = new List<Game>();
+                        developerEntry = developerEntry with { Games = new List<Game>() };
                         developersDictionary.Add(developerEntry.Id, developerEntry);
                     }
 
@@ -176,7 +176,10 @@ VALUES (@Name);"
                     if (!developersDictionary.TryGetValue(developer.Id, out var developerEntry))
                     {
                         developerEntry = developer;
-                        developerEntry.Games = new List<Game>();
+                        developerEntry = developerEntry with
+                        {
+                            Games = new List<Game>()
+                        };
                         developersDictionary.Add(developerEntry.Id, developerEntry);
                     }
 

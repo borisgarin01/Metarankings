@@ -185,7 +185,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageUrl, gs.gameid
     FROM (select Id, Name, Image, ReleaseDate, Description, PublisherId, LocalizationId 
         from Games ORDER BY id
         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
@@ -717,16 +717,16 @@ ORDER BY g.id, gen.id;";
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
     FROM games g
-    WHERE extract(year from g.ReleaseDate) = @year
+    WHERE year (g.ReleaseDate) = @year
 )
 SELECT
-    g.Id, g.name, g.image, g.releasedate, g.description,
-    d.id, d.name,
-    p.id, p.name,
-    gen.id, gen.name,
-    l.id, l.name,
-    plat.id, plat.name,
-    gs.id, gs.gameid
+    g.Id, g.Name, g.Image, g.ReleaseDate, g.Description,
+    d.Id, d.Name,
+    p.Id, p.Name,
+    gen.Id, gen.Name,
+    l.Id, l.Name,
+    plat.Id, plat.Name,
+    gs.Id, gs.ImageUrl, gs.GameId
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -783,128 +783,6 @@ ORDER BY g.id, gen.id;";
             var result = gameDictionary.Values;
 
             return result.ToArray();
-        }
-    }
-
-    public async Task<IEnumerable<Game>> GetByParametersAsync(GamesGettingRequestModel gamesGettingRequestModel)
-    {
-        using (var connection = new SqlConnection(ConnectionString))
-        {
-            string initialQuery = @"SELECT
-    g.Id, g.name, g.image, g.releasedate, g.description,
-    d.id, d.name,
-    p.id, p.name,
-    gen.id, gen.name,
-    l.id, l.name,
-    plat.id, plat.name,
-    gs.id, gs.gameid
-FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-WHERE 
-g.Id in 
-(SELECT games.id 
-FROM games 
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-WHERE 1=1
-";
-
-            var queryStringBuilder = new StringBuilder(initialQuery);
-
-            // Параметры для запроса
-            var parameters = new DynamicParameters();
-
-            // Добавляем условия в зависимости от заполненности фильтров
-            if (gamesGettingRequestModel.ReleasesYears?.Any() == true)
-            {
-                queryStringBuilder.Append(" AND extract(year from g.ReleaseDate) = ANY(ARRAY[@ReleasesYears])");
-                parameters.Add("ReleasesYears", gamesGettingRequestModel.ReleasesYears);
-            }
-
-            if (gamesGettingRequestModel.DevelopersIds?.Any() == true)
-            {
-                queryStringBuilder.Append(" AND gd.DeveloperId = ANY(ARRAY[@DevelopersIds])");
-                parameters.Add("DevelopersIds", gamesGettingRequestModel.DevelopersIds);
-            }
-
-            if (gamesGettingRequestModel.GenresIds?.Any() == true)
-            {
-                queryStringBuilder.Append(" AND gg.GenreId = ANY(ARRAY[@GenresIds])");
-                parameters.Add("GenresIds", gamesGettingRequestModel.GenresIds);
-            }
-
-            if (gamesGettingRequestModel.PublishersIds?.Any() == true)
-            {
-                queryStringBuilder.Append(" AND g.PublisherId = ANY(ARRAY[@PublishersIds])");
-                parameters.Add("PublishersIds", gamesGettingRequestModel.PublishersIds);
-            }
-
-            if (gamesGettingRequestModel.PlatformsIds?.Any() == true)
-            {
-                queryStringBuilder.Append(" AND gp.PlatformId = ANY(ARRAY[@PlatformsIds])");
-                parameters.Add("PlatformsIds", gamesGettingRequestModel.PlatformsIds);
-            }
-
-            queryStringBuilder.Append(");");
-
-            var query = queryStringBuilder.ToString();
-
-            var gameDictionary = new Dictionary<string, Game>();
-
-            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
-                queryStringBuilder.ToString(),
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
-                {
-                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
-                    {
-                        gameEntry = game;
-                        gameEntry.Developers = new List<Developer>();
-                        gameEntry.Genres = new List<Genre>();
-                        gameEntry.Platforms = new List<Platform>();
-                        gameEntry.Screenshots = new List<GameScreenshot>();
-                        gameDictionary.Add(gameEntry.Name, gameEntry);
-                    }
-
-                    if (developer != null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        gameEntry.Developers.Add(developer);
-
-                    if (publisher != null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
-
-                    if (genre != null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
-                        gameEntry.Genres.Add(genre);
-
-                    if (localization != null && gameEntry.Localization == null)
-                        gameEntry.Localization = localization;
-
-                    if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        gameEntry.Platforms.Add(platform);
-
-                    if (screenshot != null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
-                        gameEntry.Screenshots.Add(screenshot);
-
-                    return gameEntry;
-                },
-                parameters,
-                splitOn: "Id,Id,Id,Id,Id,Id"
-            );
-
-            return gameDictionary.Values.ToArray();
         }
     }
 }

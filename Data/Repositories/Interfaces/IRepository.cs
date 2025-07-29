@@ -1,15 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace Data.Repositories.Interfaces;
+﻿namespace Data.Repositories.Interfaces;
 public interface IRepository<T>
 {
-    public Task<IEnumerable<T>> GetAllAsync();
-    public Task<T> GetAsync(long id);
-    public Task<IEnumerable<T>> GetAsync(long offset, long limit);
-    public Task<long> AddAsync(T entity);
-    public Task<T> UpdateAsync(T entity, long id);
-    public Task AddRangeAsync(IEnumerable<T> entities);
-    public Task RemoveAsync(long id);
-    public Task RemoveRangeAsync(IEnumerable<long> ids);
+    Task<IEnumerable<T>> GetAllAsync();
+    Task<T> GetAsync(long id);
+    Task<IEnumerable<T>> GetAsync(long offset, long limit);
+    Task<long> AddAsync(T entity);
+    Task<T> UpdateAsync(T entity, long id);
+    Task AddRangeAsync(IEnumerable<T> entities);
+    Task RemoveAsync(long id);
+    Task RemoveRangeAsync(IEnumerable<long> ids);
 }

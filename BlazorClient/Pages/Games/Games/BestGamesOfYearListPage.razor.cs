@@ -1,4 +1,5 @@
 ﻿using Domain.Games;
+using System;
 
 namespace BlazorClient.Pages.Games.Games;
 
@@ -20,36 +21,13 @@ public partial class BestGamesOfYearListPage : ComponentBase
     public int? PublisherId { get; set; }
 
 
-    public IEnumerable<GameModel> Games { get; set; }
+    public IEnumerable<Game> Games { get; set; }
 
     [Inject]
     public HttpClient HttpClient { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        var gamesGettingRequestModel = new GamesGettingRequestModel
-        {
-            DevelopersIds = DeveloperId.HasValue ? [DeveloperId.Value] : null,
-            GenresIds = GenreId.HasValue ? [GenreId.Value] : null,
-            PlatformsIds = PlatformId.HasValue ? [PlatformId.Value] : null,
-            ReleasesYears = Year.HasValue ? [Year.Value] : null,
-            PublishersIds = PublisherId.HasValue ? [PublisherId.Value] : null
-        };
-
-        var httpResponseMessage = await HttpClient.PostAsJsonAsync($"{HttpClient.BaseAddress}api/games/gamesByParameters", gamesGettingRequestModel);
-
-        if (httpResponseMessage.IsSuccessStatusCode)
-        {
-            try
-            {
-                var games = await JsonSerializer.DeserializeAsync<IEnumerable<GameModel>>(await httpResponseMessage.Content.ReadAsStreamAsync());
-
-                Games = games;
-            }
-            catch
-            {
-                Games = Enumerable.Empty<GameModel>();
-            }
-        }
+        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"{HttpClient.BaseAddress}api/games/year/{Year}");
     }
 }

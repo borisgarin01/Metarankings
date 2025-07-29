@@ -1,12 +1,11 @@
 ﻿namespace Domain.Games;
 
-public sealed record Tag
-{
-    [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long Id { get; set; }
+public sealed record Tag(
+    [property: Key]
+    [property: DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    long Id,
 
-    [Required(ErrorMessage = "Title is requeried")]
-    [MaxLength(255, ErrorMessage = "Title's max length is 255")]
-    [MinLength(1, ErrorMessage = "Title should be not empty")]
-    public string Title { get; set; }
-}
+    [property:Required(ErrorMessage = "Title is requeried")]
+    [property:MaxLength(255, ErrorMessage = "Title's max length is 255")]
+    [property:MinLength(1, ErrorMessage = "Title should be not empty")]
+    string Title);

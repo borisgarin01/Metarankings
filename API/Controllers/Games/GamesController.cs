@@ -9,7 +9,7 @@ namespace API.Controllers.Games;
 [Route("api/[controller]")]
 public sealed class GamesController : ControllerBase
 {
-    JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
+    private JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
     private readonly IMapper _mapper;
     private readonly GamesRepository _gamesRepository;
 
@@ -28,7 +28,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy ="Admin")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<long>> AddAsync(AddGameModel gameModel)
     {
         var game = _mapper.Map<Game>(gameModel);
@@ -57,7 +57,7 @@ public sealed class GamesController : ControllerBase
     [HttpGet("images/uploads/{year:int}/{month:int}/{image}")]
     public async Task<IActionResult> GetImage(int year, int month, string image)
     {
-        var file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{(month < 10 ? $"0{month}" : $"{month}")}/{image}");
+        var file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{month}/{image}");
         if (file is null)
             return NotFound();
         return File(file, "image/jpeg");
@@ -136,22 +136,6 @@ public sealed class GamesController : ControllerBase
             if (gamesOfYear is null)
                 return NotFound();
             return Ok(gamesOfYear);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex);
-        }
-    }
-
-    [HttpPost("gamesByParameters")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesByParameters(GamesGettingRequestModel gamesGettingRequestModel)
-    {
-        try
-        {
-            var games = await _gamesRepository.GetByParametersAsync(gamesGettingRequestModel);
-            if (games is null)
-                return NotFound();
-            return Ok(games);
         }
         catch (Exception ex)
         {
