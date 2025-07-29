@@ -11,25 +11,25 @@ else
 {
     foreach (var game in Games)
     {
-        <BlazorClient.Components.PagesComponents.GamesList.Game Id="@game.Id"
-                                                                Name="@game.Name"
-                                                                Description="@game.Description"
-                                                                Developers="@game.Developers"
-                                                                Genres="@game.Genres"
-                                                                Image="@game.Image"
-                                                                Localization="@game.Localization"
-                                                                Platforms="@game.Platforms"
-                                                                Publisher="@game.Publisher"
-                                                                ReleaseDate="@game.ReleaseDate"
-                                                                Score="0"
-                                                                ScoresCount="0" />
+        <BlazorClient.Components.PagesComponents.GamesList.GamePost Id="@game.Id"
+                                                                    Name="@game.Name"
+                                                                    Description="@game.Description"
+                                                                    Developers="@game.Developers"
+                                                                    Genres="@game.Genres"
+                                                                    Image="@game.Image"
+                                                                    Localization="@game.Localization"
+                                                                    Platforms="@game.Platforms"
+                                                                    Publisher="@game.Publisher"
+                                                                    ReleaseDate="@game.ReleaseDate"
+                                                                    Score="0"
+                                                                    ScoresCount="0" />
     }
     @if (PageNumber > 1)
     {
-        <a href="/@(PageSize)/@(PageNumber-1)">Пред.</a>
+        <a href="/@(PageSize)/@(PageNumber - 1)">Пред.</a>
     }
     @if (Games.Count() == PageSize)
     {
-        <a href="/@(PageSize)/@(PageNumber+1)">След.</a>
+        <a href="/@(PageSize)/@(PageNumber + 1)">След.</a>
     }
 }

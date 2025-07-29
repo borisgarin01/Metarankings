@@ -28,27 +28,6 @@ public partial class BestGamesOfYearListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        var gamesGettingRequestModel = new GamesGettingRequestModel(
-            Year.HasValue ? [Year.Value] : null,
-            DeveloperId.HasValue ? [DeveloperId.Value] : null,
-            GenreId.HasValue ? [GenreId.Value] : null,
-            PublisherId.HasValue ? [PublisherId.Value] : null,
-            PlatformId.HasValue ? [PlatformId.Value] : null);
-
-        var httpResponseMessage = await HttpClient.PostAsJsonAsync($"{HttpClient.BaseAddress}api/games/gamesByParameters", gamesGettingRequestModel);
-
-        if (httpResponseMessage.IsSuccessStatusCode)
-        {
-            try
-            {
-                var games = await JsonSerializer.DeserializeAsync<IEnumerable<Game>>(await httpResponseMessage.Content.ReadAsStreamAsync());
-
-                Games = games;
-            }
-            catch
-            {
-                Games = Enumerable.Empty<Game>();
-            }
-        }
+        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"{HttpClient.BaseAddress}api/games/year/{Year}");
     }
 }

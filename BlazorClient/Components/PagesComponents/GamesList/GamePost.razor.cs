@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Components.PagesComponents.GamesList;
 
-public partial class Game : ComponentBase
+public partial class GamePost : ComponentBase
 {
     [Parameter, EditorRequired]
     public long Id { get; set; }
