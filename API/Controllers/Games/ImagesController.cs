@@ -1,5 +1,4 @@
-﻿using FilesManagement;
-
+﻿
 namespace API.Controllers.Games;
 
 [ApiController]
@@ -7,12 +6,10 @@ namespace API.Controllers.Games;
 public class ImagesController : ControllerBase
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
-    private readonly ContentTypeGetter _contentTypeGetter;
 
-    public ImagesController(IWebHostEnvironment webHostEnvironment, ContentTypeGetter contentTypeGetter)
+    public ImagesController(IWebHostEnvironment webHostEnvironment)
     {
         _webHostEnvironment = webHostEnvironment;
-        _contentTypeGetter = contentTypeGetter;
     }
 
     [HttpPost("imagePath")]
@@ -75,8 +72,6 @@ public class ImagesController : ControllerBase
                 detail: $"Image {_webHostEnvironment.ContentRootPath}/Images/{imagePath} doesn't exist",
                 statusCode: StatusCodes.Status500InternalServerError);
 
-        string contentType = _contentTypeGetter.GetContentType(imagePath);
-
-        return File($"{_webHostEnvironment.ContentRootPath}/Images/{imagePath}", contentType);
+        return File($"{_webHostEnvironment.ContentRootPath}/Images/{imagePath}", imagePath.Substring(imagePath.IndexOf("."), imagePath.Length - imagePath.IndexOf(".")));
     }
 }
