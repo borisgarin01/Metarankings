@@ -1,4 +1,4 @@
-﻿namespace Data.Migrations;
+﻿namespace Data.Migrations.Games.CreateTables;
 
 [Migration(10, "Add games screenshots table migration")]
 public sealed class CreateGamesScreenshotsTableMigration : Migration
@@ -13,7 +13,7 @@ public sealed class CreateGamesScreenshotsTableMigration : Migration
         Execute.Sql(@"CREATE TABLE GamesScreenshots 
 (Id bigint not null primary key identity(1,1),
 GameId bigint not null,
-ImageUrl nvarchar(1023) not null,
+ImageUrl nvarchar(1023) not null unique,
 FOREIGN KEY(GameId) 
 REFERENCES Games(Id) 
 ON DELETE CASCADE 
