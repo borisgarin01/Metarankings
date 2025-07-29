@@ -39,11 +39,12 @@ public sealed class LocalizationsController : ControllerBase
 
         var insertedLocalizationId = await _localizationsRepository.AddAsync(localization);
 
-        localization.Id = insertedLocalizationId;
+        localization = localization with { Id = insertedLocalizationId };
         return Created($"api/developers/{localization.Id}", localization);
     }
 
-    [HttpGet("{id:long}/{platformId:long?}")]
+    [HttpGet("{id:long}")]
+    [HttpGet("{id:long}/{platformId:long}")]
     public async Task<ActionResult<Localization>> GetAsync(long id, long? platformId)
     {
         Localization localization = null;

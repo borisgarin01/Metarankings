@@ -24,6 +24,7 @@
     <PackageReference Include="FluentMigrator.Console" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Extensions.SqlServer" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Runner.SqlServer" Version="7.1.0" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
@@ -38,7 +39,7 @@
     <ProjectReference Include="..\blazorclient\BlazorClient.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
-    <ProjectReference Include="..\ExcelProcessors\ExcelProcessors.csproj" />
+    <ProjectReference Include="..\FilesManagement\FilesManagement.csproj" />
     <ProjectReference Include="..\IdentityLibrary\IdentityLibrary.csproj" />
   </ItemGroup>
 
@@ -50,6 +51,11 @@
 
   <ItemGroup>
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\RequestsModels\Movies\MoviesGenres\" />
+    <Folder Include="Models\RequestsModels\Movies\MoviesStudios\" />
   </ItemGroup>
 
 </Project>

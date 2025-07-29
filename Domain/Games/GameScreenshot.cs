@@ -1,14 +1,14 @@
 ﻿namespace Domain.Games;
 public sealed record GameScreenshot
-{
-    [JsonPropertyName("id")]
-    public long Id { get; set; }
+(
+    [property: JsonPropertyName("id")]
+    long Id,
 
-    [Required]
-    [JsonPropertyName("url")]
-    public string Url { get; set; }
+    [property: Required]
+    [property: JsonPropertyName("imageUrl")]
+    string ImageUrl,
 
-    [Required]
-    [JsonPropertyName("gameId")]
-    public long GameId { get; set; }
-}
+    [property: Required]
+    [property: JsonPropertyName("gameId")]
+    long GameId
+);

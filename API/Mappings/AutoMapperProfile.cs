@@ -1,12 +1,12 @@
-﻿using Domain.Games;
+﻿using API.Models.RequestsModels.Games;
+using API.Models.RequestsModels.Games.Developers;
+using API.Models.RequestsModels.Games.Genres;
+using API.Models.RequestsModels.Games.Localizations;
+using API.Models.RequestsModels.Games.Platforms;
+using API.Models.RequestsModels.Games.Publishers;
+using API.Models.RequestsModels.Movies.MoviesDirectors;
+using Domain.Games;
 using Domain.Movies;
-using Domain.RequestsModels.Games;
-using Domain.RequestsModels.Games.Developers;
-using Domain.RequestsModels.Games.Genres;
-using Domain.RequestsModels.Games.Localizations;
-using Domain.RequestsModels.Games.Platforms;
-using Domain.RequestsModels.Games.Publishers;
-using Domain.RequestsModels.Movies.MoviesDirectors;
 
 namespace API.Mappings;
 

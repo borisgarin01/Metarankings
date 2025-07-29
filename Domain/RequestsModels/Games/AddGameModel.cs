@@ -6,35 +6,47 @@ using Domain.RequestsModels.Games.Publishers;
 
 namespace Domain.RequestsModels.Games;
 
-public sealed record AddGameModel
-{
-    [JsonPropertyName("name")]
-    public required string Name { get; set; }
+public sealed record AddGameModel(
+    [property : JsonPropertyName("name")]
+    [Required(ErrorMessage = "Name should be set")]
+    [MaxLength(511, ErrorMessage ="Name's max length is 511")]
+    [MinLength(1, ErrorMessage ="Name should be not empty")]
+    string Name,
 
-    [JsonPropertyName("image")]
-    public required string Image { get; set; }
+    [property: JsonPropertyName("image")]
+    [Required(ErrorMessage = "Image should be set")]
+    [MaxLength(511, ErrorMessage ="Image's max length is 1023")]
+    [MinLength(1, ErrorMessage ="Image should be not empty")] string Image,
 
-    [JsonPropertyName("developers")]
-    public List<AddDeveloperModel> Developers { get; set; } = new();
+    [property: JsonPropertyName("developers")]
+    [Required(ErrorMessage ="Developers should be set")]
+    [MinLength(1,ErrorMessage ="Developers should be not empty")]
+    IEnumerable<AddDeveloperModel> Developers,
 
-    [JsonPropertyName("publisher")]
-    public required AddPublisherModel Publisher { get; set; }
+    [property: JsonPropertyName("publisher")]
+    [Required(ErrorMessage ="Publisher should be set")]
+    AddPublisherModel Publisher,
 
-    [JsonPropertyName("genres")]
-    public List<AddGenreModel> Genres { get; set; } = new();
+    [property: JsonPropertyName("genres")]
+    [Required(ErrorMessage ="Genres should be set")]
+    [MinLength(1,ErrorMessage ="Genres should be not empty")]
+    IEnumerable<AddGenreModel> Genres,
 
-    [JsonPropertyName("localization")]
-    public required AddLocalizationModel Localization { get; set; }
+    [property: JsonPropertyName("localization")]
+    [Required(ErrorMessage ="Localization should be set")]
+    AddLocalizationModel Localization,
 
-    [JsonPropertyName("releaseDate")]
-    public DateTime? ReleaseDate { get; set; }
+    [property: JsonPropertyName("releaseDate")]
+    [Required(ErrorMessage ="Release date should be set")]
+    [Range(typeof(DateTime), "1/1/1940", "1/1/2200",
+        ErrorMessage = "Value for {0} must be between {1} and {2}")]
+    DateTime? ReleaseDate,
 
-    [JsonPropertyName("description")]
-    public required string Description { get; set; }
+    [property:JsonPropertyName("description")]
+    [MinLength(1, ErrorMessage ="Description should be not empty")]
+    string Description,
 
-    [JsonPropertyName("trailer")]
-    public string Trailer { get; set; }
-
-    [JsonPropertyName("platforms")]
-    public List<AddPlatformModel> Platforms { get; set; } = new();
-}
+    [property: JsonPropertyName("trailer")]
+    string Trailer,
+    [property: JsonPropertyName("platforms")]
+    IEnumerable<AddPlatformModel> Platforms);

@@ -9,5 +9,6 @@ public sealed record Publisher
     [JsonPropertyName("name")]
     public string Name { get; set; }
 
-    public List<Game> Games { get; set; } = new List<Game>();
+    [JsonPropertyName("games")]
+    public List<Game> Games { get; set; } = new();
 }

@@ -5,7 +5,10 @@ public sealed record Platform
 {
     [JsonPropertyName("id")]
     public long Id { get; set; }
+
     [JsonPropertyName("name")]
     public string Name { get; set; }
-    public List<Game> Games { get; set; } = new List<Game>();
+
+    [JsonPropertyName("games")]
+    public List<Game> Games { get; set; } = new();
 }

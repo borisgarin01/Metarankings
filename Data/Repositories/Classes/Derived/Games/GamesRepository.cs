@@ -1,8 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
-using System;
-using System.Linq;
-using System.Text;
 
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class GamesRepository : Repository, IRepository<Game>
@@ -17,7 +14,7 @@ public sealed class GamesRepository : Repository, IRepository<Game>
         {
             connection.Open();
 
-            using (var transaction = connection.BeginTransaction())
+            using (SqlTransaction transaction = connection.BeginTransaction())
             {
                 List<Developer> insertedDevelopers = new();
                 List<Genre> insertedGenres = new();
@@ -103,9 +100,7 @@ VALUES
 
                 foreach (var gameGenre in insertedGenres)
                 {
-                    var gameGenreToFind = await connection.QueryFirstOrDefaultAsync(@"SELECT Id, GameId, GenreId 
-FROM GamesGenres 
-WHERE GenreId=@GenreId and GameId=@GameId",
+                    var gameGenreToFind = await connection.QueryFirstOrDefaultAsync(@"SELECT Id, GameId, GenreId FROM GamesGenres WHERE GenreId=@GenreId and GameId=@GameId",
                         new
                         {
                             GenreId = gameGenre.Id,
@@ -185,10 +180,8 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
-    FROM (select Id, Name, Image, ReleaseDate, Description, PublisherId, LocalizationId 
-        from Games ORDER BY id
-        OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
+gs.id, gs.imageurl, gs.gameid
+    FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
     LEFT JOIN publishers p ON p.id = g.publisherid
@@ -197,53 +190,62 @@ gs.id, gs.gameid
     LEFT JOIN localizations l ON l.id = g.localizationid
     LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
     LEFT JOIN platforms plat ON plat.id = gp.platformid
-    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id";
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+WHERE g.Id IN(SELECT Id FROM games ORDER BY Id ASC OFFSET @offset ROWS
+            FETCH NEXT @limit ROWS ONLY)";
 
-            var gameDictionary = new Dictionary<long, Game>();
-
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
-                    if (!gameDictionary.TryGetValue(game.Id, out Game? gameEntry))
+                    if (developer is not null)
+                        game.Developers.Add(developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
+                    if (screenshot is not null)
+                        game.Screenshots.Add(screenshot);
+
+                    game = game with { Publisher = publisher, Localization = localization };
+
+                    return game;
+                }, new { offset, limit });
+
+            var gamesResult = games.GroupBy(g => g.Id).Select(gr =>
+            {
+                Game groupedGame = gr.First();
+
+                groupedGame = groupedGame with
+                {
+                    Developers = gr.SelectMany(g => g.Developers)
+                    .GroupBy(d => d.Id)
+                    .Select(devGroup =>
                     {
-                        gameEntry = game;
-                        gameEntry.Developers = new List<Developer>();
-                        gameEntry.Genres = new List<Genre>();
-                        gameEntry.Platforms = new List<Platform>();
-                        gameEntry.Screenshots = new List<GameScreenshot>();
-                        gameDictionary.Add(gameEntry.Id, gameEntry);
-                    }
+                        var dev = devGroup.First();
+                        dev = dev with
+                        {
+                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                        };
+                        return dev;
+                    }).ToList(),
+                    Platforms = gr.SelectMany(g => g.Platforms)
+                    .GroupBy(d => d.Id)
+                    .Select(platfGroup => { return platfGroup.First(); }).ToList(),
+                    Genres = gr.SelectMany(g => g.Genres)
+                    .GroupBy(d => d.Id)
+                    .Select(genreGroup => { return genreGroup.First(); }).ToList(),
+                    Screenshots = gr.SelectMany(g => g.Screenshots)
+                    .GroupBy(d => d.Id)
+                    .Select(screenGroup => { return screenGroup.First(); }).ToList(),
+                };
 
-                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        gameEntry.Developers.Add(developer);
+                return groupedGame;
+            });
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
-
-                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
-                        gameEntry.Genres.Add(genre);
-
-                    if (localization is not null && gameEntry.Localization == null)
-                        gameEntry.Localization = localization;
-
-                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        gameEntry.Platforms.Add(platform);
-
-                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
-                        gameEntry.Screenshots.Add(screenshot);
-
-                    return gameEntry;
-                }, new { offset, limit },
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
-            );
-
-            var result = gameDictionary.Values.ToList();
-
-            return result;
+            return gamesResult;
         }
     }
-
 
     public async Task<IEnumerable<Game>> GetAllAsync()
     {
@@ -256,7 +258,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -268,48 +270,56 @@ gs.id, gs.gameid
     LEFT JOIN platforms plat ON plat.id = gp.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id";
 
-            var gameDictionary = new Dictionary<string, Game>();
-
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
-                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    if (developer is not null)
+                        game.Developers.Add(developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
+                    if (screenshot is not null)
+                        game.Screenshots.Add(screenshot);
+
+                    game = game with { Publisher = publisher, Localization = localization };
+
+                    return game;
+                });
+
+            var gamesResult = games.GroupBy(g => g.Id).Select(gr =>
+            {
+                Game groupedGame = gr.First();
+
+                groupedGame = groupedGame with
+                {
+                    Developers = gr.SelectMany(g => g.Developers)
+                    .GroupBy(d => d.Id)
+                    .Select(devGroup =>
                     {
-                        gameEntry = game;
-                        gameEntry.Developers = new List<Developer>();
-                        gameEntry.Genres = new List<Genre>();
-                        gameEntry.Platforms = new List<Platform>();
-                        gameEntry.Screenshots = new List<GameScreenshot>();
-                        gameDictionary.Add(gameEntry.Name, gameEntry);
-                    }
+                        var dev = devGroup.First();
+                        dev = dev with
+                        {
+                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                        };
+                        return dev;
+                    }).ToList(),
+                    Platforms = gr.SelectMany(g => g.Platforms)
+                    .GroupBy(d => d.Id)
+                    .Select(platfGroup => { return platfGroup.First(); }).ToList(),
+                    Genres = gr.SelectMany(g => g.Genres)
+                    .GroupBy(d => d.Id)
+                    .Select(genreGroup => { return genreGroup.First(); }).ToList(),
+                    Screenshots = gr.SelectMany(g => g.Screenshots)
+                    .GroupBy(d => d.Id)
+                    .Select(screenGroup => { return screenGroup.First(); }).ToList(),
+                };
 
-                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        gameEntry.Developers.Add(developer);
+                return groupedGame;
+            });
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
-
-                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
-                        gameEntry.Genres.Add(genre);
-
-                    if (localization is not null && gameEntry.Localization == null)
-                        gameEntry.Localization = localization;
-
-                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        gameEntry.Platforms.Add(platform);
-
-                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
-                        gameEntry.Screenshots.Add(screenshot);
-
-                    return gameEntry;
-                },
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
-            );
-
-            var result = gameDictionary.Values.ToList();
-
-            return result;
+            return gamesResult;
         }
     }
 
@@ -321,10 +331,10 @@ gs.id, gs.gameid
 g.Id, g.name, g.image, g.releasedate, g.description,
 d.id, d.name, 
 p.id, p.name, 
-gen.id, gen.name,
+gen.id, gen.name, 
 l.id, l.name,
-plat.id, plat.name,
-gs.id, gs.gameid
+plat.id, plat.name, 
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -337,49 +347,64 @@ gs.id, gs.gameid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.Id=@id";
 
-            var gameDictionary = new Dictionary<string, Game>();
-
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
-                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    if (developer is not null)
+                        game.Developers.Add(developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
+                    if (screenshot is not null)
+                        game.Screenshots.Add(screenshot);
+
+                    game = game with { Publisher = publisher, Localization = localization };
+
+                    return game;
+                }, new { id });
+
+            var gamesResult = games.GroupBy(g => g.Id).Select(gr =>
+            {
+                Game groupedGame = gr.First();
+
+                groupedGame = groupedGame with
+                {
+                    Developers = gr.SelectMany(g => g.Developers)
+                    .GroupBy(d => d.Id)
+                    .Select(devsGroup =>
                     {
-                        gameEntry = game;
-                        gameEntry.Developers = new List<Developer>();
-                        gameEntry.Genres = new List<Genre>();
-                        gameEntry.Platforms = new List<Platform>();
-                        gameEntry.Screenshots = new List<GameScreenshot>();
-                        gameDictionary.Add(gameEntry.Name, gameEntry);
-                    }
+                        var dev = devsGroup.First();
+                        return dev;
+                    }).ToList(),
+                    Platforms = gr.SelectMany(g => g.Platforms)
+                    .GroupBy(d => d.Id)
+                    .Select(platformsGroup =>
+                    {
+                        Platform platform = platformsGroup.First();
+                        return platform;
+                    }).ToList(),
+                    Genres = gr.SelectMany(g => g.Genres)
+                    .GroupBy(d => d.Id)
+                    .Select(genresGroup =>
+                    {
+                        Genre genre = genresGroup.First();
+                        return genre;
+                    }).ToList(),
+                    Screenshots = gr.SelectMany(g => g.Screenshots)
+                    .GroupBy(s => s.ImageUrl)
+                    .Select(screenGroup =>
+                    {
+                        GameScreenshot screenshot = screenGroup.First();
+                        return screenshot;
+                    }).ToList()
+                };
 
-                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        gameEntry.Developers.Add(developer);
+                return groupedGame;
+            });
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
-
-                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
-                        gameEntry.Genres.Add(genre);
-
-                    if (localization is not null && gameEntry.Localization == null)
-                        gameEntry.Localization = localization;
-
-                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        gameEntry.Platforms.Add(platform);
-
-                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
-                        gameEntry.Screenshots.Add(screenshot);
-
-                    return gameEntry;
-                },
-                new { id }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
-            );
-
-            var result = gameDictionary.Values.FirstOrDefault();
-
-            return result;
+            return gamesResult.FirstOrDefault();
         }
     }
 
@@ -387,75 +412,67 @@ WHERE g.Id=@id";
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var sql = @"WITH FilteredGames AS (
-    SELECT DISTINCT g.id
+            var sql = @"SELECT         
+g.Id, g.name, g.image, g.releasedate, g.description,
+d.id, d.name, 
+p.id, p.name, 
+gen.id, gen.name, 
+l.id, l.name,
+plat.id, plat.name, 
+gs.id, gs.imageurl, gs.gameid
     FROM games g
-    JOIN gamesgenres gg ON gg.gameid = g.id
-    gg.genreId=@genreId
-)
-SELECT
-    g.Id, g.name, g.image, g.releasedate, g.description,
-    d.id, d.name,
-    p.id, p.name,
-    gen.id, gen.name,
-    l.id, l.name,
-    plat.id, plat.name,
-    gs.id, gs.gameid
-FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-WHERE g.id IN (SELECT id FROM FilteredGames)
-ORDER BY g.id, gen.id;";
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN publishers p ON p.id = g.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+WHERE gen.Id=@genreId";
 
-            var gameDictionary = new Dictionary<string, Game>();
-
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
-                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    if (developer is not null)
+                        game.Developers.Add(developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
+                    if (screenshot is not null)
+                        game.Screenshots.Add(screenshot);
+
+                    game = game with { Publisher = publisher, Localization = localization };
+
+                    return game;
+                }, new { genreId });
+
+            var gamesResult = games.GroupBy(g => g.Id).Select(gr =>
+            {
+                Game groupedGame = gr.First();
+
+                groupedGame = groupedGame with
+                {
+                    Developers = gr.SelectMany(g => g.Developers)
+                    .GroupBy(d => d.Id)
+                    .Select(devGroup =>
                     {
-                        gameEntry = game;
-                        gameEntry.Developers = new List<Developer>();
-                        gameEntry.Genres = new List<Genre>();
-                        gameEntry.Platforms = new List<Platform>();
-                        gameDictionary.Add(gameEntry.Name, gameEntry);
-                    }
+                        var dev = devGroup.First();
+                        dev = dev with
+                        {
+                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                        };
+                        return dev;
+                    }).ToList()
+                };
 
-                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        gameEntry.Developers.Add(developer);
+                return groupedGame;
+            });
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
-
-                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
-                        gameEntry.Genres.Add(genre);
-
-                    if (localization is not null && gameEntry.Localization == null)
-                        gameEntry.Localization = localization;
-
-                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        gameEntry.Platforms.Add(platform);
-
-                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
-                        gameEntry.Screenshots.Add(screenshot);
-
-                    return gameEntry;
-                },
-                new { genreId }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
-            );
-
-            var result = gameDictionary.Values;
-
-            return result.ToArray();
+            return gamesResult;
         }
     }
 
@@ -463,76 +480,67 @@ ORDER BY g.id, gen.id;";
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var sql = @"WITH FilteredGames AS (
-    SELECT DISTINCT g.id
+            var sql = @"SELECT         
+g.Id, g.name, g.image, g.releasedate, g.description,
+d.id, d.name, 
+p.id, p.name, 
+gen.id, gen.name, 
+l.id, l.name,
+plat.id, plat.name, 
+gs.id, gs.imageurl, gs.gameid
     FROM games g
-    JOIN gamesplatforms gp ON gp.gameid = g.id
-    WHERE gp.platformId = @platformId
-)
-SELECT
-    g.Id, g.name, g.image, g.releasedate, g.description,
-    d.id, d.name, 
-    p.id, p.name, 
-    gen.id, gen.name, 
-    l.id, l.name,
-    plat.id, plat.name,
-    gs.id, gs.gameid
-FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-WHERE g.id IN (SELECT id FROM FilteredGames)
-ORDER BY g.id, gen.id;";
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN publishers p ON p.id = g.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+WHERE plat.Id=@platformId";
 
-            var gameDictionary = new Dictionary<string, Game>();
-
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
-                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    if (developer is not null)
+                        game.Developers.Add(developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
+                    if (screenshot is not null)
+                        game.Screenshots.Add(screenshot);
+
+                    game = game with { Publisher = publisher, Localization = localization };
+
+                    return game;
+                }, new { platformId });
+
+            var gamesResult = games.GroupBy(g => g.Id).Select(gr =>
+            {
+                Game groupedGame = gr.First();
+
+                groupedGame = groupedGame with
+                {
+                    Developers = gr.SelectMany(g => g.Developers)
+                    .GroupBy(d => d.Id)
+                    .Select(devGroup =>
                     {
-                        gameEntry = game;
-                        gameEntry.Developers = new List<Developer>();
-                        gameEntry.Genres = new List<Genre>();
-                        gameEntry.Platforms = new List<Platform>();
-                        gameEntry.Screenshots = new List<GameScreenshot>();
-                        gameDictionary.Add(gameEntry.Name, gameEntry);
-                    }
+                        var dev = devGroup.First();
+                        dev = dev with
+                        {
+                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                        };
+                        return dev;
+                    }).ToList()
+                };
 
-                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        gameEntry.Developers.Add(developer);
+                return groupedGame;
+            });
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
-
-                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
-                        gameEntry.Genres.Add(genre);
-
-                    if (localization is not null && gameEntry.Localization == null)
-                        gameEntry.Localization = localization;
-
-                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        gameEntry.Platforms.Add(platform);
-
-                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
-                        gameEntry.Screenshots.Add(screenshot);
-
-                    return gameEntry;
-                },
-                new { platformId }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
-            );
-
-            var result = gameDictionary.Values;
-
-            return result.ToArray();
+            return gamesResult;
         }
     }
 
@@ -540,76 +548,67 @@ ORDER BY g.id, gen.id;";
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var sql = @"WITH FilteredGames AS (
-    SELECT DISTINCT g.id
+            var sql = @"SELECT         
+g.Id, g.name, g.image, g.releasedate, g.description,
+d.id, d.name, 
+p.id, p.name, 
+gen.id, gen.name, 
+l.id, l.name,
+plat.id, plat.name, 
+gs.id, gs.imageurl, gs.gameid
     FROM games g
-    JOIN gamesdevelopers gd ON gd.gameid = g.id
-    WHERE gd.developerId = @developerId
-)
-SELECT
-    g.Id, g.name, g.image, g.releasedate, g.description,
-    d.id, d.name,
-    p.id, p.name,
-    gen.id, gen.name,
-    l.id, l.name,
-    plat.id, plat.name,
-    gs.id, gs.gameid
-FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-WHERE g.id IN (SELECT id FROM FilteredGames)
-ORDER BY g.id, gen.id;";
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN publishers p ON p.id = g.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+WHERE gd.developerid = @developerId";
 
-            var gameDictionary = new Dictionary<string, Game>();
-
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
-                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    if (developer is not null)
+                        game.Developers.Add(developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
+                    if (screenshot is not null)
+                        game.Screenshots.Add(screenshot);
+
+                    game = game with { Publisher = publisher, Localization = localization };
+
+                    return game;
+                }, new { developerId });
+
+            var gamesResult = games.GroupBy(g => g.Id).Select(gr =>
+            {
+                Game groupedGame = gr.First();
+
+                groupedGame = groupedGame with
+                {
+                    Developers = gr.SelectMany(g => g.Developers)
+                    .GroupBy(d => d.Id)
+                    .Select(devGroup =>
                     {
-                        gameEntry = game;
-                        gameEntry.Developers = new List<Developer>();
-                        gameEntry.Genres = new List<Genre>();
-                        gameEntry.Platforms = new List<Platform>();
-                        gameEntry.Screenshots = new List<GameScreenshot>();
-                        gameDictionary.Add(gameEntry.Name, gameEntry);
-                    }
+                        var dev = devGroup.First();
+                        dev = dev with
+                        {
+                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                        };
+                        return dev;
+                    }).ToList()
+                };
 
-                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        gameEntry.Developers.Add(developer);
+                return groupedGame;
+            });
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
-
-                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
-                        gameEntry.Genres.Add(genre);
-
-                    if (localization is not null && gameEntry.Localization == null)
-                        gameEntry.Localization = localization;
-
-                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        gameEntry.Platforms.Add(platform);
-
-                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
-                        gameEntry.Screenshots.Add(screenshot);
-
-                    return gameEntry;
-                },
-                new { developerId }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
-            );
-
-            var result = gameDictionary.Values;
-
-            return result.ToArray();
+            return gamesResult;
         }
     }
 
@@ -618,81 +617,143 @@ ORDER BY g.id, gen.id;";
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var sql = @"WITH FilteredGames AS (
-    SELECT DISTINCT g.id
+            var sql = @"SELECT         
+g.Id, g.name, g.image, g.releasedate, g.description,
+d.id, d.name, 
+p.id, p.name, 
+gen.id, gen.name, 
+l.id, l.name,
+plat.id, plat.name, 
+gs.id, gs.imageurl, gs.gameid
     FROM games g
-    WHERE g.publisherId = @publisherId
-)
-SELECT
-    g.Id, g.name, g.image, g.releasedate, g.description,
-    d.id, d.name,
-    p.id, p.name,
-    gen.id, gen.name,
-    l.id, l.name,
-    plat.id, plat.name,
-    gs.id, gs.gameid
-FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-WHERE g.id IN (SELECT id FROM FilteredGames)
-ORDER BY g.id, gen.id;";
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN publishers p ON p.id = g.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+WHERE p.Id = @publisherId";
 
-            var gameDictionary = new Dictionary<string, Game>();
-
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
-                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    if (developer is not null)
+                        game.Developers.Add(developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
+                    if (screenshot is not null)
+                        game.Screenshots.Add(screenshot);
+
+                    game = game with { Publisher = publisher, Localization = localization };
+
+                    return game;
+                }, new { publisherId });
+
+            var gamesResult = games.GroupBy(g => g.Id).Select(gr =>
+            {
+                Game groupedGame = gr.First();
+
+                groupedGame = groupedGame with
+                {
+                    Developers = gr.SelectMany(g => g.Developers)
+                    .GroupBy(d => d.Id)
+                    .Select(devGroup =>
                     {
-                        gameEntry = game;
-                        gameEntry.Developers = new List<Developer>();
-                        gameEntry.Genres = new List<Genre>();
-                        gameEntry.Platforms = new List<Platform>();
-                        gameEntry.Screenshots = new List<GameScreenshot>();
-                        gameDictionary.Add(gameEntry.Name, gameEntry);
-                    }
+                        var dev = devGroup.First();
+                        dev = dev with
+                        {
+                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                        };
+                        return dev;
+                    }).ToList()
+                };
 
-                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        gameEntry.Developers.Add(developer);
+                return groupedGame;
+            });
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
-
-                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
-                        gameEntry.Genres.Add(genre);
-
-                    if (localization is not null && gameEntry.Localization == null)
-                        gameEntry.Localization = localization;
-
-                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        gameEntry.Platforms.Add(platform);
-
-                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
-                        gameEntry.Screenshots.Add(screenshot);
-
-                    return gameEntry;
-                },
-                new { publisherId }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
-            );
-
-            var result = gameDictionary.Values;
-
-            return result.ToArray();
+            return gamesResult;
         }
     }
 
-    public Task<IEnumerable<Game>> GetAsync(long offset, long limit)
+    public async Task<IEnumerable<Game>> GetAsync(long offset, long limit)
     {
-        throw new NotImplementedException();
+        using (var connection = new SqlConnection(ConnectionString))
+        {
+            var sql = @"SELECT         
+g.Id, g.name, g.image, g.releasedate, g.description,
+d.id, d.name, 
+p.id, p.name, 
+gen.id, gen.name, 
+l.id, l.name,
+plat.id, plat.name, 
+gs.id, gs.imageurl, gs.gameid
+    FROM games g
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN publishers p ON p.id = g.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+WHERE g.Id in 
+(
+    SELECT Id 
+    FROM Games
+    ORDER BY Id ASC
+    OFFSET @offset ROWS
+    FETCH NEXT @limit ROWS ONLY
+);";
+
+            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+                sql,
+                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                {
+                    if (developer is not null)
+                        game.Developers.Add(developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
+                    if (screenshot is not null)
+                        game.Screenshots.Add(screenshot);
+
+                    game = game with { Publisher = publisher, Localization = localization };
+
+                    return game;
+                }, new { offset, limit });
+
+            var gamesResult = games.GroupBy(g => g.Id).Select(gr =>
+            {
+                Game groupedGame = gr.First();
+
+                groupedGame = groupedGame with
+                {
+                    Developers = gr.SelectMany(g => g.Developers)
+                    .GroupBy(d => d.Id)
+                    .Select(devGroup =>
+                    {
+                        var dev = devGroup.First();
+                        dev = dev with
+                        {
+                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                        };
+                        return dev;
+                    }).ToList()
+                };
+
+                return groupedGame;
+            });
+
+            return gamesResult;
+        }
     }
 
     public Task RemoveAsync(long id)
@@ -726,7 +787,7 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.id, gs.imageurl, gs.gameid
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -740,49 +801,47 @@ LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
-            var gameDictionary = new Dictionary<string, Game>();
-
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
-                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    if (developer is not null)
+                        game.Developers.Add(developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
+                    if (screenshot is not null)
+                        game.Screenshots.Add(screenshot);
+
+                    game = game with { Publisher = publisher, Localization = localization };
+
+                    return game;
+                }, new { year });
+
+            var gamesResult = games.GroupBy(g => g.Id).Select(gr =>
+            {
+                Game groupedGame = gr.First();
+
+                groupedGame = groupedGame with
+                {
+                    Developers = gr.SelectMany(g => g.Developers)
+                    .GroupBy(d => d.Id)
+                    .Select(devGroup =>
                     {
-                        gameEntry = game;
-                        gameEntry.Developers = new List<Developer>();
-                        gameEntry.Genres = new List<Genre>();
-                        gameEntry.Platforms = new List<Platform>();
-                        gameEntry.Screenshots = new List<GameScreenshot>();
-                        gameDictionary.Add(gameEntry.Name, gameEntry);
-                    }
+                        var dev = devGroup.First();
+                        dev = dev with
+                        {
+                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                        };
+                        return dev;
+                    }).ToList()
+                };
 
-                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        gameEntry.Developers.Add(developer);
+                return groupedGame;
+            });
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
-
-                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
-                        gameEntry.Genres.Add(genre);
-
-                    if (localization is not null && gameEntry.Localization == null)
-                        gameEntry.Localization = localization;
-
-                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        gameEntry.Platforms.Add(platform);
-
-                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
-                        gameEntry.Screenshots.Add(screenshot);
-
-                    return gameEntry;
-                },
-                new { year }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
-            );
-
-            var result = gameDictionary.Values;
-
-            return result.ToArray();
+            return gamesResult;
         }
     }
 
@@ -797,7 +856,7 @@ ORDER BY g.id, gen.id;";
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.id, gs.imageurl, gs.gameid
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -864,47 +923,46 @@ WHERE 1=1
 
             var query = queryStringBuilder.ToString();
 
-            var gameDictionary = new Dictionary<string, Game>();
-
             var games = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
-                queryStringBuilder.ToString(),
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                query, (game, developer, publisher, genre, localization, platform, screenshot) =>
                 {
-                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    if (developer is not null)
+                        game.Developers.Add(developer);
+                    if (genre is not null)
+                        game.Genres.Add(genre);
+                    if (platform is not null)
+                        game.Platforms.Add(platform);
+                    if (screenshot is not null)
+                        game.Screenshots.Add(screenshot);
+
+                    game = game with { Publisher = publisher, Localization = localization };
+
+                    return game;
+                }, new { parameters });
+
+            var gamesResult = games.GroupBy(g => g.Id).Select(gr =>
+            {
+                Game groupedGame = gr.First();
+
+                groupedGame = groupedGame with
+                {
+                    Developers = gr.SelectMany(g => g.Developers)
+                    .GroupBy(d => d.Id)
+                    .Select(devGroup =>
                     {
-                        gameEntry = game;
-                        gameEntry.Developers = new List<Developer>();
-                        gameEntry.Genres = new List<Genre>();
-                        gameEntry.Platforms = new List<Platform>();
-                        gameEntry.Screenshots = new List<GameScreenshot>();
-                        gameDictionary.Add(gameEntry.Name, gameEntry);
-                    }
+                        var dev = devGroup.First();
+                        dev = dev with
+                        {
+                            Games = devGroup.SelectMany(d => d.Games).DistinctBy(g => g.Id).ToList()
+                        };
+                        return dev;
+                    }).ToList()
+                };
 
-                    if (developer != null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
-                        gameEntry.Developers.Add(developer);
+                return groupedGame;
+            });
 
-                    if (publisher != null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
-
-                    if (genre != null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
-                        gameEntry.Genres.Add(genre);
-
-                    if (localization != null && gameEntry.Localization == null)
-                        gameEntry.Localization = localization;
-
-                    if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
-                        gameEntry.Platforms.Add(platform);
-
-                    if (screenshot != null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
-                        gameEntry.Screenshots.Add(screenshot);
-
-                    return gameEntry;
-                },
-                parameters,
-                splitOn: "Id,Id,Id,Id,Id,Id"
-            );
-
-            return gameDictionary.Values.ToArray();
+            return gamesResult;
         }
     }
 }

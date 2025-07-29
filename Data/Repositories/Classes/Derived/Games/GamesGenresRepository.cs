@@ -12,14 +12,15 @@ public sealed class GamesGenresRepository : Repository, IRepository<Genre>
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Genres
-(Name)
+            var id = await connection.QueryFirstAsync<long>(@"
+INSERT INTO Genres
+    (Name)
 OUTPUT inserted.Id
 VALUES (@Name);"
- , new
- {
-     genre.Name
- });
+    , new
+    {
+        genre.Name
+    });
             return id;
         }
     }
@@ -36,10 +37,35 @@ VALUES (@Name);"
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var genres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
+            var genres = await connection.QueryAsync<Genre, Game, Genre>(@"
+SELECT Genres.Id, Genres.Name, 
+	Games.Id, Games.Name, Games.Image, 
+	Games.LocalizationId, Games.PublisherId, Games.ReleaseDate, 
+	Games.Description, Games.Trailer
 FROM 
-Genres;");
-            return genres;
+Genres 
+	left join GamesGenres 
+		on GamesGenres.GenreId=Genres.Id
+	left join Games
+		on Games.Id=GamesGenres.GameId", (genre, game) =>
+            {
+                genre.Games.Add(game);
+                return genre;
+            });
+
+            var genresResult = genres
+                            .GroupBy(d => d.Id)
+                            .Select(g =>
+                            {
+                                Genre groupedGenre = g.First() with
+                                {
+                                    Games = g.SelectMany(d => d.Games).ToList()
+                                };
+
+                                return groupedGenre;
+                            });
+
+            return genresResult;
         }
     }
 
@@ -47,34 +73,36 @@ Genres;");
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var genre = await connection.QueryFirstOrDefaultAsync<Genre>(@"SELECT Id, Name 
+            var genres = await connection.QueryAsync<Genre, Game, Genre>(@"
+SELECT Genres.Id, Genres.Name, 
+	Games.Id, Games.Name, Games.Image, 
+	Games.LocalizationId, Games.PublisherId, Games.ReleaseDate, 
+	Games.Description, Games.Trailer
 FROM 
-Genres
-WHERE Id=@id", new { id });
-
-            if (genre is null)
-                return null;
-
-            var genreGames = await connection.QueryAsync<GameGenre>(@"SELECT Id, GameId, GenreId
-	FROM GamesGenres 
-WHERE GenreId=@GenreId;", new { GenreId = id });
-
-            var games = new List<Game>();
-
-            foreach (var genreGame in genreGames)
+Genres 
+	left join GamesGenres 
+		on GamesGenres.GenreId=Genres.Id
+	left join Games
+		on Games.Id=GamesGenres.GameId
+WHERE Genres.Id=@id", (genre, game) =>
             {
-                var game = await connection.QueryFirstOrDefaultAsync<Game>(@"SELECT Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
-FROM Games WHERE Id=@GameId", new { genreGame.GameId });
+                genre.Games.Add(game);
+                return genre;
+            }, new { id });
 
-                if (game is not null)
-                {
-                    games.Add(game);
-                }
-            }
+            var genresResult = genres
+                            .GroupBy(d => d.Id)
+                            .Select(g =>
+                            {
+                                Genre groupedGenre = g.First() with
+                                {
+                                    Games = g.SelectMany(d => d.Games).ToList()
+                                };
 
-            genre.Games = games;
+                                return groupedGenre;
+                            });
 
-            return genre;
+            return genresResult.FirstOrDefault();
         }
     }
 
