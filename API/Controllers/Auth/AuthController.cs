@@ -114,8 +114,12 @@ public sealed class AuthController : ControllerBase
 
         else
         {
-            await _usersManager.AddToRoleAsync(humanToAssignToAdmin, "Admin");
-            return Ok("Admin rights are successfully set");
+            IdentityResult identityResult = await _usersManager.AddToRoleAsync(humanToAssignToAdmin, "Admin");
+            if (identityResult is null)
+                return NotFound();
+            if (!identityResult.Succeeded)
+                return BadRequest(identityResult);
+            return Ok(identityResult);
         }
     }
 }
