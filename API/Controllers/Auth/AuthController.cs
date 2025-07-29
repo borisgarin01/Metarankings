@@ -102,4 +102,20 @@ public sealed class AuthController : ControllerBase
 
         return Ok(tokenString);
     }
+
+    [HttpPost("assignToAdmin")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    public async Task<ActionResult> AssignToAdmin(string humanToAssignToAdminEmail)
+    {
+        var humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
+
+        if (humanToAssignToAdmin is null)
+            return NotFound("Human to assign to admin not found");
+
+        else
+        {
+            await _usersManager.AddToRoleAsync(humanToAssignToAdmin, "Admin");
+            return Ok("Admin rights are successfully set");
+        }
+    }
 }
