@@ -185,7 +185,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.imageUrl, gs.gameid
     FROM (select Id, Name, Image, ReleaseDate, Description, PublisherId, LocalizationId 
         from Games ORDER BY id
         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
@@ -717,16 +717,16 @@ ORDER BY g.id, gen.id;";
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
     FROM games g
-    WHERE extract(year from g.ReleaseDate) = @year
+    WHERE year (g.ReleaseDate) = @year
 )
 SELECT
-    g.Id, g.name, g.image, g.releasedate, g.description,
-    d.id, d.name,
-    p.id, p.name,
-    gen.id, gen.name,
-    l.id, l.name,
-    plat.id, plat.name,
-    gs.id, gs.gameid
+    g.Id, g.Name, g.Image, g.ReleaseDate, g.Description,
+    d.Id, d.Name,
+    p.Id, p.Name,
+    gen.Id, gen.Name,
+    l.Id, l.Name,
+    plat.Id, plat.Name,
+    gs.Id, gs.ImageUrl, gs.GameId
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
