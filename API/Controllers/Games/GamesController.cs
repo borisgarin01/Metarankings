@@ -1,7 +1,7 @@
 ﻿using API.Json;
-using API.Models.RequestsModels.Games;
 using Data.Repositories.Classes.Derived.Games;
 using Domain.Games;
+using Domain.RequestsModels.Games;
 
 namespace API.Controllers.Games;
 

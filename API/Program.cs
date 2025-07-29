@@ -5,7 +5,6 @@ using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 
-
 internal class Program
 {
     private static void Main(string[] args)
@@ -43,7 +42,13 @@ internal class Program
             options.SaveToken = true;
         });
 
-        builder.Services.AddAuthorization(options => { options.AddPolicy("Admin", options => { options.RequireRole("Admin"); }); });
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Admin", options =>
+            {
+                options.RequireRole("Admin");
+            });
+        });
 
         builder.Services.AddSwaggerGen(options =>
         {
@@ -97,7 +102,7 @@ internal class Program
         });
 
         builder.Services.RegisterRepositories(builder.Configuration);
-        builder.Services.RegisterValidators();
+        builder.Services.RegisterFilesDataReaders();
 
         builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
             .AddUserStore<UsersStore>()

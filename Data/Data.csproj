@@ -1,15 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <Compile Remove="Migrations\Developers\**" />
-    <EmbeddedResource Remove="Migrations\Developers\**" />
-    <None Remove="Migrations\Developers\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Usings.cs~RF126d098.TMP" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="FluentMigrator" Version="7.1.0" />
@@ -19,6 +8,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\Developers\" />
+    <Folder Include="Migrations\Games\InsertData\" />
+    <Folder Include="Migrations\Movies\InsertData\" />
   </ItemGroup>
 
   <PropertyGroup>

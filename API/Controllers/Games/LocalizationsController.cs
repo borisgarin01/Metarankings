@@ -1,6 +1,6 @@
-﻿using API.Models.RequestsModels.Games.Localizations;
-using Data.Repositories.Interfaces.Derived;
+﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
+using Domain.RequestsModels.Games.Localizations;
 
 namespace API.Controllers.Games;
 
@@ -12,15 +12,10 @@ public sealed class LocalizationsController : ControllerBase
 
     private readonly ILocalizationsRepository _localizationsRepository;
 
-    private readonly IValidator<AddLocalizationModel> _addLocalizationModelValidator;
-    private readonly IValidator<UpdateLocalizationModel> _updateLocalizationModelValidator;
-
-    public LocalizationsController(IMapper mapper, ILocalizationsRepository localizationsRepository, IValidator<AddLocalizationModel> addLocalizationModelValidator, IValidator<UpdateLocalizationModel> updateLocalizationModelValidator)
+    public LocalizationsController(IMapper mapper, ILocalizationsRepository localizationsRepository)
     {
         _mapper = mapper;
         _localizationsRepository = localizationsRepository;
-        _addLocalizationModelValidator = addLocalizationModelValidator;
-        _updateLocalizationModelValidator = updateLocalizationModelValidator;
     }
 
     [HttpGet]
@@ -35,11 +30,9 @@ public sealed class LocalizationsController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Localization>> AddAsync(AddLocalizationModel addLocalizationModel)
     {
-        var validationResult = _addLocalizationModelValidator.Validate(addLocalizationModel);
-
-        if (!validationResult.IsValid)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(validationResult);
+            return BadRequest(ModelState);
         }
 
         var localization = _mapper.Map<Localization>(addLocalizationModel);
@@ -91,11 +84,9 @@ public sealed class LocalizationsController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<Localization>> UpdateAsync(long id, UpdateLocalizationModel updateLocalizationModel)
     {
-        var validationResult = _updateLocalizationModelValidator.Validate(updateLocalizationModel);
-
-        if (!validationResult.IsValid)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(validationResult);
+            return BadRequest(ModelState);
         }
 
         var localizationToUpdate = await _localizationsRepository.GetAsync(id);

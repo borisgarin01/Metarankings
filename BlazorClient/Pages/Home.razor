@@ -3,6 +3,12 @@
 <BlazorClient.Components.PagesComponents.Common.Headerer />
 <BlazorClient.Components.PagesComponents.Common.GameMenu />
 
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        <a href="/admin">Страница администратора</a>
+    </Authorized>
+</AuthorizeView>
+
 <div class="pager">Лучшие в прошлом месяце <span class="">Фильмы</span><span class="cycle-pager-active">Игры</span></div>
 
 <div class="slideshow">

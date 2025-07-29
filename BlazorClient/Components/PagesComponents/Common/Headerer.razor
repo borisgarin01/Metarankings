@@ -13,7 +13,7 @@
             <div class="nav">
                 <ul>
                     <li>
-                        <span@*onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});"*@ ><a href="/best-movies/">Фильмы</a></span>
+                        <span @*onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});" *@><a href="/best-movies/">Фильмы</a></span>
                         <div class="movie-drop">
                             <a href="/new-movies/">Новинки</a>
                             <a href="/coming-soon/">Скоро</a>
@@ -67,6 +67,14 @@
                     <li>
                         <a href="/user-reviews/">Отзывы</a>
                     </li>
+                    <AuthorizeView>
+                        <Authorized>
+                            <li class="single-line"><a href="/auth/logout">Выйти</a></li>
+                        </Authorized>
+                        <NotAuthorized>
+                            <li class="single-line"><a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a></li>
+                        </NotAuthorized>
+                    </AuthorizeView>
                 </ul>
             </div>
             <div class="nav_login">

@@ -1,0 +1,7 @@
+﻿.single-line {
+    white-space: nowrap; /* Prevents the text from wrapping to the next line */
+}
+
+    .single-line a {
+        display: inline; /* Ensures the anchor tags stay inline (this is usually default for <a> tags) */
+    }

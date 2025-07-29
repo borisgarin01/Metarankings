@@ -21,6 +21,7 @@ public sealed class AuthController : ControllerBase
         if (loginModel is null)
             return BadRequest("Неверный логин");
 
+
         if (string.IsNullOrWhiteSpace(loginModel.UserEmail) || string.IsNullOrWhiteSpace(loginModel.Password))
             return BadRequest("Email и пароль должны быть указаны");
 
@@ -46,10 +47,7 @@ public sealed class AuthController : ControllerBase
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        return Ok(new
-        {
-            Token = tokenString
-        });
+        return Ok(tokenString);
     }
 
     [HttpPost("register")]
@@ -102,6 +100,6 @@ public sealed class AuthController : ControllerBase
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        return Ok(new { Token = tokenString });
+        return Ok(tokenString);
     }
 }

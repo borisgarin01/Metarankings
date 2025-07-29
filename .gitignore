@@ -17,6 +17,7 @@ IdentityLibrary/obj
 API/appsettings.Development.json
 API/appsettings.json
 API/appsettings.Production.json
-FilesManagement/bin
+ExcelProcessors/bin
+ExcelProcessors/obj
 FilesManagement/obj
-IdentityLibrary/Migrations/0025_InsertAdminAccountMigration.cs
+FilesManagement/bin
