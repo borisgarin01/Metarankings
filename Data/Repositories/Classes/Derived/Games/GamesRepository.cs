@@ -324,7 +324,7 @@ p.id, p.name,
 gen.id, gen.name,
 l.id, l.name,
 plat.id, plat.name,
-gs.id, gs.gameid
+gs.id, gs.imageurl, gs.gameid
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
