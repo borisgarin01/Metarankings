@@ -1,7 +1,9 @@
 ﻿@page "/admin"
 
-<h3>AdminPage</h3>
+<h1>You're an admin</h1>
 
-@code {
-
-}
+<div class="form-group">
+    <label for="adminEmail">Admin Email</label>
+    <input type="email" class="form-control" @bind-value="@FutureAdminEmail" />
+    <button class="btn btn-primary" type="submit" @onclick="@AssignToAdminAsync">Assign to admin role</button>
+</div>

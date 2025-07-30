@@ -1,4 +1,5 @@
-﻿using IdentityLibrary.DTOs;
+﻿using Domain.Auth;
+using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 
 namespace API.Controllers.Auth;
@@ -105,9 +106,9 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("assignToAdmin")]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult> AssignToAdmin(string humanToAssignToAdminEmail)
+    public async Task<ActionResult> AssignToAdmin(UserAssignToRoleModel userAssignToRoleModel)
     {
-        var humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
+        var humanToAssignToAdmin = await _usersManager.FindByEmailAsync(userAssignToRoleModel.UserEmail);
 
         if (humanToAssignToAdmin is null)
             return NotFound("Human to assign to admin not found");

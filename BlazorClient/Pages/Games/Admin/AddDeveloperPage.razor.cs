@@ -1,7 +1,9 @@
 ﻿using Domain.RequestsModels.Games.Developers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlazorClient.Pages.Games.Admin;
 
+[Authorize(Policy = "Admin")]
 public partial class AddDeveloperPage : ComponentBase
 {
     [Inject]
