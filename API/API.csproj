@@ -24,6 +24,7 @@
     <PackageReference Include="FluentMigrator.Console" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Extensions.SqlServer" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Runner.SqlServer" Version="7.1.0" />
+    <PackageReference Include="MailKit" Version="4.13.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
