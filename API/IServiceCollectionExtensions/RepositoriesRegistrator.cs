@@ -35,6 +35,8 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IRepository<MovieStudio>, MoviesStudiosRepository>(instance => new MoviesStudiosRepository(metarankingsConnectionString));
 
+        services.AddScoped<IRepository<GameComment>, GamesCommentsRepository>(instance => new GamesCommentsRepository(metarankingsConnectionString));
+
         return services;
     }
 }
