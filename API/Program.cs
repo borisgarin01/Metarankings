@@ -47,6 +47,11 @@ internal class Program
             {
                 options.RequireRole("Admin");
             });
+            options.AddPolicy("AuthorizedWithEmailConfirmed", options =>
+            {
+                options.RequireAuthenticatedUser();
+                options.RequireClaim("EmailConfirmed", true.ToString());
+            });
         });
 
         builder.Services.AddSwaggerGen(options =>

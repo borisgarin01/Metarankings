@@ -21,11 +21,9 @@ public partial class Register : ComponentBase
     {
         try
         {
-            string jsonToken = await AuthService.RegisterAsync(RegisterModel);
-            if (!string.IsNullOrWhiteSpace(jsonToken))
-                NavigationManager.NavigateTo("/");
-            else
-                await JSRuntime.InvokeVoidAsync("alert", "Непредвиденная ошибка при регистрации");
+            await AuthService.RegisterAsync(RegisterModel);
+            await JSRuntime.InvokeVoidAsync("alert", "На Ваш адрес электронной почты отправлено письмо для перехода по ссылке для подтверждения аккаунта");
+            NavigationManager.NavigateTo("/");
         }
         catch (Exception ex)
         {

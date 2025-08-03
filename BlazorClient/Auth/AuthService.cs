@@ -45,19 +45,11 @@ public class AuthService : IAuthService
             .MarkUserAsLoggedOut();
     }
 
-    public async Task<string> RegisterAsync(RegisterModel registerModel)
+    public async Task RegisterAsync(RegisterModel registerModel)
     {
         var response = await _httpClient.PostAsJsonAsync("api/auth/register", registerModel);
 
         if (response.StatusCode == HttpStatusCode.BadRequest ^ response.StatusCode == HttpStatusCode.NotFound)
             throw new Exception(await response.Content.ReadAsStringAsync());
-
-        var token = await response.Content.ReadAsStringAsync();
-        await _localStorage.SetItemAsync("authToken", token);
-
-        ((JwtAuthenticationStateProvider)_authenticationStateProvider)
-            .MarkUserAsAuthenticated(registerModel.UserEmail);
-
-        return token;
     }
 }
