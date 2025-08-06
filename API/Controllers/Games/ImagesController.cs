@@ -1,4 +1,6 @@
 ﻿
+using IdentityLibrary.Telegram;
+
 namespace API.Controllers.Games;
 
 [ApiController]
@@ -7,9 +9,12 @@ public class ImagesController : ControllerBase
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public ImagesController(IWebHostEnvironment webHostEnvironment)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+
+    public ImagesController(IWebHostEnvironment webHostEnvironment, TelegramAuthenticator telegramAuthenticator)
     {
         _webHostEnvironment = webHostEnvironment;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpPost("imagePath")]
@@ -57,6 +62,9 @@ public class ImagesController : ControllerBase
             {
                 await formFile.CopyToAsync(fileStream);
             }
+
+            await _telegramAuthenticator.SendMessageAsync($"New image at api/images/{formFile.FileName}");
+
             return Created($"api/images/{formFile.FileName}", formFile);
         }
 

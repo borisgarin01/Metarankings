@@ -1,6 +1,8 @@
 ﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.RequestsModels.Games.Localizations;
+using IdentityLibrary.Telegram;
+using Microsoft.AspNetCore.Http;
 
 namespace API.Controllers.Games;
 
@@ -12,10 +14,13 @@ public sealed class LocalizationsController : ControllerBase
 
     private readonly ILocalizationsRepository _localizationsRepository;
 
-    public LocalizationsController(IMapper mapper, ILocalizationsRepository localizationsRepository)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+
+    public LocalizationsController(IMapper mapper, ILocalizationsRepository localizationsRepository, TelegramAuthenticator telegramAuthenticator)
     {
         _mapper = mapper;
         _localizationsRepository = localizationsRepository;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpGet]
@@ -40,6 +45,8 @@ public sealed class LocalizationsController : ControllerBase
         var insertedLocalizationId = await _localizationsRepository.AddAsync(localization);
 
         localization = localization with { Id = insertedLocalizationId };
+
+        await _telegramAuthenticator.SendMessageAsync($"New localization at api/localizations/{insertedLocalizationId}");
         return Created($"api/developers/{localization.Id}", localization);
     }
 

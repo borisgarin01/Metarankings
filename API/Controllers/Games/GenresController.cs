@@ -1,6 +1,7 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
 using Domain.RequestsModels.Games.Genres;
+using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -12,10 +13,13 @@ public sealed class GenresController : ControllerBase
 
     private readonly IRepository<Genre> _genresRepository;
 
-    public GenresController(IMapper mapper, IRepository<Genre> genresRepository)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+
+    public GenresController(IMapper mapper, IRepository<Genre> genresRepository, TelegramAuthenticator telegramAuthenticator)
     {
         _mapper = mapper;
         _genresRepository = genresRepository;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpGet]
@@ -40,6 +44,9 @@ public sealed class GenresController : ControllerBase
         var insertedGenreId = await _genresRepository.AddAsync(genre);
 
         genre.Id = insertedGenreId;
+
+        await _telegramAuthenticator.SendMessageAsync($"New genre at {insertedGenreId}");
+
         return Created($"api/developers/{genre.Id}", genre);
     }
 

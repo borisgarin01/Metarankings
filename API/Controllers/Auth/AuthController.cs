@@ -1,6 +1,9 @@
-﻿using Domain.Auth;
-using IdentityLibrary.DTOs;
+﻿using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
+using IdentityLibrary.Telegram;
+using MailKit.Net.Smtp;
+using MimeKit;
+using System.Net;
 
 namespace API.Controllers.Auth;
 
@@ -10,10 +13,12 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator)
     {
         _configuration = configuration;
         _usersManager = usersManager;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpPost("login")]
@@ -43,6 +48,8 @@ public sealed class AuthController : ControllerBase
 
         if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
             userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
+
+        userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
 
         var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
 
@@ -76,39 +83,67 @@ public sealed class AuthController : ControllerBase
             TwoFactorEnabled = false,
             UserName = registerModel.UserName
         };
-        var identityResult = await _usersManager.CreateAsync(user);
 
-        user = await _usersManager.FindByEmailAsync(user.Email);
+        IdentityResult userCreationResult = await _usersManager.CreateAsync(user);
 
-        var userClaims = new List<Claim>();
-
-        var adminEmail = _configuration["Auth:AdminEmail"];
-        var adminPassword = _configuration["Auth:AdminPassword"];
-
-        if (identityResult.Succeeded && string.Equals(registerModel.UserEmail, _configuration["Auth:AdminEmail"]) && string.Equals(registerModel.Password, _configuration["Auth:AdminPassword"]))
+        if (userCreationResult.Succeeded)
         {
-            await _usersManager.AddToRoleAsync(user, "Admin");
-            userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
+            user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
+
+            string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
+            var callbackUrl = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+
+            var emailMessage = new MimeMessage();
+
+            emailMessage.From.Add(new MailboxAddress("Metarankings.ru", "boris.garin01job@mail.ru"));
+            emailMessage.To.Add(new MailboxAddress("", user.Email));
+            emailMessage.Subject = "Confirm email";
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+            {
+                Text = $"Confirm email: go to email confirmation <a href=\"{callbackUrl}\">link</a> to confirm your email"
+            };
+
+            using (var client = new SmtpClient())
+            {
+                await client.ConnectAsync("smtp.mail.ru", 465, true);
+                await client.AuthenticateAsync("boris.garin01job@mail.ru", "tWySJBDnb2Lfgirt1XSo");
+                await client.SendAsync(emailMessage);
+
+                await client.DisconnectAsync(true);
+            }
+
+            return Ok("Email verification has been set");
         }
 
-        await _usersManager.AddToRoleAsync(user, "User");
-        userClaims.Add(new Claim(ClaimTypes.Role, "User"));
+        return StatusCode(500, "User creation error");
+    }
 
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
-        var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
+    [HttpGet("ConfirmEmail")]
+    public async Task<IActionResult> ConfirmEmail(string userId, string code)
+    {
+        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
+            return BadRequest("UserId and code are required");
 
-        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
+        // URL decode the code if needed
+        code = WebUtility.UrlDecode(code);
 
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        var user = await _usersManager.FindByIdAsync(userId);
+        if (user is null)
+            return NotFound("User not found");
 
-        return Ok(tokenString);
+        var emailConfirmationResult = await _usersManager.ConfirmEmailAsync(user, code);
+
+        if (!emailConfirmationResult.Succeeded)
+            return StatusCode(StatusCodes.Status400BadRequest, userId);
+
+        return Ok($"Email {user.Email} подтверждён.");
     }
 
     [HttpPost("assignToAdmin")]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult> AssignToAdmin(UserAssignToRoleModel userAssignToRoleModel)
+    public async Task<ActionResult> AssignToAdmin(string humanToAssignToAdminEmail)
     {
-        var humanToAssignToAdmin = await _usersManager.FindByEmailAsync(userAssignToRoleModel.UserEmail);
+        var humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
 
         if (humanToAssignToAdmin is null)
             return NotFound("Human to assign to admin not found");

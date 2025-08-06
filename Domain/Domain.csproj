@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="RequestsModels\Movies\MoviesGenres\" />
     <Folder Include="RequestsModels\Movies\MoviesStudios\" />
-    <Folder Include="Reviews\" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿namespace Data.Migrations;
 
-[Migration(26, "Create games comments table")]
+[Migration(25, "Create games comments table")]
 public sealed class CreateGamesCommentsTableMigration : Migration
 {
     public override void Down()

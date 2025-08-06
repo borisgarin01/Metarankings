@@ -2,6 +2,7 @@
 using Data.Repositories.Classes.Derived.Games;
 using Domain.Games;
 using Domain.RequestsModels.Games;
+using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -13,11 +14,14 @@ public sealed class GamesController : ControllerBase
     private readonly IMapper _mapper;
     private readonly GamesRepository _gamesRepository;
 
-    public GamesController(GamesRepository gamesRepository, IMapper mapper)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+
+    public GamesController(GamesRepository gamesRepository, IMapper mapper, TelegramAuthenticator telegramAuthenticator)
     {
         jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
         _gamesRepository = gamesRepository;
         _mapper = mapper;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
@@ -33,6 +37,7 @@ public sealed class GamesController : ControllerBase
     {
         var game = _mapper.Map<Game>(gameModel);
         var createdGame = await _gamesRepository.AddAsync(game);
+        await _telegramAuthenticator.SendMessageAsync($"New game at api/games/{createdGame}");
         return Ok(createdGame);
     }
 

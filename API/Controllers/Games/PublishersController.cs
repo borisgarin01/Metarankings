@@ -2,6 +2,7 @@
 using Domain.Games;
 using Domain.RequestsModels.Games.Publishers;
 using ExcelProcessors;
+using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -19,8 +20,11 @@ public sealed class PublishersController : ControllerBase
 
     private readonly ILogger<PublishersController> _logger;
 
-    public PublishersController(IMapper mapper, IRepository<Publisher> publishersRepository, IExcelDataReader<Publisher> publishersExcelDataReader, IWebHostEnvironment webHostEnvironment, ILogger<PublishersController> logger)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+
+    public PublishersController(TelegramAuthenticator telegramAuthenticator, IMapper mapper, IRepository<Publisher> publishersRepository, IExcelDataReader<Publisher> publishersExcelDataReader, IWebHostEnvironment webHostEnvironment, ILogger<PublishersController> logger)
     {
+        _telegramAuthenticator = telegramAuthenticator;
         _mapper = mapper;
         _publishersRepository = publishersRepository;
         _publishersExcelDataReader = publishersExcelDataReader;
@@ -51,6 +55,8 @@ public sealed class PublishersController : ControllerBase
         var insertedPublisherId = await _publishersRepository.AddAsync(publisher);
 
         publisher = publisher with { Id = insertedPublisherId };
+
+        await _telegramAuthenticator.SendMessageAsync($"New publsiher at api/publsihers/{publisher.Id}");
 
         return Created($"api/publishers/{publisher.Id}", publisher);
     }
