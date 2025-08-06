@@ -1,9 +1,7 @@
 ﻿using API.Json;
 using Data.Repositories.Classes.Derived.Games;
-using Domain.Games;
 using Domain.RequestsModels.Games;
 using IdentityLibrary.Telegram;
-using Telegram.Bot.Types;
 
 namespace API.Controllers.Games;
 

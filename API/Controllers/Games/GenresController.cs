@@ -2,7 +2,6 @@
 using Domain.Games;
 using Domain.RequestsModels.Games.Genres;
 using IdentityLibrary.Telegram;
-using Telegram.Bot.Types;
 
 namespace API.Controllers.Games;
 
