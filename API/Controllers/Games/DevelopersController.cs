@@ -57,7 +57,10 @@ public sealed class DevelopersController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var developer = _mapper.Map<Developer>(addDeveloperModel);
+        var developer = _mapper.Map<Developer>(addDeveloperModel) with
+        {
+            CreateTimeStamp = DateTime.UtcNow
+        };
 
         var insertedDeveloperId = await _developersRepository.AddAsync(developer);
 
