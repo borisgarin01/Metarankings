@@ -113,7 +113,9 @@ internal class Program
             .AddRoleStore<RoleStore>()
             .AddDefaultTokenProviders();
 
-        builder.Services.AddScoped<TelegramAuthenticator>(instance => new TelegramAuthenticator(builder.Configuration["Auth:Telegram:Bot:Token"], builder.Configuration["Auth:Telegram:Bot:ChatId"]));
+        builder.Services.AddSingleton<TelegramAuthenticator>(instance => new TelegramAuthenticator(builder.Configuration["Auth:Telegram:Bot:Token"], builder.Configuration["Auth:Telegram:Bot:ChatId"]));
+
+        builder.Services.AddHostedService<NotificationsBackgroundService>();
 
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
