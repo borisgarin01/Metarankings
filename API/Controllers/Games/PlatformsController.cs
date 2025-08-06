@@ -44,8 +44,8 @@ public sealed class PlatformsController : ControllerBase
         var insertedPlatformId = await _platformsRepository.AddAsync(platform);
 
         platform = platform with { Id = insertedPlatformId };
-        await _telegramAuthenticator.SendMessageAsync($"New platform at api/developers/{platform.Id}");
-        return Created($"api/developers/{platform.Id}", platform);
+        await _telegramAuthenticator.SendMessageAsync($"New platform {platform.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/platforms/{platform.Id}");
+        return Created($"api/platforms/{platform.Id}", platform);
     }
 
     [HttpGet("{id:long}")]

@@ -3,6 +3,7 @@ using Domain.Games;
 using Domain.RequestsModels.Games.Developers;
 using ExcelProcessors;
 using IdentityLibrary.Telegram;
+using Telegram.Bot.Types;
 
 namespace API.Controllers.Games;
 
@@ -63,7 +64,7 @@ public sealed class DevelopersController : ControllerBase
 
         developer = developer with { Id = insertedDeveloperId };
 
-        await _telegramAuthenticator.SendMessageAsync($"New developer at api/developers/{developer.Id}");
+        await _telegramAuthenticator.SendMessageAsync($"New developer {developer.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/developers/{developer.Id}");
 
         return Created($"api/developers/{developer.Id}", developer);
     }

@@ -2,6 +2,7 @@
 using Domain.Games;
 using Domain.RequestsModels.Games.Genres;
 using IdentityLibrary.Telegram;
+using Telegram.Bot.Types;
 
 namespace API.Controllers.Games;
 
@@ -45,9 +46,9 @@ public sealed class GenresController : ControllerBase
 
         genre.Id = insertedGenreId;
 
-        await _telegramAuthenticator.SendMessageAsync($"New genre at {insertedGenreId}");
+        await _telegramAuthenticator.SendMessageAsync($"New genre {genre.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/genres/{genre.Id}");
 
-        return Created($"api/developers/{genre.Id}", genre);
+        return Created($"api/genres/{genre.Id}", genre);
     }
 
     [HttpGet("{id:long}")]

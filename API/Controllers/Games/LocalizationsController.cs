@@ -46,8 +46,8 @@ public sealed class LocalizationsController : ControllerBase
 
         localization = localization with { Id = insertedLocalizationId };
 
-        await _telegramAuthenticator.SendMessageAsync($"New localization at api/localizations/{insertedLocalizationId}");
-        return Created($"api/developers/{localization.Id}", localization);
+        await _telegramAuthenticator.SendMessageAsync($"New localization {localization.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/localizations/{localization.Id}");
+        return Created($"api/localizations/{localization.Id}", localization);
     }
 
     [HttpGet("{id:long}")]

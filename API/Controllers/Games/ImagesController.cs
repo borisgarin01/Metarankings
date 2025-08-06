@@ -1,4 +1,5 @@
 ﻿
+using Domain.Games;
 using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
@@ -63,7 +64,7 @@ public class ImagesController : ControllerBase
                 await formFile.CopyToAsync(fileStream);
             }
 
-            await _telegramAuthenticator.SendMessageAsync($"New image at api/images/{formFile.FileName}");
+            await _telegramAuthenticator.SendMessageAsync($"New image {formFile.FileName} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/images/{formFile.FileName}");
 
             return Created($"api/images/{formFile.FileName}", formFile);
         }

@@ -56,7 +56,7 @@ public sealed class PublishersController : ControllerBase
 
         publisher = publisher with { Id = insertedPublisherId };
 
-        await _telegramAuthenticator.SendMessageAsync($"New publsiher at api/publsihers/{publisher.Id}");
+        await _telegramAuthenticator.SendMessageAsync($"New publisher {publisher.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/publishers/{publisher.Id}");
 
         return Created($"api/publishers/{publisher.Id}", publisher);
     }

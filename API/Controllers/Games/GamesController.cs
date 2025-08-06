@@ -3,6 +3,7 @@ using Data.Repositories.Classes.Derived.Games;
 using Domain.Games;
 using Domain.RequestsModels.Games;
 using IdentityLibrary.Telegram;
+using Telegram.Bot.Types;
 
 namespace API.Controllers.Games;
 
@@ -25,7 +26,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<Domain.Games.Game>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
     {
         var games = await _gamesRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
         return Ok(games);
@@ -35,21 +36,21 @@ public sealed class GamesController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<long>> AddAsync(AddGameModel gameModel)
     {
-        var game = _mapper.Map<Game>(gameModel);
+        var game = _mapper.Map<Domain.Games.Game>(gameModel);
         var createdGame = await _gamesRepository.AddAsync(game);
-        await _telegramAuthenticator.SendMessageAsync($"New game at api/games/{createdGame}");
-        return Ok(createdGame);
+        await _telegramAuthenticator.SendMessageAsync($"New game {game.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/games/{game.Id}");
+        return Created($"api/games/{game.Id}", createdGame);
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<Domain.Games.Game>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var games = await _gamesRepository.GetAllAsync();
         return Ok(games);
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<Game>> GetAsync(long id)
+    public async Task<ActionResult<Domain.Games.Game>> GetAsync(long id)
     {
         var game = await _gamesRepository.GetAsync(id);
 
@@ -69,7 +70,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("genres/{genreId:long}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfGenre(long genreId)
+    public async Task<ActionResult<IEnumerable<Domain.Games.Game>>> GetGamesOfGenre(long genreId)
     {
         try
         {
@@ -85,7 +86,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("platforms/{platformId:long}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfPlatform(long platformId)
+    public async Task<ActionResult<IEnumerable<Domain.Games.Game>>> GetGamesOfPlatform(long platformId)
     {
         try
         {
@@ -101,7 +102,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("developers/{developerId:long}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfDeveloper(long developerId)
+    public async Task<ActionResult<IEnumerable<Domain.Games.Game>>> GetGamesOfDeveloper(long developerId)
     {
         try
         {
@@ -117,7 +118,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("publishers/{publisherId:long}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfPublisher(long publisherId)
+    public async Task<ActionResult<IEnumerable<Domain.Games.Game>>> GetGamesOfPublisher(long publisherId)
     {
         try
         {
@@ -133,7 +134,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("year/{year:int}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfYear(int year)
+    public async Task<ActionResult<IEnumerable<Domain.Games.Game>>> GetGamesOfYear(int year)
     {
         try
         {
