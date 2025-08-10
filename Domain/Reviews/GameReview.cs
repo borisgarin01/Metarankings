@@ -1,14 +1,22 @@
-﻿namespace Domain.Reviews;
+﻿using IdentityLibrary.DTOs;
 
-public sealed record GameReview(
-    [property: Key]
-    [property:DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    long Id,
+namespace Domain.Reviews;
 
-    long GameId,
+public sealed record GameReview
+{
+    public long Id { get; set; }
 
-    long UserId,
+    public long GameId { get; set; }
 
-    [property:Required(ErrorMessage ="Text should be set")]
-    [property:MinLength(1,ErrorMessage ="Text should be not empty")]
-    string Text);
+    [Range(0.0f, 10.0f)]
+    public float Score { get; set; }
+
+    public ApplicationUser ApplicationUser { get; set; }
+    public long UserId { get; set; }
+
+    [Required(ErrorMessage = "Text should be set")]
+    [MinLength(1, ErrorMessage = "Text should be not empty")]
+    public string TextContent { get; set; }
+
+    public DateTime Date { get; set; }
+}

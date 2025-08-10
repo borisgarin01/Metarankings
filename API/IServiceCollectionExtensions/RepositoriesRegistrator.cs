@@ -4,6 +4,7 @@ using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.Movies;
+using Domain.Reviews;
 
 namespace API.IServiceCollectionExtensions;
 
@@ -35,7 +36,7 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IRepository<MovieStudio>, MoviesStudiosRepository>(instance => new MoviesStudiosRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<GameComment>, GamesCommentsRepository>(instance => new GamesCommentsRepository(metarankingsConnectionString));
+        services.AddScoped(instance => new GamesPlayersReviewsRepository(metarankingsConnectionString));
 
         return services;
     }

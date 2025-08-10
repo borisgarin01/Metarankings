@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\IdentityLibrary\IdentityLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>
