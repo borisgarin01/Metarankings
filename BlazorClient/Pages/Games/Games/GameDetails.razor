@@ -25,12 +25,8 @@ else
                            ImageSource="@Game.Image" />
 
 
-            <RatingComponent Score="@(0)"
-                             ScoresCount="@(0)"
-                             OnRate="RatePost"
-                             SelectedRating="@selectedRating"
-                             CurrentHoverRating="@currentHoverRating"
-                             OnHover="SetRatingPreview" />
+            <RatingComponent Score="@(Game.GamesPlayersReviews.Any() ? Game.GamesPlayersReviews.Average(g => g.Score) : 0)"
+                             ScoresCount="@Game.GamesPlayersReviews.Count" />
 
             <GameMetadata Developers="@Game.Developers"
                           Publisher="@Game.Publisher"
@@ -44,9 +40,9 @@ else
             <SystemRequirements />
 
             <GameTags Links="@(new List<string> {
-                                                                                                                                                                                                                                        "/best-ps4-games/",
-                                                                                                                                                                                                                                        "/top-igry-priklyucheniya/"
-                                                                                                                                                                                                                                    })" />
+                                                                                                                                                                                                                                                                                                                                                    "/best-ps4-games/",
+                                                                                                                                                                                                                                                                                                                                                    "/top-igry-priklyucheniya/"
+                                                                                                                                                                                                                                                                                                                                                })" />
 
         <AdHorizontal AdId="R-A-201169-7" />
 
@@ -87,6 +83,15 @@ else
                             }
                         </ol>
                     </div>
+                    <AuthorizeView>
+                        <Authorized>
+                            <form method="post" @onsubmit="@AddReviewAsync">
+                                <InputNumber @bind-Value="@YourScore" />
+                                <InputTextArea @bind-Value="@Text" />
+                                <input type="submit" value="Add" />
+                            </form>
+                        </Authorized>
+                    </AuthorizeView>
                 </div>
             </div>
         </div>

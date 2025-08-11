@@ -1,0 +1,34 @@
+﻿@using BlazorClient.Components.PagesComponents.GameDetails
+@using BlazorClient.Components.PagesComponents.Common
+@using Domain.Reviews
+
+
+<input type="hidden" name="GameId" value="GameId" />
+
+<div class="your-score"><p>Ваша оценка</p></div>
+<div class="ratings mark-@Math.Round(AverageGameGamersScore)">
+    <div class="post-ratings">
+        <div class="rating">
+            <div class="score">
+                @Math.Round(AverageGameGamersScore, 1)
+            </div>
+            <h1>Оценки</h1>: <span>@ScoresCount</span>
+        </div>
+        <div class="your-score">
+            <InputNumber @bind-Value="@YourScore"
+                         class="form-control"
+                         step="0.1"
+                         min="0"
+                         max="10" />
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label>Your Review</label>
+    <InputTextArea @bind-Value="@Text"
+                   class="form-control" />
+    <ValidationMessage For="@(() => Text)" />
+</div>
+
+<button type="submit" class="btn btn-primary">Submit Review</button>
