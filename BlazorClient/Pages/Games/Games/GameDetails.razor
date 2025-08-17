@@ -95,7 +95,12 @@ else
                     </div>
                     <AuthorizeView>
                         <Authorized>
-                            <YourScoreComponent YourScore="10" AverageGameGamersScore="10" Text="@string.Empty" GameId="@Game.Id" ScoresCount="0" />
+                            @if (currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier) != null &&
+                                                    !string.IsNullOrWhiteSpace(currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier).Value) &&
+                                                    !Game.GamesPlayersReviews.Any(a => a.UserId == long.Parse(currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier).Value)))
+                            {
+                                <YourScoreComponent YourScore="10" AverageGameGamersScore="10" Text="@string.Empty" GameId="@Game.Id" ScoresCount="0" />
+                            }
                         </Authorized>
                     </AuthorizeView>
                 </div>
