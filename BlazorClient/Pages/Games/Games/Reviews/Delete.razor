@@ -1,0 +1,9 @@
+﻿@page "/games/reviews/delete/{Id:long}"
+
+<h3>Delete</h3>
+
+<label>@GameReview.Score</label>
+
+<p>@GameReview.TextContent</p>
+
+<button type="submit" class="btn btn-primary" @onclick="DeleteAsync">Commit deleting</button>

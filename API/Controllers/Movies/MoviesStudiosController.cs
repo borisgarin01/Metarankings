@@ -1,4 +1,5 @@
-﻿using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Classes.Derived.Movies;
+using Data.Repositories.Interfaces;
 using Domain.Movies;
 
 namespace API.Controllers.Movies;
@@ -7,9 +8,9 @@ namespace API.Controllers.Movies;
 [Route("api/[controller]")]
 public sealed class MoviesStudiosController : ControllerBase
 {
-    private readonly IRepository<MovieStudio> _moviesStudiosRepository;
+    private readonly IRepository<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel> _moviesStudiosRepository;
 
-    public MoviesStudiosController(IRepository<MovieStudio> moviesStudiosRepository)
+    public MoviesStudiosController(IRepository<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel> moviesStudiosRepository)
     {
         _moviesStudiosRepository = moviesStudiosRepository;
     }
@@ -24,12 +25,12 @@ public sealed class MoviesStudiosController : ControllerBase
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult<MovieStudio>> AddAsync(MovieStudio movieStudio)
+    public async Task<ActionResult<MovieStudio>> AddAsync(AddMovieStudioModel movieStudio)
     {
         var createdMovieStudioId = await _moviesStudiosRepository.AddAsync(movieStudio);
 
         var createdMovieStudio = await _moviesStudiosRepository.GetAsync(createdMovieStudioId);
 
-        return Ok(createdMovieStudio);
+        return Created($"/api/moviesStudios/{createdMovieStudioId}", createdMovieStudio);
     }
 }

@@ -5,6 +5,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Pages\Games\Games\Reviews\Edit.razor~RF6a8d29.TMP" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />

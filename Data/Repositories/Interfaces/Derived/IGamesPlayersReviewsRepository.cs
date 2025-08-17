@@ -1,9 +1,9 @@
-﻿using Domain.Games;
+﻿using Domain.RequestsModels.Games.GamesGamersReviews;
 using Domain.Reviews;
 
 namespace Data.Repositories.Interfaces.Derived;
 
-public interface IGamesReviewsRepository : IRepository<GameReview>
+public interface IGamesPlayersReviewsRepository : IRepository<GameReview, AddGamePlayerReviewWithUserIdAndDateModel, UpdateGamePlayerReviewModel>
 {
     public Task<GameReview> GetUserReviewForGameAsync(long userId, long gameId);
     public Task<IEnumerable<GameReview>> GetGameReviewsAsync(long gameId);

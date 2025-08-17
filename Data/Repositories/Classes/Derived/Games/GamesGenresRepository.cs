@@ -1,14 +1,15 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
+using Domain.RequestsModels.Games.Genres;
 
 namespace Data.Repositories.Classes.Derived.Games;
-public sealed class GamesGenresRepository : Repository, IRepository<Genre>
+public sealed class GamesGenresRepository : Repository, IRepository<Genre, AddGenreModel, UpdateGenreModel>
 {
     public GamesGenresRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(Genre genre)
+    public async Task<long> AddAsync(AddGenreModel genre)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -25,7 +26,7 @@ VALUES (@Name);"
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<Genre> genres)
+    public async Task AddRangeAsync(IEnumerable<AddGenreModel> genres)
     {
         foreach (var genre in genres)
         {
@@ -137,7 +138,7 @@ Genres WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<Genre> UpdateAsync(Genre genre, long id)
+    public async Task<Genre> UpdateAsync(UpdateGenreModel genre, long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {

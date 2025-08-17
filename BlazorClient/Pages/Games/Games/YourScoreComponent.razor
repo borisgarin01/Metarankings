@@ -3,32 +3,12 @@
 @using Domain.Reviews
 
 
-<input type="hidden" name="GameId" value="GameId" />
+<form method="post" @onsubmit="AddReviewAsync">
+    <h3>Edit</h3>
 
-<div class="your-score"><p>Ваша оценка</p></div>
-<div class="ratings mark-@Math.Round(AverageGameGamersScore)">
-    <div class="post-ratings">
-        <div class="rating">
-            <div class="score">
-                @Math.Round(AverageGameGamersScore, 1)
-            </div>
-            <h1>Оценки</h1>: <span>@ScoresCount</span>
-        </div>
-        <div class="your-score">
-            <InputNumber @bind-Value="@YourScore"
-                         class="form-control"
-                         step="0.1"
-                         min="0"
-                         max="10" />
-        </div>
-    </div>
-</div>
+    <InputNumber class="form-control" @bind-Value="YourScore" />
 
-<div class="form-group">
-    <label>Your Review</label>
-    <InputTextArea @bind-Value="@Text"
-                   class="form-control" />
-    <ValidationMessage For="@(() => Text)" />
-</div>
+    <InputTextArea class="form-control" @bind-Value="Text" />
 
-<button type="submit" class="btn btn-primary">Submit Review</button>
+    <button type="submit" class="btn btn-primary">Add review</button>
+</form>

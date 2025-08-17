@@ -8,10 +8,10 @@ namespace API.Controllers.Movies;
 [Route("api/[controller]")]
 public class MoviesDirectorsController : ControllerBase
 {
-    private readonly IRepository<MovieDirector> _moviesDirectorsRepository;
+    private readonly IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> _moviesDirectorsRepository;
     private readonly IMapper _mapper;
 
-    public MoviesDirectorsController(IRepository<MovieDirector> moviesDirectorsRepository, IMapper mapper)
+    public MoviesDirectorsController(IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> moviesDirectorsRepository, IMapper mapper)
     {
         _moviesDirectorsRepository = moviesDirectorsRepository;
         _mapper = mapper;
@@ -55,14 +55,13 @@ public class MoviesDirectorsController : ControllerBase
     {
         if (ModelState.IsValid)
         {
-            var movieDirector = _mapper.Map<MovieDirector>(addMovieDirectorModel);
             try
             {
-                var insertedId = await _moviesDirectorsRepository.AddAsync(movieDirector);
+                var insertedId = await _moviesDirectorsRepository.AddAsync(addMovieDirectorModel);
 
-                movieDirector = movieDirector with { Id = insertedId };
+                var insertedMovieDirector = await _moviesDirectorsRepository.GetAsync(insertedId);
 
-                return Ok(movieDirector);
+                return Created($"/api/moviesdirectors/{insertedId}", insertedMovieDirector);
             }
             catch (Exception ex)
             {
@@ -84,12 +83,11 @@ public class MoviesDirectorsController : ControllerBase
 
         if (ModelState.IsValid)
         {
-            var movieDirector = _mapper.Map<MovieDirector>(updateMovieDirectorModel);
             try
             {
-                var updatedMovieDirector = await _moviesDirectorsRepository.UpdateAsync(movieDirector, id);
+                var updatedMovieDirector = await _moviesDirectorsRepository.UpdateAsync(updateMovieDirectorModel, id);
 
-                return Ok(movieDirector);
+                return Ok(updatedMovieDirector);
             }
             catch (Exception ex)
             {

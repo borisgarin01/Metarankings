@@ -1,38 +1,39 @@
 ﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
+using Domain.RequestsModels.Games.GamesGamersReviews;
 using Domain.Reviews;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesPlayersReviewsRepository : Repository, IGamesReviewsRepository
+public sealed class GamesPlayersReviewsRepository : Repository, IGamesPlayersReviewsRepository
 {
     public GamesPlayersReviewsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(GameReview gameReview)
+    public async Task<long> AddAsync(AddGamePlayerReviewWithUserIdAndDateModel gameReview)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
             var insertedGameReviewId = await connection.QueryFirstAsync<long>(@"
 INSERT INTO GamesPlayersReviews (GameId, UserId, TextContent, Score, Date)
 OUTPUT inserted.Id
-VALUES(@GameId, @UserId, @TextContent, @Score, @Date);", new
+VALUES(@GameId, @UserId, @TextContent, @Score, @TimeStamp);", new
             {
                 gameReview.GameId,
                 gameReview.UserId,
                 gameReview.TextContent,
                 gameReview.Score,
-                gameReview.Date
+                gameReview.TimeStamp
             });
 
             return insertedGameReviewId;
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<GameReview> gamesReviews)
+    public async Task AddRangeAsync(IEnumerable<AddGamePlayerReviewWithUserIdAndDateModel> gamesReviews)
     {
-        foreach (GameReview gameReview in gamesReviews)
+        foreach (AddGamePlayerReviewWithUserIdAndDateModel gameReview in gamesReviews)
         {
             await AddAsync(gameReview);
         }
@@ -86,7 +87,7 @@ OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", new { offset, limit });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            await connection.ExecuteAsync(@"DELETE FROM GamesPlayersReviews WHERE Id=@id");
+            await connection.ExecuteAsync(@"DELETE FROM GamesPlayersReviews WHERE Id=@id", new { id });
         }
     }
 
@@ -98,19 +99,17 @@ OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", new { offset, limit });
         }
     }
 
-    public async Task<GameReview> UpdateAsync(GameReview gameReview, long id)
+    public async Task<GameReview> UpdateAsync(UpdateGamePlayerReviewModel gameReview, long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
             var updatedGamePlayerReview = await connection.QueryFirstOrDefaultAsync<GameReview>(@"UPDATE GamesPlayersReviews 
-SET GameId=@GameId, UserId=@UserId, TextContent=@Text, Score=@Score, Date=@Date
+SET TextContent=@TextContent, Score=@Score, Date=@TimeStamp
 WHERE Id=@id", new
             {
-                gameReview.GameId,
-                gameReview.UserId,
                 gameReview.TextContent,
                 gameReview.Score,
-                gameReview.Date,
+                TimeStamp = DateTime.Now,
                 id
             });
 
