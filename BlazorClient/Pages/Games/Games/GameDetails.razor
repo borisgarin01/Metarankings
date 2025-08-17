@@ -95,7 +95,8 @@ else
                     </div>
                     <AuthorizeView>
                         <Authorized>
-                            @if (currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier) != null &&
+                            @if (currentUser?.Identity is not null &&
+                                                    currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier) != null &&
                                                     !string.IsNullOrWhiteSpace(currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier).Value) &&
                                                     !Game.GamesPlayersReviews.Any(a => a.UserId == long.Parse(currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier).Value)))
                             {
