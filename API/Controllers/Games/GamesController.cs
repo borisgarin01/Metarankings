@@ -33,12 +33,14 @@ public sealed class GamesController : ControllerBase
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult<long>> AddAsync(AddGameModel gameModel)
+    public async Task<ActionResult<long>> AddAsync(AddGameModel addGameModel)
     {
-        Game game = _mapper.Map<Game>(gameModel);
-        long createdGame = await _gamesRepository.AddAsync(game);
-        await _telegramAuthenticator.SendMessageAsync($"New game {game.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/games/{game.Id}");
-        return Created($"api/games/{game.Id}", createdGame);
+        long createdGameId = await _gamesRepository.AddAsync(addGameModel);
+
+        Game createdGame = await _gamesRepository.GetAsync(createdGameId);
+
+        await _telegramAuthenticator.SendMessageAsync($"New game {addGameModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/games/{createdGame.Id}");
+        return Created($"api/games/{createdGame.Id}", createdGame);
     }
 
     [HttpGet]

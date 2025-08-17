@@ -11,11 +11,11 @@ public sealed class PlatformsController : ControllerBase
 {
     private readonly IMapper _mapper;
 
-    private readonly IRepository<Platform> _platformsRepository;
+    private readonly IRepository<Platform, AddPlatformModel, UpdatePlatformModel> _platformsRepository;
 
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public PlatformsController(IMapper mapper, IRepository<Platform> platformsRepository, TelegramAuthenticator telegramAuthenticator)
+    public PlatformsController(IMapper mapper, IRepository<Platform, AddPlatformModel, UpdatePlatformModel> platformsRepository, TelegramAuthenticator telegramAuthenticator)
     {
         _mapper = mapper;
         _platformsRepository = platformsRepository;
@@ -39,13 +39,12 @@ public sealed class PlatformsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var platform = _mapper.Map<Platform>(addPlatformModel);
+        var insertedPlatformId = await _platformsRepository.AddAsync(addPlatformModel);
 
-        var insertedPlatformId = await _platformsRepository.AddAsync(platform);
+        var insertedPlatform = await _platformsRepository.GetAsync(insertedPlatformId);
 
-        platform = platform with { Id = insertedPlatformId };
-        await _telegramAuthenticator.SendMessageAsync($"New platform {platform.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/platforms/{platform.Id}");
-        return Created($"api/platforms/{platform.Id}", platform);
+        await _telegramAuthenticator.SendMessageAsync($"New platform {addPlatformModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/platforms/{insertedPlatformId}");
+        return Created($"api/platforms/{insertedPlatform.Id}", insertedPlatform);
     }
 
     [HttpGet("{id:long}")]
@@ -92,11 +91,8 @@ public sealed class PlatformsController : ControllerBase
         if (platformToUpdate is null)
             return NotFound();
 
-        // Map the update model to the existing entity
-        var platformToGetAfterUpdate = _mapper.Map<Platform>(updatePlatformModel);
-
         // Update and return the updated entity
-        var updatedPlatform = await _platformsRepository.UpdateAsync(platformToGetAfterUpdate, id);
+        var updatedPlatform = await _platformsRepository.UpdateAsync(updatePlatformModel, id);
 
         return Ok(updatedPlatform);
     }

@@ -1,13 +1,14 @@
 ﻿using Domain.Games;
 using Data.Repositories.Interfaces;
+using Domain.RequestsModels.Games.Developers;
 namespace Data.Repositories.Classes.Derived.Games;
-public sealed class DevelopersRepository : Repository, IRepository<Developer>
+public sealed class DevelopersRepository : Repository, IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel>
 {
     public DevelopersRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(Developer developer)
+    public async Task<long> AddAsync(AddDeveloperModel developer)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -23,7 +24,7 @@ VALUES (@Name);"
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<Developer> developers)
+    public async Task AddRangeAsync(IEnumerable<AddDeveloperModel> developers)
     {
         foreach (var developer in developers)
         {
@@ -226,7 +227,7 @@ Developers WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<Developer> UpdateAsync(Developer developer, long id)
+    public async Task<Developer> UpdateAsync(UpdateDeveloperModel developer, long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {

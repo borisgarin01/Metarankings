@@ -3,18 +3,18 @@ using Domain.Games;
 
 namespace Data.Repositories.Classes.Derived;
 
-public sealed class TagsRepository : Repository, IRepository<Tag>
+public sealed class TagsRepository : Repository, IRepository<Tag, AddTagModel, UpdateTagModel>
 {
     public TagsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public Task<long> AddAsync(Tag entity)
+    public Task<long> AddAsync(AddTagModel entity)
     {
         throw new NotImplementedException();
     }
 
-    public Task AddRangeAsync(IEnumerable<Tag> entities)
+    public Task AddRangeAsync(IEnumerable<AddTagModel> entities)
     {
         throw new NotImplementedException();
     }
@@ -44,7 +44,7 @@ public sealed class TagsRepository : Repository, IRepository<Tag>
         throw new NotImplementedException();
     }
 
-    public Task<Tag> UpdateAsync(Tag entity, long id)
+    public Task<Tag> UpdateAsync(UpdateTagModel entity, long id)
     {
         throw new NotImplementedException();
     }

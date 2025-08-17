@@ -1,0 +1,65 @@
+﻿using Domain.RequestsModels.Games.GamesGamersReviews;
+using Domain.Reviews;
+using Microsoft.AspNetCore.Components.Authorization;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
+
+namespace BlazorClient.Pages.Games.Games;
+
+public partial class YourScoreComponent : ComponentBase
+{
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    private ClaimsPrincipal currentUser;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (authenticationState is not null)
+        {
+            AuthenticationState authState = await authenticationState;
+            currentUser = authState?.User;
+        }
+        StateHasChanged();
+    }
+
+    [Parameter, EditorRequired]
+    [Range(0.0, 10.0)]
+    public double AverageGameGamersScore { get; set; }
+
+    [Parameter, EditorRequired]
+    [Range(0.0f, 10.0f)]
+    public float YourScore { get; set; }
+
+    [Parameter, EditorRequired]
+    [Range(0, long.MaxValue)]
+    public long ScoresCount { get; set; }
+
+    [Parameter, EditorRequired]
+    [MinLength(1, ErrorMessage = "Write a review")]
+    [MaxLength(4000, ErrorMessage = "Review is too long")]
+    [Required(ErrorMessage = "Review text is required")]
+    public string Text { get; set; }
+
+    [Parameter, EditorRequired]
+    public long GameId { get; set; }
+
+    [Inject]
+    public HttpClient HttpClient { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+
+    public async Task AddReviewAsync()
+    {
+        var addGamePlayerReviewModel = new AddGamePlayerReviewModel(GameId, Text, YourScore);
+        HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClient.PostAsJsonAsync<AddGamePlayerReviewModel>("api/GamesGamersReviews", addGamePlayerReviewModel);
+        if (addingGamePlayerReviewHttpResponseMessage.IsSuccessStatusCode)
+            NavigationManager.NavigateTo($"/games/Details/{GameId}", true);
+        else
+            await JSRuntime.InvokeVoidAsync("alert", await addingGamePlayerReviewHttpResponseMessage.Content.ReadAsStringAsync());
+    }
+}
