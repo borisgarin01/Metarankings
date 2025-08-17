@@ -1,5 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <None Remove="Migrations\0027_CreateDevelopersCreationTimestampsTableMigration.cs~RF1428c82.TMP" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="FluentMigrator" Version="7.1.0" />
     <PackageReference Include="FluentMigrator.Console" Version="7.1.0" />
@@ -8,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\IdentityLibrary\IdentityLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>

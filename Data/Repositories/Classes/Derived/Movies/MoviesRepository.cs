@@ -2,13 +2,13 @@
 using Domain.Movies;
 
 namespace Data.Repositories.Classes.Derived.Movies;
-public sealed class MoviesRepository : Repository, IRepository<MovieModel>
+public sealed class MoviesRepository : Repository, IRepository<Movie, AddMovieModel, UpdateMovieModel>
 {
     public MoviesRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(MovieModel entity)
+    public async Task<long> AddAsync(AddMovieModel entity)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -16,7 +16,7 @@ public sealed class MoviesRepository : Repository, IRepository<MovieModel>
             var insertedMovieStudios = new List<MovieStudio>();
             var insertedMovieDirectors = new List<MovieDirector>();
 
-            foreach (var movieGenre in entity.MovieGenres)
+            foreach (var movieGenre in entity.AddMovieGenresModels)
             {
                 var movieGenreToFind = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"SELECT Id, Name
 FROM MoviesGenres
@@ -33,7 +33,7 @@ VALUES (@Name);", new { movieGenre.Name });
                 else
                     insertedMovieGenres.Add(movieGenreToFind);
             }
-            foreach (var movieStudio in entity.MoviesStudios)
+            foreach (var movieStudio in entity.AddMovieStudiosModels)
             {
                 var moviesStudioToFind = await connection.QueryFirstOrDefaultAsync<MovieStudio>(@"SELECT Id, Name
 FROM MoviesStudios
@@ -53,7 +53,7 @@ VALUES (@Name);", new { movieStudio.Name });
                 }
             }
 
-            foreach (var movieDirector in entity.MoviesDirectors)
+            foreach (var movieDirector in entity.AddMovieDirectorsModels)
             {
                 var moviesDirectorToFind = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"SELECT Id, Name
 FROM MoviesDirectors
@@ -111,7 +111,7 @@ VALUES (@MovieId, @MovieDirectorId);",
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<MovieModel> entities)
+    public async Task AddRangeAsync(IEnumerable<AddMovieModel> entities)
     {
         foreach (var movieModel in entities)
         {
@@ -119,7 +119,7 @@ VALUES (@MovieId, @MovieDirectorId);",
         }
     }
 
-    public async Task<IEnumerable<MovieModel>> GetAllAsync()
+    public async Task<IEnumerable<Movie>> GetAllAsync()
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -136,9 +136,9 @@ md.id, md.name
     LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
     LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId";
 
-            var moviesDictionary = new Dictionary<long, MovieModel>();
+            var moviesDictionary = new Dictionary<long, Movie>();
 
-            var query = await connection.QueryAsync<MovieModel, MovieGenre, MovieStudio, MovieDirector, MovieModel>(
+            var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
                 sql,
                 (movie, movieGenre, movieStudio, movieDirector) =>
                 {
@@ -171,7 +171,7 @@ md.id, md.name
         }
     }
 
-    public async Task<MovieModel> GetAsync(long id)
+    public async Task<Movie> GetAsync(long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -189,9 +189,9 @@ md.id, md.name
     LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
 WHERE m.id=@id";
 
-            var moviesDictionary = new Dictionary<long, MovieModel>();
+            var moviesDictionary = new Dictionary<long, Movie>();
 
-            var query = await connection.QueryAsync<MovieModel, MovieGenre, MovieStudio, MovieDirector, MovieModel>(
+            var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
                 sql,
                 (movie, movieGenre, movieStudio, movieDirector) =>
                 {
@@ -225,7 +225,7 @@ WHERE m.id=@id";
         }
     }
 
-    public Task<IEnumerable<MovieModel>> GetAsync(long offset, long limit)
+    public Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }
@@ -240,7 +240,7 @@ WHERE m.id=@id";
         throw new NotImplementedException();
     }
 
-    public Task<MovieModel> UpdateAsync(MovieModel entity, long id)
+    public Task<Movie> UpdateAsync(UpdateMovieModel entity, long id)
     {
         throw new NotImplementedException();
     }

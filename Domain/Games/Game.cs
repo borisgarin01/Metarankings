@@ -1,4 +1,6 @@
-﻿namespace Domain.Games;
+﻿using Domain.Reviews;
+
+namespace Domain.Games;
 
 [Table("Games")]
 public sealed record Game
@@ -34,9 +36,12 @@ public sealed record Game
 
     [JsonPropertyName("developers")]
     public required List<Developer> Developers { get; set; } = new();
-    
+
     [JsonPropertyName("gameScreenshots")]
     public required List<GameScreenshot> Screenshots { get; set; } = new();
+
+    [JsonPropertyName("gamePlayersReviews")]
+    public required List<GameReview> GamesPlayersReviews { get; set; } = new();
 
     [JsonPropertyName("localization")]
     public required Localization Localization { get; set; }

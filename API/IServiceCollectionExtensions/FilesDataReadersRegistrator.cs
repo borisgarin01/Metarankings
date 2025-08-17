@@ -1,4 +1,6 @@
 ﻿using Domain.Games;
+using Domain.RequestsModels.Games.Developers;
+using Domain.RequestsModels.Games.Publishers;
 using ExcelProcessors;
 using ExcelProcessors.Derived;
 
@@ -8,8 +10,8 @@ public static class FilesDataReadersRegistrator
 {
     public static IServiceCollection RegisterFilesDataReaders(this IServiceCollection services)
     {
-        services.AddScoped<IExcelDataReader<Publisher>>(instance => new PublishersDataReader());
-        services.AddScoped<IExcelDataReader<Developer>>(instance => new DevelopersDataReader());
+        services.AddScoped<IExcelDataReader<AddPublisherModel>>(instance => new PublishersDataReader());
+        services.AddScoped<IExcelDataReader<AddDeveloperModel>>(instance => new DevelopersDataReader());
 
         return services;
     }
