@@ -1,17 +1,19 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
-using System;
-using System.Linq;
-using System.Text;
+using IdentityLibrary.DTOs;
+using Data.Extensions;
+using Dapper;
+using Domain.Reviews;
+using Domain.RequestsModels.Games;
 
 namespace Data.Repositories.Classes.Derived.Games;
-public sealed class GamesRepository : Repository, IRepository<Game>
+public sealed class GamesRepository : Repository, IRepository<Game, AddGameModel, UpdateGameModel>
 {
     public GamesRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(Game entity)
+    public async Task<long> AddAsync(AddGameModel entity)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -133,7 +135,7 @@ output inserted.Id, inserted.Name
 VALUES (@Name);", new { platform.Name }, transaction: transaction);
                     }
 
-                    var existingGamePlatform = await connection.QueryFirstOrDefaultAsync<GamePlatform>(@"SELECT GameId, PlatformId FROM GamesPlatforms WHERE GameId=@GameId AND PlatformId=@PlatformId", new { GameId = insertedGame.Id, PlatformId = platform.Id }, transaction: transaction);
+                    var existingGamePlatform = await connection.QueryFirstOrDefaultAsync<GamePlatform>(@"SELECT GameId, PlatformId FROM GamesPlatforms WHERE GameId=@GameId AND PlatformId=@PlatformId", new { GameId = insertedGame.Id, PlatformId = existingPlatform.Id }, transaction: transaction);
 
                     if (existingGamePlatform is null)
                     {
@@ -168,7 +170,7 @@ VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = ex
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<Game> games)
+    public async Task AddRangeAsync(IEnumerable<AddGameModel> games)
     {
         foreach (var entity in games)
             await AddAsync(entity);
@@ -324,7 +326,9 @@ p.id, p.name,
 gen.id, gen.name,
 l.id, l.name,
 plat.id, plat.name,
-gs.id, gs.gameid
+gs.id, gs.imageUrl, gs.gameid,
+gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
+au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -335,13 +339,15 @@ gs.id, gs.gameid
     LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
     LEFT JOIN platforms plat ON plat.id = gp.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN GamesPlayersReviews gpr on gpr.gameid=g.Id
+    LEFT JOIN ApplicationUsers au on au.Id=gpr.UserId
 WHERE g.Id=@id";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameReview, ApplicationUser, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                (game, developer, publisher, genre, localization, platform, screenshot, gamePlayerReview, applicationUser) =>
                 {
                     if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
                     {
@@ -350,6 +356,7 @@ WHERE g.Id=@id";
                         gameEntry.Genres = new List<Genre>();
                         gameEntry.Platforms = new List<Platform>();
                         gameEntry.Screenshots = new List<GameScreenshot>();
+                        gameEntry.GamesPlayersReviews = new List<GameReview>();
                         gameDictionary.Add(gameEntry.Name, gameEntry);
                     }
 
@@ -371,10 +378,16 @@ WHERE g.Id=@id";
                     if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                         gameEntry.Screenshots.Add(screenshot);
 
+                    if (gamePlayerReview is not null && applicationUser is not null)
+                    {
+                        gamePlayerReview = gamePlayerReview with { ApplicationUser = applicationUser };
+
+                        if (!gameEntry.GamesPlayersReviews.Any(s => s.Id == gamePlayerReview.Id))
+                            gameEntry.GamesPlayersReviews.Add(gamePlayerReview);
+                    }
                     return gameEntry;
                 },
-                new { id }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+                new { id } // Parameter passed here
             );
 
             var result = gameDictionary.Values.FirstOrDefault();
@@ -705,7 +718,7 @@ ORDER BY g.id, gen.id;";
         throw new NotImplementedException();
     }
 
-    public Task<Game> UpdateAsync(Game entity, long id)
+    public Task<Game> UpdateAsync(UpdateGameModel entity, long id)
     {
         throw new NotImplementedException();
     }

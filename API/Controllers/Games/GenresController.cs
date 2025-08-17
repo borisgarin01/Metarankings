@@ -1,6 +1,7 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
 using Domain.RequestsModels.Games.Genres;
+using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -10,12 +11,15 @@ public sealed class GenresController : ControllerBase
 {
     private readonly IMapper _mapper;
 
-    private readonly IRepository<Genre> _genresRepository;
+    private readonly IRepository<Genre, AddGenreModel, UpdateGenreModel> _genresRepository;
 
-    public GenresController(IMapper mapper, IRepository<Genre> genresRepository)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+
+    public GenresController(IMapper mapper, IRepository<Genre, AddGenreModel, UpdateGenreModel> genresRepository, TelegramAuthenticator telegramAuthenticator)
     {
         _mapper = mapper;
         _genresRepository = genresRepository;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpGet]
@@ -35,12 +39,13 @@ public sealed class GenresController : ControllerBase
             return BadRequest(addGenreModel);
         }
 
-        var genre = _mapper.Map<Genre>(addGenreModel);
+        var insertedGenreId = await _genresRepository.AddAsync(addGenreModel);
 
-        var insertedGenreId = await _genresRepository.AddAsync(genre);
+        await _telegramAuthenticator.SendMessageAsync($"New genre {addGenreModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/genres/{insertedGenreId}");
 
-        genre.Id = insertedGenreId;
-        return Created($"api/developers/{genre.Id}", genre);
+        Genre insertedGenre = await _genresRepository.GetAsync(insertedGenreId);
+
+        return Created($"api/genres/{insertedGenreId}", insertedGenre);
     }
 
     [HttpGet("{id:long}")]
@@ -91,7 +96,7 @@ public sealed class GenresController : ControllerBase
         var genreToGetAfterUpdate = _mapper.Map<Genre>(updateGenreModel);
 
         // Update and return the updated entity
-        var updatedGenre = await _genresRepository.UpdateAsync(genreToGetAfterUpdate, id);
+        var updatedGenre = await _genresRepository.UpdateAsync(updateGenreModel, id);
 
         return Ok(updatedGenre);
     }

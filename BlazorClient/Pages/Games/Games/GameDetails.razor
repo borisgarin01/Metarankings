@@ -1,6 +1,7 @@
 ﻿@page "/games/Details/{Id:long}"
 @using BlazorClient.Components.PagesComponents.GameDetails
 @using BlazorClient.Components.PagesComponents.Common
+@using Domain.Reviews
 
 <Headerer />
 <GameMenu />
@@ -24,12 +25,8 @@ else
                            ImageSource="@Game.Image" />
 
 
-            <RatingComponent Score="@(0)"
-                             ScoresCount="@(0)"
-                             OnRate="RatePost"
-                             SelectedRating="@selectedRating"
-                             CurrentHoverRating="@currentHoverRating"
-                             OnHover="SetRatingPreview" />
+            <RatingComponent Score="@(Game.GamesPlayersReviews.Any() ? Game.GamesPlayersReviews.Average(g => g.Score) : 0)"
+                             ScoresCount="@Game.GamesPlayersReviews.Count" />
 
             <GameMetadata Developers="@Game.Developers"
                           Publisher="@Game.Publisher"
@@ -43,11 +40,11 @@ else
             <SystemRequirements />
 
             <GameTags Links="@(new List<string> {
-                "/best-ps4-games/",
-                "/top-igry-priklyucheniya/"
-            })" />
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "/best-ps4-games/",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "/top-igry-priklyucheniya/"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            })" />
 
-            <AdHorizontal AdId="R-A-201169-7" />
+        <AdHorizontal AdId="R-A-201169-7" />
 
             <GameMedia Trailer="@Game.Trailer"
                        Screenshots="@Game.Screenshots"
@@ -55,6 +52,54 @@ else
                        Image="@Game.Image"
                        ReleaseDate="@Game.ReleaseDate"
                        GameId="@Game.Id" />
+
+            <div class="user-reviews comments">
+                <div id="comments">
+                    <h1 id="users">Отзывы</h1>
+                    <span class="countnum">@Game.GamesPlayersReviews.Count</span>
+                    <div class="comment_list">
+                        <ol>
+                        @foreach (GameReview gameReview in Game.GamesPlayersReviews)
+                            {
+                                <li class="mark-@Math.Round(gameReview.Score)">
+                                    <div>
+                                        <div class="ureview-text">
+                                            <div class="comment-meta">
+                                                <div class="small-score mark-@Math.Round(gameReview.Score)">
+                                                    <span data-title="Оценка отзыва из 10 баллов" class="tooltip">10</span>
+                                                </div>
+                                                <p class="user-reviews-author comment-author"><span>@gameReview.ApplicationUser.UserName</span></p>
+                                                <p class="comment-date">@gameReview.Date.ToString("dd.MM.yyyy")</p>
+                                                <div class="rating-com">
+                                                    <span class="ldc-ul_like" onclick="alter_ul_post_values(this,'53','c_like')">+ <span>60</span></span><span class="ldc-ul_dislike" onclick="alter_ul_post_values(this,'53','c_dislike')">- <span>6</span></span>
+                                                </div>
+                                            </div>
+                                            <div class="review-text">
+                                                <p>@gameReview.TextContent</p>
+                                            </div>
+                                        </div>
+                                        @if (currentUser?.Identity is not null &&
+                                                                        currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier) != null &&
+                                                                        !string.IsNullOrWhiteSpace(currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier).Value) &&
+                                                                        long.Parse(currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier).Value) == gameReview.UserId)
+                                        {
+                                            <div>
+                                                <a href="/games/reviews/edit/@gameReview.Id">Изменить</a>
+                                                <a href="/games/reviews/delete/@gameReview.Id">Удалить</a>
+                                            </div>
+                                        }
+                                    </div>
+                                </li>
+                            }
+                        </ol>
+                    </div>
+                    <AuthorizeView>
+                        <Authorized>
+                            <YourScoreComponent YourScore="10" AverageGameGamersScore="10" Text="@string.Empty" GameId="@Game.Id" ScoresCount="0" />
+                        </Authorized>
+                    </AuthorizeView>
+                </div>
+            </div>
         </div>
     </div>
 }

@@ -2,6 +2,7 @@
 using Domain.Games;
 using Domain.RequestsModels.Games.Publishers;
 using ExcelProcessors;
+using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -11,16 +12,19 @@ public sealed class PublishersController : ControllerBase
 {
     private readonly IMapper _mapper;
 
-    private readonly IRepository<Publisher> _publishersRepository;
+    private readonly IRepository<Publisher, AddPublisherModel, UpdatePublisherModel> _publishersRepository;
 
-    private readonly IExcelDataReader<Publisher> _publishersExcelDataReader;
+    private readonly IExcelDataReader<AddPublisherModel> _publishersExcelDataReader;
 
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     private readonly ILogger<PublishersController> _logger;
 
-    public PublishersController(IMapper mapper, IRepository<Publisher> publishersRepository, IExcelDataReader<Publisher> publishersExcelDataReader, IWebHostEnvironment webHostEnvironment, ILogger<PublishersController> logger)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+
+    public PublishersController(TelegramAuthenticator telegramAuthenticator, IMapper mapper, IRepository<Publisher, AddPublisherModel, UpdatePublisherModel> publishersRepository, IExcelDataReader<AddPublisherModel> publishersExcelDataReader, IWebHostEnvironment webHostEnvironment, ILogger<PublishersController> logger)
     {
+        _telegramAuthenticator = telegramAuthenticator;
         _mapper = mapper;
         _publishersRepository = publishersRepository;
         _publishersExcelDataReader = publishersExcelDataReader;
@@ -46,13 +50,13 @@ public sealed class PublishersController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var publisher = _mapper.Map<Publisher>(addPublisherModel);
+        long insertedPublisherId = await _publishersRepository.AddAsync(addPublisherModel);
 
-        var insertedPublisherId = await _publishersRepository.AddAsync(publisher);
+        Publisher insertedPublisher = await _publishersRepository.GetAsync(insertedPublisherId);
 
-        publisher = publisher with { Id = insertedPublisherId };
+        await _telegramAuthenticator.SendMessageAsync($"New publisher {insertedPublisher.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/publishers/{insertedPublisher.Id}");
 
-        return Created($"api/publishers/{publisher.Id}", publisher);
+        return Created($"api/publishers/{insertedPublisher.Id}", insertedPublisher);
     }
 
     [HttpPost("publishers-excel-upload")]
@@ -79,7 +83,7 @@ public sealed class PublishersController : ControllerBase
                 await excelFileWithPublishers.CopyToAsync(fileStream);
             }
 
-            IEnumerable<Publisher> publishersToUpload = _publishersExcelDataReader.GetFromExcel(filePath);
+            IEnumerable<AddPublisherModel> publishersToUpload = _publishersExcelDataReader.GetFromExcel(filePath);
 
             try
             {
@@ -111,7 +115,7 @@ public sealed class PublishersController : ControllerBase
 
     [HttpPost("upload-publishers-from-json")]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult> AddFromJsonAsync(IEnumerable<Publisher> publishers)
+    public async Task<ActionResult> AddFromJsonAsync(IEnumerable<AddPublisherModel> publishers)
     {
         if (publishers is null)
             return Problem("Publishers don't set", null, 400);
@@ -184,9 +188,7 @@ public sealed class PublishersController : ControllerBase
         if (publisherToUpdate is null)
             return NotFound();
 
-        var publisherToGetAfterUpdate = _mapper.Map<Publisher>(updatePublisherModel);
-
-        var updatePublisher = await _publishersRepository.UpdateAsync(publisherToGetAfterUpdate, id);
+        var updatePublisher = await _publishersRepository.UpdateAsync(updatePublisherModel, id);
 
         return Ok(updatePublisher);
     }

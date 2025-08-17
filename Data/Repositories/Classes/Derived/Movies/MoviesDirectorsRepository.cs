@@ -1,14 +1,15 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Movies;
+using Domain.RequestsModels.Movies.MoviesDirectors;
 
 namespace Data.Repositories.Classes.Derived.Movies;
-public sealed class MoviesDirectorsRepository : Repository, IRepository<MovieDirector>
+public sealed class MoviesDirectorsRepository : Repository, IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>
 {
     public MoviesDirectorsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(MovieDirector entity)
+    public async Task<long> AddAsync(AddMovieDirectorModel entity)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -20,7 +21,7 @@ VALUES (@Name)", new { entity.Name });
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<MovieDirector> entities)
+    public async Task AddRangeAsync(IEnumerable<AddMovieDirectorModel> entities)
     {
         foreach (var entity in entities)
         {
@@ -79,7 +80,7 @@ WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<MovieDirector> UpdateAsync(MovieDirector entity, long id)
+    public async Task<MovieDirector> UpdateAsync(UpdateMovieDirectorModel entity, long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {

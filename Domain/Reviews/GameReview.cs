@@ -1,14 +1,29 @@
-﻿namespace Domain.Reviews;
+﻿using IdentityLibrary.DTOs;
 
-public sealed record GameReview(
-    [property: Key]
-    [property:DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    long Id,
+namespace Domain.Reviews;
 
-    long GameId,
+public sealed record GameReview
+{
+    [JsonPropertyName("id")]
+    public long Id { get; init; }
 
-    long UserId,
+    [JsonPropertyName("gameId")]
+    public long GameId { get; init; }
 
-    [property:Required(ErrorMessage ="Text should be set")]
-    [property:MinLength(1,ErrorMessage ="Text should be not empty")]
-    string Text);
+    [JsonPropertyName("applicationUser")]
+    public ApplicationUser ApplicationUser { get; init; }
+
+    [JsonPropertyName("userId")]
+    public long UserId { get; init; }
+
+    [JsonPropertyName("score")]
+    [Range(0.0f, 10.0f)]
+    public float Score { get; init; }
+
+    [Required(ErrorMessage = "Text should be set")]
+    [MinLength(1, ErrorMessage = "Text should be not empty")]
+    public string TextContent { get; init; }
+
+    [JsonPropertyName("date")]
+    public DateTime Date { get; init; }
+}

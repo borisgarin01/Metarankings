@@ -2,6 +2,7 @@
 using Domain.Games;
 using Domain.RequestsModels.Games.Developers;
 using ExcelProcessors;
+using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -11,14 +12,16 @@ public sealed class DevelopersController : ControllerBase
 {
     private readonly IMapper _mapper;
 
-    private readonly IRepository<Developer> _developersRepository;
-    private readonly IExcelDataReader<Developer> _developersExcelDataReader;
+    private readonly IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel> _developersRepository;
+    private readonly IExcelDataReader<AddDeveloperModel> _developersExcelDataReader;
 
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     private readonly ILogger<DevelopersController> _logger;
 
-    public DevelopersController(IMapper mapper, IRepository<Developer> developersRepository, ILogger<DevelopersController> logger, IExcelDataReader<Developer> developersExcelDataReader)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+
+    public DevelopersController(IMapper mapper, IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel> developersRepository, ILogger<DevelopersController> logger, IExcelDataReader<AddDeveloperModel> developersExcelDataReader, TelegramAuthenticator telegramAuthenticator)
     {
         _mapper = mapper;
 
@@ -26,6 +29,7 @@ public sealed class DevelopersController : ControllerBase
         _developersExcelDataReader = developersExcelDataReader;
 
         _logger = logger;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpGet]
@@ -53,13 +57,13 @@ public sealed class DevelopersController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var developer = _mapper.Map<Developer>(addDeveloperModel);
+        long insertedDeveloperId = await _developersRepository.AddAsync(addDeveloperModel);
 
-        var insertedDeveloperId = await _developersRepository.AddAsync(developer);
+        Developer insertedDeveloper = await _developersRepository.GetAsync(insertedDeveloperId);
 
-        developer = developer with { Id = insertedDeveloperId };
+        await _telegramAuthenticator.SendMessageAsync($"New developer {insertedDeveloper.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/developers/{insertedDeveloper.Id}");
 
-        return Created($"api/developers/{developer.Id}", developer);
+        return Created($"api/developers/{insertedDeveloper.Id}", insertedDeveloper);
     }
 
     [HttpGet("{id:long}")]
@@ -106,18 +110,15 @@ public sealed class DevelopersController : ControllerBase
         if (developerToUpdate is null)
             return NotFound();
 
-        // Map the update model to the existing entity
-        var developerToGetAfterUpdate = _mapper.Map<Developer>(updateDeveloperModel);
-
         // Update and return the updated entity
-        var updatedDeveloper = await _developersRepository.UpdateAsync(developerToGetAfterUpdate, id);
+        Developer updatedDeveloper = await _developersRepository.UpdateAsync(updateDeveloperModel, id);
 
         return Ok(updatedDeveloper);
     }
 
     [HttpPost("upload-developers-from-json")]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult> AddFromJsonAsync(IEnumerable<Developer> developers)
+    public async Task<ActionResult> AddFromJsonAsync(IEnumerable<AddDeveloperModel> developers)
     {
         if (developers is null)
             return Problem("Developers don't set", null, 400);
@@ -169,7 +170,7 @@ public sealed class DevelopersController : ControllerBase
                 await excelFileWithPublishers.CopyToAsync(fileStream);
             }
 
-            IEnumerable<Developer> developersToUpload = _developersExcelDataReader.GetFromExcel(filePath);
+            IEnumerable<AddDeveloperModel> developersToUpload = _developersExcelDataReader.GetFromExcel(filePath);
 
             try
             {

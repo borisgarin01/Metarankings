@@ -4,6 +4,13 @@ using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.Movies;
+using Domain.RequestsModels.Games.Developers;
+using Domain.RequestsModels.Games.Genres;
+using Domain.RequestsModels.Games.Localizations;
+using Domain.RequestsModels.Games.Platforms;
+using Domain.RequestsModels.Games.Publishers;
+using Domain.RequestsModels.Movies.MoviesDirectors;
+using Domain.Reviews;
 
 namespace API.IServiceCollectionExtensions;
 
@@ -13,29 +20,29 @@ public static class RepositoriesRegistrator
     {
         string metarankingsConnectionString = configuration.GetConnectionString("MetarankingsConnection");
 
-        services.AddScoped<IRepository<Developer>, DevelopersRepository>(instance => new DevelopersRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel>, DevelopersRepository>(instance => new DevelopersRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Genre>, GamesGenresRepository>(instance => new GamesGenresRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<Genre, AddGenreModel, UpdateGenreModel>, GamesGenresRepository>(instance => new GamesGenresRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Platform>, PlatformsRepository>(instance => new PlatformsRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsRepository>(instance => new PlatformsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Localization>, LocalizationsRepository>(instance => new LocalizationsRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<Localization, AddLocalizationModel, UpdateLocalizationModel>, LocalizationsRepository>(instance => new LocalizationsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Publisher>, PublishersRepository>(instance => new PublishersRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersRepository>(instance => new PublishersRepository(metarankingsConnectionString));
 
         services.AddScoped(instance => new GamesRepository(metarankingsConnectionString));
 
         services.AddScoped<ILocalizationsRepository>(instance => new LocalizationsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<MovieModel>, MoviesRepository>(instance => new MoviesRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<Movie, AddMovieModel, UpdateMovieModel>, MoviesRepository>(instance => new MoviesRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<MovieDirector>, MoviesDirectorsRepository>(instance => new MoviesDirectorsRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsRepository>(instance => new MoviesDirectorsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<MovieGenre>, MoviesGenresRepository>(instance => new MoviesGenresRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresRepository>(instance => new MoviesGenresRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<MovieStudio>, MoviesStudiosRepository>(instance => new MoviesStudiosRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosRepository>(instance => new MoviesStudiosRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<GameComment>, GamesCommentsRepository>(instance => new GamesCommentsRepository(metarankingsConnectionString));
+        services.AddScoped(instance => new GamesPlayersReviewsRepository(metarankingsConnectionString));
 
         return services;
     }

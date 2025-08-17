@@ -11,4 +11,8 @@
     <Folder Include="RequestsModels\Movies\MoviesStudios\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IdentityLibrary\IdentityLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

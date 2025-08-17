@@ -1,5 +1,6 @@
 ﻿using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
+using IdentityLibrary.Telegram;
 using MailKit.Net.Smtp;
 using MimeKit;
 using System.Net;
@@ -12,10 +13,12 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator)
     {
         _configuration = configuration;
         _usersManager = usersManager;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpPost("login")]
@@ -47,6 +50,8 @@ public sealed class AuthController : ControllerBase
             userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
 
         userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
+
+        userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
 
         var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
 

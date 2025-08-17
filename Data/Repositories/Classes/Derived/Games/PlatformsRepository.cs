@@ -1,15 +1,16 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
+using Domain.RequestsModels.Games.Platforms;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class PlatformsRepository : Repository, IRepository<Platform>
+public sealed class PlatformsRepository : Repository, IRepository<Platform, AddPlatformModel, UpdatePlatformModel>
 {
     public PlatformsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(Platform platform)
+    public async Task<long> AddAsync(AddPlatformModel platform)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -25,7 +26,7 @@ VALUES (@Name);"
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<Platform> platfroms)
+    public async Task AddRangeAsync(IEnumerable<AddPlatformModel> platfroms)
     {
         foreach (var platform in platfroms)
         {
@@ -235,7 +236,7 @@ Platforms WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<Platform> UpdateAsync(Platform platform, long id)
+    public async Task<Platform> UpdateAsync(UpdatePlatformModel platform, long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
