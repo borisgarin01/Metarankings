@@ -25,12 +25,8 @@ else
                            ImageSource="@Game.Image" />
 
 
-            <RatingComponent Score="@(0)"
-                             ScoresCount="@(0)"
-                             OnRate="RatePost"
-                             SelectedRating="@selectedRating"
-                             CurrentHoverRating="@currentHoverRating"
-                             OnHover="SetRatingPreview" />
+            <RatingComponent Score="@(Game.GamesPlayersReviews.Any() ? Game.GamesPlayersReviews.Average(g => g.Score) : 0)"
+                             ScoresCount="@Game.GamesPlayersReviews.Count" />
 
             <GameMetadata Developers="@Game.Developers"
                           Publisher="@Game.Publisher"
@@ -44,9 +40,9 @@ else
             <SystemRequirements />
 
             <GameTags Links="@(new List<string> {
-                                                                                                                                                                                                                                        "/best-ps4-games/",
-                                                                                                                                                                                                                                        "/top-igry-priklyucheniya/"
-                                                                                                                                                                                                                                    })" />
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "/best-ps4-games/",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "/top-igry-priklyucheniya/"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            })" />
 
         <AdHorizontal AdId="R-A-201169-7" />
 
@@ -82,11 +78,26 @@ else
                                                 <p>@gameReview.TextContent</p>
                                             </div>
                                         </div>
+                                        @if (currentUser?.Identity is not null &&
+                                                                        currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier) != null &&
+                                                                        !string.IsNullOrWhiteSpace(currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier).Value) &&
+                                                                        long.Parse(currentUser.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier).Value) == gameReview.UserId)
+                                        {
+                                            <div>
+                                                <a href="/games/reviews/edit/@gameReview.Id">Изменить</a>
+                                                <a href="/games/reviews/delete/@gameReview.Id">Удалить</a>
+                                            </div>
+                                        }
                                     </div>
                                 </li>
                             }
                         </ol>
                     </div>
+                    <AuthorizeView>
+                        <Authorized>
+                            <YourScoreComponent YourScore="10" AverageGameGamersScore="10" Text="@string.Empty" GameId="@Game.Id" ScoresCount="0" />
+                        </Authorized>
+                    </AuthorizeView>
                 </div>
             </div>
         </div>

@@ -1,0 +1,14 @@
+﻿@using BlazorClient.Components.PagesComponents.GameDetails
+@using BlazorClient.Components.PagesComponents.Common
+@using Domain.Reviews
+
+
+<form method="post" @onsubmit="AddReviewAsync">
+    <h3>Edit</h3>
+
+    <InputNumber class="form-control" @bind-Value="YourScore" />
+
+    <InputTextArea class="form-control" @bind-Value="Text" />
+
+    <button type="submit" class="btn btn-primary">Add review</button>
+</form>

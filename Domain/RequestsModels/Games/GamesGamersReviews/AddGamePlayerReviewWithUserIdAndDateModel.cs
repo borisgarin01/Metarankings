@@ -1,6 +1,6 @@
 ﻿namespace Domain.RequestsModels.Games.GamesGamersReviews;
 
-public sealed record AddGamePlayerReviewModel(
+public sealed record AddGamePlayerReviewWithUserIdAndDateModel(
     [property: JsonPropertyName("gameId")]
     long GameId,
 
@@ -11,4 +11,12 @@ public sealed record AddGamePlayerReviewModel(
     string TextContent,
 
     [Range(0.0f, 10.0f, ErrorMessage = "Score should be between 0 and 10")]
-    float Score);
+    float Score,
+
+    [property:JsonPropertyName("userId")]
+    [Required(ErrorMessage = "User id is required")]
+    long UserId,
+
+    [property:JsonPropertyName("timeStamp")]
+    [Required(ErrorMessage = "TimeStamp is required")]
+    DateTime TimeStamp);

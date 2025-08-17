@@ -1,15 +1,16 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces;
 using Domain.Games;
+using Domain.RequestsModels.Games.Publishers;
 
 namespace Data.Repositories.Classes.Derived.Games;
-public sealed class PublishersRepository : Repository, IRepository<Publisher>
+public sealed class PublishersRepository : Repository, IRepository<Publisher, AddPublisherModel, UpdatePublisherModel>
 {
     public PublishersRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(Publisher publisher)
+    public async Task<long> AddAsync(AddPublisherModel publisher)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -25,7 +26,7 @@ VALUES (@Name);"
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<Publisher> publishers)
+    public async Task AddRangeAsync(IEnumerable<AddPublisherModel> publishers)
     {
         foreach (var publisher in publishers)
         {
@@ -166,7 +167,7 @@ Publishers WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<Publisher> UpdateAsync(Publisher publisher, long id)
+    public async Task<Publisher> UpdateAsync(UpdatePublisherModel publisher, long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
