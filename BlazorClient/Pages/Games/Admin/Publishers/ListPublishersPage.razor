@@ -1,9 +1,9 @@
-﻿@page "/admin/list-publishers"
+﻿@page "/admin/publishers/list-publishers"
 @using Domain.Games
 
 <AuthorizeView Policy="Admin">
     <Authorized>
-        <a href="/admin/add-publisher">Добавить издателя</a>
+        <a href="/admin/publishers/add-publisher">Добавить издателя</a>
         <div class="publishersList">
             @foreach (Publisher publisher in Publishers)
             {

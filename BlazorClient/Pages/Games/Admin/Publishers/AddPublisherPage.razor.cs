@@ -1,8 +1,6 @@
-﻿using Domain.RequestsModels.Games.Developers;
-using Domain.RequestsModels.Games.Publishers;
-using System.Net.Http.Json;
+﻿using Domain.RequestsModels.Games.Publishers;
 
-namespace BlazorClient.Pages.Games.Admin;
+namespace BlazorClient.Pages.Games.Admin.Publishers;
 
 public partial class AddPublisherPage : ComponentBase
 {
@@ -19,9 +17,9 @@ public partial class AddPublisherPage : ComponentBase
 
     public async Task AddPublisherAsync()
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddPublisherModel>("/api/Publishers", AddPublisherModel);
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Publishers", AddPublisherModel);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
-            NavigationManager.NavigateTo("/admin/list-publishers");
+            NavigationManager.NavigateTo("/admin/publishers/list-publishers");
         else
             if (httpResponseMessage is not null)
             await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());

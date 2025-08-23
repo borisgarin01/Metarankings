@@ -1,7 +1,7 @@
 ﻿using Domain.Games;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BlazorClient.Pages.Games.Admin;
+namespace BlazorClient.Pages.Games.Admin.Publishers;
 
 [Authorize(Policy = "Admin")]
 public partial class ListPublishersPage : ComponentBase
