@@ -5,7 +5,7 @@
 <div class="form-group">
     <label for="adminEmail">Admin Email</label>
     <input type="email" class="form-control" @bind-value="@FutureAdminEmail" />
-    <button class="btn btn-primary" type="submit" @onclick="@AssignToAdminAsync">Assign to admin role</button>
+    <button class="btn btn-primary" type="submit" @onclick="@AssignToAdminAsync">Назначить админом</button>
 </div>
 
 <div class="form-group">
@@ -13,4 +13,5 @@
     <a class="link-dark" href="/admin/publishers/list-publishers">Издатели</a>
     <a class="link-dark" href="/admin/platforms/list-platforms">Платформы</a>
     <a class="link-dark" href="/admin/localizations/list-localizations">Локализации</a>
+    <a class="link-dark" href="/admin/genres/list-genres">Жанры</a>
 </div>

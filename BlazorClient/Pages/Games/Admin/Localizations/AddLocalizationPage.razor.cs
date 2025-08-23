@@ -16,10 +16,6 @@ public partial class AddLocalizationPage : ComponentBase
     public IJSRuntime JSRuntime { get; set; }
 
     public AddLocalizationModel AddLocalizationModel { get; } = new AddLocalizationModel();
-    protected override Task OnInitializedAsync()
-    {
-        return base.OnInitializedAsync();
-    }
 
     public async Task AddLocalizationAsync()
     {

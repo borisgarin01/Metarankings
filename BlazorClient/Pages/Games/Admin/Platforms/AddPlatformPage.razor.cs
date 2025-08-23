@@ -14,10 +14,6 @@ public partial class AddPlatformPage : ComponentBase
     public IJSRuntime JSRuntime { get; set; }
 
     public AddPlatformModel AddPlatformModel { get; } = new AddPlatformModel();
-    protected override Task OnInitializedAsync()
-    {
-        return base.OnInitializedAsync();
-    }
 
     public async Task AddPlatformAsync()
     {
