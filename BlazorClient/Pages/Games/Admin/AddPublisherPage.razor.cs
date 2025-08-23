@@ -1,10 +1,10 @@
 ﻿using Domain.RequestsModels.Games.Developers;
-using Microsoft.AspNetCore.Authorization;
+using Domain.RequestsModels.Games.Publishers;
+using System.Net.Http.Json;
 
 namespace BlazorClient.Pages.Games.Admin;
 
-[Authorize(Policy = "Admin")]
-public partial class AddDeveloperPage : ComponentBase
+public partial class AddPublisherPage : ComponentBase
 {
     [Inject]
     public HttpClient HttpClient { get; set; }
@@ -15,19 +15,16 @@ public partial class AddDeveloperPage : ComponentBase
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
 
-    public AddDeveloperModel AddDeveloperModel { get; } = new AddDeveloperModel();
-    protected override Task OnInitializedAsync()
-    {
-        return base.OnInitializedAsync();
-    }
+    public AddPublisherModel AddPublisherModel { get; } = new AddPublisherModel();
 
-    public async Task AddDeveloperAsync()
+    public async Task AddPublisherAsync()
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddDeveloperModel>("/api/Developers", AddDeveloperModel);
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddPublisherModel>("/api/Publishers", AddPublisherModel);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
-            NavigationManager.NavigateTo("/admin/list-developers");
+            NavigationManager.NavigateTo("/admin/list-publishers");
         else
             if (httpResponseMessage is not null)
             await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
     }
+
 }
