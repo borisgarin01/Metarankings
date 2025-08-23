@@ -55,6 +55,10 @@ public sealed class AuthController : ControllerBase
 
         var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
 
+        userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
+
+        string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
+
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
         return Ok(tokenString);
@@ -159,5 +163,22 @@ public sealed class AuthController : ControllerBase
                 return BadRequest(identityResult);
             return Ok(identityResult);
         }
+    }
+
+    [HttpPost("changePassword")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult> ChangePassword(string oldPassword, string passwordToAssign)
+    {
+        ApplicationUser? applicationUser = await _usersManager.FindByIdAsync(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value);
+        var isCorrectOldPassword = BCrypt.Net.BCrypt.EnhancedVerify(oldPassword, applicationUser.PasswordHash);
+        if (!isCorrectOldPassword)
+            return BadRequest("Неверный предыдущий пароль пользователя");
+        string encryptedNewPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(passwordToAssign);
+        string token = await _usersManager.GeneratePasswordResetTokenAsync(applicationUser);
+
+        IdentityResult passwordChangingResult = await _usersManager.ChangePasswordAsync(applicationUser, token, encryptedNewPassword);
+        if (passwordChangingResult is not null && passwordChangingResult.Succeeded)
+            return Ok();
+        return BadRequest();
     }
 }

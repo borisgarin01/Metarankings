@@ -2,7 +2,7 @@
 
 namespace IdentityLibrary.Repositories;
 
-public sealed class UsersStore : IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>
+public sealed class UsersStore : IUserSecurityStampStore<ApplicationUser>, IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>
 {
     private readonly string _connectionString;
 
@@ -122,6 +122,11 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
             WHERE UserId = @Id);", new { user.Id })).ToList();
     }
 
+    public Task<string?> GetSecurityStampAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(user.SecurityStamp);
+    }
+
     public Task<string> GetUserIdAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         return Task.FromResult(user.Id.ToString());
@@ -219,6 +224,12 @@ WHERE Id=@Id;", new { normalizedUsername, user.Id });
         await connection.ExecuteAsync(@"UPDATE ApplicationUsers 
 SET PasswordHash = @passwordHash 
 WHERE Id=@Id;", new { passwordHash, user.Id });
+    }
+
+    public Task SetSecurityStampAsync(ApplicationUser user, string stamp, CancellationToken cancellationToken)
+    {
+        user.SecurityStamp = stamp;
+        return Task.CompletedTask;
     }
 
     public async Task SetUserNameAsync(ApplicationUser user, string? userName, CancellationToken cancellationToken)
