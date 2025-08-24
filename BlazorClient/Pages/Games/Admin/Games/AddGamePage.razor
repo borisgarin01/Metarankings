@@ -1,5 +1,105 @@
-﻿<h3>AddGamePage</h3>
+﻿@page "/admin/games/add-game"
+@using Domain.Games
 
-@code {
+<h3>Add game page</h3>
 
+@if (DevelopersToSelectFrom is null || GenresToSelectFrom is null || LocalizationsToSelectFrom is null || PlatformsToSelectFrom is null || PublishersToSelectFrom is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <p>
+        <label>
+            Enter name:
+            <input @bind="@Name" />
+        </label>
+    </p>
+    <p>
+        <label>
+            Enter image:
+            <input @bind="@Image" />
+        </label>
+    </p>
+    <p>
+        <label>
+            Enter release date:
+            <input @bind="@ReleaseDate" />
+        </label>
+    </p>
+    <p>
+        <label>
+            Enter description:
+            <textarea type="text" @bind="@Description" />
+        </label>
+    </p>
+    <p>
+        <label>
+            Enter trailer:
+            <input @bind="@Trailer" />
+        </label>
+    </p>
+
+    <p>
+        <label>
+            Select developers:
+            <select @onchange="SelectDeveloper" multiple>
+                <option value="-1" selected>None</option>
+                @foreach (Developer developer in DevelopersToSelectFrom)
+                {
+                    <option value="@developer.Id.ToString()">@developer.Name</option>
+                }
+            </select>
+        </label>
+    </p>
+    <p>
+        <label>
+            Select genres:
+            <select @onchange="SelectGenre" multiple>
+                <option value="-1" selected>None</option>
+                @foreach (Genre genre in GenresToSelectFrom)
+                {
+                    <option value="@genre.Id.ToString()">@genre.Name</option>
+                }
+            </select>
+        </label>
+    </p>
+    <p>
+        <label>
+            Select localization:
+            <select @onchange="SelectLocalization">
+                <option value="-1" selected>None</option>
+                @foreach (Localization localization in LocalizationsToSelectFrom)
+                {
+                    <option value="@localization.Id.ToString()">@localization.Name</option>
+                }
+            </select>
+        </label>
+    </p>
+    <p>
+        <label>
+            Select platforms:
+            <select @onchange="SelectPlatform" multiple>
+                <option value="-1" selected>None</option>
+                @foreach (Platform platform in PlatformsToSelectFrom)
+                {
+                    <option value="@platform.Id.ToString()">@platform.Name</option>
+                }
+            </select>
+        </label>
+    </p>
+    <p>
+        <label>
+            Select publisher:
+            <select @onchange="SelectPublisher">
+                <option value="-1" selected>None</option>
+                @foreach (Publisher publisher in PublishersToSelectFrom)
+                {
+                    <option value="@publisher.Id.ToString()">@publisher.Name</option>
+                }
+            </select>
+        </label>
+    </p>
+
+    <input type="submit" @onclick="@AddGameAsync" value="Submit" />
 }

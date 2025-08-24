@@ -21,73 +21,6 @@ public sealed class GamesRepository : Repository, IRepository<Game, AddGameModel
 
             using (var transaction = connection.BeginTransaction())
             {
-                List<Developer> insertedDevelopers = new();
-                List<Genre> insertedGenres = new();
-                Publisher insertedPublisher = null;
-                Localization insertedLocalization = null;
-
-                foreach (var developer in entity.Developers)
-                {
-                    var developerToFind = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name
-FROM Developers
-WHERE Name=@Name;", new { developer.Name }, transaction: transaction);
-
-                    if (developerToFind is null)
-                    {
-                        var insertedDeveloper = await connection.QueryFirstAsync<Developer>(@"INSERT INTO Developers 
-(Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { developer.Name }, transaction: transaction);
-                        insertedDevelopers.Add(insertedDeveloper);
-                    }
-                    else
-                        insertedDevelopers.Add(developerToFind);
-                }
-                foreach (var genre in entity.Genres)
-                {
-                    var genreToFind = await connection.QueryFirstOrDefaultAsync<Genre>(@"SELECT Id, Name
-FROM Genres
-WHERE Name=@Name;", new { genre.Name }, transaction: transaction);
-
-                    if (genreToFind is null)
-                    {
-                        var insertedGenre = await connection.QueryFirstAsync<Genre>(@"INSERT INTO Genres 
-(Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { genre.Name }, transaction: transaction);
-                        insertedGenres.Add(insertedGenre);
-                    }
-                    else
-                    {
-                        insertedGenres.Add(genreToFind);
-                    }
-                }
-
-                var publisherToFind = await connection.QueryFirstOrDefaultAsync<Publisher>(@"SELECT Id, Name 
-FROM Publishers 
-WHERE Name=@Name", new { entity.Publisher.Name }, transaction: transaction);
-
-                if (publisherToFind is null)
-                {
-                    insertedPublisher = await connection.QueryFirstAsync<Publisher>(@"INSERT INTO Publishers (Name) 
-output inserted.id, inserted.name
-VALUES (@Name);", new { entity.Publisher.Name }, transaction: transaction);
-                }
-                else
-                    insertedPublisher = publisherToFind;
-
-                var localizationToFind = await connection.QueryFirstOrDefaultAsync<Localization>(@"SELECT Id, Name 
-FROM Localizations WHERE Name=@Name", new { entity.Localization.Name }, transaction: transaction);
-
-                if (localizationToFind is null)
-                {
-                    insertedLocalization = await connection.QueryFirstOrDefaultAsync<Localization>(@"INSERT INTO Localizations (Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { entity.Localization.Name }, transaction: transaction);
-                }
-                else
-                    insertedLocalization = localizationToFind;
-
                 var insertedGame = await connection.QueryFirstAsync<Game>(@"INSERT INTO Games 
 (Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer) 
 output inserted.Id, inserted.Name, inserted.Image, inserted.LocalizationId, inserted.PublisherId, inserted.ReleaseDate, inserted.Description, inserted.Trailer
@@ -96,71 +29,35 @@ VALUES
                 {
                     entity.Name,
                     entity.Image,
-                    LocalizationId = insertedLocalization.Id,
-                    PublisherId = insertedPublisher.Id,
+                    entity.LocalizationId,
+                    entity.PublisherId,
                     ReleaseDate = entity.ReleaseDate.Value,
                     entity.Description,
                     entity.Trailer
                 }, transaction: transaction);
 
-                foreach (var gameGenre in insertedGenres)
+                foreach (var genreId in entity.GenresIds)
                 {
-                    var gameGenreToFind = await connection.QueryFirstOrDefaultAsync(@"SELECT Id, GameId, GenreId 
-FROM GamesGenres 
-WHERE GenreId=@GenreId and GameId=@GameId",
-                        new
-                        {
-                            GenreId = gameGenre.Id,
-                            GameId = insertedGame.Id
-                        }, transaction: transaction);
-
-                    if (gameGenreToFind is null)
                     {
                         var insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(@"INSERT INTO GamesGenres (GameId, GenreId) 
 OUTPUT inserted.Id, inserted.GameId, inserted.GenreId
-VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = gameGenre.Id }, transaction: transaction);
+VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = genreId }, transaction: transaction);
                     }
                 }
 
-                foreach (var platform in entity.Platforms)
+                foreach (var platformId in entity.PlatformsIds)
                 {
-                    var existingPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"SELECT Id, Name 
-FROM Platforms
-WHERE Name=@Name;", new { platform.Name }, transaction: transaction);
-
-                    if (existingPlatform is null)
-                    {
-                        existingPlatform = await connection.QueryFirstAsync<Platform>(@"INSERT INTO Platforms (Name)
-output inserted.Id, inserted.Name
-VALUES (@Name);", new { platform.Name }, transaction: transaction);
-                    }
-
-                    var existingGamePlatform = await connection.QueryFirstOrDefaultAsync<GamePlatform>(@"SELECT GameId, PlatformId FROM GamesPlatforms WHERE GameId=@GameId AND PlatformId=@PlatformId", new { GameId = insertedGame.Id, PlatformId = existingPlatform.Id }, transaction: transaction);
-
-                    if (existingGamePlatform is null)
-                    {
-                        existingGamePlatform = await connection.QueryFirstAsync<GamePlatform>(@"INSERT INTO GamesPlatforms 
+                    var insertedGamePlatform = await connection.QueryFirstAsync<GamePlatform>(@"INSERT INTO GamesPlatforms 
 (GameId, PlatformId)
 output inserted.GameId, inserted.PlatformId
-VALUES (@GameId, @PlatformId);", new { GameId = insertedGame.Id, PlatformId = existingPlatform.Id }, transaction: transaction);
-                    }
+VALUES (@GameId, @PlatformId);", new { GameId = insertedGame.Id, PlatformId = platformId }, transaction: transaction);
                 }
 
-                foreach (var developer in entity.Developers)
+                foreach (var developerId in entity.DevelopersIds)
                 {
-                    var existingDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name 
-FROM Developers 
-WHERE Name=@Name", new { developer.Name }, transaction: transaction);
-
-                    if (existingDeveloper is null)
-                    {
-                        existingDeveloper = await connection.QueryFirstAsync<Developer>(@"INSERT INTO Developers (Name)
-output inserted.Id, inserted.Name
-VALUES (@Name)", new { Name = developer.Name }, transaction: transaction);
-                    }
                     var insertedGameDeveloper = await connection.QueryAsync(@"INSERT INTO GamesDevelopers(GameId, DeveloperId)
 output inserted.Id, inserted.GameId, inserted.DeveloperId
-VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = existingDeveloper.Id }, transaction: transaction);
+VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = developerId }, transaction: transaction);
                 }
 
                 await transaction.CommitAsync();

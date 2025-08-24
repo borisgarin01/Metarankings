@@ -1,10 +1,4 @@
-﻿using Domain.RequestsModels.Games.Developers;
-using Domain.RequestsModels.Games.Genres;
-using Domain.RequestsModels.Games.Localizations;
-using Domain.RequestsModels.Games.Platforms;
-using Domain.RequestsModels.Games.Publishers;
-
-namespace Domain.RequestsModels.Games;
+﻿namespace Domain.RequestsModels.Games;
 
 public sealed record AddGameModel(
     [property : JsonPropertyName("name")]
@@ -18,23 +12,23 @@ public sealed record AddGameModel(
     [MaxLength(511, ErrorMessage ="Image's max length is 1023")]
     [MinLength(1, ErrorMessage ="Image should be not empty")] string Image,
 
-    [property: JsonPropertyName("developers")]
-    [Required(ErrorMessage ="Developers should be set")]
-    [MinLength(1,ErrorMessage ="Developers should be not empty")]
-    IEnumerable<AddDeveloperModel> Developers,
+    [property: JsonPropertyName("developersIds")]
+    [Required(ErrorMessage ="Developers ids should be set")]
+    [MinLength(1,ErrorMessage ="Developers ids should be not empty")]
+    IEnumerable<long> DevelopersIds,
 
-    [property: JsonPropertyName("publisher")]
-    [Required(ErrorMessage ="Publisher should be set")]
-    AddPublisherModel Publisher,
+    [property: JsonPropertyName("publisherId")]
+    [Required(ErrorMessage ="Publisher id should be set")]
+    long PublisherId,
 
-    [property: JsonPropertyName("genres")]
-    [Required(ErrorMessage ="Genres should be set")]
-    [MinLength(1,ErrorMessage ="Genres should be not empty")]
-    IEnumerable<AddGenreModel> Genres,
+    [property: JsonPropertyName("genresIds")]
+    [Required(ErrorMessage ="Genres ids should be set")]
+    [MinLength(1,ErrorMessage ="Genres ids should be not empty")]
+    IEnumerable<long> GenresIds,
 
-    [property: JsonPropertyName("localization")]
-    [Required(ErrorMessage ="Localization should be set")]
-    AddLocalizationModel Localization,
+    [property: JsonPropertyName("localizationId")]
+    [Required(ErrorMessage ="LocalizationId should be set")]
+    long LocalizationId,
 
     [property: JsonPropertyName("releaseDate")]
     [Required(ErrorMessage ="Release date should be set")]
@@ -49,4 +43,4 @@ public sealed record AddGameModel(
     [property: JsonPropertyName("trailer")]
     string Trailer,
     [property: JsonPropertyName("platforms")]
-    IEnumerable<AddPlatformModel> Platforms);
+    IEnumerable<long> PlatformsIds);
