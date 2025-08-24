@@ -43,7 +43,8 @@ public sealed class PlatformsWebManager : WebManager, IWebManager<Platform, AddP
 
     public Task<IEnumerable<Platform>> GetAllAsync(long offset, long limit)
     {
-        throw new NotImplementedException();
+        var platforms = HttpClient.GetFromJsonAsync<IEnumerable<Platform>>($"/api/Platforms/{offset}/{limit}");
+        return platforms;
     }
 
     public Task<Platform> GetAsync(long id)

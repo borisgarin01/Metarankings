@@ -1,5 +1,7 @@
-﻿using Domain.RequestsModels.Games.Localizations;
+﻿using Domain.Games;
+using Domain.RequestsModels.Games.Localizations;
 using Microsoft.AspNetCore.Authorization;
+using WebManagers;
 
 namespace BlazorClient.Pages.Games.Admin.Localizations;
 
@@ -7,7 +9,7 @@ namespace BlazorClient.Pages.Games.Admin.Localizations;
 public partial class AddLocalizationPage : ComponentBase
 {
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IWebManager<Localization, AddLocalizationModel, UpdateLocalizationModel> LocalizationsWebManager { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -19,7 +21,7 @@ public partial class AddLocalizationPage : ComponentBase
 
     public async Task AddLocalizationAsync()
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Localizations", AddLocalizationModel);
+        HttpResponseMessage httpResponseMessage = await LocalizationsWebManager.AddAsync(AddLocalizationModel);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/localizations/list-localizations");
         else

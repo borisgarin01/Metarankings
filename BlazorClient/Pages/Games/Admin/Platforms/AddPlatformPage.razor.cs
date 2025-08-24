@@ -1,11 +1,13 @@
-﻿using Domain.RequestsModels.Games.Platforms;
+﻿using Domain.Games;
+using Domain.RequestsModels.Games.Platforms;
+using WebManagers;
 
 namespace BlazorClient.Pages.Games.Admin.Platforms;
 
 public partial class AddPlatformPage : ComponentBase
 {
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> PlatformsWebManager { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -17,7 +19,7 @@ public partial class AddPlatformPage : ComponentBase
 
     public async Task AddPlatformAsync()
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Platforms", AddPlatformModel);
+        HttpResponseMessage httpResponseMessage = await PlatformsWebManager.AddAsync(AddPlatformModel);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/platforms/list-platforms");
         else

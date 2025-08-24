@@ -1,6 +1,8 @@
 ﻿using Domain.Games;
 using Domain.RequestsModels.Games.Publishers;
 using Microsoft.AspNetCore.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace WebManagers.Derived
 {
@@ -10,9 +12,10 @@ namespace WebManagers.Derived
         {
         }
 
-        public Task<HttpResponseMessage> AddAsync(AddPublisherModel tAdd)
+        public async Task<HttpResponseMessage> AddAsync(AddPublisherModel addPublisherModel)
         {
-            throw new NotImplementedException();
+            var httpResponseMessage = await HttpClient.PostAsJsonAsync<AddPublisherModel>("/api/Publishers", addPublisherModel);
+            return httpResponseMessage;
         }
 
         public Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile)
@@ -20,34 +23,42 @@ namespace WebManagers.Derived
             throw new NotImplementedException();
         }
 
-        public Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddPublisherModel> adds)
+        public async Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddPublisherModel> addPublishersModels)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Localizations/upload-publishers-from-json", addPublishersModels);
+            return httpResponseMessage;
         }
 
-        public Task<HttpResponseMessage> DeleteAsync(long id)
+        public async Task<HttpResponseMessage> DeleteAsync(long id)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"/api/Localizations/{id}");
+            return httpResponseMessage;
         }
 
-        public Task<IEnumerable<Publisher>> GetAllAsync()
+        public async Task<IEnumerable<Publisher>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var publishers = await HttpClient.GetFromJsonAsync<IEnumerable<Publisher>>("/api/Publishers");
+            return publishers;
         }
 
-        public Task<IEnumerable<Publisher>> GetAllAsync(long offset, long limit)
+        public async Task<IEnumerable<Publisher>> GetAllAsync(long offset, long limit)
         {
-            throw new NotImplementedException();
+            var publishers = await HttpClient.GetFromJsonAsync<IEnumerable<Publisher>>($"/api/Publishers/{offset}/{limit}");
+            return publishers;
         }
 
-        public Task<Publisher> GetAsync(long id)
+        public async Task<Publisher> GetAsync(long id)
         {
-            throw new NotImplementedException();
+            var publisher = await HttpClient.GetFromJsonAsync<Publisher>($"/api/Publishers/{id}");
+            return publisher;
         }
 
-        public Task<Publisher> UpdateAsync(long id, UpdatePublisherModel tUpdate)
+        public async Task<Publisher> UpdateAsync(long id, UpdatePublisherModel updatePublisherModel)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage publisherUpdateHttpResponseMessage = await HttpClient.PutAsJsonAsync<UpdatePublisherModel>($"/api/Publishers/{id}", updatePublisherModel);
+            if (publisherUpdateHttpResponseMessage.IsSuccessStatusCode)
+                return await JsonSerializer.DeserializeAsync<Publisher>(await publisherUpdateHttpResponseMessage.Content.ReadAsStreamAsync());
+            return null;
         }
     }
 }

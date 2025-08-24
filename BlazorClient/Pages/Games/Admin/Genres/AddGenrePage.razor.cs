@@ -1,15 +1,16 @@
-﻿using Domain.RequestsModels.Games.Genres;
-using Domain.RequestsModels.Games.Localizations;
+﻿using Domain.Games;
+using Domain.RequestsModels.Games.Genres;
+using WebManagers;
 
 namespace BlazorClient.Pages.Games.Admin.Genres;
 
 public partial class AddGenrePage : ComponentBase
 {
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public NavigationManager NavigationManager { get; set; }
+    public IWebManager<Genre, AddGenreModel, UpdateGenreModel> GenresWebManager { get; set; }
 
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
@@ -18,7 +19,7 @@ public partial class AddGenrePage : ComponentBase
 
     public async Task AddGenreAsync()
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Genres", AddGenreModel);
+        HttpResponseMessage httpResponseMessage = await GenresWebManager.AddAsync(AddGenreModel);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/genres/list-genres");
         else

@@ -1,5 +1,4 @@
-﻿
-using Domain.Games;
+﻿using Domain.Games;
 using Domain.RequestsModels.Games;
 
 namespace BlazorClient.Pages.Games.Admin.Games;
@@ -33,7 +32,6 @@ public partial class AddGamePage : ComponentBase
     public NavigationManager NavigationManager { get; private set; }
 
     public string Name { get; set; }
-    public string Image { get; set; }
     public DateTime ReleaseDate { get; set; }
     public string Description { get; set; }
     public string Trailer { get; set; }
@@ -49,7 +47,7 @@ public partial class AddGamePage : ComponentBase
     public long SelectedLocalizationId { get; private set; }
     public List<long> SelectedPlatformsIds { get; private set; } = new List<long>();
     public long SelectedPublisherId { get; private set; }
-
+    public string Image { get; private set; }
     public async Task AddGameAsync()
     {
         if (GameModelToAddConfigured())
