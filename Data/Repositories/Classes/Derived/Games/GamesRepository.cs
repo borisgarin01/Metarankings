@@ -187,7 +187,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid, gs.imageUrl
+gs.Id, gs.GameId, gs.ImageUrl
     FROM (select Id, Name, Image, ReleaseDate, Description, PublisherId, LocalizationId 
         from Games ORDER BY id
         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
@@ -326,7 +326,7 @@ p.id, p.name,
 gen.id, gen.name,
 l.id, l.name,
 plat.id, plat.name,
-gs.id, gs.imageUrl, gs.gameid,
+gs.Id, gs.GameId, gs.ImageUrl,
 gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
 au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
     FROM games g
@@ -413,7 +413,7 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -489,7 +489,7 @@ SELECT
     gen.id, gen.name, 
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -566,7 +566,7 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -643,7 +643,7 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -739,7 +739,7 @@ SELECT
     gen.Id, gen.Name,
     l.Id, l.Name,
     plat.Id, plat.Name,
-    gs.Id, gs.ImageUrl, gs.GameId
+    gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
