@@ -5,17 +5,18 @@
     <Authorized>
         <a href="/admin/developers/add-developer">Добавить разраба</a>
         <div class="developersList">
-            @foreach (Developer developer in Developers)
+            @if (Developers is null)
             {
-                <div class="developer">
-                    <h4>@developer.Name</h4>
-                    @foreach (var game in developer.Games)
-                    {
-                        <div class="game">
-                            <h5>@game.Name</h5>
-                        </div>
-                    }
-                </div>
+                <p>Loading...</p>
+            }
+            else
+            {
+                foreach (Developer developer in Developers)
+                {
+                    <div class="developer">
+                        <h4>@developer.Name</h4>
+                    </div>
+                }
             }
         </div>
     </Authorized>

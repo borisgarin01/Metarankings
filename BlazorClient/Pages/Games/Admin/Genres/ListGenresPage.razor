@@ -5,11 +5,18 @@
     <Authorized>
         <a href="/admin/genres/add-genre">Добавить жанр</a>
         <div class="genresList">
-            @foreach (Genre genre in Genres)
+            @if (Genres is null)
             {
-                <div class="localization">
-                    <h4>@genre.Name</h4>
-                </div>
+                <p>Loading...</p>
+            }
+            else
+            {
+                foreach (Genre genre in Genres)
+                {
+                    <div class="localization">
+                        <h4>@genre.Name</h4>
+                    </div>
+                }
             }
         </div>
     </Authorized>

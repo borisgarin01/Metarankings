@@ -5,11 +5,18 @@
     <Authorized>
         <a href="/admin/publishers/add-publisher">Добавить издателя</a>
         <div class="publishersList">
-            @foreach (Publisher publisher in Publishers)
+            @if (Publishers is null)
             {
-                <div class="publisher">
-                    <h4>@publisher.Name</h4>
-                </div>
+                <p>Loading...</p>
+            }
+            else
+            {
+                foreach (Publisher publisher in Publishers)
+                {
+                    <div class="publisher">
+                        <h4>@publisher.Name</h4>
+                    </div>
+                }
             }
         </div>
     </Authorized>

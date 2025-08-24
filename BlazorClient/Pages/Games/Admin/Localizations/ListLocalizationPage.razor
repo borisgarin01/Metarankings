@@ -5,11 +5,18 @@
     <Authorized>
         <a href="/admin/localizations/add-localization">Добавить локализацию</a>
         <div class="localizationsList">
-            @foreach (Localization localization in Localizations)
+            @if (Localizations is null)
             {
-                <div class="localization">
-                    <h4>@localization.Name</h4>
-                </div>
+                <p>Loading...</p>
+            }
+            else
+            {
+                foreach (Localization localization in Localizations)
+                {
+                    <div class="localization">
+                        <h4>@localization.Name</h4>
+                    </div>
+                }
             }
         </div>
     </Authorized>

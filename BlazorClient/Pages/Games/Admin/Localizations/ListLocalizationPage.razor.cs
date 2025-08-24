@@ -4,7 +4,7 @@ namespace BlazorClient.Pages.Games.Admin.Localizations;
 
 public partial class ListLocalizationPage : ComponentBase
 {
-    public IEnumerable<Localization> Localizations { get; set; }
+    public IEnumerable<Localization> Localizations { get; private set; }
 
     [Inject]
     public HttpClient HttpClient { get; set; }

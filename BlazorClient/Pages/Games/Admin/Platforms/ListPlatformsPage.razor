@@ -5,11 +5,18 @@
     <Authorized>
         <a href="/admin/platforms/add-platform">Добавить платформу</a>
         <div class="platformsList">
-            @foreach (Platform platform in Platforms)
+            @if (Platforms is null)
             {
-                <div class="platform">
-                    <h4>@platform.Name</h4>
-                </div>
+                <p>Loading...</p>
+            }
+            else
+            {
+                foreach (Platform platform in Platforms)
+                {
+                    <div class="platform">
+                        <h4>@platform.Name</h4>
+                    </div>
+                }
             }
         </div>
     </Authorized>
