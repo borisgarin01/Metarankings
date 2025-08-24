@@ -1,0 +1,11 @@
+﻿@page "/admin/developers/remove-developer/{Id:long}"
+
+@if(Developer is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h3>Remove @Developer.Name</h3>
+    <p>Are you sure you want to remove this developer?</p>
+}
