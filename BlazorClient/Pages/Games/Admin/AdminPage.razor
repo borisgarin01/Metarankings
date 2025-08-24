@@ -5,5 +5,16 @@
 <div class="form-group">
     <label for="adminEmail">Admin Email</label>
     <input type="email" class="form-control" @bind-value="@FutureAdminEmail" />
-    <button class="btn btn-primary" type="submit" @onclick="@AssignToAdminAsync">Assign to admin role</button>
+    <button class="btn btn-primary" type="submit" @onclick="@AssignToAdminAsync">Назначить админом</button>
+</div>
+
+<div class="form-group">
+    <ul class="list-group">
+        <li class="list-group-item link-dark"><a href="/admin/developers/list-developers">Разрабы</a></li>
+        <li class="list-group-item link-dark"><a href="/admin/publishers/list-publishers">Издатели</a></li>
+        <li class="list-group-item link-dark"><a href="/admin/platforms/list-platforms">Платформы</a></li>
+        <li class="list-group-item link-dark"><a href="/admin/localizations/list-localizations">Локализации</a></li>
+        <li class="list-group-item link-dark"><a href="/admin/genres/list-genres">Жанры</a></li>
+        <li class="list-group-item link-dark"><a href="/admin/games/list-games">Игры</a></li>
+    </ul>
 </div>

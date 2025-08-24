@@ -2,13 +2,13 @@
 using Domain.Movies;
 
 namespace Data.Repositories.Classes.Derived.Movies;
-public sealed class MoviesStudiosRepository : Repository, IRepository<MovieStudio>
+public sealed class MoviesStudiosRepository : Repository, IRepository<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>
 {
     public MoviesStudiosRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(MovieStudio entity)
+    public async Task<long> AddAsync(AddMovieStudioModel entity)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -21,7 +21,7 @@ VALUES(@Name)", new { Name = entity.Name });
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<MovieStudio> entities)
+    public async Task AddRangeAsync(IEnumerable<AddMovieStudioModel> entities)
     {
         foreach (var entity in entities)
         {
@@ -82,7 +82,7 @@ WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<MovieStudio> UpdateAsync(MovieStudio entity, long id)
+    public async Task<MovieStudio> UpdateAsync(UpdateMovieStudioModel entity, long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {

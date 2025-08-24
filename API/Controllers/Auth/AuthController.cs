@@ -1,5 +1,6 @@
 ﻿using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
+using IdentityLibrary.Telegram;
 using MailKit.Net.Smtp;
 using MimeKit;
 using System.Net;
@@ -12,10 +13,12 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator)
     {
         _configuration = configuration;
         _usersManager = usersManager;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpPost("login")]
@@ -46,7 +49,15 @@ public sealed class AuthController : ControllerBase
         if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
             userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
 
+        userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
+
+        userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
+
         var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
+
+        userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
+
+        string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
@@ -78,29 +89,13 @@ public sealed class AuthController : ControllerBase
             TwoFactorEnabled = false,
             UserName = registerModel.UserName
         };
+
         IdentityResult userCreationResult = await _usersManager.CreateAsync(user);
 
-        if (!userCreationResult.Succeeded)
-            return StatusCode(StatusCodes.Status400BadRequest, userCreationResult);
-
-        user = await _usersManager.FindByEmailAsync(user.Email);
-
-        var userClaims = new List<Claim>();
-
-        var adminEmail = _configuration["Auth:AdminEmail"];
-        var adminPassword = _configuration["Auth:AdminPassword"];
-
-        if (userCreationResult.Succeeded && string.Equals(registerModel.UserEmail, _configuration["Auth:AdminEmail"]) && string.Equals(registerModel.Password, _configuration["Auth:AdminPassword"]))
+        if (userCreationResult.Succeeded)
         {
-            await _usersManager.AddToRoleAsync(user, "Admin");
-            userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
-        }
+            user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
-        IdentityResult addingUserToRoleResult = await _usersManager.AddToRoleAsync(user, "User");
-        userClaims.Add(new Claim(ClaimTypes.Role, "User"));
-
-        if (addingUserToRoleResult.Succeeded)
-        {
             string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
             var callbackUrl = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
@@ -114,9 +109,6 @@ public sealed class AuthController : ControllerBase
                 Text = $"Confirm email: go to email confirmation <a href=\"{callbackUrl}\">link</a> to confirm your email"
             };
 
-            //Z4QI4N5xXt4m59zKCBdp
-
-
             using (var client = new SmtpClient())
             {
                 await client.ConnectAsync("smtp.mail.ru", 465, true);
@@ -125,16 +117,11 @@ public sealed class AuthController : ControllerBase
 
                 await client.DisconnectAsync(true);
             }
+
+            return Ok("Email verification has been set");
         }
 
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
-        var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
-
-        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
-
-        string token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-
-        return Ok(token);
+        return StatusCode(500, "User creation error");
     }
 
     [HttpGet("ConfirmEmail")]
@@ -150,13 +137,12 @@ public sealed class AuthController : ControllerBase
         if (user is null)
             return NotFound("User not found");
 
-        var result = await _usersManager.ConfirmEmailAsync(user, code);
+        var emailConfirmationResult = await _usersManager.ConfirmEmailAsync(user, code);
 
-        if (result.Succeeded)
-            return Ok($"{user.Email} has been confirmed successfully");
+        if (!emailConfirmationResult.Succeeded)
+            return StatusCode(StatusCodes.Status400BadRequest, userId);
 
-        // Provide more detailed error information
-        return BadRequest($"Email confirmation failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        return Ok($"Email {user.Email} подтверждён.");
     }
 
     [HttpPost("assignToAdmin")]
@@ -177,5 +163,22 @@ public sealed class AuthController : ControllerBase
                 return BadRequest(identityResult);
             return Ok(identityResult);
         }
+    }
+
+    [HttpPost("changePassword")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult> ChangePassword(string oldPassword, string passwordToAssign)
+    {
+        ApplicationUser? applicationUser = await _usersManager.FindByIdAsync(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value);
+        var isCorrectOldPassword = BCrypt.Net.BCrypt.EnhancedVerify(oldPassword, applicationUser.PasswordHash);
+        if (!isCorrectOldPassword)
+            return BadRequest("Неверный предыдущий пароль пользователя");
+        string encryptedNewPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(passwordToAssign);
+        string token = await _usersManager.GeneratePasswordResetTokenAsync(applicationUser);
+
+        IdentityResult passwordChangingResult = await _usersManager.ChangePasswordAsync(applicationUser, token, encryptedNewPassword);
+        if (passwordChangingResult is not null && passwordChangingResult.Succeeded)
+            return Ok();
+        return BadRequest();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
+using Domain.RequestsModels.Games.Localizations;
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ public sealed class LocalizationsRepository : Repository, ILocalizationsReposito
     {
     }
 
-    public async Task<long> AddAsync(Localization localization)
+    public async Task<long> AddAsync(AddLocalizationModel localization)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -29,7 +30,7 @@ VALUES (@Name);"
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<Localization> localizations)
+    public async Task AddRangeAsync(IEnumerable<AddLocalizationModel> localizations)
     {
         foreach (var localization in localizations)
             await AddAsync(localization);
@@ -362,7 +363,7 @@ Localizations WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<Localization> UpdateAsync(Localization localization, long id)
+    public async Task<Localization> UpdateAsync(UpdateLocalizationModel localization, long id)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {

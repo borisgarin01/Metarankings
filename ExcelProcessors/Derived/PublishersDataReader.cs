@@ -1,13 +1,14 @@
 ﻿using Domain.Games;
+using Domain.RequestsModels.Games.Publishers;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
 namespace ExcelProcessors.Derived;
 
-public sealed class PublishersDataReader : IExcelDataReader<Publisher>
+public sealed class PublishersDataReader : IExcelDataReader<AddPublisherModel>
 {
-    public IEnumerable<Publisher> GetFromExcel(string fileName)
+    public IEnumerable<AddPublisherModel> GetFromExcel(string fileName)
     {
         using (var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
         {
@@ -18,20 +19,20 @@ public sealed class PublishersDataReader : IExcelDataReader<Publisher>
 
             if (sheet is not null)
             {
-                var publishersToUpload = new List<Publisher>();
+                var publishersToUpload = new List<AddPublisherModel>();
                 for (int i = 1; i <= sheet.LastRowNum; i++)
                 {
                     IRow currentRow = sheet.GetRow(i);
 
                     var publisherName = currentRow.GetCell(0).StringCellValue.Trim();
 
-                    publishersToUpload.Add(new Publisher { Name = publisherName });
+                    publishersToUpload.Add(new AddPublisherModel { Name = publisherName });
                 }
 
                 return publishersToUpload;
             }
 
-            return Enumerable.Empty<Publisher>();
+            return Enumerable.Empty<AddPublisherModel>();
         }
     }
 }

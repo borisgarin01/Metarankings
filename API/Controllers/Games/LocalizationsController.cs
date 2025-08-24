@@ -1,6 +1,7 @@
 ﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.RequestsModels.Games.Localizations;
+using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -12,10 +13,13 @@ public sealed class LocalizationsController : ControllerBase
 
     private readonly ILocalizationsRepository _localizationsRepository;
 
-    public LocalizationsController(IMapper mapper, ILocalizationsRepository localizationsRepository)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+
+    public LocalizationsController(IMapper mapper, ILocalizationsRepository localizationsRepository, TelegramAuthenticator telegramAuthenticator)
     {
         _mapper = mapper;
         _localizationsRepository = localizationsRepository;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpGet]
@@ -35,12 +39,12 @@ public sealed class LocalizationsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var localization = _mapper.Map<Localization>(addLocalizationModel);
+        long insertedLocalizationId = await _localizationsRepository.AddAsync(addLocalizationModel);
 
-        var insertedLocalizationId = await _localizationsRepository.AddAsync(localization);
+        Localization insertedLocalization = await _localizationsRepository.GetAsync(insertedLocalizationId);
 
-        localization = localization with { Id = insertedLocalizationId };
-        return Created($"api/developers/{localization.Id}", localization);
+        await _telegramAuthenticator.SendMessageAsync($"New localization {addLocalizationModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/localizations/{insertedLocalizationId}");
+        return Created($"api/localizations/{insertedLocalizationId}", insertedLocalization);
     }
 
     [HttpGet("{id:long}")]
@@ -93,11 +97,8 @@ public sealed class LocalizationsController : ControllerBase
         if (localizationToUpdate is null)
             return NotFound();
 
-        // Map the update model to the existing entity
-        var localizationToGetAfterUpdate = _mapper.Map<Localization>(updateLocalizationModel);
-
         // Update and return the updated entity
-        var updatedLocalization = await _localizationsRepository.UpdateAsync(localizationToGetAfterUpdate, id);
+        var updatedLocalization = await _localizationsRepository.UpdateAsync(updateLocalizationModel, id);
 
         return Ok(updatedLocalization);
     }

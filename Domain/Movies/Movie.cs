@@ -28,11 +28,11 @@ public sealed record Movie
     public required string Description { get; set; }
 
     [JsonPropertyName("movieGenres")]
-    public IEnumerable<MovieGenre> MovieGenres { get; set; } = Enumerable.Empty<MovieGenre>();
+    public List<MovieGenre> MovieGenres { get; set; } = new List<MovieGenre>();
 
     [JsonPropertyName("moviesStudios")]
-    public IEnumerable<MovieStudio> MoviesStudios { get; set; } = Enumerable.Empty<MovieStudio>();
+    public List<MovieStudio> MoviesStudios { get; set; } = new List<MovieStudio>();
 
     [JsonPropertyName("moviesDirectors")]
-    public IEnumerable<MovieDirector> MoviesDirectors { get; set; } = Enumerable.Empty<MovieDirector>();
+    public List<MovieDirector> MoviesDirectors { get; set; } = new List<MovieDirector>();
 }

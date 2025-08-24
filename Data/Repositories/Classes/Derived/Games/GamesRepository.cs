@@ -1,17 +1,19 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
-using System;
-using System.Linq;
-using System.Text;
+using IdentityLibrary.DTOs;
+using Data.Extensions;
+using Dapper;
+using Domain.Reviews;
+using Domain.RequestsModels.Games;
 
 namespace Data.Repositories.Classes.Derived.Games;
-public sealed class GamesRepository : Repository, IRepository<Game>
+public sealed class GamesRepository : Repository, IRepository<Game, AddGameModel, UpdateGameModel>
 {
     public GamesRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(Game entity)
+    public async Task<long> AddAsync(AddGameModel entity)
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
@@ -19,73 +21,6 @@ public sealed class GamesRepository : Repository, IRepository<Game>
 
             using (var transaction = connection.BeginTransaction())
             {
-                List<Developer> insertedDevelopers = new();
-                List<Genre> insertedGenres = new();
-                Publisher insertedPublisher = null;
-                Localization insertedLocalization = null;
-
-                foreach (var developer in entity.Developers)
-                {
-                    var developerToFind = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name
-FROM Developers
-WHERE Name=@Name;", new { developer.Name }, transaction: transaction);
-
-                    if (developerToFind is null)
-                    {
-                        var insertedDeveloper = await connection.QueryFirstAsync<Developer>(@"INSERT INTO Developers 
-(Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { developer.Name }, transaction: transaction);
-                        insertedDevelopers.Add(insertedDeveloper);
-                    }
-                    else
-                        insertedDevelopers.Add(developerToFind);
-                }
-                foreach (var genre in entity.Genres)
-                {
-                    var genreToFind = await connection.QueryFirstOrDefaultAsync<Genre>(@"SELECT Id, Name
-FROM Genres
-WHERE Name=@Name;", new { genre.Name }, transaction: transaction);
-
-                    if (genreToFind is null)
-                    {
-                        var insertedGenre = await connection.QueryFirstAsync<Genre>(@"INSERT INTO Genres 
-(Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { genre.Name }, transaction: transaction);
-                        insertedGenres.Add(insertedGenre);
-                    }
-                    else
-                    {
-                        insertedGenres.Add(genreToFind);
-                    }
-                }
-
-                var publisherToFind = await connection.QueryFirstOrDefaultAsync<Publisher>(@"SELECT Id, Name 
-FROM Publishers 
-WHERE Name=@Name", new { entity.Publisher.Name }, transaction: transaction);
-
-                if (publisherToFind is null)
-                {
-                    insertedPublisher = await connection.QueryFirstAsync<Publisher>(@"INSERT INTO Publishers (Name) 
-output inserted.id, inserted.name
-VALUES (@Name);", new { entity.Publisher.Name }, transaction: transaction);
-                }
-                else
-                    insertedPublisher = publisherToFind;
-
-                var localizationToFind = await connection.QueryFirstOrDefaultAsync<Localization>(@"SELECT Id, Name 
-FROM Localizations WHERE Name=@Name", new { entity.Localization.Name }, transaction: transaction);
-
-                if (localizationToFind is null)
-                {
-                    insertedLocalization = await connection.QueryFirstOrDefaultAsync<Localization>(@"INSERT INTO Localizations (Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { entity.Localization.Name }, transaction: transaction);
-                }
-                else
-                    insertedLocalization = localizationToFind;
-
                 var insertedGame = await connection.QueryFirstAsync<Game>(@"INSERT INTO Games 
 (Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer) 
 output inserted.Id, inserted.Name, inserted.Image, inserted.LocalizationId, inserted.PublisherId, inserted.ReleaseDate, inserted.Description, inserted.Trailer
@@ -94,71 +29,35 @@ VALUES
                 {
                     entity.Name,
                     entity.Image,
-                    LocalizationId = insertedLocalization.Id,
-                    PublisherId = insertedPublisher.Id,
+                    entity.LocalizationId,
+                    entity.PublisherId,
                     ReleaseDate = entity.ReleaseDate.Value,
                     entity.Description,
                     entity.Trailer
                 }, transaction: transaction);
 
-                foreach (var gameGenre in insertedGenres)
+                foreach (var genreId in entity.GenresIds)
                 {
-                    var gameGenreToFind = await connection.QueryFirstOrDefaultAsync(@"SELECT Id, GameId, GenreId 
-FROM GamesGenres 
-WHERE GenreId=@GenreId and GameId=@GameId",
-                        new
-                        {
-                            GenreId = gameGenre.Id,
-                            GameId = insertedGame.Id
-                        }, transaction: transaction);
-
-                    if (gameGenreToFind is null)
                     {
                         var insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(@"INSERT INTO GamesGenres (GameId, GenreId) 
 OUTPUT inserted.Id, inserted.GameId, inserted.GenreId
-VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = gameGenre.Id }, transaction: transaction);
+VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = genreId }, transaction: transaction);
                     }
                 }
 
-                foreach (var platform in entity.Platforms)
+                foreach (var platformId in entity.PlatformsIds)
                 {
-                    var existingPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"SELECT Id, Name 
-FROM Platforms
-WHERE Name=@Name;", new { platform.Name }, transaction: transaction);
-
-                    if (existingPlatform is null)
-                    {
-                        existingPlatform = await connection.QueryFirstAsync<Platform>(@"INSERT INTO Platforms (Name)
-output inserted.Id, inserted.Name
-VALUES (@Name);", new { platform.Name }, transaction: transaction);
-                    }
-
-                    var existingGamePlatform = await connection.QueryFirstOrDefaultAsync<GamePlatform>(@"SELECT GameId, PlatformId FROM GamesPlatforms WHERE GameId=@GameId AND PlatformId=@PlatformId", new { GameId = insertedGame.Id, PlatformId = platform.Id }, transaction: transaction);
-
-                    if (existingGamePlatform is null)
-                    {
-                        existingGamePlatform = await connection.QueryFirstAsync<GamePlatform>(@"INSERT INTO GamesPlatforms 
+                    var insertedGamePlatform = await connection.QueryFirstAsync<GamePlatform>(@"INSERT INTO GamesPlatforms 
 (GameId, PlatformId)
 output inserted.GameId, inserted.PlatformId
-VALUES (@GameId, @PlatformId);", new { GameId = insertedGame.Id, PlatformId = existingPlatform.Id }, transaction: transaction);
-                    }
+VALUES (@GameId, @PlatformId);", new { GameId = insertedGame.Id, PlatformId = platformId }, transaction: transaction);
                 }
 
-                foreach (var developer in entity.Developers)
+                foreach (var developerId in entity.DevelopersIds)
                 {
-                    var existingDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"SELECT Id, Name 
-FROM Developers 
-WHERE Name=@Name", new { developer.Name }, transaction: transaction);
-
-                    if (existingDeveloper is null)
-                    {
-                        existingDeveloper = await connection.QueryFirstAsync<Developer>(@"INSERT INTO Developers (Name)
-output inserted.Id, inserted.Name
-VALUES (@Name)", new { Name = developer.Name }, transaction: transaction);
-                    }
                     var insertedGameDeveloper = await connection.QueryAsync(@"INSERT INTO GamesDevelopers(GameId, DeveloperId)
 output inserted.Id, inserted.GameId, inserted.DeveloperId
-VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = existingDeveloper.Id }, transaction: transaction);
+VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = developerId }, transaction: transaction);
                 }
 
                 await transaction.CommitAsync();
@@ -168,7 +67,7 @@ VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = ex
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<Game> games)
+    public async Task AddRangeAsync(IEnumerable<AddGameModel> games)
     {
         foreach (var entity in games)
             await AddAsync(entity);
@@ -185,7 +84,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.imageUrl, gs.gameid
+gs.Id, gs.GameId, gs.ImageUrl
     FROM (select Id, Name, Image, ReleaseDate, Description, PublisherId, LocalizationId 
         from Games ORDER BY id
         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
@@ -256,7 +155,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.gameid, gs.imageUrl
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -324,7 +223,9 @@ p.id, p.name,
 gen.id, gen.name,
 l.id, l.name,
 plat.id, plat.name,
-gs.id, gs.gameid
+gs.Id, gs.GameId, gs.ImageUrl,
+gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
+au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -335,13 +236,15 @@ gs.id, gs.gameid
     LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
     LEFT JOIN platforms plat ON plat.id = gp.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN GamesPlayersReviews gpr on gpr.gameid=g.Id
+    LEFT JOIN ApplicationUsers au on au.Id=gpr.UserId
 WHERE g.Id=@id";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameReview, ApplicationUser, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                (game, developer, publisher, genre, localization, platform, screenshot, gamePlayerReview, applicationUser) =>
                 {
                     if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
                     {
@@ -350,6 +253,7 @@ WHERE g.Id=@id";
                         gameEntry.Genres = new List<Genre>();
                         gameEntry.Platforms = new List<Platform>();
                         gameEntry.Screenshots = new List<GameScreenshot>();
+                        gameEntry.GamesPlayersReviews = new List<GameReview>();
                         gameDictionary.Add(gameEntry.Name, gameEntry);
                     }
 
@@ -371,10 +275,16 @@ WHERE g.Id=@id";
                     if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                         gameEntry.Screenshots.Add(screenshot);
 
+                    if (gamePlayerReview is not null && applicationUser is not null)
+                    {
+                        gamePlayerReview = gamePlayerReview with { ApplicationUser = applicationUser };
+
+                        if (!gameEntry.GamesPlayersReviews.Any(s => s.Id == gamePlayerReview.Id))
+                            gameEntry.GamesPlayersReviews.Add(gamePlayerReview);
+                    }
                     return gameEntry;
                 },
-                new { id }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+                new { id } // Parameter passed here
             );
 
             var result = gameDictionary.Values.FirstOrDefault();
@@ -400,7 +310,7 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -476,7 +386,7 @@ SELECT
     gen.id, gen.name, 
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -553,7 +463,7 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -630,7 +540,7 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.id, gs.gameid
+    gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid
@@ -705,7 +615,7 @@ ORDER BY g.id, gen.id;";
         throw new NotImplementedException();
     }
 
-    public Task<Game> UpdateAsync(Game entity, long id)
+    public Task<Game> UpdateAsync(UpdateGameModel entity, long id)
     {
         throw new NotImplementedException();
     }
@@ -726,7 +636,7 @@ SELECT
     gen.Id, gen.Name,
     l.Id, l.Name,
     plat.Id, plat.Name,
-    gs.Id, gs.ImageUrl, gs.GameId
+    gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
 LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
 LEFT JOIN developers d ON d.id = gd.developerid

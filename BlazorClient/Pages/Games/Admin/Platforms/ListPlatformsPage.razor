@@ -1,0 +1,26 @@
+﻿@page "/admin/platforms/list-platforms"
+@using Domain.Games
+
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        <a href="/admin/platforms/add-platform">Добавить платформу</a>
+        <div class="platformsList">
+            @if (Platforms is null)
+            {
+                <p>Loading...</p>
+            }
+            else
+            {
+                foreach (Platform platform in Platforms)
+                {
+                    <div class="platform">
+                        <h4>@platform.Name</h4>
+                    </div>
+                }
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a>, чтобы добавить платформу
+    </NotAuthorized>
+</AuthorizeView>

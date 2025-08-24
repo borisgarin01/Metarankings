@@ -4,8 +4,8 @@ public sealed record MovieGenre(
     [property:DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     long Id,
 
-    [property:Required(ErrorMessage = "Name is required")]
-    [property:MaxLength(255, ErrorMessage = "Name max length is 255")]
-    [property:MinLength(1, ErrorMessage = "Name should be not empty")]
+    [Required(ErrorMessage = "Name is required")]
+    [MaxLength(255, ErrorMessage = "Name max length is 255")]
+    [MinLength(1, ErrorMessage = "Name should be not empty")]
     string Name
 );

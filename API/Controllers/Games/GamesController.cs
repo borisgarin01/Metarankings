@@ -2,6 +2,7 @@
 using Data.Repositories.Classes.Derived.Games;
 using Domain.Games;
 using Domain.RequestsModels.Games;
+using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -13,27 +14,33 @@ public sealed class GamesController : ControllerBase
     private readonly IMapper _mapper;
     private readonly GamesRepository _gamesRepository;
 
-    public GamesController(GamesRepository gamesRepository, IMapper mapper)
+    private readonly TelegramAuthenticator _telegramAuthenticator;
+
+    public GamesController(GamesRepository gamesRepository, IMapper mapper, TelegramAuthenticator telegramAuthenticator)
     {
         jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
         _gamesRepository = gamesRepository;
         _mapper = mapper;
+        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
     public async Task<ActionResult<IEnumerable<Game>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
     {
-        var games = await _gamesRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
+        IEnumerable<Game> games = await _gamesRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
         return Ok(games);
     }
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult<long>> AddAsync(AddGameModel gameModel)
+    public async Task<ActionResult<long>> AddAsync(AddGameModel addGameModel)
     {
-        var game = _mapper.Map<Game>(gameModel);
-        var createdGame = await _gamesRepository.AddAsync(game);
-        return Ok(createdGame);
+        long createdGameId = await _gamesRepository.AddAsync(addGameModel);
+
+        Game createdGame = await _gamesRepository.GetAsync(createdGameId);
+
+        await _telegramAuthenticator.SendMessageAsync($"New game {addGameModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/games/{createdGame.Id}");
+        return Created($"api/games/{createdGame.Id}", createdGame);
     }
 
     [HttpGet]
@@ -46,7 +53,7 @@ public sealed class GamesController : ControllerBase
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Game>> GetAsync(long id)
     {
-        var game = await _gamesRepository.GetAsync(id);
+        Game? game = await _gamesRepository.GetAsync(id);
 
         if (game is null)
             return NotFound();
@@ -57,7 +64,7 @@ public sealed class GamesController : ControllerBase
     [HttpGet("images/uploads/{year:int}/{month:int}/{image}")]
     public async Task<IActionResult> GetImage(int year, int month, string image)
     {
-        var file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{month}/{image}");
+        byte[]? file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{month}/{image}");
         if (file is null)
             return NotFound();
         return File(file, "image/jpeg");
@@ -68,7 +75,7 @@ public sealed class GamesController : ControllerBase
     {
         try
         {
-            var gamesOfGenre = await _gamesRepository.GetByGenreIdAsync(genreId);
+            IEnumerable<Game>? gamesOfGenre = await _gamesRepository.GetByGenreIdAsync(genreId);
             if (gamesOfGenre is null)
                 return NotFound();
             return Ok(gamesOfGenre);
@@ -84,7 +91,7 @@ public sealed class GamesController : ControllerBase
     {
         try
         {
-            var gamesOfPlatform = await _gamesRepository.GetByPlatformIdAsync(platformId);
+            IEnumerable<Game>? gamesOfPlatform = await _gamesRepository.GetByPlatformIdAsync(platformId);
             if (gamesOfPlatform is null)
                 return NotFound();
             return Ok(gamesOfPlatform);
@@ -100,7 +107,7 @@ public sealed class GamesController : ControllerBase
     {
         try
         {
-            var gamesOfDeveloper = await _gamesRepository.GetByDeveloperIdAsync(developerId);
+            IEnumerable<Game>? gamesOfDeveloper = await _gamesRepository.GetByDeveloperIdAsync(developerId);
             if (gamesOfDeveloper is null)
                 return NotFound();
             return Ok(gamesOfDeveloper);
@@ -116,7 +123,7 @@ public sealed class GamesController : ControllerBase
     {
         try
         {
-            var gamesOfDeveloper = await _gamesRepository.GetByPublisherIdAsync(publisherId);
+            IEnumerable<Game>? gamesOfDeveloper = await _gamesRepository.GetByPublisherIdAsync(publisherId);
             if (gamesOfDeveloper is null)
                 return NotFound();
             return Ok(gamesOfDeveloper);
@@ -132,7 +139,7 @@ public sealed class GamesController : ControllerBase
     {
         try
         {
-            var gamesOfYear = await _gamesRepository.GetByReleaseYearAsync(year);
+            IEnumerable<Game>? gamesOfYear = await _gamesRepository.GetByReleaseYearAsync(year);
             if (gamesOfYear is null)
                 return NotFound();
             return Ok(gamesOfYear);

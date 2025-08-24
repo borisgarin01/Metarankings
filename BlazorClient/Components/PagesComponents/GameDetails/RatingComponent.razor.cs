@@ -2,7 +2,7 @@
 
 public partial class RatingComponent : ComponentBase
 {
-    [Parameter] public float? Score { get; set; }
+    [Parameter] public double? Score { get; set; }
     [Parameter] public long ScoresCount { get; set; }
     [Parameter] public byte SelectedRating { get; set; }
     [Parameter] public byte CurrentHoverRating { get; set; }

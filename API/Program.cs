@@ -3,6 +3,7 @@ using Data.Migrations;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
+using IdentityLibrary.Telegram;
 
 internal class Program
 {
@@ -46,6 +47,11 @@ internal class Program
             options.AddPolicy("Admin", options =>
             {
                 options.RequireRole("Admin");
+            });
+            options.AddPolicy("AuthorizedWithEmailConfirmed", options =>
+            {
+                options.RequireAuthenticatedUser();
+                options.RequireClaim("EmailConfirmed", true.ToString());
             });
         });
 
@@ -106,6 +112,10 @@ internal class Program
             .AddUserStore<UsersStore>()
             .AddRoleStore<RoleStore>()
             .AddDefaultTokenProviders();
+
+        builder.Services.AddSingleton<TelegramAuthenticator>(instance => new TelegramAuthenticator(builder.Configuration["Auth:Telegram:Bot:Token"], builder.Configuration["Auth:Telegram:Bot:ChatId"]));
+
+        builder.Services.AddHostedService<NotificationsBackgroundService>();
 
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
