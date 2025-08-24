@@ -1,11 +1,18 @@
 ﻿@page "/admin/developers/remove-developer/{Id:long}"
 
-@if(Developer is null)
-{
-    <p>Loading...</p>
-}
-else
-{
-    <h3>Remove @Developer.Name</h3>
-    <p>Are you sure you want to remove this developer?</p>
-}
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        @if (Developer is null)
+        {
+            <p>Загружается...</p>
+        }
+        else
+        {
+            <h3>Удалить @Developer.Name</h3>
+            <p>Вы уверены, что хотете удалить этого разработчика?</p>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы удалить разраба
+    </NotAuthorized>
+</AuthorizeView>

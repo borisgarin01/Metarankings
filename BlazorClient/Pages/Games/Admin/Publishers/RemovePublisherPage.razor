@@ -1,11 +1,18 @@
 ﻿@page "/admin/publishers/remove-publisher/{Id:long}"
 
-@if (Publisher is null)
-{
-    <p>Loading...</p>
-}
-else
-{
-    <h3>Remove @Publisher.Name</h3>
-    <p>Are you sure you want to remove this publisher?</p>
-}
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        @if (Publisher is null)
+        {
+            <p>Загружается...</p>
+        }
+        else
+        {
+            <h3>Удалить @Publisher.Name</h3>
+            <p>Вы уверены, что хотете удалить этого издателя?</p>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы удалить издателя
+    </NotAuthorized>
+</AuthorizeView>
