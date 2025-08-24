@@ -187,7 +187,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.imageUrl, gs.gameid
+gs.id, gs.gameid, gs.imageUrl
     FROM (select Id, Name, Image, ReleaseDate, Description, PublisherId, LocalizationId 
         from Games ORDER BY id
         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
@@ -258,7 +258,7 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.id, gs.gameid
+gs.id, gs.gameid, gs.imageUrl
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
