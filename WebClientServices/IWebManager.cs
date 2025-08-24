@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace WebManagers;
 
-public interface IWebManager<T, TAdd, TUpdate> where T : class, new()
+public interface IWebManager<T, TAdd, TUpdate> where T : class
 {
     Task<IEnumerable<T>> GetAllAsync();
     Task<IEnumerable<T>> GetAllAsync(long offset, long limit);

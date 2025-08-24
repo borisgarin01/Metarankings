@@ -1,7 +1,11 @@
-﻿@page "/admin/developers/remove-game/{Id:long}"
+﻿@page "/admin/games/remove-game/{Id:long}"
 
-<h3>RemoveGamePage</h3>
-
-@code {
-    [Parameter] public long Id { get; set; }
+@if (Game is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h3>Remove @Game.Name</h3>
+    <p>Are you sure you want to remove this game?</p>
 }

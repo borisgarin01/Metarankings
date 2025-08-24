@@ -1,7 +1,11 @@
 ﻿@page "/admin/genres/remove-genre/{Id:long}"
 
-<h3>RemoveGenrePage</h3>
-
-@code {
-    [Parameter] public long Id { get; set; }
+@if (Genre is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h3>Remove @Genre.Name</h3>
+    <p>Are you sure you want to remove this genre?</p>
 }

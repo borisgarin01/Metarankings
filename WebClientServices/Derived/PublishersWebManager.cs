@@ -14,7 +14,7 @@ namespace WebManagers.Derived
 
         public async Task<HttpResponseMessage> AddAsync(AddPublisherModel addPublisherModel)
         {
-            var httpResponseMessage = await HttpClient.PostAsJsonAsync<AddPublisherModel>("/api/Publishers", addPublisherModel);
+            HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddPublisherModel>("/api/Publishers", addPublisherModel);
             return httpResponseMessage;
         }
 
