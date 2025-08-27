@@ -21,13 +21,16 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public GamesGamersReviewsController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, GamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, IMapper mapper)
+    private readonly ILogger<GamesGamersReviewsController> _logger;
+
+    public GamesGamersReviewsController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, GamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, IMapper mapper, ILogger<GamesGamersReviewsController> logger)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _telegramAuthenticator = telegramAuthenticator;
         _gamesRepository = gamesRepository;
         _usersManager = usersManager;
         _mapper = mapper;
+        _logger = logger;
     }
 
     [HttpPost]
@@ -45,15 +48,12 @@ public sealed class GamesGamersReviewsController : ControllerBase
         if (game is null)
             return NotFound("Game not found");
 
-        var gameReview = _mapper.Map<GameReview>(addGameReviewModel);
+        var addGameReviewWithUserIdAndDateModel = new AddGamePlayerReviewWithUserIdAndDateModel(addGameReviewModel.GameId, addGameReviewModel.TextContent, addGameReviewModel.Score, long.Parse(User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value), DateTime.Now);
 
-        gameReview.UserId = userId;
-        gameReview.Date = DateTime.UtcNow;
-
-        var gameReviewId = await _gamesPlayersReviewsRepository.AddAsync(gameReview);
+        var gameReviewId = await _gamesPlayersReviewsRepository.AddAsync(addGameReviewWithUserIdAndDateModel);
         var createdGameReview = await _gamesPlayersReviewsRepository.GetAsync(gameReviewId);
         await _telegramAuthenticator.SendMessageAsync($"New game review for game {game.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/GamesGamersReviews/{createdGameReview.Id}");
-        return Created($"api/GamesReviews/{gameReview.Id}", createdGameReview);
+        return Created($"api/GamesReviews/{createdGameReview.Id}", createdGameReview);
 
     }
 
@@ -64,5 +64,54 @@ public sealed class GamesGamersReviewsController : ControllerBase
         if (gameReview is null)
             return NotFound();
         return Ok(gameReview);
+    }
+
+    [HttpPut("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<GameReview>> UpdateReview(long id, UpdateGamePlayerReviewModel updateGamePlayerReviewModel)
+    {
+        GameReview gameReview = await _gamesPlayersReviewsRepository.GetAsync(id);
+        if (gameReview is null)
+            return NotFound();
+
+        if (long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value) != gameReview.UserId)
+            return BadRequest("User are not a review author");
+
+        else
+            try
+            {
+                GameReview updatedGameReview = await _gamesPlayersReviewsRepository.UpdateAsync(updateGamePlayerReviewModel, id);
+                return Ok(updatedGameReview);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                return StatusCode(500, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            }
+    }
+
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<GameReview>> RemoveReview(long id)
+    {
+        GameReview gameReview = await _gamesPlayersReviewsRepository.GetAsync(id);
+        if (gameReview is null)
+            return NotFound();
+
+        if (long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value) != gameReview.UserId)
+            return BadRequest("User are not a review author");
+
+        else
+            try
+            {
+
+                await _gamesPlayersReviewsRepository.RemoveAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                return StatusCode(500, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            }
     }
 }

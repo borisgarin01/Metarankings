@@ -28,6 +28,10 @@ internal class Program
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth:Secret"]))
         };
 
+        builder.Services.AddLogging();
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -113,7 +117,7 @@ internal class Program
             .AddRoleStore<RoleStore>()
             .AddDefaultTokenProviders();
 
-        builder.Services.AddSingleton<TelegramAuthenticator>(instance => new TelegramAuthenticator(builder.Configuration["Auth:Telegram:Bot:Token"], builder.Configuration["Auth:Telegram:Bot:ChatId"]));
+        builder.Services.AddSingleton<TelegramAuthenticator>();
 
         builder.Services.AddHostedService<NotificationsBackgroundService>();
 

@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.18" />
@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\IdentityLibrary\IdentityLibrary.csproj" />
+    <ProjectReference Include="..\WebClientServices\WebManagers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

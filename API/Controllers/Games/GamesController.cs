@@ -13,15 +13,16 @@ public sealed class GamesController : ControllerBase
     private JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
     private readonly IMapper _mapper;
     private readonly GamesRepository _gamesRepository;
-
+    private readonly ILogger<GamesController> _logger;
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public GamesController(GamesRepository gamesRepository, IMapper mapper, TelegramAuthenticator telegramAuthenticator)
+    public GamesController(GamesRepository gamesRepository, IMapper mapper, TelegramAuthenticator telegramAuthenticator, ILogger<GamesController> logger)
     {
         jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
         _gamesRepository = gamesRepository;
         _mapper = mapper;
         _telegramAuthenticator = telegramAuthenticator;
+        _logger = logger;
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
@@ -33,12 +34,33 @@ public sealed class GamesController : ControllerBase
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult<long>> AddAsync(AddGameModel gameModel)
+    public async Task<ActionResult<long>> AddAsync(AddGameModel addGameModel)
     {
-        Game game = _mapper.Map<Game>(gameModel);
-        long createdGame = await _gamesRepository.AddAsync(game);
-        await _telegramAuthenticator.SendMessageAsync($"New game {game.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/games/{game.Id}");
-        return Created($"api/games/{game.Id}", createdGame);
+        long createdGameId = await _gamesRepository.AddAsync(addGameModel);
+
+        Game createdGame = await _gamesRepository.GetAsync(createdGameId);
+
+        await _telegramAuthenticator.SendMessageAsync($"New game {addGameModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/games/{createdGame.Id}");
+        return Created($"api/games/{createdGame.Id}", createdGame);
+    }
+
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    public async Task<ActionResult<long>> RemoveAsync(long id)
+    {
+        Game game = await _gamesRepository.GetAsync(id);
+        if (game is null)
+            return NotFound();
+        try
+        {
+            await _gamesRepository.RemoveAsync(id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{ex.Message}\t{ex.StackTrace}");
+            return StatusCode(500, ex);
+        }
     }
 
     [HttpGet]

@@ -11,4 +11,4 @@ public sealed record AddGamePlayerReviewModel(
     string TextContent,
 
     [Range(0.0f, 10.0f, ErrorMessage = "Score should be between 0 and 10")]
-    double Score);
+    float Score);

@@ -1,0 +1,11 @@
+﻿@page "/games/reviews/edit/{Id:long}"
+
+<form method="post" @onsubmit="UpdateAsync">
+    <h3>Edit</h3>
+
+    <InputNumber class="form-control" @bind-Value="Score" />
+
+    <InputTextArea class="form-control" @bind-Value="TextContent" />
+
+    <button type="submit" class="btn btn-primary">Commit editing</button>
+</form>

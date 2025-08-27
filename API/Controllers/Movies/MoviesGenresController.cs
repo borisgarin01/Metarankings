@@ -1,5 +1,7 @@
-﻿using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Classes.Derived.Movies;
+using Data.Repositories.Interfaces;
 using Domain.Movies;
+using Domain.RequestsModels.Movies.MoviesDirectors;
 
 namespace API.Controllers.Movies;
 
@@ -7,9 +9,9 @@ namespace API.Controllers.Movies;
 [Route("api/[controller]")]
 public class MoviesGenresController : ControllerBase
 {
-    private readonly IRepository<MovieGenre> _moviesGenresRepository;
+    private readonly IRepository<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> _moviesGenresRepository;
 
-    public MoviesGenresController(IRepository<MovieGenre> moviesGenresRepository)
+    public MoviesGenresController(IRepository<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> moviesGenresRepository)
     {
         _moviesGenresRepository = moviesGenresRepository;
     }
@@ -48,17 +50,17 @@ public class MoviesGenresController : ControllerBase
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult<MovieGenre>> AddAsync(MovieGenre movieGenre)
+    public async Task<ActionResult<MovieGenre>> AddAsync(AddMovieGenreModel addMovieGenreModel)
     {
         if (ModelState.IsValid)
         {
             try
             {
-                var insertedId = await _moviesGenresRepository.AddAsync(movieGenre);
+                var insertedId = await _moviesGenresRepository.AddAsync(addMovieGenreModel);
 
-                movieGenre = movieGenre with { Id = insertedId };
+                var insertedMovieGenre = await _moviesGenresRepository.GetAsync(insertedId);
 
-                return Ok(movieGenre);
+                return Created($"/api/moviesGenres/{insertedId}", insertedMovieGenre);
             }
             catch (Exception ex)
             {

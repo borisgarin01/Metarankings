@@ -1,17 +1,35 @@
 ﻿using Domain.RequestsModels.Games.GamesGamersReviews;
+using Domain.Reviews;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 
 namespace BlazorClient.Pages.Games.Games;
 
 public partial class YourScoreComponent : ComponentBase
 {
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    private ClaimsPrincipal currentUser;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (authenticationState is not null)
+        {
+            AuthenticationState authState = await authenticationState;
+            currentUser = authState?.User;
+        }
+        StateHasChanged();
+    }
+
     [Parameter, EditorRequired]
     [Range(0.0, 10.0)]
     public double AverageGameGamersScore { get; set; }
 
     [Parameter, EditorRequired]
-    [Range(0.0, 10.0)]
-    public double YourScore { get; set; }
+    [Range(0.0f, 10.0f)]
+    public float YourScore { get; set; }
 
     [Parameter, EditorRequired]
     [Range(0, long.MaxValue)]
@@ -30,12 +48,18 @@ public partial class YourScoreComponent : ComponentBase
     public HttpClient HttpClient { get; set; }
 
     [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [Inject]
     public IJSRuntime JSRuntime { get; set; }
 
     public async Task AddReviewAsync()
     {
         var addGamePlayerReviewModel = new AddGamePlayerReviewModel(GameId, Text, YourScore);
         HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClient.PostAsJsonAsync<AddGamePlayerReviewModel>("api/GamesGamersReviews", addGamePlayerReviewModel);
-        await JSRuntime.InvokeVoidAsync("alert", addingGamePlayerReviewHttpResponseMessage.StatusCode);
+        if (addingGamePlayerReviewHttpResponseMessage.IsSuccessStatusCode)
+            NavigationManager.NavigateTo($"/games/Details/{GameId}", true);
+        else
+            await JSRuntime.InvokeVoidAsync("alert", await addingGamePlayerReviewHttpResponseMessage.Content.ReadAsStringAsync());
     }
 }

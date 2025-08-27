@@ -14,11 +14,13 @@ public sealed class AuthController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
     private readonly TelegramAuthenticator _telegramAuthenticator;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator)
+    private readonly ILogger<AuthController> _logger;
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, ILogger<AuthController> logger)
     {
         _configuration = configuration;
         _usersManager = usersManager;
         _telegramAuthenticator = telegramAuthenticator;
+        _logger = logger;
     }
 
     [HttpPost("login")]
@@ -55,9 +57,39 @@ public sealed class AuthController : ControllerBase
 
         var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
 
+        userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
+
+        string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
+
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        return Ok(tokenString);
+        IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
+
+        if (identityResult.Succeeded)
+            return Ok(tokenString);
+
+        return StatusCode(500, "Authentication token setting has been failed");
+    }
+
+    [HttpPost("logout")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult> Logout()
+    {
+        try
+        {
+            ApplicationUser authorizedApplicationUser = await _usersManager.FindByIdAsync(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value);
+            IdentityResult logoutResult = await _usersManager.RemoveAuthenticationTokenAsync(authorizedApplicationUser, "SQLServer", "AuthToken");
+            if (logoutResult.Succeeded)
+                return Ok();
+
+            _logger.LogError("Ошибка отзыва токена авторизации");
+            return StatusCode(500, "Ошибка отзыва токена авторизации");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+        }
     }
 
     [HttpPost("register")]
@@ -159,5 +191,22 @@ public sealed class AuthController : ControllerBase
                 return BadRequest(identityResult);
             return Ok(identityResult);
         }
+    }
+
+    [HttpPost("changePassword")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult> ChangePassword(string oldPassword, string passwordToAssign)
+    {
+        ApplicationUser? applicationUser = await _usersManager.FindByIdAsync(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value);
+        var isCorrectOldPassword = BCrypt.Net.BCrypt.EnhancedVerify(oldPassword, applicationUser.PasswordHash);
+        if (!isCorrectOldPassword)
+            return BadRequest("Неверный предыдущий пароль пользователя");
+        string encryptedNewPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(passwordToAssign);
+        string token = await _usersManager.GeneratePasswordResetTokenAsync(applicationUser);
+
+        IdentityResult passwordChangingResult = await _usersManager.ChangePasswordAsync(applicationUser, token, encryptedNewPassword);
+        if (passwordChangingResult is not null && passwordChangingResult.Succeeded)
+            return Ok();
+        return BadRequest();
     }
 }

@@ -40,9 +40,13 @@ public class AuthService : IAuthService
 
     public async Task LogoutAsync()
     {
-        await _localStorage.RemoveItemAsync("authToken");
-        ((JwtAuthenticationStateProvider)_authenticationStateProvider)
-            .MarkUserAsLoggedOut();
+        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsync("api/auth/logout", null);
+        if (httpResponseMessage.IsSuccessStatusCode)
+        {
+            await _localStorage.RemoveItemAsync("authToken");
+            ((JwtAuthenticationStateProvider)_authenticationStateProvider)
+                .MarkUserAsLoggedOut();
+        }
     }
 
     public async Task RegisterAsync(RegisterModel registerModel)

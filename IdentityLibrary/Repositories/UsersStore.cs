@@ -2,7 +2,7 @@
 
 namespace IdentityLibrary.Repositories;
 
-public sealed class UsersStore : IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>
+public sealed class UsersStore : IUserSecurityStampStore<ApplicationUser>, IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>, IUserAuthenticationTokenStore<ApplicationUser>
 {
     private readonly string _connectionString;
 
@@ -16,7 +16,7 @@ public sealed class UsersStore : IUserStore<ApplicationUser>, IUserEmailStore<Ap
         get
         {
             using var connection = new SqlConnection(_connectionString);
-            var users = connection.Query<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled 
+            var users = connection.Query<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp 
 FROM ApplicationUsers;");
 
             return users.AsQueryable();
@@ -37,9 +37,9 @@ END;", new { roleName, UserId = user.Id });
     public async Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         using var connection = new SqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"INSERT INTO ApplicationUsers (UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled) 
+        await connection.ExecuteAsync(@"INSERT INTO ApplicationUsers (UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp) 
 VALUES
-(@UserName, @NormalizedUserName, @Email, @NormalizedEmail, @EmailConfirmed, @PasswordHash, @PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled);", user);
+(@UserName, @NormalizedUserName, @Email, @NormalizedEmail, @EmailConfirmed, @PasswordHash, @PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled, @SecurityStamp);", user);
 
         return IdentityResult.Success;
     }
@@ -59,7 +59,7 @@ VALUES
     public async Task<ApplicationUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
     {
         using var connection = new SqlConnection(_connectionString);
-        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled
+        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
 FROM ApplicationUsers 
 WHERE NormalizedEmail = @normalizedEmail;", new { normalizedEmail });
 
@@ -69,7 +69,7 @@ WHERE NormalizedEmail = @normalizedEmail;", new { normalizedEmail });
     public async Task<ApplicationUser?> FindByIdAsync(string userId, CancellationToken cancellationToken)
     {
         using var connection = new SqlConnection(_connectionString);
-        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled
+        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
 FROM ApplicationUsers 
 WHERE Id = @Id;", new { Id = userId });
 
@@ -79,7 +79,7 @@ WHERE Id = @Id;", new { Id = userId });
     public async Task<ApplicationUser?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
     {
         using var connection = new SqlConnection(_connectionString);
-        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled
+        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
 FROM ApplicationUsers 
 WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
 
@@ -122,6 +122,12 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
             WHERE UserId = @Id);", new { user.Id })).ToList();
     }
 
+    public Task<string?> GetSecurityStampAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(user.SecurityStamp);
+    }
+
+
     public Task<string> GetUserIdAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         return Task.FromResult(user.Id.ToString());
@@ -137,7 +143,7 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
         using var connection = new SqlConnection(_connectionString);
         var applicationUsers = await connection.QueryAsync<ApplicationUser>(
             @"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, 
-                    PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled
+                    PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
                 FROM ApplicationUsers
                     WHERE Id IN
                     (SELECT UserId
@@ -177,6 +183,48 @@ WHERE UserId=@UserId
     AND RoleId = (SELECT Id 
         FROM ApplicationRoles
             WHERE NormalizedName = UPPER (@roleName));", new { roleName });
+    }
+    public async Task<string?> GetTokenAsync(ApplicationUser user, string loginProvider, string name, CancellationToken cancellationToken)
+    {
+        using var connection = new SqlConnection(_connectionString);
+        string token = await connection.QueryFirstOrDefaultAsync<string>(@"SELECT Value 
+FROM AccessTokens
+WHERE UserId=@UserId 
+    AND LoginProvider=@LoginProvider
+    AND Name=@Name", new
+        {
+            UserId = user.Id,
+            LoginProvider = loginProvider,
+            Name = name
+        });
+        return token;
+    }
+    public async Task SetTokenAsync(ApplicationUser user, string loginProvider, string name, string? value, CancellationToken cancellationToken)
+    {
+        using var connection = new SqlConnection(_connectionString);
+        await connection.ExecuteAsync(@"INSERT INTO AccessTokens(UserId, LoginProvider, Name, Value)
+VALUES(@UserId, @LoginProvider, @Name, @Value);",
+new
+{
+    UserId = user.Id,
+    LoginProvider = loginProvider,
+    Name = name,
+    Value = value
+});
+    }
+
+    public async Task RemoveTokenAsync(ApplicationUser user, string loginProvider, string name, CancellationToken cancellationToken)
+    {
+        using var connection = new SqlConnection(_connectionString);
+        await connection.ExecuteAsync(@"DELETE FROM AccessTokens 
+WHERE UserId = @UserId
+and LoginProvider=@LoginProvider
+and Name=@Name", new
+        {
+            UserId = user.Id,
+            LoginProvider = loginProvider,
+            Name = name
+        });
     }
 
     public async Task SetEmailAsync(ApplicationUser user, string? email, CancellationToken cancellationToken)
@@ -221,6 +269,15 @@ SET PasswordHash = @passwordHash
 WHERE Id=@Id;", new { passwordHash, user.Id });
     }
 
+    public async Task SetSecurityStampAsync(ApplicationUser user, string stamp, CancellationToken cancellationToken)
+    {
+        using var connection = new SqlConnection(_connectionString);
+        await connection.ExecuteAsync(@"UPDATE ApplicationUsers 
+SET SecurityStamp = @stamp 
+WHERE Id=@Id;", new { stamp, user.Id });
+    }
+
+
     public async Task SetUserNameAsync(ApplicationUser user, string? userName, CancellationToken cancellationToken)
     {
         using var connection = new SqlConnection(_connectionString);
@@ -242,7 +299,9 @@ EmailConfirmed=@EmailConfirmed,
 PasswordHash=@PasswordHash,
 PhoneNumber=@PhoneNumber,
 PhoneNumberConfirmed=@PhoneNumberConfirmed,
-TwoFactorEnabled=@TwoFactorEnabled WHERE Id=@Id;", user);
+TwoFactorEnabled=@TwoFactorEnabled,
+SecurityStamp=@SecurityStamp 
+WHERE Id=@Id;", user);
 
         return IdentityResult.Success;
     }
