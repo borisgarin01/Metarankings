@@ -114,7 +114,7 @@ internal class Program
 
         builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
             .AddUserStore<UsersStore>()
-            .AddRoleStore<RoleStore>()
+            .AddRoleStore<RolesStore>()
             .AddDefaultTokenProviders();
 
         builder.Services.AddSingleton<TelegramAuthenticator>();

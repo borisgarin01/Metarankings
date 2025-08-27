@@ -2,11 +2,11 @@
 
 namespace IdentityLibrary.Repositories;
 
-public sealed class RoleStore : IRoleStore<ApplicationRole>
+public sealed class RolesStore : IRoleStore<ApplicationRole>
 {
     private readonly string _connectionString;
 
-    public RoleStore(IConfiguration configuration)
+    public RolesStore(IConfiguration configuration)
     {
         _connectionString = configuration.GetConnectionString("MetarankingsConnection");
     }
@@ -72,6 +72,17 @@ output str(id)
         return Task.FromResult(role.NormalizedName);
     }
 
+    public async Task SetNormalizedRoleNameAsync(ApplicationRole role, string? normalizedName, CancellationToken cancellationToken)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.ExecuteAsync(@"UPDATE ApplicationRoles 
+SET NormalizedName=@normalizedName
+WHERE Id=@Id;", new { normalizedName, role.Id });
+            role.NormalizedName = normalizedName;
+        }
+    }
+
     public Task<string> GetRoleIdAsync(ApplicationRole role, CancellationToken cancellationToken)
     {
         return Task.FromResult(role.Id.ToString());
@@ -82,16 +93,15 @@ output str(id)
         return Task.FromResult(role.Name);
     }
 
-    public Task SetNormalizedRoleNameAsync(ApplicationRole role, string? normalizedName, CancellationToken cancellationToken)
+    public async Task SetRoleNameAsync(ApplicationRole role, string? roleName, CancellationToken cancellationToken)
     {
-        role.NormalizedName = normalizedName;
-        return Task.FromResult(0);
-    }
-
-    public Task SetRoleNameAsync(ApplicationRole role, string? roleName, CancellationToken cancellationToken)
-    {
-        role.Name = roleName;
-        return Task.FromResult(0);
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.ExecuteAsync(@"UPDATE ApplicationRoles 
+SET Name=@roleName
+WHERE Id=@Id;", new { roleName, role.Id });
+            role.Name = roleName;
+        }
     }
 
     public async Task<IdentityResult> UpdateAsync(ApplicationRole role, CancellationToken cancellationToken)
