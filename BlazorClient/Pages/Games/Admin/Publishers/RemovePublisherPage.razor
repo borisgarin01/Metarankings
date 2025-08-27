@@ -9,7 +9,10 @@
         else
         {
             <h3>Удалить @Publisher.Name</h3>
-            <p>Вы уверены, что хотете удалить этого издателя?</p>
+            <p>Вы уверены, что хотите удалить этого издателя?</p>
+            <p>
+                <button type="button" @onclick="RemovePublisherAsync">Удалить</button>
+            </p>
         }
     </Authorized>
     <NotAuthorized>

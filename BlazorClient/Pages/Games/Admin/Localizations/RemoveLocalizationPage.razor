@@ -9,7 +9,10 @@
         else
         {
             <h3>Удалить @Localization.Name</h3>
-            <p>Вы уверены, что хотете удалить эту локализацию?</p>
+            <p>Вы уверены, что хотите удалить эту локализацию?</p>
+            <p>
+                <button type="button" @onclick="RemoveLocalizationAsync">Удалить</button>
+            </p>
         }
     </Authorized>
     <NotAuthorized>

@@ -9,7 +9,10 @@
         else
         {
             <h3>Удалить @Platform.Name</h3>
-            <p>Вы уверены, что хотете удалить эту платформу?</p>
+            <p>Вы уверены, что хотите удалить эту платформу?</p>
+            <p>
+                <button type="button" @onclick="RemovePlatformAsync">Удалить</button>
+            </p>
         }
     </Authorized>
     <NotAuthorized>

@@ -2,6 +2,7 @@
 using Domain.RequestsModels.Games.Localizations;
 using Domain.RequestsModels.Games.Publishers;
 using WebManagers;
+using WebManagers.Derived;
 
 namespace BlazorClient.Pages.Games.Admin.Publishers;
 
@@ -14,9 +15,28 @@ public partial class RemovePublisherPage : ComponentBase
 
     [Inject]
     public IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel> PublishersWebManager { get; set; }
+    
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         Publisher = await PublishersWebManager.GetAsync(Id);
+    }
+
+    public async Task RemovePublisherAsync()
+    {
+        HttpResponseMessage httpResponseMessage = await PublishersWebManager.DeleteAsync(Id);
+        if (httpResponseMessage.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/admin/publishers/list-publishers");
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+        }
     }
 }

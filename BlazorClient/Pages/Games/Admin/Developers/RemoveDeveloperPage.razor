@@ -9,7 +9,10 @@
         else
         {
             <h3>Удалить @Developer.Name</h3>
-            <p>Вы уверены, что хотете удалить этого разработчика?</p>
+            <p>Вы уверены, что хотите удалить этого разработчика?</p>
+            <p>
+                <button type="button" @onclick="RemoveDeveloperAsync">Удалить</button>
+            </p>
         }
     </Authorized>
     <NotAuthorized>
