@@ -14,11 +14,13 @@ public sealed class AuthController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
     private readonly TelegramAuthenticator _telegramAuthenticator;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator)
+    private readonly ILogger<AuthController> _logger;
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, ILogger<AuthController> logger)
     {
         _configuration = configuration;
         _usersManager = usersManager;
         _telegramAuthenticator = telegramAuthenticator;
+        _logger = logger;
     }
 
     [HttpPost("login")]
@@ -61,7 +63,33 @@ public sealed class AuthController : ControllerBase
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        return Ok(tokenString);
+        IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
+
+        if (identityResult.Succeeded)
+            return Ok(tokenString);
+
+        return StatusCode(500, "Authentication token setting has been failed");
+    }
+
+    [HttpPost("logout")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult> Logout()
+    {
+        try
+        {
+            ApplicationUser authorizedApplicationUser = await _usersManager.FindByIdAsync(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value);
+            IdentityResult logoutResult = await _usersManager.RemoveAuthenticationTokenAsync(authorizedApplicationUser, "SQLServer", "AuthToken");
+            if (logoutResult.Succeeded)
+                return Ok();
+
+            _logger.LogError("Ошибка отзыва токена авторизации");
+            return StatusCode(500, "Ошибка отзыва токена авторизации");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+        }
     }
 
     [HttpPost("register")]

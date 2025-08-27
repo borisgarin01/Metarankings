@@ -34,7 +34,7 @@ internal class Program
         builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
         builder.Services.AddScoped<IAuthService, AuthService>();
 
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://192.168.1.101:5001") });
+        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://172.16.1.62:5001") });
 
         await builder.Build().RunAsync();
     }
