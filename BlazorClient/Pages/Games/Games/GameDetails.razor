@@ -40,9 +40,9 @@ else
             <SystemRequirements />
 
             <GameTags Links="@(new List<string> {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "/best-ps4-games/",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "/top-igry-priklyucheniya/"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            })" />
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "/best-ps4-games/",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "/top-igry-priklyucheniya/"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                })" />
 
         <AdHorizontal AdId="R-A-201169-7" />
 
@@ -95,7 +95,10 @@ else
                     </div>
                     <AuthorizeView>
                         <Authorized>
-                            <YourScoreComponent YourScore="10" AverageGameGamersScore="10" Text="@string.Empty" GameId="@Game.Id" ScoresCount="0" />
+                            @if (IsAbleToWriteComments)
+                            {
+                                <YourScoreComponent YourScore="10" AverageGameGamersScore="10" Text="@string.Empty" GameId="@Game.Id" ScoresCount="0" />
+                            }
                         </Authorized>
                     </AuthorizeView>
                 </div>
