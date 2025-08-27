@@ -30,6 +30,18 @@ public partial class GameDetails : ComponentBase
 
     private ClaimsPrincipal currentUser;
 
+    private bool isAbleToWriteComments = false;
+
+    public bool IsAbleToWriteComments
+    {
+        get => isAbleToWriteComments;
+        private set
+        {
+            isAbleToWriteComments = value;
+            StateHasChanged();
+        }
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         Game = await HttpClient.GetFromJsonAsync<Game>($"/api/Games/{Id}");
@@ -38,6 +50,16 @@ public partial class GameDetails : ComponentBase
         {
             AuthenticationState authState = await authenticationState;
             currentUser = authState?.User;
+
+            if (currentUser is not null
+                && currentUser.Claims.FirstOrDefault(cuc => cuc.Type == ClaimTypes.NameIdentifier) != null)
+            {
+                long userId = long.Parse(currentUser.Claims.FirstOrDefault(cuc => cuc.Type == ClaimTypes.NameIdentifier).Value);
+                if (Game.GamesPlayersReviews.FirstOrDefault(g => g.UserId == userId) is null)
+                {
+                    IsAbleToWriteComments = true;
+                }
+            }
         }
         StateHasChanged();
     }
