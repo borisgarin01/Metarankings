@@ -1,0 +1,11 @@
+﻿@page "/admin/platforms/add-platform"
+
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        <InputText @bind-Value="AddPlatformModel.Name" />
+        <input type="submit" value="Добавить" @onclick="AddPlatformAsync" />
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы добавить платформу
+    </NotAuthorized>
+</AuthorizeView>

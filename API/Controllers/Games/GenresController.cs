@@ -25,9 +25,9 @@ public sealed class GenresController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Genre>>> GetAllAsync()
     {
-        var developers = await _genresRepository.GetAllAsync();
+        var genres = await _genresRepository.GetAllAsync();
 
-        return Ok(developers);
+        return Ok(genres);
     }
 
     [HttpPost]

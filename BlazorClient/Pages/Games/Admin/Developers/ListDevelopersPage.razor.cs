@@ -1,10 +1,10 @@
 ﻿using Domain.Games;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BlazorClient.Pages.Games.Admin;
+namespace BlazorClient.Pages.Games.Admin.Developers;
 
 [Authorize(Policy = "Admin")]
-public partial class ListDeveloperPage : ComponentBase
+public partial class ListDevelopersPage : ComponentBase
 {
     public IEnumerable<Developer> Developers { get; set; }
 
