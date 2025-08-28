@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Auth\ResetPasswordConfirmModel.cs~RF7a779f.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Files\" />
     <Folder Include="RequestsModels\Movies\MoviesGenres\" />
     <Folder Include="RequestsModels\Movies\MoviesStudios\" />
