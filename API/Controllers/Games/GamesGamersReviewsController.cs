@@ -98,20 +98,19 @@ public sealed class GamesGamersReviewsController : ControllerBase
         if (gameReview is null)
             return NotFound();
 
-        if (long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value) != gameReview.UserId)
+        if ((long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value) != gameReview.UserId)
+            && User.Claims.FirstOrDefault(a => a.Type == ClaimTypes.Role && a.Value == "Admin") is null)
             return BadRequest("User are not a review author");
 
-        else
-            try
-            {
-
-                await _gamesPlayersReviewsRepository.RemoveAsync(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
-                return StatusCode(500, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            }
+        try
+        {
+            await _gamesPlayersReviewsRepository.RemoveAsync(id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+        }
     }
 }

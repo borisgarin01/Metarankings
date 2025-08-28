@@ -1,0 +1,34 @@
+﻿<li class="mark-@Math.Round(Score)">
+    <div>
+        <div class="ureview-text">
+            <div class="comment-meta">
+                <div class="small-score mark-@Math.Round(Score)">
+                    <span data-title="Оценка отзыва из 10 баллов" class="tooltip">10</span>
+                </div>
+                <p class="user-reviews-author comment-author">
+                    <span>@UserName</span>
+                </p>
+                <p class="comment-date">@PublishDate.ToString("dd.MM.yyyy")</p>
+                <div class="rating-com">
+                    <span class="ldc-ul_like" onclick="alter_ul_post_values(this,'53','c_like')">+ <span>60</span></span><span class="ldc-ul_dislike" onclick="alter_ul_post_values(this,'53','c_dislike')">- <span>6</span></span>
+                </div>
+            </div>
+            <div class="review-text">
+                <p>@TextContent</p>
+            </div>
+        </div>
+        @if (IsAbleToEdit || IsAbleToRemove)
+        {
+            <div>
+                @if (IsAbleToEdit)
+                {
+                    <a href="/games/reviews/edit/@Id">Изменить</a>
+                }
+                @if (IsAbleToRemove)
+                {
+                    <a href="/games/reviews/delete/@Id">Удалить</a>
+                }
+            </div>
+        }
+    </div>
+</li>
