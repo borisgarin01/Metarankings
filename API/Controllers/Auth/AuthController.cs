@@ -3,7 +3,9 @@ using IdentityLibrary.Models;
 using IdentityLibrary.Telegram;
 using MailKit.Net.Smtp;
 using MimeKit;
+using NPOI.SS.Formula.Functions;
 using System.Net;
+using Telegram.Bot.Types;
 
 namespace API.Controllers.Auth;
 
@@ -130,7 +132,7 @@ public sealed class AuthController : ControllerBase
 
             var emailMessage = new MimeMessage();
 
-            emailMessage.From.Add(new MailboxAddress("Metarankings.ru", "boris.garin01job@mail.ru"));
+            emailMessage.From.Add(new MailboxAddress(_configuration["EmailSettings:Sender:Name"], _configuration["EmailSettings:Sender:Email"]));
             emailMessage.To.Add(new MailboxAddress("", user.Email));
             emailMessage.Subject = "Confirm email";
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -140,8 +142,8 @@ public sealed class AuthController : ControllerBase
 
             using (var client = new SmtpClient())
             {
-                await client.ConnectAsync("smtp.mail.ru", 465, true);
-                await client.AuthenticateAsync("boris.garin01job@mail.ru", "tWySJBDnb2Lfgirt1XSo");
+                await client.ConnectAsync(_configuration["EmailSettings:Host"], int.Parse(_configuration["EmailSettings:Port"]), bool.Parse(_configuration["EmailSettings:UseSsl"]));
+                await client.AuthenticateAsync(_configuration["EmailSettings:UserName"], _configuration["EmailSettings:Password"]);
                 await client.SendAsync(emailMessage);
 
                 await client.DisconnectAsync(true);
