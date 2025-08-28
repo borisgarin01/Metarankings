@@ -16,10 +16,9 @@ public class ImagesController : ControllerBase
         _telegramAuthenticator = telegramAuthenticator;
     }
 
-    [HttpPost("imagePath")]
-    [HttpPost("imagePath/{year:int}/{month:int}")]
+    [HttpPost("{year:int}/{month:int}/{imagePath}")]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult> UploadImageAsync(IFormFile formFile, string imagePath, int? year, int? month)
+    public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int? year, int? month, string imagePath)
     {
         //JPEG, PNG, GIF, TIFF, WebP, SVG, BMP, and HEIF
 

@@ -14,10 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Controllers\Games\ReviewsController.cs~RF9c3bba.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Properties\launchSettings.json" />
   </ItemGroup>
 
@@ -45,6 +41,7 @@
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\ExcelProcessors\ExcelProcessors.csproj" />
     <ProjectReference Include="..\IdentityLibrary\IdentityLibrary.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
