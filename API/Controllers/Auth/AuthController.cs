@@ -212,4 +212,19 @@ public sealed class AuthController : ControllerBase
             return Ok();
         return BadRequest();
     }
+
+    [HttpPost("resetPassword")]
+    public async Task<ActionResult> ResetPassword(string email, string newPassword)
+    {
+        ApplicationUser user = await _usersManager.FindByEmailAsync(email);
+        if (user is null)
+            return NotFound();
+
+        user.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(newPassword);
+        string resetPasswordToken = await _usersManager.GeneratePasswordResetTokenAsync(user);
+        IdentityResult passwordResettingResult = await _usersManager.ResetPasswordAsync(user, resetPasswordToken, newPassword);
+        if (passwordResettingResult.Succeeded)
+            return Ok();
+        return BadRequest();
+    }
 }
