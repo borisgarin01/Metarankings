@@ -605,14 +605,21 @@ ORDER BY g.id, gen.id;";
         throw new NotImplementedException();
     }
 
-    public Task RemoveAsync(long id)
+    public async Task RemoveAsync(long id)
     {
-        throw new NotImplementedException();
+        using (var connection = new SqlConnection(ConnectionString))
+        {
+            await connection.ExecuteAsync(@"DELETE FROM Games
+WHERE Id=@id", new { id });
+        }
     }
 
-    public Task RemoveRangeAsync(IEnumerable<long> ids)
+    public async Task RemoveRangeAsync(IEnumerable<long> ids)
     {
-        throw new NotImplementedException();
+        foreach (long id in ids)
+        {
+            await RemoveAsync(id);
+        }
     }
 
     public Task<Game> UpdateAsync(UpdateGameModel entity, long id)

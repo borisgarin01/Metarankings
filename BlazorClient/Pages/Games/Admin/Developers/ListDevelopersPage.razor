@@ -7,7 +7,7 @@
         <div class="developersList">
             @if (Developers is null)
             {
-                <p>Loading...</p>
+                <p>Загружается...</p>
             }
             else
             {
@@ -15,6 +15,7 @@
                 {
                     <div class="developer">
                         <h4>@developer.Name</h4>
+                        <a href="/admin/developers/remove-developer/@developer.Id">Remove developer</a>
                     </div>
                 }
             }

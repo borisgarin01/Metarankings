@@ -1,11 +1,14 @@
-﻿using Domain.RequestsModels.Games.Publishers;
+﻿using Domain.Games;
+using Domain.RequestsModels.Games.Publishers;
+using WebManagers;
 
 namespace BlazorClient.Pages.Games.Admin.Publishers;
 
 public partial class AddPublisherPage : ComponentBase
 {
+
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel> PublishersWebManager { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -17,7 +20,7 @@ public partial class AddPublisherPage : ComponentBase
 
     public async Task AddPublisherAsync()
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Publishers", AddPublisherModel);
+        HttpResponseMessage httpResponseMessage = await PublishersWebManager.AddAsync(AddPublisherModel);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/publishers/list-publishers");
         else

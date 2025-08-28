@@ -1,5 +1,7 @@
-﻿using Domain.RequestsModels.Games.Developers;
+﻿using Domain.Games;
+using Domain.RequestsModels.Games.Developers;
 using Microsoft.AspNetCore.Authorization;
+using WebManagers;
 
 namespace BlazorClient.Pages.Games.Admin.Developers;
 
@@ -7,7 +9,7 @@ namespace BlazorClient.Pages.Games.Admin.Developers;
 public partial class AddDeveloperPage : ComponentBase
 {
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IWebManager<Developer, AddDeveloperModel, UpdateDeveloperModel> DevelopersWebManager { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -23,7 +25,7 @@ public partial class AddDeveloperPage : ComponentBase
 
     public async Task AddDeveloperAsync()
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Developers", AddDeveloperModel);
+        HttpResponseMessage httpResponseMessage = await DevelopersWebManager.AddAsync(AddDeveloperModel);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/developers/list-developers");
         else

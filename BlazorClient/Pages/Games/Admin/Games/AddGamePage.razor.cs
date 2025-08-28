@@ -1,6 +1,7 @@
-﻿
-using Domain.Games;
+﻿using Domain.Games;
 using Domain.RequestsModels.Games;
+using Microsoft.AspNetCore.Components.Forms;
+using WebManagers;
 
 namespace BlazorClient.Pages.Games.Admin.Games;
 
@@ -23,6 +24,8 @@ public partial class AddGamePage : ComponentBase
         PublishersToSelectFrom = publishersGettingTask.Result;
     }
 
+    const int MAX_FILESIZE = 5000 * 1024;
+
     [Inject]
     public HttpClient HttpClient { get; private set; }
 
@@ -30,14 +33,15 @@ public partial class AddGamePage : ComponentBase
     public IJSRuntime JSRuntime { get; private set; }
 
     [Inject]
+    public IWebManager<Game, AddGameModel, UpdateGameModel> GetWebManager { get; private set; }
+
+    [Inject]
     public NavigationManager NavigationManager { get; private set; }
 
     public string Name { get; set; }
-    public string Image { get; set; }
     public DateTime ReleaseDate { get; set; }
     public string Description { get; set; }
     public string Trailer { get; set; }
-
     public IEnumerable<Developer> DevelopersToSelectFrom { get; private set; }
     public IEnumerable<Genre> GenresToSelectFrom { get; private set; }
     public IEnumerable<Localization> LocalizationsToSelectFrom { get; private set; }
@@ -49,36 +53,59 @@ public partial class AddGamePage : ComponentBase
     public long SelectedLocalizationId { get; private set; }
     public List<long> SelectedPlatformsIds { get; private set; } = new List<long>();
     public long SelectedPublisherId { get; private set; }
-
+    public string ImageDestinationPath { get; private set; }
+    public IBrowserFile ImageToUpload { get; private set; }
     public async Task AddGameAsync()
     {
         if (GameModelToAddConfigured())
         {
-            var addGameModel = new AddGameModel(Name, Image, SelectedDevelopersIds, SelectedPublisherId, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
-
-            HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddGameModel>("/api/games", addGameModel);
-
-            if (httpResponseMessage != null)
+            try
             {
-                if (httpResponseMessage.IsSuccessStatusCode)
+                // Create multipart form data
+                var content = new MultipartFormDataContent();
+                var fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024)); // 50MB max
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
+                content.Add(fileContent, "formFile", ImageToUpload.Name);
+
+                // Build the URL with parameters
+                var url = $"api/images/{ReleaseDate.Year}/{ReleaseDate.Month}/{Uri.EscapeDataString(ImageToUpload.Name)}";
+
+                // Send the request with authentication token
+                var response = await HttpClient.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    NavigationManager.NavigateTo("/admin/games/list-games");
+                    // Extract the URL from the response
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    var addGameModel = new AddGameModel(Name, ImageToUpload.Name, SelectedDevelopersIds, SelectedPublisherId, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
+
+                    HttpResponseMessage addingGameResponseMessage = await GetWebManager.AddAsync(addGameModel);
+
+                    if (addingGameResponseMessage.IsSuccessStatusCode)
+                        NavigationManager.NavigateTo("/admin/games/list-games");
                 }
                 else
                 {
-                    await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+                    var problemDetails = await response.Content.ReadAsStringAsync();
+                    await JSRuntime.InvokeVoidAsync("alert", problemDetails);
                 }
             }
-        }
-        else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "Please, fill all required fields");
+            catch (Exception ex)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+            }
         }
     }
 
     private bool GameModelToAddConfigured()
     {
-        return !SelectedDevelopersIds.Contains(-1) && !SelectedGenresIds.Contains(-1) && SelectedLocalizationId != -1 && !SelectedPlatformsIds.Contains(-1) && SelectedPublisherId != -1;
+        return !SelectedDevelopersIds.Contains(-1)
+            && !SelectedGenresIds.Contains(-1)
+            && SelectedLocalizationId != -1
+            && !SelectedPlatformsIds.Contains(-1)
+            && SelectedPublisherId != -1
+            && ImageToUpload is not null;
     }
 
     private async Task SelectDeveloper(ChangeEventArgs e)
@@ -110,5 +137,10 @@ public partial class AddGamePage : ComponentBase
         SelectedPlatformsIds = ((string[])e.Value)
         .Select(idString => long.Parse(idString))
             .ToList();
+    }
+
+    private async Task FileUploaded(InputFileChangeEventArgs e)
+    {
+        ImageToUpload = e.File;
     }
 }

@@ -15,13 +15,13 @@
 
             <div class="form-group">
                 <label for="userEmail">User email</label>
-                <InputText Id="phone" class="form-control" @bind-Value="RegisterModel.UserEmail" />
+                <InputText Id="email" class="form-control" @bind-Value="RegisterModel.UserEmail" />
                 <ValidationMessage For="@(() => RegisterModel.UserEmail)" />
             </div>
 
             <div class="form-group">
                 <label for="userName">User name</label>
-                <InputText Id="phone" class="form-control" @bind-Value="RegisterModel.UserName" />
+                <InputText Id="userName" class="form-control" @bind-Value="RegisterModel.UserName" />
                 <ValidationMessage For="@(() => RegisterModel.UserName)" />
             </div>
 
@@ -37,7 +37,10 @@
                 <ValidationMessage For="@(() => RegisterModel.PasswordConfirmation)" />
             </div>
 
-            <button type="submit" class="btn btn-primary">Register</button>
+            <div class="form-group">
+                <p>Are you registered already? <a class="link-opacity-10" href="/auth/login">Login</a></p>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
         </EditForm>
     </div>
 </div>

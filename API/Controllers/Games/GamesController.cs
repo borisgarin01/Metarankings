@@ -13,15 +13,16 @@ public sealed class GamesController : ControllerBase
     private JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
     private readonly IMapper _mapper;
     private readonly GamesRepository _gamesRepository;
-
+    private readonly ILogger<GamesController> _logger;
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public GamesController(GamesRepository gamesRepository, IMapper mapper, TelegramAuthenticator telegramAuthenticator)
+    public GamesController(GamesRepository gamesRepository, IMapper mapper, TelegramAuthenticator telegramAuthenticator, ILogger<GamesController> logger)
     {
         jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
         _gamesRepository = gamesRepository;
         _mapper = mapper;
         _telegramAuthenticator = telegramAuthenticator;
+        _logger = logger;
     }
 
     [HttpGet("{pageNumber:int}/{pageSize:int}")]
@@ -41,6 +42,25 @@ public sealed class GamesController : ControllerBase
 
         await _telegramAuthenticator.SendMessageAsync($"New game {addGameModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/games/{createdGame.Id}");
         return Created($"api/games/{createdGame.Id}", createdGame);
+    }
+
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    public async Task<ActionResult<long>> RemoveAsync(long id)
+    {
+        Game game = await _gamesRepository.GetAsync(id);
+        if (game is null)
+            return NotFound();
+        try
+        {
+            await _gamesRepository.RemoveAsync(id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{ex.Message}\t{ex.StackTrace}");
+            return StatusCode(500, ex);
+        }
     }
 
     [HttpGet]
