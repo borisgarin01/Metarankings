@@ -15,13 +15,13 @@
 
             <div class="form-group">
                 <label for="userEmail">User email</label>
-                <InputText Id="phone" class="form-control" @bind-Value="RegisterModel.UserEmail" />
+                <InputText Id="email" class="form-control" @bind-Value="RegisterModel.UserEmail" />
                 <ValidationMessage For="@(() => RegisterModel.UserEmail)" />
             </div>
 
             <div class="form-group">
                 <label for="userName">User name</label>
-                <InputText Id="phone" class="form-control" @bind-Value="RegisterModel.UserName" />
+                <InputText Id="userName" class="form-control" @bind-Value="RegisterModel.UserName" />
                 <ValidationMessage For="@(() => RegisterModel.UserName)" />
             </div>
 

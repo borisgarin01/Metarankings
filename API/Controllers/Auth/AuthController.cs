@@ -115,7 +115,8 @@ public sealed class AuthController : ControllerBase
             PhoneNumber = registerModel.PhoneNumber,
             PhoneNumberConfirmed = false,
             TwoFactorEnabled = false,
-            UserName = registerModel.UserName
+            UserName = registerModel.UserName,
+            SecurityStamp = DateTime.Now.ToString()
         };
 
         IdentityResult userCreationResult = await _usersManager.CreateAsync(user);
