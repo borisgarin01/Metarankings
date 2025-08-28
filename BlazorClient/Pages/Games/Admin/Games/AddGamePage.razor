@@ -17,12 +17,6 @@ else
     </p>
     <p>
         <label>
-            Enter image:
-            <input type="file" @bind="@Image" />
-        </label>
-    </p>
-    <p>
-        <label>
             Enter release date:
             <input @bind="@ReleaseDate" />
         </label>
@@ -98,6 +92,12 @@ else
                     <option value="@publisher.Id.ToString()">@publisher.Name</option>
                 }
             </select>
+        </label>
+    </p>
+    <p>
+        <label>
+            Enter image:
+            <InputFile OnChange="FileUploaded" />
         </label>
     </p>
 

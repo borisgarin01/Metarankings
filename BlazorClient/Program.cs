@@ -32,9 +32,9 @@ internal class Program
         builder.Services.AddScoped<IWebManager<Game, AddGameModel, UpdateGameModel>, GamesWebManager>();
 
         builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
-        builder.Services.AddScoped<IAuthService, AuthService>();
 
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://172.16.1.62:5001") });
+        builder.Services.AddScoped<IAuthService, AuthService>();
 
         await builder.Build().RunAsync();
     }
