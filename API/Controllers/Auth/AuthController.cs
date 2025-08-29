@@ -1,4 +1,5 @@
 ﻿using Domain.Auth;
+using EnumsNET;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using IdentityLibrary.Telegram;
@@ -15,13 +16,16 @@ public sealed class AuthController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
     private readonly TelegramAuthenticator _telegramAuthenticator;
+    private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, ILogger<AuthController> logger)
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger)
     {
         _configuration = configuration;
         _usersManager = usersManager;
         _telegramAuthenticator = telegramAuthenticator;
+        _passwordHasher = passwordHasher;
         _logger = logger;
+
     }
 
     [HttpPost("login")]
@@ -39,9 +43,9 @@ public sealed class AuthController : ControllerBase
         if (userToCheckExistance is null)
             return NotFound("Пользователь не зарегистрирован");
 
-        var isCorrectPassword = BCrypt.Net.BCrypt.EnhancedVerify(loginModel.Password, userToCheckExistance.PasswordHash);
+        PasswordVerificationResult passwordVerificationResult = _passwordHasher.VerifyHashedPassword(userToCheckExistance, userToCheckExistance.PasswordHash, loginModel.Password);
 
-        if (!isCorrectPassword)
+        if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
 
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
@@ -104,7 +108,7 @@ public sealed class AuthController : ControllerBase
         if (!string.Equals(registerModel.Password, registerModel.PasswordConfirmation))
             return BadRequest("Пароль не совпадает с подтверждением пароля");
 
-        var passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(registerModel.Password);
+        var passwordHash = _passwordHasher.HashPassword(null, registerModel.Password);
 
         var user = new ApplicationUser
         {
