@@ -1,10 +1,8 @@
 ﻿using Data.Repositories.Classes.Derived.Games;
-using Domain.Games;
 using Domain.RequestsModels.Games.GamesGamersReviews;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Telegram;
-using Microsoft.AspNetCore.Mvc.Razor.Internal;
 
 namespace API.Controllers.Games;
 

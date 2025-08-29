@@ -1,5 +1,4 @@
 ﻿using Domain.Auth;
-using EnumsNET;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using IdentityLibrary.Telegram;
