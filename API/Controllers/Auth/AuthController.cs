@@ -1,11 +1,10 @@
-﻿using IdentityLibrary.DTOs;
+﻿using Domain.Auth;
+using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using IdentityLibrary.Telegram;
 using MailKit.Net.Smtp;
 using MimeKit;
-using NPOI.SS.Formula.Functions;
 using System.Net;
-using Telegram.Bot.Types;
 
 namespace API.Controllers.Auth;
 
@@ -16,13 +15,16 @@ public sealed class AuthController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
     private readonly TelegramAuthenticator _telegramAuthenticator;
+    private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, ILogger<AuthController> logger)
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger)
     {
         _configuration = configuration;
         _usersManager = usersManager;
         _telegramAuthenticator = telegramAuthenticator;
+        _passwordHasher = passwordHasher;
         _logger = logger;
+
     }
 
     [HttpPost("login")]
@@ -40,9 +42,9 @@ public sealed class AuthController : ControllerBase
         if (userToCheckExistance is null)
             return NotFound("Пользователь не зарегистрирован");
 
-        var isCorrectPassword = BCrypt.Net.BCrypt.EnhancedVerify(loginModel.Password, userToCheckExistance.PasswordHash);
+        PasswordVerificationResult passwordVerificationResult = _passwordHasher.VerifyHashedPassword(userToCheckExistance, userToCheckExistance.PasswordHash, loginModel.Password);
 
-        if (!isCorrectPassword)
+        if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
 
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
@@ -105,7 +107,7 @@ public sealed class AuthController : ControllerBase
         if (!string.Equals(registerModel.Password, registerModel.PasswordConfirmation))
             return BadRequest("Пароль не совпадает с подтверждением пароля");
 
-        var passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(registerModel.Password);
+        var passwordHash = _passwordHasher.HashPassword(null, registerModel.Password);
 
         var user = new ApplicationUser
         {
@@ -196,35 +198,46 @@ public sealed class AuthController : ControllerBase
         }
     }
 
-    [HttpPost("changePassword")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    public async Task<ActionResult> ChangePassword(string oldPassword, string passwordToAssign)
-    {
-        ApplicationUser? applicationUser = await _usersManager.FindByIdAsync(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value);
-        var isCorrectOldPassword = BCrypt.Net.BCrypt.EnhancedVerify(oldPassword, applicationUser.PasswordHash);
-        if (!isCorrectOldPassword)
-            return BadRequest("Неверный предыдущий пароль пользователя");
-        string encryptedNewPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(passwordToAssign);
-        string token = await _usersManager.GeneratePasswordResetTokenAsync(applicationUser);
-
-        IdentityResult passwordChangingResult = await _usersManager.ChangePasswordAsync(applicationUser, token, encryptedNewPassword);
-        if (passwordChangingResult is not null && passwordChangingResult.Succeeded)
-            return Ok();
-        return BadRequest();
-    }
-
     [HttpPost("resetPassword")]
-    public async Task<ActionResult> ResetPassword(string email, string newPassword)
+    public async Task<ActionResult> ResetPassword(ResetPasswordModel resetPasswordModel)
     {
-        ApplicationUser user = await _usersManager.FindByEmailAsync(email);
+        ApplicationUser user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
         if (user is null)
             return NotFound();
 
-        user.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(newPassword);
         string resetPasswordToken = await _usersManager.GeneratePasswordResetTokenAsync(user);
-        IdentityResult passwordResettingResult = await _usersManager.ResetPasswordAsync(user, resetPasswordToken, newPassword);
+
+        var emailMessage = new MimeMessage();
+
+        emailMessage.From.Add(new MailboxAddress(_configuration["EmailSettings:Sender:Name"], _configuration["EmailSettings:Sender:Email"]));
+        emailMessage.To.Add(new MailboxAddress("", user.Email));
+        emailMessage.Subject = "Reset password";
+        emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+        {
+            Text = $"Reset password token - {resetPasswordToken}"
+        };
+
+        using (var client = new SmtpClient())
+        {
+            await client.ConnectAsync(_configuration["EmailSettings:Host"], int.Parse(_configuration["EmailSettings:Port"]), bool.Parse(_configuration["EmailSettings:UseSsl"]));
+            await client.AuthenticateAsync(_configuration["EmailSettings:UserName"], _configuration["EmailSettings:Password"]);
+            await client.SendAsync(emailMessage);
+
+            await client.DisconnectAsync(true);
+        }
+
+        return Ok($"Email with reset password token has been send to {resetPasswordModel.Email}");
+    }
+
+    [HttpPost("resetPasswordConfirm")]
+    public async Task<ActionResult> ResetPasswordConfirm(ResetPasswordConfirmModel resetPasswordModel)
+    {
+        ApplicationUser user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
+        if (user is null)
+            return NotFound();
+        IdentityResult passwordResettingResult = await _usersManager.ResetPasswordAsync(user, resetPasswordModel.ResetPasswordToken, resetPasswordModel.NewPassword);
         if (passwordResettingResult.Succeeded)
-            return Ok();
+            return Ok("Password has been changed successfully");
         return BadRequest();
     }
 }

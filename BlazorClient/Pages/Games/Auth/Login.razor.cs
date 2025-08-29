@@ -39,4 +39,10 @@ public partial class Login : ComponentBase
             await JSRuntime.InvokeVoidAsync("alert", ex.Message);
         }
     }
+
+    public Task SendResetPasswordMessageAsync()
+    {
+        NavigationManager.NavigateTo("/auth/resetPassword");
+        return Task.CompletedTask;
+    }
 }

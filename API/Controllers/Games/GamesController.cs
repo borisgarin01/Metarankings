@@ -11,16 +11,14 @@ namespace API.Controllers.Games;
 public sealed class GamesController : ControllerBase
 {
     private JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
-    private readonly IMapper _mapper;
     private readonly GamesRepository _gamesRepository;
     private readonly ILogger<GamesController> _logger;
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public GamesController(GamesRepository gamesRepository, IMapper mapper, TelegramAuthenticator telegramAuthenticator, ILogger<GamesController> logger)
+    public GamesController(GamesRepository gamesRepository, TelegramAuthenticator telegramAuthenticator, ILogger<GamesController> logger)
     {
         jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
         _gamesRepository = gamesRepository;
-        _mapper = mapper;
         _telegramAuthenticator = telegramAuthenticator;
         _logger = logger;
     }

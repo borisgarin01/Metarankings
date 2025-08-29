@@ -103,12 +103,7 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
 
     public async Task SetEmailConfirmedAsync(ApplicationUser user, bool confirmed, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
-        bool emailConfirmed = await connection.QueryFirstAsync<bool>(@"UPDATE ApplicationUsers 
-SET EmailConfirmed=@confirmed 
-OUTPUT inserted.EmailConfirmed
-WHERE Id=@Id;", new { confirmed, user.Id });
-        user.EmailConfirmed = emailConfirmed;
+        user.EmailConfirmed = confirmed;
     }
 
     public Task<string?> GetNormalizedEmailAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -116,12 +111,10 @@ WHERE Id=@Id;", new { confirmed, user.Id });
         return Task.FromResult(user.NormalizedEmail);
     }
 
-    public async Task SetNormalizedEmailAsync(ApplicationUser user, string? normalizedEmail, CancellationToken cancellationToken)
+    public Task SetNormalizedEmailAsync(ApplicationUser user, string? normalizedEmail, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"UPDATE ApplicationUsers 
-SET NormalizedEmail=@normalizedEmail 
-WHERE Id=@Id;", new { normalizedEmail, user.Id });
+        user.NormalizedEmail = normalizedEmail;
+        return Task.CompletedTask;
     }
 
     public async Task<IList<string>> GetRolesAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -140,12 +133,10 @@ WHERE Id=@Id;", new { normalizedEmail, user.Id });
         return Task.FromResult(user.SecurityStamp);
     }
 
-    public async Task SetSecurityStampAsync(ApplicationUser user, string stamp, CancellationToken cancellationToken)
+    public Task SetSecurityStampAsync(ApplicationUser user, string stamp, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"UPDATE ApplicationUsers 
-SET SecurityStamp = @stamp 
-WHERE Id=@Id;", new { stamp, user.Id });
+        user.SecurityStamp = stamp;
+        return Task.CompletedTask;
     }
 
     public Task<string> GetUserIdAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -158,12 +149,10 @@ WHERE Id=@Id;", new { stamp, user.Id });
         return Task.FromResult(user.UserName);
     }
 
-    public async Task SetUserNameAsync(ApplicationUser user, string? userName, CancellationToken cancellationToken)
+    public Task SetUserNameAsync(ApplicationUser user, string? userName, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"UPDATE ApplicationUsers 
-SET UserName=@userName 
-WHERE Id=@Id;", new { userName, user.Id });
+        user.UserName = userName;
+        return Task.CompletedTask;
     }
 
     public async Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
@@ -253,10 +242,7 @@ and Name=@Name", new
 
     public async Task SetEmailAsync(ApplicationUser user, string? email, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"UPDATE ApplicationUsers 
-SET Email=@email 
-WHERE Id=@Id;", new { email, user.Id });
+        user.Email = email;
     }
 
     public Task<string?> GetNormalizedUserNameAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -266,22 +252,17 @@ WHERE Id=@Id;", new { email, user.Id });
 
     public async Task SetNormalizedUserNameAsync(ApplicationUser user, string? normalizedUsername, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"UPDATE ApplicationUsers 
-SET NormalizedUserName=@normalizedUsername 
-WHERE Id=@Id;", new { normalizedUsername, user.Id });
+        user.NormalizedUserName = normalizedUsername;
     }
     public Task<string?> GetPasswordHashAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         return Task.FromResult(user.PasswordHash);
     }
 
-    public async Task SetPasswordHashAsync(ApplicationUser user, string? passwordHash, CancellationToken cancellationToken)
+    public Task SetPasswordHashAsync(ApplicationUser user, string? passwordHash, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"UPDATE ApplicationUsers 
-SET PasswordHash = @passwordHash 
-WHERE Id=@Id;", new { passwordHash, user.Id });
+        user.PasswordHash = passwordHash;
+        return Task.CompletedTask;
     }
 
     public async Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
