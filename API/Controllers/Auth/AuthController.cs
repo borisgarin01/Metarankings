@@ -103,6 +103,9 @@ public sealed class AuthController : ControllerBase
 
         if (userToCheckExistance is not null)
             return BadRequest($"Пользователь с {registerModel.UserEmail} уже существует");
+        userToCheckExistance = registeredUsers.FirstOrDefault(b => b.NormalizedUserName == registerModel.UserName.ToUpperInvariant());
+        if (userToCheckExistance is not null)
+            return BadRequest($"Пользователь с логином {registerModel.UserName} уже существует");
 
         if (!string.Equals(registerModel.Password, registerModel.PasswordConfirmation))
             return BadRequest("Пароль не совпадает с подтверждением пароля");
