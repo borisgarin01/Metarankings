@@ -72,10 +72,15 @@ output str(id)
         return Task.FromResult(role.NormalizedName);
     }
 
-    public Task SetNormalizedRoleNameAsync(ApplicationRole role, string? normalizedName, CancellationToken cancellationToken)
+    public async Task SetNormalizedRoleNameAsync(ApplicationRole role, string? normalizedName, CancellationToken cancellationToken)
     {
-        role.NormalizedName = normalizedName;
-        return Task.CompletedTask;
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.ExecuteAsync(@"UPDATE ApplicationRoles 
+SET NormalizedName=@normalizedName
+WHERE Id=@Id;", new { normalizedName, role.Id });
+            role.NormalizedName = normalizedName;
+        }
     }
 
     public Task<string> GetRoleIdAsync(ApplicationRole role, CancellationToken cancellationToken)
@@ -88,10 +93,15 @@ output str(id)
         return Task.FromResult(role.Name);
     }
 
-    public Task SetRoleNameAsync(ApplicationRole role, string? roleName, CancellationToken cancellationToken)
+    public async Task SetRoleNameAsync(ApplicationRole role, string? roleName, CancellationToken cancellationToken)
     {
-        role.Name = roleName;
-        return Task.CompletedTask;
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.ExecuteAsync(@"UPDATE ApplicationRoles 
+SET Name=@roleName
+WHERE Id=@Id;", new { roleName, role.Id });
+            role.Name = roleName;
+        }
     }
 
     public async Task<IdentityResult> UpdateAsync(ApplicationRole role, CancellationToken cancellationToken)
@@ -102,16 +112,8 @@ output str(id)
         {
             await connection.OpenAsync(cancellationToken);
             await connection.ExecuteAsync($@"UPDATE [ApplicationRoles] SET
-                    [Name] = @Name,
-                    [NormalizedName] = @NormalizedName,
-                    ConcurrencyStamp=@ConcurrencyStamp
-                    WHERE str(Id) = @Id", new
-            {
-                role.Name,
-                role.NormalizedName,
-                role.ConcurrencyStamp,
-                role.Id
-            });
+                    [Name] = @Name
+                    WHERE str(Id) = @Id", role.Id);
         }
 
         return IdentityResult.Success;

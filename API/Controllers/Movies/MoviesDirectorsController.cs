@@ -9,10 +9,12 @@ namespace API.Controllers.Movies;
 public class MoviesDirectorsController : ControllerBase
 {
     private readonly IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> _moviesDirectorsRepository;
+    private readonly IMapper _mapper;
 
-    public MoviesDirectorsController(IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> moviesDirectorsRepository)
+    public MoviesDirectorsController(IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> moviesDirectorsRepository, IMapper mapper)
     {
         _moviesDirectorsRepository = moviesDirectorsRepository;
+        _mapper = mapper;
     }
 
     [HttpGet]

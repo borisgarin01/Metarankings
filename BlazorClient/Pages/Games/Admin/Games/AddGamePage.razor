@@ -99,9 +99,6 @@ else
             Enter image:
             <InputFile OnChange="FileUploaded" />
         </label>
-        <div class="image-container">
-            <img class="post-image" src="@ImageSource" alt="Изображение на странице игры для загрузки игры" title="Игра @Name" itemprop="image">
-        </div>
     </p>
 
     <input type="submit" @onclick="@AddGameAsync" value="Submit" />

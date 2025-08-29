@@ -9,12 +9,15 @@ namespace API.Controllers.Games;
 [Route("api/[controller]")]
 public sealed class PlatformsController : ControllerBase
 {
+    private readonly IMapper _mapper;
+
     private readonly IRepository<Platform, AddPlatformModel, UpdatePlatformModel> _platformsRepository;
 
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public PlatformsController(IRepository<Platform, AddPlatformModel, UpdatePlatformModel> platformsRepository, TelegramAuthenticator telegramAuthenticator)
+    public PlatformsController(IMapper mapper, IRepository<Platform, AddPlatformModel, UpdatePlatformModel> platformsRepository, TelegramAuthenticator telegramAuthenticator)
     {
+        _mapper = mapper;
         _platformsRepository = platformsRepository;
         _telegramAuthenticator = telegramAuthenticator;
     }

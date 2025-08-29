@@ -10,6 +10,7 @@ namespace API.Controllers.Games;
 [Route("api/[controller]")]
 public sealed class DevelopersController : ControllerBase
 {
+    private readonly IMapper _mapper;
 
     private readonly IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel> _developersRepository;
     private readonly IExcelDataReader<AddDeveloperModel> _developersExcelDataReader;
@@ -20,8 +21,10 @@ public sealed class DevelopersController : ControllerBase
 
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public DevelopersController(IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel> developersRepository, ILogger<DevelopersController> logger, IExcelDataReader<AddDeveloperModel> developersExcelDataReader, TelegramAuthenticator telegramAuthenticator)
+    public DevelopersController(IMapper mapper, IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel> developersRepository, ILogger<DevelopersController> logger, IExcelDataReader<AddDeveloperModel> developersExcelDataReader, TelegramAuthenticator telegramAuthenticator)
     {
+        _mapper = mapper;
+
         _developersRepository = developersRepository;
         _developersExcelDataReader = developersExcelDataReader;
 
@@ -58,7 +61,7 @@ public sealed class DevelopersController : ControllerBase
 
         Developer insertedDeveloper = await _developersRepository.GetAsync(insertedDeveloperId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New developer {insertedDeveloper.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/developers/{insertedDeveloper.Id}");
+        await _telegramAuthenticator.SendMessageAsync($"New developer {insertedDeveloper.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/developers/{insertedDeveloper.Id}");
 
         return Created($"api/developers/{insertedDeveloper.Id}", insertedDeveloper);
     }
