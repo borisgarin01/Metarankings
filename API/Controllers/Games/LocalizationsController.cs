@@ -9,15 +9,12 @@ namespace API.Controllers.Games;
 [Route("api/[controller]")]
 public sealed class LocalizationsController : ControllerBase
 {
-    private readonly IMapper _mapper;
-
     private readonly ILocalizationsRepository _localizationsRepository;
 
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public LocalizationsController(IMapper mapper, ILocalizationsRepository localizationsRepository, TelegramAuthenticator telegramAuthenticator)
+    public LocalizationsController(ILocalizationsRepository localizationsRepository, TelegramAuthenticator telegramAuthenticator)
     {
-        _mapper = mapper;
         _localizationsRepository = localizationsRepository;
         _telegramAuthenticator = telegramAuthenticator;
     }
@@ -43,7 +40,7 @@ public sealed class LocalizationsController : ControllerBase
 
         Localization insertedLocalization = await _localizationsRepository.GetAsync(insertedLocalizationId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New localization {addLocalizationModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/localizations/{insertedLocalizationId}");
+        await _telegramAuthenticator.SendMessageAsync($"New localization {addLocalizationModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/localizations/{insertedLocalizationId}");
         return Created($"api/localizations/{insertedLocalizationId}", insertedLocalization);
     }
 

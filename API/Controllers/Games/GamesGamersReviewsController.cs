@@ -1,10 +1,8 @@
 ﻿using Data.Repositories.Classes.Derived.Games;
-using Domain.Games;
 using Domain.RequestsModels.Games.GamesGamersReviews;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Telegram;
-using Microsoft.AspNetCore.Mvc.Razor.Internal;
 
 namespace API.Controllers.Games;
 
@@ -17,19 +15,16 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
     private readonly UserManager<ApplicationUser> _usersManager;
 
-    private readonly IMapper _mapper;
-
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
     private readonly ILogger<GamesGamersReviewsController> _logger;
 
-    public GamesGamersReviewsController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, GamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, IMapper mapper, ILogger<GamesGamersReviewsController> logger)
+    public GamesGamersReviewsController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, GamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, ILogger<GamesGamersReviewsController> logger)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _telegramAuthenticator = telegramAuthenticator;
         _gamesRepository = gamesRepository;
         _usersManager = usersManager;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -52,7 +47,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
         var gameReviewId = await _gamesPlayersReviewsRepository.AddAsync(addGameReviewWithUserIdAndDateModel);
         var createdGameReview = await _gamesPlayersReviewsRepository.GetAsync(gameReviewId);
-        await _telegramAuthenticator.SendMessageAsync($"New game review for game {game.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/GamesGamersReviews/{createdGameReview.Id}");
+        await _telegramAuthenticator.SendMessageAsync($"New game review for game {game.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/details/{createdGameReview.GameId}");
         return Created($"api/GamesReviews/{createdGameReview.Id}", createdGameReview);
 
     }

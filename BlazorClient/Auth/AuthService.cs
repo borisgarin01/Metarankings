@@ -1,4 +1,5 @@
-﻿using IdentityLibrary.Models;
+﻿using Domain.Auth;
+using IdentityLibrary.Models;
 using System.Net;
 
 namespace BlazorClient.Auth;
@@ -51,9 +52,21 @@ public class AuthService : IAuthService
 
     public async Task RegisterAsync(RegisterModel registerModel)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/register", registerModel);
+        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/register", registerModel);
 
-        if (response.StatusCode == HttpStatusCode.BadRequest ^ response.StatusCode == HttpStatusCode.NotFound)
-            throw new Exception(await response.Content.ReadAsStringAsync());
+        if (httpResponseMessage.StatusCode == HttpStatusCode.BadRequest ^ httpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            throw new Exception(await httpResponseMessage.Content.ReadAsStringAsync());
+    }
+
+    public async Task<HttpResponseMessage> SendResetPasswordConfirmMessage(ResetPasswordConfirmModel resetPasswordConfirmModel)
+    {
+        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/resetPasswordConfirm", resetPasswordConfirmModel);
+        return httpResponseMessage;
+    }
+
+    public async Task<HttpResponseMessage> SendResetPasswordMessage(ResetPasswordModel resetPasswordModel)
+    {
+        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/resetPassword", resetPasswordModel);
+        return httpResponseMessage;
     }
 }

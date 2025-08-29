@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-
-namespace Data.Repositories.Classes.Derived.Movies;
+﻿namespace Data.Repositories.Classes.Derived.Movies;
 
 public sealed record AddMovieGenreModel(
     [Required(ErrorMessage = "Name is required")]
