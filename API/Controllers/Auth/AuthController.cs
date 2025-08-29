@@ -103,6 +103,11 @@ public sealed class AuthController : ControllerBase
 
         if (userToCheckExistance is not null)
             return BadRequest($"Пользователь с {registerModel.UserEmail} уже существует");
+        IEnumerable<ApplicationUser> registeredUsers = _usersManager.Users;
+        userToCheckExistance = registeredUsers.FirstOrDefault(b => b.PhoneNumber == registerModel.PhoneNumber);
+        if (userToCheckExistance is not null)
+            return BadRequest($"Пользователь с телефоном {registerModel.PhoneNumber} уже существует");
+
         userToCheckExistance = registeredUsers.FirstOrDefault(b => b.NormalizedUserName == registerModel.UserName.ToUpperInvariant());
         if (userToCheckExistance is not null)
             return BadRequest($"Пользователь с логином {registerModel.UserName} уже существует");
