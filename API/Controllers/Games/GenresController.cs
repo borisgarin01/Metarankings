@@ -9,15 +9,12 @@ namespace API.Controllers.Games;
 [Route("api/[controller]")]
 public sealed class GenresController : ControllerBase
 {
-    private readonly IMapper _mapper;
-
     private readonly IRepository<Genre, AddGenreModel, UpdateGenreModel> _genresRepository;
 
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public GenresController(IMapper mapper, IRepository<Genre, AddGenreModel, UpdateGenreModel> genresRepository, TelegramAuthenticator telegramAuthenticator)
+    public GenresController(IRepository<Genre, AddGenreModel, UpdateGenreModel> genresRepository, TelegramAuthenticator telegramAuthenticator)
     {
-        _mapper = mapper;
         _genresRepository = genresRepository;
         _telegramAuthenticator = telegramAuthenticator;
     }
@@ -91,9 +88,6 @@ public sealed class GenresController : ControllerBase
         var genreToUpdate = await _genresRepository.GetAsync(id);
         if (genreToUpdate is null)
             return NotFound();
-
-        // Map the update model to the existing entity
-        var genreToGetAfterUpdate = _mapper.Map<Genre>(updateGenreModel);
 
         // Update and return the updated entity
         var updatedGenre = await _genresRepository.UpdateAsync(updateGenreModel, id);

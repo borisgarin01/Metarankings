@@ -10,8 +10,6 @@ namespace API.Controllers.Games;
 [Route("api/[controller]")]
 public sealed class PublishersController : ControllerBase
 {
-    private readonly IMapper _mapper;
-
     private readonly IRepository<Publisher, AddPublisherModel, UpdatePublisherModel> _publishersRepository;
 
     private readonly IExcelDataReader<AddPublisherModel> _publishersExcelDataReader;
@@ -22,10 +20,9 @@ public sealed class PublishersController : ControllerBase
 
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public PublishersController(TelegramAuthenticator telegramAuthenticator, IMapper mapper, IRepository<Publisher, AddPublisherModel, UpdatePublisherModel> publishersRepository, IExcelDataReader<AddPublisherModel> publishersExcelDataReader, IWebHostEnvironment webHostEnvironment, ILogger<PublishersController> logger)
+    public PublishersController(TelegramAuthenticator telegramAuthenticator, IRepository<Publisher, AddPublisherModel, UpdatePublisherModel> publishersRepository, IExcelDataReader<AddPublisherModel> publishersExcelDataReader, IWebHostEnvironment webHostEnvironment, ILogger<PublishersController> logger)
     {
         _telegramAuthenticator = telegramAuthenticator;
-        _mapper = mapper;
         _publishersRepository = publishersRepository;
         _publishersExcelDataReader = publishersExcelDataReader;
         _webHostEnvironment = webHostEnvironment;

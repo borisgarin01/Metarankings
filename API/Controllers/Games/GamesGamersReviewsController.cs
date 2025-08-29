@@ -17,19 +17,16 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
     private readonly UserManager<ApplicationUser> _usersManager;
 
-    private readonly IMapper _mapper;
-
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
     private readonly ILogger<GamesGamersReviewsController> _logger;
 
-    public GamesGamersReviewsController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, GamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, IMapper mapper, ILogger<GamesGamersReviewsController> logger)
+    public GamesGamersReviewsController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, GamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, ILogger<GamesGamersReviewsController> logger)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _telegramAuthenticator = telegramAuthenticator;
         _gamesRepository = gamesRepository;
         _usersManager = usersManager;
-        _mapper = mapper;
         _logger = logger;
     }
 

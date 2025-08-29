@@ -14,7 +14,6 @@ global using Microsoft.AspNetCore.Http;
 global using System.IdentityModel.Tokens.Jwt;
 global using System.Security.Claims;
 global using System.IO;
-global using AutoMapper;
 global using System.Text.Json.Serialization;
 global using System.Globalization;
 global using System.ComponentModel.DataAnnotations;

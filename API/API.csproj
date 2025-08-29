@@ -52,8 +52,4 @@
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mappings\" />
-  </ItemGroup>
-
 </Project>

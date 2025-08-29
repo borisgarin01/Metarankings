@@ -121,8 +121,6 @@ internal class Program
 
         builder.Services.AddHostedService<NotificationsBackgroundService>();
 
-        builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
