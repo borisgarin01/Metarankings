@@ -38,7 +38,7 @@ public sealed class GamesController : ControllerBase
 
         Game createdGame = await _gamesRepository.GetAsync(createdGameId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New game {addGameModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/games/{createdGame.Id}");
+        await _telegramAuthenticator.SendMessageAsync($"New game {addGameModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/Details/{createdGameId}");
         return Created($"api/games/{createdGame.Id}", createdGame);
     }
 

@@ -38,7 +38,7 @@ public sealed class GenresController : ControllerBase
 
         var insertedGenreId = await _genresRepository.AddAsync(addGenreModel);
 
-        await _telegramAuthenticator.SendMessageAsync($"New genre {addGenreModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/genres/{insertedGenreId}");
+        await _telegramAuthenticator.SendMessageAsync($"New genre {addGenreModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/genres/{insertedGenreId}");
 
         Genre insertedGenre = await _genresRepository.GetAsync(insertedGenreId);
 

@@ -47,7 +47,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
         var gameReviewId = await _gamesPlayersReviewsRepository.AddAsync(addGameReviewWithUserIdAndDateModel);
         var createdGameReview = await _gamesPlayersReviewsRepository.GetAsync(gameReviewId);
-        await _telegramAuthenticator.SendMessageAsync($"New game review for game {game.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/GamesGamersReviews/{createdGameReview.Id}");
+        await _telegramAuthenticator.SendMessageAsync($"New game review for game {game.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/details/{createdGameReview.GameId}");
         return Created($"api/GamesReviews/{createdGameReview.Id}", createdGameReview);
 
     }
