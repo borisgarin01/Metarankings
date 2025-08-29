@@ -1,6 +1,7 @@
 ﻿using Domain.Games;
 using Domain.RequestsModels.Games;
 using Microsoft.AspNetCore.Components.Forms;
+using System.IO;
 using WebManagers;
 
 namespace BlazorClient.Pages.Games.Admin.Games;
@@ -53,7 +54,7 @@ public partial class AddGamePage : ComponentBase
     public long SelectedLocalizationId { get; private set; }
     public List<long> SelectedPlatformsIds { get; private set; } = new List<long>();
     public long SelectedPublisherId { get; private set; }
-    public string ImageDestinationPath { get; private set; }
+    public string ImageSource { get; private set; }
     public IBrowserFile ImageToUpload { get; private set; }
     public async Task AddGameAsync()
     {
@@ -142,5 +143,13 @@ public partial class AddGamePage : ComponentBase
     private async Task FileUploaded(InputFileChangeEventArgs e)
     {
         ImageToUpload = e.File;
+        using (Stream imageToUploadReadStream = ImageToUpload.OpenReadStream(MAX_FILESIZE))
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await imageToUploadReadStream.CopyToAsync(memoryStream);
+                ImageSource = $"data:{ImageToUpload.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+            }
+        }
     }
 }
