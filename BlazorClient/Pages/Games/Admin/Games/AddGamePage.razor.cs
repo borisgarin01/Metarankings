@@ -109,35 +109,40 @@ public partial class AddGamePage : ComponentBase
             && ImageToUpload is not null;
     }
 
-    private async Task SelectDeveloper(ChangeEventArgs e)
+    private Task SelectDeveloper(ChangeEventArgs e)
     {
         SelectedDevelopersIds = ((string[])e.Value)
             .Select(idString => long.Parse(idString))
             .ToList();
+        return Task.CompletedTask;
     }
 
-    private async Task SelectGenre(ChangeEventArgs e)
+    private Task SelectGenre(ChangeEventArgs e)
     {
         SelectedGenresIds = ((string[])e.Value)
         .Select(idString => long.Parse(idString))
             .ToList();
+        return Task.CompletedTask;
     }
 
-    private async Task SelectPublisher(ChangeEventArgs e)
+    private Task SelectPublisher(ChangeEventArgs e)
     {
         SelectedPublisherId = long.Parse((string)e.Value);
+        return Task.CompletedTask;
     }
 
-    private async Task SelectLocalization(ChangeEventArgs e)
+    private Task SelectLocalization(ChangeEventArgs e)
     {
         SelectedLocalizationId = long.Parse((string)e.Value);
+        return Task.CompletedTask;
     }
 
-    private async Task SelectPlatform(ChangeEventArgs e)
+    private Task SelectPlatform(ChangeEventArgs e)
     {
         SelectedPlatformsIds = ((string[])e.Value)
         .Select(idString => long.Parse(idString))
             .ToList();
+        return Task.CompletedTask;
     }
 
     private async Task FileUploaded(InputFileChangeEventArgs e)
