@@ -2,6 +2,7 @@
 using Domain.Games;
 using Domain.RequestsModels.Games.GamesGamersReviews;
 using Domain.Reviews;
+using IdentityLibrary.DTOs;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -43,12 +44,28 @@ VALUES(@GameId, @UserId, @TextContent, @Score, @TimeStamp);", new
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var gameReviewToCheckExistance = await connection.QueryFirstOrDefaultAsync<GameReview>(@"
-SELECT Id, GameId, UserId, TextContent, Score, Date
+            var gameReviewToCheckExistance = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
+Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
-WHERE UserId=@userId and GameId=@gameId;", new { userId, gameId });
+INNER JOIN Games
+on GamesPlayersReviews.GameId=Games.Id
+INNER JOIN ApplicationUsers
+on GamesPlayersReviews.UserId=ApplicationUsers.Id
+WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, applicationUser) =>
+            {
+                gameReview = gameReview with
+                {
+                    Game = game,
+                    ApplicationUser = applicationUser
+                };
 
-            return gameReviewToCheckExistance;
+                return gameReview;
+
+            }, new { userId, gameId });
+
+            return gameReviewToCheckExistance.FirstOrDefault();
         }
     }
 
@@ -56,8 +73,26 @@ WHERE UserId=@userId and GameId=@gameId;", new { userId, gameId });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            return await connection.QueryAsync<GameReview>(@"SELECT Id, GameId, UserId, TextContent, Score, Date 
-FROM GamesPlayersReviews;");
+            IEnumerable<GameReview> gamesReviews = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
+Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
+FROM GamesPlayersReviews
+INNER JOIN Games
+on GamesPlayersReviews.GameId=Games.Id
+INNER JOIN ApplicationUsers
+on GamesPlayersReviews.UserId=ApplicationUsers.Id
+WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, applicationUser) =>
+            {
+                gameReview = gameReview with
+                {
+                    Game = game,
+                    ApplicationUser = applicationUser
+                };
+                return gameReview;
+            });
+
+            return gamesReviews;
         }
     }
 
@@ -65,10 +100,26 @@ FROM GamesPlayersReviews;");
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            return await connection.QueryFirstOrDefaultAsync<GameReview>(@"
-SELECT Id, GameId, UserId, TextContent, Score, Date
+            var gamesReviews = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
+Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
-WHERE Id = @id;", new { id });
+INNER JOIN Games
+on GamesPlayersReviews.GameId=Games.Id
+INNER JOIN ApplicationUsers
+on GamesPlayersReviews.UserId=ApplicationUsers.Id
+WHERE GamesPlayersReviews.Id = @id;", (gameReview, game, applicationUser) =>
+            {
+                gameReview = gameReview with
+                {
+                    Game = game,
+                    ApplicationUser = applicationUser
+                };
+                return gameReview;
+            }, new { id });
+
+            return gamesReviews.FirstOrDefault();
         }
     }
 
@@ -76,10 +127,25 @@ WHERE Id = @id;", new { id });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            return await connection.QueryAsync<GameReview>(@"SELECT Id, GameId, UserId, TextContent, Score, Date 
+            return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
+Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
-ORDER BY id
-OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", new { offset, limit });
+INNER JOIN Games
+on GamesPlayersReviews.GameId=Games.Id
+INNER JOIN ApplicationUsers
+on GamesPlayersReviews.UserId=ApplicationUsers.Id
+ORDER BY GamesPlayersReviews.Id
+OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", (gameReview, game, applicationUser) =>
+            {
+                gameReview = gameReview with
+                {
+                    Game = game,
+                    ApplicationUser = applicationUser
+                };
+                return gameReview;
+            }, new { offset, limit });
         }
     }
 
@@ -121,10 +187,25 @@ WHERE Id=@id", new
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            return await connection.QueryAsync<GameReview>(@"
-SELECT Id, GameId, UserId, TextContent, Score, Date
+            return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
+Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
-WHERE GameId = @gameId;", new { gameId });
+INNER JOIN Games
+on GamesPlayersReviews.GameId=Games.Id
+INNER JOIN ApplicationUsers
+on GamesPlayersReviews.UserId=ApplicationUsers.Id
+WHERE GameId = @gameId
+ORDER BY GamesPlayersReviews.Id;", (gameReview, game, applicationUser) =>
+            {
+                gameReview = gameReview with
+                {
+                    Game = game,
+                    ApplicationUser = applicationUser
+                };
+                return gameReview;
+            }, new { gameId });
         }
     }
 
@@ -132,10 +213,24 @@ WHERE GameId = @gameId;", new { gameId });
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            return await connection.QueryAsync<GameReview>(@"
-SELECT Id, GameId, UserId, TextContent, Score, Date
+            return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
+Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
-WHERE UserId = @userId;", new { userId });
+INNER JOIN Games
+on GamesPlayersReviews.GameId=Games.Id
+INNER JOIN ApplicationUsers
+on GamesPlayersReviews.UserId=ApplicationUsers.Id
+WHERE UserId = @userId;", (gameReview, game, applicationUser) =>
+            {
+                gameReview = gameReview with
+                {
+                    Game = game,
+                    ApplicationUser = applicationUser
+                };
+                return gameReview;
+            }, new { userId });
         }
     }
 }

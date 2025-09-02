@@ -52,6 +52,13 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
     }
 
+    [HttpGet("{offset:long}/{limit:long}")]
+    public async Task<ActionResult<IEnumerable<GameReview>>> GetReviewsAsync(long offset, long limit)
+    {
+        IEnumerable<GameReview> gamesReviews = await _gamesPlayersReviewsRepository.GetAsync(offset, limit);
+        return Ok(gamesReviews);
+    }
+
     [HttpGet("{id:long}")]
     public async Task<ActionResult<GameReview>> GetReview(long id)
     {
