@@ -18,7 +18,7 @@ public sealed record MovieReview
     public ApplicationUser ApplicationUser { get; init; }
 
     [JsonPropertyName("userId")]
-    public long UserId { get; init; }
+    public long ViewerId { get; init; }
 
     [JsonPropertyName("score")]
     [Range(0.0f, 10.0f)]

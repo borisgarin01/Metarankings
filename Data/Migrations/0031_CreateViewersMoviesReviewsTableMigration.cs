@@ -11,7 +11,9 @@ public sealed class CreateViewersMoviesReviewsTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE ViewersMoviesReviews
-(ViewerId bigint not null, 
+(
+Id bigint not null primary key identity(1,1),
+ViewerId bigint not null, 
 MovieId bigint not null, 
 Score float not null, 
 TextContent nvarchar(max), 

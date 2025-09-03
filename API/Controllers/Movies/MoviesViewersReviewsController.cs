@@ -15,7 +15,7 @@ namespace API.Controllers.Movies
     public sealed class MoviesViewersReviewsController : ControllerBase
     {
         private readonly IMoviesViewersReviewsRepository _moviesViewersReviewsRepository;
-        private readonly MoviesRepository _moviesRepository;
+        private readonly IMoviesRepository _moviesRepository;
 
         private readonly UserManager<ApplicationUser> _usersManager;
 
@@ -23,7 +23,7 @@ namespace API.Controllers.Movies
 
         private readonly ILogger<MoviesViewersReviewsController> _logger;
 
-        public MoviesViewersReviewsController(IMoviesViewersReviewsRepository moviesViewersReviewsRepository, TelegramAuthenticator telegramAuthenticator, MoviesRepository moviesRepository, UserManager<ApplicationUser> usersManager, ILogger<MoviesViewersReviewsController> logger)
+        public MoviesViewersReviewsController(IMoviesViewersReviewsRepository moviesViewersReviewsRepository, TelegramAuthenticator telegramAuthenticator, IMoviesRepository moviesRepository, UserManager<ApplicationUser> usersManager, ILogger<MoviesViewersReviewsController> logger)
         {
             _moviesViewersReviewsRepository = moviesViewersReviewsRepository;
             _telegramAuthenticator = telegramAuthenticator;
@@ -80,7 +80,7 @@ namespace API.Controllers.Movies
             if (movieReview is null)
                 return NotFound();
 
-            if (long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value) != movieReview.UserId)
+            if (long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value) != movieReview.ViewerId)
                 return BadRequest("User are not a review author");
 
             else
@@ -104,7 +104,7 @@ namespace API.Controllers.Movies
             if (movieReview is null)
                 return NotFound();
 
-            if (long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value) != movieReview.UserId
+            if (long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value) != movieReview.ViewerId
                 && User.Claims.FirstOrDefault(a => a.Type == ClaimTypes.Role && a.Value == "Admin") is null)
                 return BadRequest("User are not a review author");
 

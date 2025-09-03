@@ -1,6 +1,8 @@
 ﻿using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
+using Domain.Reviews;
+using IdentityLibrary.DTOs;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 public sealed class MoviesRepository : Repository, IMoviesRepository
@@ -176,11 +178,13 @@ md.id, md.name
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
-            var sql = @"SELECT         
-m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
-ms.id, ms.name,
-mg.id, mg.name,
-md.id, md.name
+            var sql = @"select m.Id, m.Name, m.ImageSource as Image, m.OriginalName, m.PremierDate, m.Description,
+ms.Id, ms.Name,
+mg.Id, mg.Name,
+md.Id, md.Name,
+vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
+au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
+au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
     FROM movies m
     LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
     LEFT JOIN moviesGenres mg ON mg.id = mmg.moviegenreid
@@ -188,13 +192,16 @@ md.id, md.name
     LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
     LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
     LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
+    LEFT JOIN viewersMoviesReviews vmr on vmr.movieId = m.Id
+    LEFT JOIN applicationUsers au on au.Id = vmr.ViewerId
+
 WHERE m.id=@id";
 
             var moviesDictionary = new Dictionary<long, Movie>();
 
-            var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
+            var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, MovieReview, ApplicationUser, Movie>(
                 sql,
-                (movie, movieGenre, movieStudio, movieDirector) =>
+                (movie, movieGenre, movieStudio, movieDirector, movieReview, applicationUser) =>
                 {
                     if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
                     {
@@ -205,19 +212,25 @@ WHERE m.id=@id";
                         moviesDictionary.Add(movieEntry.Id, movieEntry);
                     }
 
-                    if (movieGenre is not null && !movieEntry.MovieGenres.Any(d => d.Id == movieGenre.Id))
+                    if (movieGenre is not null && !movieEntry.MovieGenres.Any(mg => mg.Id == movieGenre.Id))
                         movieEntry.MovieGenres.Add(movieGenre);
 
-                    if (movieStudio is not null && !movieEntry.MoviesStudios.Any(g => g.Id == movieStudio.Id))
+                    if (movieStudio is not null && !movieEntry.MoviesStudios.Any(ms => ms.Id == movieStudio.Id))
                         movieEntry.MoviesStudios.Add(movieStudio);
 
-                    if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(p => p.Id == movieDirector.Id))
+                    if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(md => md.Id == movieDirector.Id))
                         movieEntry.MoviesDirectors.Add(movieDirector);
+
+                    if (movieReview is not null && !movieEntry.MovieReviews.Any(mr => mr.Id == movieReview.Id) && applicationUser is not null)
+                    {
+                        movieReview = movieReview with { ApplicationUser = applicationUser };
+                        movieEntry.MovieReviews.Add(movieReview);
+                    }
 
                     return movieEntry;
                 },
                 new { id },
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+                splitOn: "Id,Id,Id,Id,MovieId,Id" // The columns where each new entity starts
             );
 
             var result = moviesDictionary.Values.FirstOrDefault();
