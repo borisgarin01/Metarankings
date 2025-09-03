@@ -34,7 +34,7 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<ILocalizationsRepository>(instance => new LocalizationsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Movie, AddMovieModel, UpdateMovieModel>, MoviesRepository>(instance => new MoviesRepository(metarankingsConnectionString));
+        services.AddScoped<IMoviesRepository, MoviesRepository>(instance => new MoviesRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsRepository>(instance => new MoviesDirectorsRepository(metarankingsConnectionString));
 
@@ -43,6 +43,8 @@ public static class RepositoriesRegistrator
         services.AddScoped<IRepository<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosRepository>(instance => new MoviesStudiosRepository(metarankingsConnectionString));
 
         services.AddScoped(instance => new GamesPlayersReviewsRepository(metarankingsConnectionString));
+
+        services.AddScoped<IMoviesViewersReviewsRepository, MoviesViewersReviewsRepository>(instance => new MoviesViewersReviewsRepository(metarankingsConnectionString));
 
         return services;
     }

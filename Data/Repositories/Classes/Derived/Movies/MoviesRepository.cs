@@ -1,8 +1,12 @@
 ﻿using Data.Repositories.Interfaces;
+using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
+using Domain.Reviews;
+using IdentityLibrary.DTOs;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Data.Repositories.Classes.Derived.Movies;
-public sealed class MoviesRepository : Repository, IRepository<Movie, AddMovieModel, UpdateMovieModel>
+public sealed class MoviesRepository : Repository, IMoviesRepository
 {
     public MoviesRepository(string connectionString) : base(connectionString)
     {
@@ -175,6 +179,71 @@ md.id, md.name
     {
         using (var connection = new SqlConnection(ConnectionString))
         {
+            var sql = @"select m.Id, m.Name, m.ImageSource as Image, m.OriginalName, m.PremierDate, m.Description,
+ms.Id, ms.Name,
+mg.Id, mg.Name,
+md.Id, md.Name,
+vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
+au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
+au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
+    FROM movies m
+    LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
+    LEFT JOIN moviesGenres mg ON mg.id = mmg.moviegenreid
+    LEFT JOIN moviesMoviesStudios mms ON mms.movieId = m.Id
+    LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
+    LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
+    LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
+    LEFT JOIN viewersMoviesReviews vmr on vmr.movieId = m.Id
+    LEFT JOIN applicationUsers au on au.Id = vmr.ViewerId
+
+WHERE m.id=@id";
+
+            var moviesDictionary = new Dictionary<long, Movie>();
+
+            var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, MovieReview, ApplicationUser, Movie>(
+                sql,
+                (movie, movieGenre, movieStudio, movieDirector, movieReview, applicationUser) =>
+                {
+                    if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                    {
+                        movieEntry = movie;
+                        movieEntry.MovieGenres = new List<MovieGenre>();
+                        movieEntry.MoviesStudios = new List<MovieStudio>();
+                        movieEntry.MoviesDirectors = new List<MovieDirector>();
+                        moviesDictionary.Add(movieEntry.Id, movieEntry);
+                    }
+
+                    if (movieGenre is not null && !movieEntry.MovieGenres.Any(mg => mg.Id == movieGenre.Id))
+                        movieEntry.MovieGenres.Add(movieGenre);
+
+                    if (movieStudio is not null && !movieEntry.MoviesStudios.Any(ms => ms.Id == movieStudio.Id))
+                        movieEntry.MoviesStudios.Add(movieStudio);
+
+                    if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(md => md.Id == movieDirector.Id))
+                        movieEntry.MoviesDirectors.Add(movieDirector);
+
+                    if (movieReview is not null && !movieEntry.MovieReviews.Any(mr => mr.Id == movieReview.Id) && applicationUser is not null)
+                    {
+                        movieReview = movieReview with { ApplicationUser = applicationUser };
+                        movieEntry.MovieReviews.Add(movieReview);
+                    }
+
+                    return movieEntry;
+                },
+                new { id },
+                splitOn: "Id,Id,Id,Id,MovieId,Id" // The columns where each new entity starts
+            );
+
+            var result = moviesDictionary.Values.FirstOrDefault();
+
+            return result;
+        }
+    }
+
+    public async Task<IEnumerable<Movie>> GetAsync(DateTime dateFrom, DateTime dateTo)
+    {
+        using (var connection = new SqlConnection(ConnectionString))
+        {
             var sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
 ms.id, ms.name,
@@ -187,7 +256,7 @@ md.id, md.name
     LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
     LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
     LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
-WHERE m.id=@id";
+WHERE m.premierDate between @dateFrom and @dateTo";
 
             var moviesDictionary = new Dictionary<long, Movie>();
 
@@ -214,20 +283,70 @@ WHERE m.id=@id";
                         movieEntry.MoviesDirectors.Add(movieDirector);
 
                     return movieEntry;
-                },
-                new { id },
+                }, new { dateFrom, dateTo },
                 splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
             );
 
-            var result = moviesDictionary.Values.FirstOrDefault();
+            var result = moviesDictionary.Values.ToList();
 
             return result;
         }
     }
 
-    public Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
+    public async Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
     {
-        throw new NotImplementedException();
+        using (var connection = new SqlConnection(ConnectionString))
+        {
+            var sql = @"SELECT         
+m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
+ms.id, ms.name,
+mg.id, mg.name,
+md.id, md.name
+     FROM (
+                select Id, Name, ImageSource, OriginalName, PremierDate, Description from Movies
+                ORDER BY Id asc
+                OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
+            ) AS m
+    LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
+    LEFT JOIN moviesGenres mg ON mg.id = mmg.moviegenreid
+    LEFT JOIN moviesMoviesStudios mms ON mms.movieId = m.Id
+    LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
+    LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
+    LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId;";
+
+            var moviesDictionary = new Dictionary<long, Movie>();
+
+            var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
+                sql,
+                (movie, movieGenre, movieStudio, movieDirector) =>
+                {
+                    if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                    {
+                        movieEntry = movie;
+                        movieEntry.MovieGenres = new List<MovieGenre>();
+                        movieEntry.MoviesStudios = new List<MovieStudio>();
+                        movieEntry.MoviesDirectors = new List<MovieDirector>();
+                        moviesDictionary.Add(movieEntry.Id, movieEntry);
+                    }
+
+                    if (movieGenre is not null && !movieEntry.MovieGenres.Any(d => d.Id == movieGenre.Id))
+                        movieEntry.MovieGenres.Add(movieGenre);
+
+                    if (movieStudio is not null && !movieEntry.MoviesStudios.Any(g => g.Id == movieStudio.Id))
+                        movieEntry.MoviesStudios.Add(movieStudio);
+
+                    if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(p => p.Id == movieDirector.Id))
+                        movieEntry.MoviesDirectors.Add(movieDirector);
+
+                    return movieEntry;
+                }, new { Offset = offset, Limit = limit },
+                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+            );
+
+            var result = moviesDictionary.Values.ToList();
+
+            return result;
+        }
     }
 
     public Task RemoveAsync(long id)

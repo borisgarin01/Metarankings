@@ -1,8 +1,8 @@
 ﻿using Domain.RequestsModels.Games.GamesGamersReviews;
 
-namespace BlazorClient.Pages.Games.Games;
+namespace BlazorClient.Components.PagesComponents.Common;
 
-public partial class YourScoreComponent : ComponentBase
+public abstract partial class YourScoreComponent : ComponentBase
 {
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -49,13 +49,5 @@ public partial class YourScoreComponent : ComponentBase
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
 
-    public async Task AddReviewAsync()
-    {
-        var addGamePlayerReviewModel = new AddGamePlayerReviewModel(GameId, Text, YourScore);
-        HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClient.PostAsJsonAsync<AddGamePlayerReviewModel>("api/GamesGamersReviews", addGamePlayerReviewModel);
-        if (addingGamePlayerReviewHttpResponseMessage.IsSuccessStatusCode)
-            NavigationManager.NavigateTo($"/games/Details/{GameId}", true);
-        else
-            await JSRuntime.InvokeVoidAsync("alert", await addingGamePlayerReviewHttpResponseMessage.Content.ReadAsStringAsync());
-    }
+    public abstract Task AddReviewAsync();
 }
