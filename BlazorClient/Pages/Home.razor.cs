@@ -1,5 +1,7 @@
 ﻿using Domain.Games;
+using Domain.Movies;
 using Domain.Reviews;
+using System.Net.NetworkInformation;
 
 namespace BlazorClient.Pages;
 
@@ -7,6 +9,9 @@ public partial class Home : ComponentBase
 {
     private IEnumerable<Game> games;
     private IEnumerable<GameReview> gamesReviews;
+
+    private IEnumerable<Movie> movies;
+    private IEnumerable<MovieReview> moviesReviews;
 
     [Inject]
     public HttpClient HttpClient { get; set; }
@@ -17,6 +22,15 @@ public partial class Home : ComponentBase
         private set
         {
             games = value;
+            StateHasChanged();
+        }
+    }
+    public IEnumerable<Movie> Movies
+    {
+        get => movies;
+        private set
+        {
+            movies = value;
             StateHasChanged();
         }
     }
