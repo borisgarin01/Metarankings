@@ -51,4 +51,11 @@ public sealed class MoviesController : ControllerBase
         IEnumerable<Movie> movies = await _moviesModelsRepository.GetAsync(dateFrom, dateTo);
         return Ok(movies);
     }
+
+    [HttpGet("{offset:long}/{limit:long}")]
+    public async Task<ActionResult<IEnumerable<Movie>>> GetAsync(long offset, long limit)
+    {
+        IEnumerable<Movie> movies = await _moviesModelsRepository.GetAsync(offset, limit);
+        return Ok(movies);
+    }
 }

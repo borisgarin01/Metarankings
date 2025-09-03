@@ -114,6 +114,7 @@ WHERE Genres.Id=@id", (genre, game) =>
             var genres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
 FROM 
 Genres 
+order by Id asc
 OFFSET @offset
 LIMIT @limit;", new { offset, limit });
 

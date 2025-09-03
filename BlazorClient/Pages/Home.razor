@@ -11,7 +11,7 @@
 
 <div class="pager">Лучшие в прошлом месяце <span class="">Фильмы</span><span class="cycle-pager-active">Игры</span></div>
 
-@if (Games is null || GamesReviews is null)
+@if (Games is null || GamesReviews is null || Movies is null || MoviesReviews is null)
 {
     <p>Loading...</p>
 }
@@ -500,56 +500,14 @@ else
                 <h3>Последние отзывы</h3>
                 <div class="widget-body">
                     <ul>
-                        <li class="recent-reviews">
-                            <div class="ureview-text">
-                                <span class="title-reviews"><a href="https://metarankings.ru/lilo-i-stich-2025/">Лило и Стич</a></span>
-                            </div>
-                        </li>
-                        <li class="recent-reviews">
-                            <div class="ureview-text">
-                                <span class="title-reviews"><a href="https://metarankings.ru/missiya-nevypolnima-finalnaya-rasplata-2025/">Миссия невыполнима: Финальная расплата</a></span>
-                            </div>
-                        </li>
-                        <li class="recent-reviews">
-                            <div class="ureview-text">
-                                <span class="title-reviews"><a href="https://metarankings.ru/mikki-monstr-2025/">Микки Монстр</a></span>
-                            </div>
-                        </li>
-                        <li class="recent-reviews">
-                            <div class="ureview-text">
-                                <span class="title-reviews"><a href="https://metarankings.ru/minecraft-v-kino/">Minecraft в кино</a></span>
-                            </div>
-                        </li>
-                        <li class="recent-reviews">
-                            <div class="ureview-text">
-                                <span class="title-reviews"><a href="https://metarankings.ru/master-2025/">Мастер</a></span>
-                            </div>
-                        </li>
-                        <li class="recent-reviews">
-                            <div class="ureview-text">
-                                <span class="title-reviews"><a href="https://metarankings.ru/zhdun-v-kino/">Ждун</a></span>
-                            </div>
-                        </li>
-                        <li class="recent-reviews">
-                            <div class="ureview-text">
-                                <span class="title-reviews"><a href="https://metarankings.ru/volshebnik-izumrudnogo-goroda-2025/">Волшебник Изумрудного города. Дорога из желтого кирпича</a></span>
-                            </div>
-                        </li>
-                        <li class="recent-reviews">
-                            <div class="ureview-text">
-                                <span class="title-reviews"><a href="https://metarankings.ru/nosferatu-2024/">Носферату</a></span>
-                            </div>
-                        </li>
-                        <li class="recent-reviews">
-                            <div class="ureview-text">
-                                <span class="title-reviews"><a href="https://metarankings.ru/mufasa-korol-lev/">Муфаса: Король лев</a></span>
-                            </div>
-                        </li>
-                        <li class="recent-reviews">
-                            <div class="ureview-text">
-                                <span class="title-reviews"><a href="https://metarankings.ru/pyatyj-bitl-2024/">Пятый битл</a></span>
-                            </div>
-                        </li>
+                        @foreach (var review in MoviesReviews)
+                        {
+                            <li class="recent-reviews">
+                                <div class="ureview-text">
+                                    <span class="title-reviews"><a href="/movies/Details/@review.MovieId">@review.Movie.Name</a></span>
+                                </div>
+                            </li>
+                        }
                     </ul>
                     <ul>
                         @foreach (var review in GamesReviews)

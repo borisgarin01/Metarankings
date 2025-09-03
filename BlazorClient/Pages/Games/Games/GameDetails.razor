@@ -1,12 +1,13 @@
 ﻿@page "/games/Details/{Id:long}"
 @using BlazorClient.Components.PagesComponents.GameDetails
 @using BlazorClient.Components.PagesComponents.Common
+@using BlazorClient.Pages.Games.Games.Reviews
 @using Domain.Reviews
 
 <Headerer />
 <GameMenu />
 
-@if (Game == null)
+@if (Game is null)
 {
     <LoadingIndicator />
 }
@@ -19,10 +20,11 @@ else
                     ReleaseYear="@Game.ReleaseDate!.Value.Year" />
 
         <div class="post-content">
-            <GameThumbnail Name="@Game.Name"
-                           ReleaseYear="@Game.ReleaseDate.Value.Year"
-                           ReleaseMonth="@Game.ReleaseDate.Value.Month"
-                           ImageSource="@Game.Image" />
+            <Thumbnail Name="@Game.Name"
+                       ReleaseYear="@Game.ReleaseDate.Value.Year"
+                       ReleaseMonth="@Game.ReleaseDate.Value.Month"
+                       ImageSource="@Game.Image"
+                       Prefix="Games" />
 
 
             <RatingComponent Score="@(Game.GamesPlayersReviews.Any() ? Game.GamesPlayersReviews.Average(g => g.Score) : 0)"

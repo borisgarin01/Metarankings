@@ -124,9 +124,31 @@ WHERE vmr.Id=@id;", (movieReview, movie, applicationUser) =>
         }
     }
 
-    public Task<IEnumerable<MovieReview>> GetAsync(long offset, long limit)
+    public async Task<IEnumerable<MovieReview>> GetAsync(long offset, long limit)
     {
-        throw new NotImplementedException();
+        using (var connection = new SqlConnection(ConnectionString))
+        {
+            var moviesReviewsForTimespan = await connection.QueryAsync<MovieReview, Movie, ApplicationUser, MovieReview>(@"
+SELECT vmr.Id, vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
+    m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description,
+    au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
+        au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
+FROM ViewersMoviesReviews vmr
+LEFT JOIN Movies m on vmr.MovieId=m.ID
+LEFT JOIN ApplicationUsers au on au.Id=vmr.ViewerId
+order by vmr.Id desc
+OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", (movieReview, movie, applicationUser) =>
+            {
+                movieReview = movieReview with
+                {
+                    Movie = movie,
+                    ApplicationUser = applicationUser
+                };
+                return movieReview;
+            }, new { offset, limit });
+
+            return moviesReviewsForTimespan;
+        }
     }
 
 

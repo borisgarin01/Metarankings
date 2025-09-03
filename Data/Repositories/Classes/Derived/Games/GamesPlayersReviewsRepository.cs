@@ -136,7 +136,7 @@ INNER JOIN Games
 on GamesPlayersReviews.GameId=Games.Id
 INNER JOIN ApplicationUsers
 on GamesPlayersReviews.UserId=ApplicationUsers.Id
-ORDER BY GamesPlayersReviews.Id
+ORDER BY GamesPlayersReviews.Id asc
 OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", (gameReview, game, applicationUser) =>
             {
                 gameReview = gameReview with

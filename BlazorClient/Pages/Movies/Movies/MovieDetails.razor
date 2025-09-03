@@ -1,0 +1,40 @@
+﻿@page "/movies/details/{Id:long}"
+@using BlazorClient.Components.PagesComponents.Common;
+@using BlazorClient.Components.PagesComponents.MovieDetails;
+@using Domain.Games
+
+
+<Headerer />
+<MovieMenu />
+
+@if (Movie is null)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <div class="post single clear movie">
+        <MovieHeader Description="@Movie.Description"
+                     Id="@Id"
+                     ReleaseYear="@Movie.PremierDate.Value.Year"
+                     Name="@Movie.Name" />
+
+        <div class="post-content">
+
+            <Thumbnail Name="@Movie.Name"
+                       ReleaseYear="@Movie.PremierDate.Value.Year"
+                       ReleaseMonth="@Movie.PremierDate.Value.Month"
+                       ImageSource="@Movie.ImageSource"
+                       Prefix="Movies" />
+
+            <RatingComponent Score="@(Movie.MovieReviews.Any() ? Movie.MovieReviews.Average(g => g.Score) : 0)"
+                             ScoresCount="@Movie.MovieReviews.Count" />
+
+            <MovieMetadata Genres="@Movie.MovieGenres.Select(g=>new Genre{Id=g.Id, Name=g.Name})"
+                           MoviesStudios="@Movie.MoviesStudios"
+                           PremierDate="@(Movie.PremierDate.HasValue?Movie.PremierDate.Value:default)" />
+
+
+        </div>
+    </div>
+}

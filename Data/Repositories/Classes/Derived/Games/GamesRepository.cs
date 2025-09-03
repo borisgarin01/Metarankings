@@ -86,7 +86,7 @@ l.id, l.name,
 plat.id, plat.name, 
 gs.Id, gs.GameId, gs.ImageUrl
     FROM (select Id, Name, Image, ReleaseDate, Description, PublisherId, LocalizationId 
-        from Games ORDER BY id
+        from Games ORDER BY id asc
         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid

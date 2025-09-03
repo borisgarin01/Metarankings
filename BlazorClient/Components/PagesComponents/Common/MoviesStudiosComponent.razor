@@ -1,0 +1,10 @@
+﻿<p>
+    <span class="label">Студия:</span> <span itemprop="productionCompany">
+        @for (int i = 0; i < MoviesStudios.Count() - 1; i++)
+        {
+            <a href="/moviesStudios/@MoviesStudios.ElementAt(i).Id">@MoviesStudios.ElementAt(i).Name</a>
+            <text>, </text>
+        }
+        <a href="/moviesStudios/@MoviesStudios.ElementAt(MoviesStudios.Count() - 1).Id">@MoviesStudios.ElementAt(MoviesStudios.Count() - 1).Name</a>
+    </span>
+</p>

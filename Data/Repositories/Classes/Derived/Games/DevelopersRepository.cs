@@ -165,7 +165,7 @@ VALUES (@Name);"
             FROM (
                 SELECT id, name 
                 FROM developers
-                ORDER BY id
+                ORDER BY id asc
                 OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
             ) AS developers
             LEFT JOIN gamesdevelopers ON gamesdevelopers.developerid = developers.id

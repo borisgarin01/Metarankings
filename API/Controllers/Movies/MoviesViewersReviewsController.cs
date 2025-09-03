@@ -1,8 +1,5 @@
-﻿using Data.Repositories.Classes.Derived.Games;
-using Data.Repositories.Classes.Derived.Movies;
-using Data.Repositories.Interfaces.Derived;
+﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
-using Domain.RequestsModels.Games.GamesGamersReviews;
 using Domain.RequestsModels.Movies.MoviesViewersReviews;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;

@@ -1,6 +1,6 @@
 ﻿using Domain.Games;
 
-namespace BlazorClient.Components.PagesComponents.GamesList;
+namespace BlazorClient.Components.PagesComponents.Common;
 
 public partial class GenresComponent : ComponentBase
 {

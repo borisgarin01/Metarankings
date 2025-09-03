@@ -3,6 +3,7 @@ using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 public sealed class MoviesRepository : Repository, IMoviesRepository
@@ -292,9 +293,60 @@ WHERE m.premierDate between @dateFrom and @dateTo";
         }
     }
 
-    public Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
+    public async Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
     {
-        throw new NotImplementedException();
+        using (var connection = new SqlConnection(ConnectionString))
+        {
+            var sql = @"SELECT         
+m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
+ms.id, ms.name,
+mg.id, mg.name,
+md.id, md.name
+     FROM (
+                select Id, Name, ImageSource, OriginalName, PremierDate, Description from Movies
+                ORDER BY Id asc
+                OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
+            ) AS m
+    LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
+    LEFT JOIN moviesGenres mg ON mg.id = mmg.moviegenreid
+    LEFT JOIN moviesMoviesStudios mms ON mms.movieId = m.Id
+    LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
+    LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
+    LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId;";
+
+            var moviesDictionary = new Dictionary<long, Movie>();
+
+            var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
+                sql,
+                (movie, movieGenre, movieStudio, movieDirector) =>
+                {
+                    if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                    {
+                        movieEntry = movie;
+                        movieEntry.MovieGenres = new List<MovieGenre>();
+                        movieEntry.MoviesStudios = new List<MovieStudio>();
+                        movieEntry.MoviesDirectors = new List<MovieDirector>();
+                        moviesDictionary.Add(movieEntry.Id, movieEntry);
+                    }
+
+                    if (movieGenre is not null && !movieEntry.MovieGenres.Any(d => d.Id == movieGenre.Id))
+                        movieEntry.MovieGenres.Add(movieGenre);
+
+                    if (movieStudio is not null && !movieEntry.MoviesStudios.Any(g => g.Id == movieStudio.Id))
+                        movieEntry.MoviesStudios.Add(movieStudio);
+
+                    if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(p => p.Id == movieDirector.Id))
+                        movieEntry.MoviesDirectors.Add(movieDirector);
+
+                    return movieEntry;
+                }, new { Offset = offset, Limit = limit },
+                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+            );
+
+            var result = moviesDictionary.Values.ToList();
+
+            return result;
+        }
     }
 
     public Task RemoveAsync(long id)

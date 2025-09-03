@@ -2,7 +2,7 @@
 @inject HttpClient HttpClient
 
 <div class="thumb">
-    <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/uploads/{ReleaseYear}/{ReleaseMonth}/{ImageSource}")" alt="Игра @Name" title="Игра @Name" itemprop="image">
+    <img class="post-image" src="@($"{HttpClient.BaseAddress}api/{Prefix}/images/uploads/{ReleaseYear}/{ReleaseMonth}/{ImageSource}")" alt="@Name" title="@Name" itemprop="image">
 
     <div class="best-prod">
         <span class="star">★</span> Лучшие в @ReleaseYear году

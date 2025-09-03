@@ -1,4 +1,4 @@
-﻿namespace BlazorClient.Components.PagesComponents.GameDetails;
+﻿namespace BlazorClient.Components.PagesComponents.Common;
 
 public partial class RatingComponent : ComponentBase
 {
