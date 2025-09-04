@@ -20,7 +20,6 @@ public partial class BestGamesOfYearListPage : ComponentBase
     [SupplyParameterFromQuery]
     public int? PublisherId { get; set; }
 
-
     public IEnumerable<Game> Games { get; set; }
 
     [Inject]
@@ -28,6 +27,6 @@ public partial class BestGamesOfYearListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"{HttpClient.BaseAddress}api/games/year/{Year}");
+        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"{HttpClient.BaseAddress}api/games/games/year/{Year}");
     }
 }

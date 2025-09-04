@@ -30,7 +30,7 @@ public partial class RemovePublisherPage : ComponentBase
         HttpResponseMessage httpResponseMessage = await PublishersWebManager.DeleteAsync(Id);
         if (httpResponseMessage.IsSuccessStatusCode)
         {
-            NavigationManager.NavigateTo("/admin/publishers/list-publishers");
+            NavigationManager.NavigateTo("/admin/games/publishers/list-publishers");
         }
         else
         {

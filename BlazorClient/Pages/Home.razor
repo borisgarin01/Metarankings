@@ -29,7 +29,7 @@ else
                     {
                         <a href="/movies/details/@movie.Id" title="@movie.Name" style="visibility: visible;">
                             <div class="featured-image" style="visibility: visible;">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/movies/images/uploads/{movie.PremierDate.Value.Year}/{movie.PremierDate.Value.Month}/{movie.ImageSource}")" alt="@movie.Name" style="visibility: visible;">
+                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/movies/images/{movie.PremierDate.Value.Year}/{movie.PremierDate.Value.Month}/{movie.ImageSource}")" alt="@movie.Name" style="visibility: visible;">
                                 @if (movie.MovieReviews is not null && movie.MovieReviews.Any())
                                 {
                                     <div class="small-score mark-@Math.Round(movie.MovieReviews.Average(b => b.Score))" style="visibility: visible;">@Math.Round(movie.MovieReviews.Average(b => b.Score), 1)</div>
@@ -52,7 +52,7 @@ else
                     {
                         <a href="/movies/details/@movie.Id" title="@movie.Name" style="visibility: visible;">
                             <div class="featured-image" style="visibility: visible;">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/movies/images/uploads/{movie.PremierDate.Value.Year}/{movie.PremierDate.Value.Month}/{movie.ImageSource}")" alt="@movie.Name" style="visibility: visible;">
+                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/movies/images/{movie.PremierDate.Value.Year}/{movie.PremierDate.Value.Month}/{movie.ImageSource}")" alt="@movie.Name" style="visibility: visible;">
                                 @if (movie.MovieReviews is not null && movie.MovieReviews.Any())
                                 {
                                     <div class="small-score mark-@Math.Round(movie.MovieReviews.Average(b => b.Score))" style="visibility: visible;">@Math.Round(movie.MovieReviews.Average(b => b.Score), 1)</div>
