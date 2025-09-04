@@ -53,9 +53,9 @@ public sealed class MoviesController : ControllerBase
     }
 
     [HttpGet("{offset:long}/{limit:long}")]
-    public async Task<ActionResult<IEnumerable<Movie>>> GetAsync(long offset, long limit)
+    public async Task<ActionResult<IEnumerable<Movie>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Movie> movies = await _moviesModelsRepository.GetAsync(offset, limit);
+        IEnumerable<Movie> movies = await _moviesModelsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
         return Ok(movies);
     }
 }
