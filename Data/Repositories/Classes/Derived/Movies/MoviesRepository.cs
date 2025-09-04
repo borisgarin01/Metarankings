@@ -256,7 +256,8 @@ md.id, md.name
     LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
     LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
     LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
-WHERE m.premierDate between @dateFrom and @dateTo";
+WHERE m.premierDate between @dateFrom and @dateTo
+ORDER BY Id DESC;";
 
             var moviesDictionary = new Dictionary<long, Movie>();
 
@@ -304,7 +305,7 @@ mg.id, mg.name,
 md.id, md.name
      FROM (
                 select Id, Name, ImageSource, OriginalName, PremierDate, Description from Movies
-                ORDER BY Id asc
+                ORDER BY Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
             ) AS m
     LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
