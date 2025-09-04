@@ -14,6 +14,6 @@ public partial class PlatformGamesListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Platform = await HttpClient.GetFromJsonAsync<Platform>($"/api/Platforms/{PlatformId}");
+        Platform = await HttpClient.GetFromJsonAsync<Platform>($"/api/Games/Platforms/{PlatformId}");
     }
 }

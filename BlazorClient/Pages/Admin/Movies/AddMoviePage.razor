@@ -1,0 +1,15 @@
+﻿@page "/admin/Movies/Movies/add-movie"
+
+<h3>Add movie page</h3>
+
+<AuthorizeView>
+    <Authorized>
+        <EditForm OnValidSubmit="AddMovie" Context="myContext">
+            <InputText @bind-Value="OriginalName" />
+            <InputText @bind-Value="Name" />
+            <InputDate @bind-Value="PremierDate" />
+            <InputTextArea @bind-Value="Description" />
+            <input type="submit" value="Submit"/>
+        </EditForm>
+    </Authorized>
+</AuthorizeView>

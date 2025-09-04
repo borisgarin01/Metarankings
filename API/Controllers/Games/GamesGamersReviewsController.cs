@@ -7,7 +7,7 @@ using IdentityLibrary.Telegram;
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public sealed class GamesGamersReviewsController : ControllerBase
 {
     private readonly GamesPlayersReviewsRepository _gamesPlayersReviewsRepository;

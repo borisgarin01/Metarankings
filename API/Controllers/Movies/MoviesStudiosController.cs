@@ -5,7 +5,7 @@ using Domain.Movies;
 namespace API.Controllers.Movies;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/movies/[controller]")]
 public sealed class MoviesStudiosController : ControllerBase
 {
     private readonly IRepository<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel> _moviesStudiosRepository;
@@ -31,6 +31,6 @@ public sealed class MoviesStudiosController : ControllerBase
 
         var createdMovieStudio = await _moviesStudiosRepository.GetAsync(createdMovieStudioId);
 
-        return Created($"/api/moviesStudios/{createdMovieStudioId}", createdMovieStudio);
+        return Created($"/api/movies/moviesStudios/{createdMovieStudioId}", createdMovieStudio);
     }
 }

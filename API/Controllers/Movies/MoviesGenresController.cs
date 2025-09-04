@@ -6,7 +6,7 @@ using Domain.RequestsModels.Movies.MoviesDirectors;
 namespace API.Controllers.Movies;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/movies/[controller]")]
 public class MoviesGenresController : ControllerBase
 {
     private readonly IRepository<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> _moviesGenresRepository;
@@ -60,7 +60,7 @@ public class MoviesGenresController : ControllerBase
 
                 var insertedMovieGenre = await _moviesGenresRepository.GetAsync(insertedId);
 
-                return Created($"/api/moviesGenres/{insertedId}", insertedMovieGenre);
+                return Created($"/api/movies/moviesGenres/{insertedId}", insertedMovieGenre);
             }
             catch (Exception ex)
             {

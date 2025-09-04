@@ -3,7 +3,7 @@
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public class ImagesController : ControllerBase
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
@@ -47,9 +47,9 @@ public class ImagesController : ControllerBase
         {
             string pathToImage;
             if (year is not null && month is not null)
-                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Images/Uploads/{year}/{month}/{formFile.FileName}";
+                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Games/Images/Uploads/{year}/{month}/{formFile.FileName}";
             else
-                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Images/Uploads/{formFile.FileName}";
+                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Games/Images/Uploads/{formFile.FileName}";
 
             string imageFolder = Path.GetDirectoryName(pathToImage);
 

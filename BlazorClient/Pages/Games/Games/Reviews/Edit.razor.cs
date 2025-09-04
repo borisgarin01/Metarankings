@@ -25,7 +25,7 @@ namespace BlazorClient.Pages.Games.Games.Reviews
 
         protected override async Task OnInitializedAsync()
         {
-            var gameReview = await HttpClient.GetFromJsonAsync<GameReview>(@$"/api/GamesGamersReviews/{Id}");
+            var gameReview = await HttpClient.GetFromJsonAsync<GameReview>(@$"/api/Games/GamesGamersReviews/{Id}");
             GameId = gameReview.GameId;
             TextContent = gameReview.TextContent;
             Score = gameReview.Score;
@@ -34,7 +34,7 @@ namespace BlazorClient.Pages.Games.Games.Reviews
 
         public async Task UpdateAsync()
         {
-            HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateGamePlayerReviewModel>($"/api/gamesGamersReviews/{Id}",
+            HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateGamePlayerReviewModel>($"/api/Games/gamesGamersReviews/{Id}",
                 new UpdateGamePlayerReviewModel(TextContent, Score));
             if (httpResponseMessage.IsSuccessStatusCode)
                 NavigationManager.NavigateTo($"/games/Details/{GameId}", true);

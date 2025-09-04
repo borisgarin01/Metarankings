@@ -1,0 +1,20 @@
+﻿@page "/admin"
+
+<h1>You're an admin</h1>
+
+<div class="form-group">
+    <label for="adminEmail">Admin Email</label>
+    <input type="email" class="form-control" @bind-value="@FutureAdminEmail" />
+    <button class="btn btn-primary" type="submit" @onclick="@AssignToAdminAsync">Назначить админом</button>
+</div>
+
+<div class="form-group">
+    <ul class="list-group">
+        <li class="list-group-item link-dark"><a href="/admin/games/developers/list-developers">Разрабы</a></li>
+        <li class="list-group-item link-dark"><a href="/admin/games/publishers/list-publishers">Издатели</a></li>
+        <li class="list-group-item link-dark"><a href="/admin/games/platforms/list-platforms">Платформы</a></li>
+        <li class="list-group-item link-dark"><a href="/admin/games/localizations/list-localizations">Локализации</a></li>
+        <li class="list-group-item link-dark"><a href="/admin/games/genres/list-genres">Жанры</a></li>
+        <li class="list-group-item link-dark"><a href="/admin/games/games/list-games">Игры</a></li>
+    </ul>
+</div>

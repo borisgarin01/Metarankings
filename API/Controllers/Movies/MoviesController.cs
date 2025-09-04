@@ -5,7 +5,7 @@ using Domain.Movies;
 namespace API.Controllers.Movies;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/movies/[controller]")]
 public sealed class MoviesController : ControllerBase
 {
     private readonly IConfiguration _configuration;
@@ -57,5 +57,14 @@ public sealed class MoviesController : ControllerBase
     {
         IEnumerable<Movie> movies = await _moviesModelsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
         return Ok(movies);
+    }
+
+    [HttpGet("images/uploads/{year:int}/{month:int}/{image}")]
+    public async Task<IActionResult> GetImage(int year, int month, string image)
+    {
+        byte[]? file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{month}/{image}");
+        if (file is null)
+            return NotFound();
+        return File(file, "image/jpeg");
     }
 }

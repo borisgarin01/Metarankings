@@ -1,0 +1,21 @@
+﻿@page "/admin/games/developers/remove-developer/{Id:long}"
+
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        @if (Developer is null)
+        {
+            <p>Загружается...</p>
+        }
+        else
+        {
+            <h3>Удалить @Developer.Name</h3>
+            <p>Вы уверены, что хотите удалить этого разработчика?</p>
+            <p>
+                <button type="button" @onclick="RemoveDeveloperAsync">Удалить</button>
+            </p>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы удалить разраба
+    </NotAuthorized>
+</AuthorizeView>

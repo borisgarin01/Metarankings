@@ -20,12 +20,12 @@ namespace BlazorClient.Pages.Games.Games.Reviews
 
         protected override async Task OnInitializedAsync()
         {
-            GameReview = await HttpClient.GetFromJsonAsync<GameReview>(@$"/api/GamesGamersReviews/{Id}");
+            GameReview = await HttpClient.GetFromJsonAsync<GameReview>(@$"/api/Games/GamesGamersReviews/{Id}");
         }
 
         public async Task DeleteAsync()
         {
-            HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"/api/gamesGamersReviews/{Id}");
+            HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"/api/Games/GamesGamersReviews/{Id}");
             if (httpResponseMessage.IsSuccessStatusCode)
                 NavigationManager.NavigateTo($"/games/Details/{GameReview.GameId}", true);
             else

@@ -6,7 +6,7 @@ using IdentityLibrary.Telegram;
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public sealed class PlatformsController : ControllerBase
 {
     private readonly IRepository<Platform, AddPlatformModel, UpdatePlatformModel> _platformsRepository;
@@ -40,8 +40,8 @@ public sealed class PlatformsController : ControllerBase
 
         var insertedPlatform = await _platformsRepository.GetAsync(insertedPlatformId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New platform {addPlatformModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/platforms/{insertedPlatformId}");
-        return Created($"api/platforms/{insertedPlatform.Id}", insertedPlatform);
+        await _telegramAuthenticator.SendMessageAsync($"New platform {addPlatformModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/platforms/{insertedPlatformId}");
+        return Created($"api/games/platforms/{insertedPlatform.Id}", insertedPlatform);
     }
 
     [HttpGet("{id:long}")]

@@ -6,7 +6,7 @@ using IdentityLibrary.Telegram;
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public sealed class GenresController : ControllerBase
 {
     private readonly IRepository<Genre, AddGenreModel, UpdateGenreModel> _genresRepository;
@@ -38,11 +38,11 @@ public sealed class GenresController : ControllerBase
 
         var insertedGenreId = await _genresRepository.AddAsync(addGenreModel);
 
-        await _telegramAuthenticator.SendMessageAsync($"New genre {addGenreModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/genres/{insertedGenreId}");
+        await _telegramAuthenticator.SendMessageAsync($"New genre {addGenreModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/genres/{insertedGenreId}");
 
         Genre insertedGenre = await _genresRepository.GetAsync(insertedGenreId);
 
-        return Created($"api/genres/{insertedGenreId}", insertedGenre);
+        return Created($"api/games/genres/{insertedGenreId}", insertedGenre);
     }
 
     [HttpGet("{id:long}")]

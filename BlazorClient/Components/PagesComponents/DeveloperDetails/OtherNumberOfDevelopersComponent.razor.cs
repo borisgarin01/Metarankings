@@ -17,6 +17,6 @@ public partial class OtherNumberOfDevelopersComponent : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        OtherNumberOfDevelopers = await HttpClient.GetFromJsonAsync<IEnumerable<Developer>>($"/api/Developers/{DevelopersGettingOffset}/{DevelopersGettingLimit}");
+        OtherNumberOfDevelopers = await HttpClient.GetFromJsonAsync<IEnumerable<Developer>>($"/api/Games//Developers/{DevelopersGettingOffset}/{DevelopersGettingLimit}");
     }
 }

@@ -22,6 +22,6 @@ public partial class GamesList : ComponentBase
         if (PageSize < 1)
             PageSize = 5;
         // Fetch data based on the current PageSize and PageNumber
-        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/{PageNumber}/{PageSize}");
+        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/{PageNumber}/{PageSize}");
     }
 }

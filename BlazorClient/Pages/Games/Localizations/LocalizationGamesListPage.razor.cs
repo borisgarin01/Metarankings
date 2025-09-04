@@ -19,11 +19,11 @@ public partial class LocalizationGamesListPage : ComponentBase
     {
         if (PlatformId is null)
         {
-            Localization = await HttpClient.GetFromJsonAsync<Localization>($"/api/Localizations/{LocalizationId}");
+            Localization = await HttpClient.GetFromJsonAsync<Localization>($"/api/Games/Localizations/{LocalizationId}");
         }
         else
         {
-            Localization = await HttpClient.GetFromJsonAsync<Localization>($"/api/Localizations/{LocalizationId}/{PlatformId}");
+            Localization = await HttpClient.GetFromJsonAsync<Localization>($"/api/Games/Localizations/{LocalizationId}/{PlatformId}");
         }
     }
 }

@@ -7,7 +7,7 @@ using IdentityLibrary.Telegram;
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public sealed class DevelopersController : ControllerBase
 {
 
@@ -58,9 +58,9 @@ public sealed class DevelopersController : ControllerBase
 
         Developer insertedDeveloper = await _developersRepository.GetAsync(insertedDeveloperId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New developer {insertedDeveloper.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/developers/{insertedDeveloper.Id}");
+        await _telegramAuthenticator.SendMessageAsync($"New developer {insertedDeveloper.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/developers/{insertedDeveloper.Id}");
 
-        return Created($"api/developers/{insertedDeveloper.Id}", insertedDeveloper);
+        return Created($"api/games/developers/{insertedDeveloper.Id}", insertedDeveloper);
     }
 
     [HttpGet("{id:long}")]

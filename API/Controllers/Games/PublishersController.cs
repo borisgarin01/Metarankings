@@ -7,7 +7,7 @@ using IdentityLibrary.Telegram;
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public sealed class PublishersController : ControllerBase
 {
     private readonly IRepository<Publisher, AddPublisherModel, UpdatePublisherModel> _publishersRepository;
@@ -51,9 +51,9 @@ public sealed class PublishersController : ControllerBase
 
         Publisher insertedPublisher = await _publishersRepository.GetAsync(insertedPublisherId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New publisher {insertedPublisher.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/publishers/{insertedPublisher.Id}");
+        await _telegramAuthenticator.SendMessageAsync($"New publisher {insertedPublisher.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/games/publishers/{insertedPublisher.Id}");
 
-        return Created($"api/publishers/{insertedPublisher.Id}", insertedPublisher);
+        return Created($"api/games/publishers/{insertedPublisher.Id}", insertedPublisher);
     }
 
     [HttpPost("publishers-excel-upload")]

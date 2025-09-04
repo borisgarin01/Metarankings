@@ -6,7 +6,7 @@ using IdentityLibrary.Telegram;
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public sealed class LocalizationsController : ControllerBase
 {
     private readonly ILocalizationsRepository _localizationsRepository;
@@ -40,8 +40,8 @@ public sealed class LocalizationsController : ControllerBase
 
         Localization insertedLocalization = await _localizationsRepository.GetAsync(insertedLocalizationId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New localization {addLocalizationModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/localizations/{insertedLocalizationId}");
-        return Created($"api/localizations/{insertedLocalizationId}", insertedLocalization);
+        await _telegramAuthenticator.SendMessageAsync($"New localization {addLocalizationModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/localizations/{insertedLocalizationId}");
+        return Created($"api/games/localizations/{insertedLocalizationId}", insertedLocalization);
     }
 
     [HttpGet("{id:long}")]
