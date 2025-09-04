@@ -1,0 +1,31 @@
+﻿@using Domain.Games
+
+<div class="item">
+    <a href="/games/details/@Game.Id" title="Игра @Game.Name">
+        <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/uploads/{Game.ReleaseDate.Value.Year}/{Game.ReleaseDate.Value.Month}/{Game.Image}")" alt="@Game.Name">
+    </a>
+    @if (Game.GamesPlayersReviews is not null && Game.GamesPlayersReviews.Any())
+    {
+        <div class="small-score mark-@Math.Round(Game.GamesPlayersReviews.Average(gpr => gpr.Score))">
+            <span data-title="Рейтинг игры" class="tooltip">@Math.Round(Game.GamesPlayersReviews.Average(gpr => gpr.Score), 1)</span>
+        </div>
+    }
+    else
+    {
+        <div class="small-score mark-0">
+            <span data-title="Рейтинг игры" class="tooltip">0</span>
+        </div>
+    }
+    <span class="item-name"><a href="/games/Details/@Game.Id">@Game.Name</a></span>
+    <span class="item-meta">
+        @foreach (Platform platform in Game.Platforms)
+        {
+            <a href="/platforms/@platform.Id">@platform.Name</a>
+
+            <text> / </text>
+        }
+    </span>
+    <span class="item-meta"><a rel="nofollow" href="/games/Details/@Game.Id/#reviews">Рецензии (@Game.GamesPlayersReviews.Count)</a> <a rel="nofollow" href="/games/Details/@Game.Id/#comments">Отзывы (@Game.GamesPlayersReviews.Count)</a></span>
+    <span class="item-meta">@Game.ReleaseDate.Value.ToString("dd MMMM yyyy")</span>
+    <span class="item-description">@Game.Description</span>
+</div>

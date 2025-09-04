@@ -1,0 +1,13 @@
+﻿@using Domain.Games
+@using Domain.Movies
+
+<div class="item">
+    <a href="/movies/details/@Movie.Id" title="Фильм @Movie.Name">
+    <img class="post-image" src="@($"{HttpClient.BaseAddress}api/movies/images/uploads/{Movie.PremierDate.Value.Year}/{Movie.PremierDate.Value.Month}/{Movie.ImageSource}")" alt="@Movie.Name"></a>
+    <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
+    <span class="item-name"><a href="/movies/details/@Movie.Id">@Movie.Name</a></span>
+    <span class="item-meta"><a href="https://metarankings.ru/meta/movies/boeviki/">Боевики</a> / <a href="https://metarankings.ru/meta/movies/thrillers/">Триллеры</a></span>
+    <span class="item-meta"><a rel="nofollow" href="/movies/details/@Movie.Id/reviews">Рецензии (0)</a> <a rel="nofollow" href="https://metarankings.ru/igry-vozmezdiya-2025/#comments">Отзывы (0)</a></span>
+    <span class="item-meta">@Movie.PremierDate.Value.ToString("dd MMMM yyyy")</span>
+    <span class="item-description">@Movie.Description</span>
+</div>
