@@ -1,4 +1,5 @@
 ﻿using IdentityLibrary.Telegram;
+using Microsoft.AspNetCore.Http;
 
 namespace API.Controllers.Games;
 
@@ -67,15 +68,36 @@ public class ImagesController : ControllerBase
         return Problem(title: "Form file length == 0", detail: "Form file length == 0", statusCode: StatusCodes.Status400BadRequest);
     }
 
-    [HttpGet("imagePath")]
-    public IActionResult GetImage(string imagePath)
+    [HttpGet("{year:int}/{month:int}/{imagePath}")]
+    public IActionResult GetImage(int year, int month, string imagePath)
     {
-        if (!System.IO.File.Exists($"{_webHostEnvironment.ContentRootPath}/Images/{imagePath}"))
+        string pathToImage = $@"{_webHostEnvironment.ContentRootPath}\Games\Images\Uploads\{year}\{month}\{imagePath}";
+
+        if (!System.IO.File.Exists(pathToImage))
             return Problem(
                 title: "Image doesn't exist",
-                detail: $"Image {_webHostEnvironment.ContentRootPath}/Images/{imagePath} doesn't exist",
+                detail: $"Image {pathToImage} doesn't exist",
                 statusCode: StatusCodes.Status500InternalServerError);
 
-        return File($"{_webHostEnvironment.ContentRootPath}/Images/{imagePath}", imagePath.Substring(imagePath.IndexOf("."), imagePath.Length - imagePath.IndexOf(".")));
+        if (pathToImage.EndsWith(".jpeg"))
+            return File(System.IO.File.ReadAllBytes(pathToImage), "image/jpeg");
+        if (pathToImage.EndsWith(".jpg"))
+            return File(System.IO.File.ReadAllBytes(pathToImage), "image/jpg");
+        if (pathToImage.EndsWith(".png"))
+            return File(System.IO.File.ReadAllBytes(pathToImage), "image/png");
+        if (pathToImage.EndsWith(".svg"))
+            return File(System.IO.File.ReadAllBytes(pathToImage), "image/svg");
+        if (pathToImage.EndsWith(".gif"))
+            return File(System.IO.File.ReadAllBytes(pathToImage), "image/gif");
+        if (pathToImage.EndsWith(".tiff"))
+            return File(System.IO.File.ReadAllBytes(pathToImage), "image/tiff");
+        if (pathToImage.EndsWith(".webp"))
+            return File(System.IO.File.ReadAllBytes(pathToImage), "image/webp");
+        if (pathToImage.EndsWith(".bmp"))
+            return File(System.IO.File.ReadAllBytes(pathToImage), "image/bmp");
+        if (pathToImage.EndsWith(".heif"))
+            return File(System.IO.File.ReadAllBytes(pathToImage), "image/heif");
+
+        return BadRequest("Unknown image format");
     }
 }

@@ -3,7 +3,7 @@
 namespace API.Controllers.Movies;
 
 [ApiController]
-[Route("api/games/[controller]")]
+[Route("api/movies/[controller]")]
 public class ImagesController : ControllerBase
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
@@ -67,10 +67,10 @@ public class ImagesController : ControllerBase
         return Problem(title: "Form file length == 0", detail: "Form file length == 0", statusCode: StatusCodes.Status400BadRequest);
     }
 
-    [HttpGet("imagePath")]
-    public IActionResult GetImage(string imagePath)
+    [HttpGet("{year:int}/{month:int}/{imagePath}")]
+    public IActionResult GetImage(int year, int month, string imagePath)
     {
-        if (!System.IO.File.Exists($"{_webHostEnvironment.ContentRootPath}/Movies/Images/{imagePath}"))
+        if (!System.IO.File.Exists($"{_webHostEnvironment.ContentRootPath}/Movies/Images/Uploads/{year}/{month}/{imagePath}"))
             return Problem(
                 title: "Image doesn't exist",
                 detail: $"Image {_webHostEnvironment.ContentRootPath}/Movies/Images/{imagePath} doesn't exist",

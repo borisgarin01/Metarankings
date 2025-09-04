@@ -62,7 +62,7 @@ public sealed class MoviesController : ControllerBase
     [HttpGet("images/uploads/{year:int}/{month:int}/{image}")]
     public async Task<IActionResult> GetImage(int year, int month, string image)
     {
-        byte[]? file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{month}/{image}");
+        byte[]? file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/movies/images/uploads/{year}/{month}/{image}");
         if (file is null)
             return NotFound();
         return File(file, "image/jpeg");
