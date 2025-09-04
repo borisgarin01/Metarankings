@@ -37,7 +37,7 @@ else
                           Localization="@Game.Localization"
                           ReleaseDate="@Game.ReleaseDate.Value" />
 
-            <GameDescription Description="@Game.Description" />
+            <Description TextContent="@Game.Description" />
 
             <SystemRequirements />
 
@@ -74,7 +74,7 @@ else
                         <Authorized>
                             @if (IsAbleToWriteComments)
                             {
-                                <YourScoreComponent YourScore="10" AverageGameGamersScore="10" Text="@string.Empty" GameId="@Game.Id" ScoresCount="0" />
+                                <YourScoreComponent GameId="@Game.Id" />
                             }
                         </Authorized>
                     </AuthorizeView>
