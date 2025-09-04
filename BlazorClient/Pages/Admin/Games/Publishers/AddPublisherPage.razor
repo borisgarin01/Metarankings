@@ -2,7 +2,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
-        <EditForm OnValidSubmit="AddPublisherAsync" Context="myContext">
+        <EditForm Model="AddPublisherModel" OnValidSubmit="AddPublisherAsync" Context="myContext">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <InputText @bind-Value="AddPublisherModel.Name" />

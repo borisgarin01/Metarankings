@@ -1,1 +1,18 @@
-﻿@inherits Components.PagesComponents.Common.YourScoreComponent
+﻿@using BlazorClient.Components.PagesComponents.GameDetails
+@using BlazorClient.Components.PagesComponents.Common
+@using Domain.Reviews
+
+<AuthorizeView>
+    <Authorized>
+        <EditForm Model="YourScoreComponentModel" OnValidSubmit="AddReviewAsync" Context="myContext" class="form-control">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <InputNumber class="form-control" @bind-Value="YourScoreComponentModel.YourScore" />
+            <InputTextArea class="form-control" @bind-Value="YourScoreComponentModel.Text" />
+            <button type="submit" class="btn btn-primary">Add</button>
+        </EditForm>
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы добавить разраба
+    </NotAuthorized>
+</AuthorizeView>

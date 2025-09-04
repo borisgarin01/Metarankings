@@ -2,7 +2,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
-        <EditForm OnValidSubmit="AddGenreAsync" Context="myContext">
+        <EditForm Model="AddGenreModel" OnValidSubmit="AddGenreAsync" Context="myContext">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <InputText @bind-Value="AddGenreModel.Name" />

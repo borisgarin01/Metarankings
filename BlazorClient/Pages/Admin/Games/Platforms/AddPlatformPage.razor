@@ -2,7 +2,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
-        <EditForm OnValidSubmit="AddPlatformAsync" Context="myContext">
+        <EditForm Model="AddPlatformModel" OnValidSubmit="AddPlatformAsync" Context="myContext">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <InputText @bind-Value="AddPlatformModel.Name" />

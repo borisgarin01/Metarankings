@@ -30,7 +30,7 @@ public partial class RemovePlatformPage : ComponentBase
         HttpResponseMessage httpResponseMessage = await PlatformsWebManager.DeleteAsync(Id);
         if (httpResponseMessage.IsSuccessStatusCode)
         {
-            NavigationManager.NavigateTo("/admin/platforms/list-platforms");
+            NavigationManager.NavigateTo("/admin/games/platforms/list-platforms");
         }
         else
         {
