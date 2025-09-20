@@ -1,9 +1,12 @@
+﻿using API.Hubs;
 using API.IServiceCollectionExtensions;
 using Data.Migrations;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 using IdentityLibrary.Telegram;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.SignalR;
 
 internal class Program
 {
@@ -99,6 +102,14 @@ internal class Program
              options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
          });
 
+        builder.Services.AddSignalR();
+
+        builder.Services.AddResponseCompression(opts =>
+        {
+            opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                ["application/octet-stream"]);
+        });
+
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowBlazorFrontend", builder =>
@@ -139,6 +150,10 @@ internal class Program
         app.UseAuthorization();
 
         app.MapControllers();
+
+        app.UseResponseCompression();
+
+        app.MapHub<ChatHub>("/chathub");
 
         app.MapFallbackToFile("index.html");
 
