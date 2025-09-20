@@ -2,19 +2,24 @@
 
 <PageTitle>Chat</PageTitle>
 
-<div class="form-group">
+<div class="form-group" style="@joinRoomStyle">
     <label>
         User:
         <input @bind="userInput" />
     </label>
+    <label>
+        Chat:
+        <input @bind="chatInput" />
+    </label>
+    <button value="Join to chat" @onclick="JoinRoom" disabled="@(!IsConnected)">Join to chat</button>
 </div>
-<div class="form-group">
+<div class="form-group" style="@sendMessageStyle">
     <label>
         Message:
         <input @bind="messageInput" size="50" />
     </label>
+    <button @onclick="SendMessage" disabled="@(!IsConnected)">Send</button>
 </div>
-<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
 
 <hr>
 
