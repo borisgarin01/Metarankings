@@ -1,6 +1,4 @@
-﻿using Domain.RequestsModels.Games.GamesGamersReviews;
-
-namespace BlazorClient.Components.PagesComponents.Common;
+﻿namespace BlazorClient.Components.PagesComponents.Common;
 
 public abstract partial class YourScoreComponent : ComponentBase
 {
