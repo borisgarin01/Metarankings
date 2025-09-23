@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BlazorClient.Pages.Games.Games.Chat;
 
@@ -7,10 +8,11 @@ public partial class Chat : ComponentBase, IAsyncDisposable
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
+    [Parameter, EditorRequired]
+    public long? GameId { get; set; }
+
     private HubConnection? hubConnection;
     private List<string> messages = [];
-    private string? chatInput;
-    private string? userInput;
     private string? messageInput;
 
     private string joinRoomStyle = "display:block";
@@ -63,13 +65,28 @@ public partial class Chat : ComponentBase, IAsyncDisposable
         }
     }
 
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    private ClaimsPrincipal currentUser;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (authenticationState is not null)
+        {
+            AuthenticationState authState = await authenticationState;
+            currentUser = authState?.User;
+        }
+        await JoinRoom();
+    }
+
     private async Task JoinRoom()
     {
-        if (hubConnection is not null && !string.IsNullOrEmpty(chatInput) && !string.IsNullOrEmpty(userInput))
+        if (hubConnection is not null)
         {
             try
             {
-                await hubConnection.SendAsync("AddToGroup", chatInput, userInput);
+                await hubConnection.SendAsync("AddToGroup", GameId.ToString(), currentUser.Claims.First(b => b.Type == ClaimTypes.NameIdentifier).Value);
                 joinRoomStyle = "display:none";
                 sendMessageStyle = "display:block";
                 StateHasChanged();
@@ -87,7 +104,8 @@ public partial class Chat : ComponentBase, IAsyncDisposable
         {
             try
             {
-                await hubConnection.SendAsync("SendMessage", chatInput, userInput, messageInput);
+                await hubConnection.SendAsync("SendMessage", GameId.ToString(), 
+                    currentUser.Claims.First(b => b.Type == ClaimTypes.NameIdentifier).Value, messageInput);
                 messageInput = string.Empty; // Clear input after sending
             }
             catch (Exception ex)
@@ -105,11 +123,11 @@ public partial class Chat : ComponentBase, IAsyncDisposable
         if (hubConnection is not null)
         {
             // Leave group before disposing
-            if (!string.IsNullOrEmpty(chatInput) && !string.IsNullOrEmpty(userInput))
+            if (GameId is not null && currentUser is not null)
             {
                 try
                 {
-                    await hubConnection.SendAsync("RemoveFromGroup", chatInput, userInput);
+                    await hubConnection.SendAsync("RemoveFromGroup", GameId.ToString(), currentUser.Claims.Single(b => b.Type == ClaimTypes.NameIdentifier).Value);
                 }
                 catch
                 {

@@ -1,26 +1,21 @@
-﻿@page "/chat"
+﻿@page "/chat/{GameId:long}"
 
 <PageTitle>Chat</PageTitle>
 
-<div class="form-group" style="@joinRoomStyle">
-    <label>
-        User:
-        <input @bind="userInput" />
-    </label>
-    <label>
-        Chat:
-        <input @bind="chatInput" />
-    </label>
-    <button value="Join to chat" @onclick="JoinRoom" disabled="@(!IsConnected)">Join to chat</button>
-</div>
-<div class="form-group" style="@sendMessageStyle">
-    <label>
-        Message:
-        <input @bind="messageInput" size="50" />
-    </label>
-    <button @onclick="SendMessage" disabled="@(!IsConnected)">Send</button>
-</div>
-
+@if (!IsConnected)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="form-group" style="@sendMessageStyle">
+        <label>
+            Message:
+            <input @bind="messageInput" size="50" />
+        </label>
+        <button @onclick="SendMessage" disabled="@(!IsConnected)">Send</button>
+    </div>
+}
 <hr>
 
 <ul id="messagesList">
