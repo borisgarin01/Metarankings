@@ -14,10 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Hubs\ChatHub.cs~RF8dfe19.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Properties\launchSettings.json" />
   </ItemGroup>
 
@@ -38,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\blazorclient\BlazorClient.csproj" />
+    <ProjectReference Include="..\BlazorClient\BlazorClient.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\ExcelProcessors\ExcelProcessors.csproj" />
