@@ -1,5 +1,6 @@
 ﻿using API.Hubs;
 using API.IServiceCollectionExtensions;
+using API.SettingsDtos;
 using Data.Migrations;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
@@ -20,17 +21,20 @@ internal class Program
 
         var tokenValidationParameters = new TokenValidationParameters
         {
-            RequireExpirationTime = false,
-            RequireSignedTokens = false,
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["AuthSettings:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["AuthSettings:Audience"],
-            ValidateLifetime = false,
-            ClockSkew = TimeSpan.Zero,
+            RequireExpirationTime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:RequireExpirationTime"]),
+            RequireSignedTokens = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:RequireSignedTokens"]),
+            ValidateIssuerSigningKey = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateIssuerSigningKey"]),
+            ValidateIssuer = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateIssuer"]),
+            ValidIssuer = builder.Configuration["TokenValidationParameters:Issuer"],
+            ValidateAudience = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateAudience"]),
+            ValidAudience = builder.Configuration["TokenValidationParameters:Audience"],
+            ValidateLifetime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateLifetime"]),
+            ClockSkew = TimeSpan.FromSeconds(Convert.ToInt64(builder.Configuration["TokenValidationParameters:ClockSkew"])),
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AuthSettings:Secret"]))
         };
+
+        builder.Services.Configure<AuthSettings>(
+         builder.Configuration.GetSection("AuthSettings"));
 
         builder.Services.AddLogging();
         builder.Logging.ClearProviders();
