@@ -16,8 +16,8 @@ public sealed class GamesGenresRepository : Repository, IRepository<Genre, AddGe
             var id = await connection.QueryFirstAsync<long>(@"
 INSERT INTO Genres
     (Name)
-RETURNING Id
-VALUES (@Name);"
+VALUES (@Name)
+RETURNING Id;"
     , new
     {
         genre.Name
@@ -143,9 +143,9 @@ Genres WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE Genres set Name=@Name 
-RETURNING name, id
-where Id=@id", new
+            var updatedGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE Genres SET Name=@Name 
+where Id=@id
+RETURNING Name, Id;", new
             {
                 genre.Name,
                 id

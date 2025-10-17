@@ -24,12 +24,12 @@ internal class Program
             RequireSignedTokens = false,
             ValidateIssuerSigningKey = true,
             ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Auth:Issuer"],
+            ValidIssuer = builder.Configuration["AuthSettings:Issuer"],
             ValidateAudience = true,
-            ValidAudience = builder.Configuration["Auth:Audience"],
+            ValidAudience = builder.Configuration["AuthSettings:Audience"],
             ValidateLifetime = false,
             ClockSkew = TimeSpan.Zero,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth:Secret"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AuthSettings:Secret"]))
         };
 
         builder.Services.AddLogging();
@@ -42,9 +42,9 @@ internal class Program
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
         }).AddJwtBearer(options =>
         {
-            options.Authority = builder.Configuration["Auth:Authority"];
-            options.Audience = builder.Configuration["Auth:Audience"];
-            options.ClaimsIssuer = builder.Configuration["Auth:Issuer"];
+            options.Authority = builder.Configuration["AuthSettings:Authority"];
+            options.Audience = builder.Configuration["AuthSettings:Audience"];
+            options.ClaimsIssuer = builder.Configuration["AuthSettings:Issuer"];
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = tokenValidationParameters;
             options.SaveToken = true;

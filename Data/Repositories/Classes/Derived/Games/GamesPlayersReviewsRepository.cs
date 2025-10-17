@@ -18,8 +18,8 @@ public sealed class GamesPlayersReviewsRepository : Repository, IGamesPlayersRev
         {
             var insertedGameReviewId = await connection.QueryFirstAsync<long>(@"
 INSERT INTO GamesPlayersReviews (GameId, UserId, TextContent, Score, Date)
-RETURNING Id
-VALUES(@GameId, @UserId, @TextContent, @Score, @TimeStamp);", new
+VALUES(@GameId, @UserId, @TextContent, @Score, @TimeStamp)
+RETURNING Id;", new
             {
                 gameReview.GameId,
                 gameReview.UserId,

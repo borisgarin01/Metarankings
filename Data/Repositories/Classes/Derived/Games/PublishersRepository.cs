@@ -16,8 +16,8 @@ public sealed class PublishersRepository : Repository, IRepository<Publisher, Ad
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Publishers
 (Name)
-RETURNING id
-VALUES (@Name);"
+VALUES (@Name)
+RETURNING Id;"
  , new
  {
      publisher.Name
@@ -172,8 +172,8 @@ Publishers WHERE Id=@id", new { id });
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedPublisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"UPDATE Publishers set Name=@Name 
-RETURNING name, id
-where Id=@id", new
+RETURNING Name, Id
+WHERE Id=@Id;", new
             {
                 publisher.Name,
                 id

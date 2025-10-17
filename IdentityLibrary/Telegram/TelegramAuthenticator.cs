@@ -14,14 +14,14 @@ public sealed class TelegramAuthenticator
     {
         Configuration = configuration;
         Logger = logger;
-        TelegramBotClient = new TelegramBotClient(Configuration["Auth:Telegram:Bot:Token"]);
+        TelegramBotClient = new TelegramBotClient(Configuration["AuthSettings:Telegram:Bot:Token"]);
     }
 
     public async Task SendMessageAsync(string message)
     {
         try
         {
-            await TelegramBotClient.SendMessage(Configuration["Auth:Telegram:Bot:ChatId"], message);
+            await TelegramBotClient.SendMessage(Configuration["AuthSettings:Telegram:Bot:ChatId"], message);
         }
         catch (Exception ex)
         {

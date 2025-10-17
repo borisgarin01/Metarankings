@@ -31,12 +31,10 @@ FROM ApplicationUsers;");
     public async Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"DECLARE @RoleId int; 
-SELECT @RoleId=(SELECT Id FROM ApplicationRoles where NormalizedName=UPPER(@roleName));
-IF @RoleId is not null
-BEGIN 
-    INSERT INTO ApplicationUsersRoles (UserId, RoleId) VALUES(@UserId, @RoleId);
-END;", new { roleName, UserId = user.Id });
+        await connection.ExecuteAsync(@"INSERT INTO ApplicationUsersRoles (UserId, RoleId)
+        SELECT @UserId, Id 
+        FROM ApplicationRoles 
+        WHERE NormalizedName = UPPER(@roleName);", new { roleName, UserId = user.Id });
     }
 
     public async Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)

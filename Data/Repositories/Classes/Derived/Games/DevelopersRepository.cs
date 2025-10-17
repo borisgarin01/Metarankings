@@ -17,8 +17,8 @@ public sealed class DevelopersRepository : Repository, IRepository<Developer, Ad
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Developers
 (Name)
-RETURNING Id
-VALUES (@Name);"
+VALUES (@Name)
+RETURNING Id;"
  , new
  {
      developer.Name
@@ -234,9 +234,9 @@ Developers WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"UPDATE Developers set Name=@Name
-RETURNING Name, Id
-where Id=@id", new
+            var updatedDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"UPDATE Developers SET Name=@Name
+WHERE Id=@id
+RETURNING Name, Id;", new
             {
                 developer.Name,
                 id

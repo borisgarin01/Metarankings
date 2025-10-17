@@ -16,8 +16,8 @@ public sealed class PlatformsRepository : Repository, IRepository<Platform, AddP
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Platforms
 (Name)
-RETURNING id
-VALUES (@Name);"
+VALUES (@Name)
+RETURNING Id;"
  , new
  {
      platform.Name
@@ -241,8 +241,8 @@ Platforms WHERE Id=@id", new { id });
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name 
-RETURNING name, href, id
-where Id=@id", new
+WHERE Id=@Id
+RETURNING Name, Href, Id;", new
             {
                 platform.Name,
                 id

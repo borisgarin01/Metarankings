@@ -15,9 +15,8 @@ public sealed class MoviesGenresRepository : Repository, IRepository<MovieGenre,
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedId = await connection.QueryFirstOrDefaultAsync<long>(@"INSERT INTO MoviesGenres(Name) 
-RETURNING id
-VALUES
-(@Name);", new { entity.Name });
+VALUES (@Name)
+RETURNING Id;", new { entity.Name });
 
             return insertedId;
         }
@@ -84,9 +83,10 @@ LIMIT @limit;", new { offset, limit });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"UPDATE MoviesGenres set Name=@Name
-RETURNING name, id
-WHERE Id=@id", new
+            var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"UPDATE MoviesGenres 
+SET Name=@Name
+WHERE Id=@Id
+RETURNING Name, Id;", new
             {
                 movieGenre.Name,
                 id

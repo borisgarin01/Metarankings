@@ -47,7 +47,7 @@ public sealed class AuthController : ControllerBase
         if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
 
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Secret"]));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
 
         var userClaims = new List<Claim>();
@@ -59,7 +59,7 @@ public sealed class AuthController : ControllerBase
 
         userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
 
-        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
+        var tokenOptions = new JwtSecurityToken(issuer: _configuration["AuthSettings:Issuer"], audience: _configuration["AuthSettings:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
 
         userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
 
@@ -131,6 +131,16 @@ public sealed class AuthController : ControllerBase
 
         if (userCreationResult.Succeeded)
         {
+            if (string.Equals(registerModel.UserEmail, _configuration["AuthSettings:AdminEmail"]) && string.Equals(registerModel.Password, _configuration["AuthSettings:AdminPassword"]))
+            {
+                ApplicationUser? userToBindToAdminRole = await _usersManager.FindByEmailAsync(user.Email);
+                IdentityResult addingToAdminRoleIdentityResult = await _usersManager.AddToRoleAsync(userToBindToAdminRole, "Admin");
+                if (!addingToAdminRoleIdentityResult.Succeeded)
+                {
+                    _logger.LogError($"Ошибка добавления к роли администратора. {string.Join(", ", addingToAdminRoleIdentityResult.Errors.Select(b => $"{b.Code}, {b.Description}"))}");
+                }
+            }
+
             user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
             string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));

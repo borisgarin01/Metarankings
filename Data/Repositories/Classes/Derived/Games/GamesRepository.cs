@@ -23,9 +23,9 @@ public sealed class GamesRepository : Repository, IRepository<Game, AddGameModel
             {
                 var insertedGame = await connection.QueryFirstAsync<Game>(@"INSERT INTO Games 
 (Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer) 
-RETURNING Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer
 VALUES
-(@Name, @Image, @LocalizationId, @PublisherId, @ReleaseDate, @Description, @Trailer);", new
+(@Name, @Image, @LocalizationId, @PublisherId, @ReleaseDate, @Description, @Trailer)
+RETURNING Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer;", new
                 {
                     entity.Name,
                     entity.Image,
@@ -40,8 +40,8 @@ VALUES
                 {
                     {
                         var insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(@"INSERT INTO GamesGenres (GameId, GenreId) 
-RETURNING Id, GameId, GenreId
-VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = genreId }, transaction: transaction);
+VALUES (@GameId, @GenreId)
+RETURNING Id, GameId, GenreId;", new { GameId = insertedGame.Id, GenreId = genreId }, transaction: transaction);
                     }
                 }
 
@@ -49,15 +49,15 @@ VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = genreId 
                 {
                     var insertedGamePlatform = await connection.QueryFirstAsync<GamePlatform>(@"INSERT INTO GamesPlatforms 
 (GameId, PlatformId)
-RETURNING GameId, PlatformId
-VALUES (@GameId, @PlatformId);", new { GameId = insertedGame.Id, PlatformId = platformId }, transaction: transaction);
+VALUES (@GameId, @PlatformId)
+RETURNING GameId, PlatformId;", new { GameId = insertedGame.Id, PlatformId = platformId }, transaction: transaction);
                 }
 
                 foreach (var developerId in entity.DevelopersIds)
                 {
                     var insertedGameDeveloper = await connection.QueryAsync(@"INSERT INTO GamesDevelopers(GameId, DeveloperId)
-RETURNING Id, GameId, DeveloperId
-VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = developerId }, transaction: transaction);
+VALUES(@GameId, @DeveloperId)
+RETURNING Id, GameId, DeveloperId;", new { GameId = insertedGame.Id, DeveloperId = developerId }, transaction: transaction);
                 }
 
                 await transaction.CommitAsync();

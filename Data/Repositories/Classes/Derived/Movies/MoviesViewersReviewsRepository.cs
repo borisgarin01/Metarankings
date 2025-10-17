@@ -18,8 +18,8 @@ public sealed class MoviesViewersReviewsRepository : Repository, IMoviesViewersR
         {
             var insertedMovieViewerReviewId = await connection.QueryFirstOrDefaultAsync<long>(@"
 INSERT INTO ViewersMoviesReviews(ViewerId, MovieId, Score, TextContent, Date)
-RETURNING Id
-VALUES(@ViewerId, @MovieId, @Score, @TextContent, @Date);",
+VALUES(@ViewerId, @MovieId, @Score, @TextContent, @Date)
+RETURNING Id;",
  new
  {
      ViewerId = entity.UserId,

@@ -14,8 +14,8 @@ public sealed class MoviesDirectorsRepository : Repository, IRepository<MovieDir
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedId = await connection.QueryFirstAsync<long>(@"INSERT INTO MoviesDirectors (Name)
-output RETURNING id
-VALUES (@Name)", new { entity.Name });
+VALUES (@Name)
+RETURNING Id;", new { entity.Name });
 
             return insertedId;
         }

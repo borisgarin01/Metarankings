@@ -30,8 +30,8 @@ WHERE Name=@Name;", new { movieGenre.Name });
                 {
                     var insertedMovieGenre = await connection.QueryFirstAsync<MovieGenre>(@"INSERT INTO MoviesGenres 
 (Name)
-RETURNING id, name
-VALUES (@Name);", new { movieGenre.Name });
+VALUES (@Name)
+RETURNING Id, Name;", new { movieGenre.Name });
                     insertedMovieGenres.Add(insertedMovieGenre);
                 }
                 else
@@ -47,8 +47,8 @@ WHERE Name=@Name;", new { movieStudio.Name });
                 {
                     var insertedMovieStudio = await connection.QueryFirstAsync<MovieStudio>(@"INSERT INTO MoviesStudios 
 (Name)
-output RETURNING id, name
-VALUES (@Name);", new { movieStudio.Name });
+VALUES (@Name)
+RETURNING Id, Name;", new { movieStudio.Name });
                     insertedMovieStudios.Add(insertedMovieStudio);
                 }
                 else
@@ -67,8 +67,8 @@ WHERE Name=@Name;", new { movieDirector.Name });
                 {
                     var insertedMovieDirector = await connection.QueryFirstAsync<MovieDirector>(@"INSERT INTO MoviesDirectors 
 (Name)
-RETURNING id, name
-VALUES (@Name);", new { movieDirector.Name });
+VALUES (@Name)
+RETURNING Id, Name;", new { movieDirector.Name });
                     insertedMovieDirectors.Add(insertedMovieDirector);
                 }
                 else
@@ -79,9 +79,9 @@ VALUES (@Name);", new { movieDirector.Name });
 
             var insertedMovie = await connection.QueryFirstAsync<Movie>(@"INSERT INTO Movies 
 (Name, OriginalName, ImageSource, PremierDate, Description) 
-RETURNING id, name, originalname, imagesource, premierdate, description
 VALUES
-(@Name, @OriginalName, @ImageSource, @PremierDate, @Description);", new
+(@Name, @OriginalName, @ImageSource, @PremierDate, @Description)
+RETURNING Id, Name, OriginalName, ImageSource, PremierDate, Description;", new
             {
                 entity.Name,
                 entity.OriginalName,

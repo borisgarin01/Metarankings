@@ -17,8 +17,8 @@ public sealed class LocalizationsRepository : Repository, ILocalizationsReposito
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Localizations
 (Name)
-RETURNING id
-VALUES (@Name);"
+VALUES (@Name)
+RETURNING Id;"
  , new
  {
      localization.Name,
@@ -365,8 +365,8 @@ Localizations WHERE Id=@id", new { id });
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name
-RETURNING name, href, id
-where Id=@Id", new
+WHERE Id=@Id
+RETURNING Name, Href, Id;", new
             {
                 localization.Name,
                 id
