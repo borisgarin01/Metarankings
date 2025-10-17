@@ -16,4 +16,8 @@
     <PackageReference Include="Telegram.Bot" Version="22.6.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Settings\Settings.csproj" />
+  </ItemGroup>
+
 </Project>

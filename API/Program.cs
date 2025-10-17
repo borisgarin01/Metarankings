@@ -1,12 +1,12 @@
 ﻿using API.Hubs;
 using API.IServiceCollectionExtensions;
-using API.SettingsDtos;
 using Data.Migrations;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 using IdentityLibrary.Telegram;
 using Microsoft.AspNetCore.ResponseCompression;
+using Settings;
 
 namespace API;
 

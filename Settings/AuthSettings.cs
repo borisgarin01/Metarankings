@@ -1,4 +1,4 @@
-﻿namespace API.SettingsDtos;
+﻿namespace Settings;
 
 public sealed record AuthSettings
 {
@@ -16,18 +16,6 @@ public sealed record AuthSettings
     public bool ValidateAudience { get; set; }
     public string ValidAudience { get; set; }
     public bool ValidateLifetime { get; set; }
-    public TimeSpan ClockSkew { get; set; }
-    public sealed record Telegram
-    {
-        public sealed record Bot
-        {
-            public string Token { get; set; }
-            public string ChatId { get; set; }
-        }
-    }
-    public sealed record Vk
-    {
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-    }
+    public byte TokenLifetimeHours { get; set; }
+    public Telegram Telegram { get; set; }
 }

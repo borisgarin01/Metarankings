@@ -52,4 +52,8 @@
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SettingsDtos\" />
+  </ItemGroup>
+
 </Project>

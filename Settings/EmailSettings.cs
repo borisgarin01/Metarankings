@@ -1,4 +1,4 @@
-﻿namespace API.SettingsDtos
+﻿namespace Settings
 {
     public sealed record EmailSettings
     {
@@ -7,11 +7,6 @@
         public bool UseSsl { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
-
-        public sealed record Sender
-        {
-            public string Name { get; set; }
-            public string Email { get; set; }
-        }
+        public Sender Sender { get; set; }
     }
 }
