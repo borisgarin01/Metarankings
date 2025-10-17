@@ -1,7 +1,7 @@
 ﻿global using Dapper;
 global using FluentMigrator;
 global using Microsoft.AspNetCore.Identity;
-global using Microsoft.Data.SqlClient;
+global using Npgsql;
 global using Microsoft.Extensions.Configuration;
 global using System.Collections.Generic;
 global using System.ComponentModel.DataAnnotations;

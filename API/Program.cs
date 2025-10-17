@@ -135,6 +135,8 @@ internal class Program
 
         var app = builder.Build();
 
+        var cs = app.Configuration.GetConnectionString("MetarankingsConnection");
+
         if (app.Environment.IsDevelopment())
         {
             app.UseWebAssemblyDebugging();
@@ -182,7 +184,7 @@ internal class Program
             .AddFluentMigratorCore()
             .ConfigureRunner(rb => rb
                 // Add SQLite support to FluentMigrator
-                .AddSqlServer()
+                .AddPostgres()
                 // Set the connection string
                 .WithGlobalConnectionString(configurationManager.GetConnectionString("MetarankingsConnection"))
                 // Define the assembly containing the migrations, maintenance migrations and other customizations

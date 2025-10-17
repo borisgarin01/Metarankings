@@ -11,10 +11,10 @@ public sealed class CreateGamesPlayersReviewsShiftsTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE GamesPlayersReviewsShifts
-(Id bigint not null primary key identity(1,1), 
+(Id bigserial not null primary key, 
 GamePlayerReviewId bigint not null,
 ShifterId bigint not null,
-Direction bit not null default 1, -- 1 - up, 0 - down
+Direction bit not null, -- 1 - up, 0 - down
 UNIQUE(GamePlayerReviewId, ShifterId),
 FOREIGN KEY (GamePlayerReviewId) 
 REFERENCES GamesPlayersReviews(Id)

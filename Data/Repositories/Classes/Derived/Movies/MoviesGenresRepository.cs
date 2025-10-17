@@ -12,10 +12,10 @@ public sealed class MoviesGenresRepository : Repository, IRepository<MovieGenre,
 
     public async Task<long> AddAsync(AddMovieGenreModel entity)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedId = await connection.QueryFirstOrDefaultAsync<long>(@"INSERT INTO MoviesGenres(Name) 
-output inserted.id
+RETURNING id
 VALUES
 (@Name);", new { entity.Name });
 
@@ -33,7 +33,7 @@ VALUES
 
     public async Task<IEnumerable<MovieGenre>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesGenres = await connection.QueryAsync<MovieGenre>(@"SELECT Id, Name 
 FROM MoviesGenres;");
@@ -44,7 +44,7 @@ FROM MoviesGenres;");
 
     public async Task<MovieGenre> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesGenres = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"SELECT Id, Name 
 FROM MoviesGenres
@@ -56,7 +56,7 @@ WHERE Id=@id;", new { id });
 
     public async Task<IEnumerable<MovieGenre>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesGenres = await connection.QueryAsync<MovieGenre>(@"SELECT Id, Name 
 FROM MoviesGenres
@@ -68,7 +68,7 @@ LIMIT @limit;", new { offset, limit });
     }
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
             await connection.ExecuteAsync(@"DELETE FROM MoviesGenres WHERE Id=@id", new { id });
     }
 
@@ -82,10 +82,10 @@ LIMIT @limit;", new { offset, limit });
 
     public async Task<MovieGenre> UpdateAsync(UpdateMovieGenreModel movieGenre, long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"UPDATE MoviesGenres set Name=@Name
-output inserted.name, inserted.id
+RETURNING name, id
 WHERE Id=@id", new
             {
                 movieGenre.Name,

@@ -10,6 +10,7 @@ using WebManagers;
 using WebManagers.Derived;
 
 namespace BlazorClient;
+
 internal class Program
 {
     private static async Task Main(string[] args)
@@ -33,7 +34,7 @@ internal class Program
 
         builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://172.16.1.62:5001") });
+        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["HttpClientSettings:BaseUrl"]) });
         builder.Services.AddScoped<IAuthService, AuthService>();
 
         await builder.Build().RunAsync();

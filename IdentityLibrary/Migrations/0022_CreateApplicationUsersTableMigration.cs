@@ -12,16 +12,16 @@ public sealed class CreateApplicationUsersTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE ApplicationUsers
 (
-	Id bigint not null primary key identity(1,1),
-    UserName nvarchar(256) NOT NULL,
-    NormalizedUserName nvarchar(256) NOT NULL,
-    Email nvarchar(256) NULL,
-    NormalizedEmail nvarchar(256) NULL,
-    EmailConfirmed bit NOT NULL default 0,
-    PasswordHash nvarchar(255) NULL,
-    PhoneNumber nvarchar(50) NULL,
-    PhoneNumberConfirmed bit NOT NULL default 0,
-    TwoFactorEnabled bit NOT NULL default 0
+	Id bigserial not null primary key,
+    UserName varchar(256) NOT NULL,
+    NormalizedUserName varchar(256) NOT NULL,
+    Email varchar(256) NULL,
+    NormalizedEmail varchar(256) NULL,
+    EmailConfirmed boolean NOT NULL default FALSE,
+    PasswordHash varchar(255) NULL,
+    PhoneNumber varchar(50) NULL,
+    PhoneNumberConfirmed boolean NOT NULL default FALSE,
+    TwoFactorEnabled boolean NOT NULL default FALSE
 )");
     }
 }

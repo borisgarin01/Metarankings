@@ -1,25 +1,38 @@
-version: '3.4'
-
 networks:
   myAppNetwork:
-
+    driver: bridge
 
 services:
-  SqlServerDb:
-    container_name: SqlServerContainer
-    image: mcr.microsoft.com/mssql/server:2025-latest
-    ports:
-      - 8002:1433
+  Db:
+    container_name: Db
+    image: postgres:latest
+    networks:
+      - myAppNetwork
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U borisgarin -d Metarankings" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=myStong_Password123#
+      POSTGRES_USER: "borisgarin"
+      POSTGRES_PASSWORD: "borisgarin"
+      POSTGRES_DB: "Metarankings"
+
   WebApi:
     container_name: APIContainer
     image: ${DOCKER_REGISTRY-}api
     ports:
-      - 8001:80
+      - 8080:8080
+    networks:
+      - myAppNetwork
     build:
       context: .
       dockerfile: API/Dockerfile
     depends_on:
-      - SqlServerDb
+      Db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

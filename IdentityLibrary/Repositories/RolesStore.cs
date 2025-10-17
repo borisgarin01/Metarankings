@@ -15,7 +15,7 @@ public sealed class RolesStore : IRoleStore<ApplicationRole>
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
             role.Id = await connection.QuerySingleAsync<string>($@"INSERT INTO [ApplicationRoles] ([Name])
@@ -30,7 +30,7 @@ output str(id)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
             await connection.ExecuteAsync($"DELETE FROM [ApplicationRoles] WHERE str(Id) = @Id", role.Id);
@@ -47,7 +47,7 @@ output str(id)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
             return await connection.QuerySingleOrDefaultAsync<ApplicationRole>($@"SELECT * FROM [ApplicationRoles]
@@ -59,7 +59,7 @@ output str(id)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
             return await connection.QuerySingleOrDefaultAsync<ApplicationRole>($@"SELECT * FROM [ApplicationRoles]
@@ -98,7 +98,7 @@ output str(id)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
             await connection.ExecuteAsync($@"UPDATE [ApplicationRoles] SET

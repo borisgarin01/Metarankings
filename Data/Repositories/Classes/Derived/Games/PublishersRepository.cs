@@ -12,11 +12,11 @@ public sealed class PublishersRepository : Repository, IRepository<Publisher, Ad
 
     public async Task<long> AddAsync(AddPublisherModel publisher)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Publishers
 (Name)
-output inserted.id
+RETURNING id
 VALUES (@Name);"
  , new
  {
@@ -36,7 +36,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Publisher>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var publisherDictionary = new Dictionary<long, Publisher>();
 
@@ -72,7 +72,7 @@ VALUES (@Name);"
 
     public async Task<Publisher> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var publisherDictionary = new Dictionary<long, Publisher>();
 
@@ -110,7 +110,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Publisher>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var publisherDictionary = new Dictionary<long, Publisher>();
 
@@ -152,7 +152,7 @@ VALUES (@Name);"
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Publishers WHERE Id=@id", new { id });
@@ -169,10 +169,10 @@ Publishers WHERE Id=@id", new { id });
 
     public async Task<Publisher> UpdateAsync(UpdatePublisherModel publisher, long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedPublisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"UPDATE Publishers set Name=@Name 
-output inserted.name, inserted.id
+RETURNING name, id
 where Id=@id", new
             {
                 publisher.Name,

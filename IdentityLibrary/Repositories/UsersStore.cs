@@ -1,4 +1,5 @@
 ﻿using IdentityLibrary.DTOs;
+using System;
 
 namespace IdentityLibrary.Repositories;
 
@@ -19,7 +20,7 @@ public sealed class UsersStore : IUserSecurityStampStore<ApplicationUser>, IUser
     {
         get
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new NpgsqlConnection(_connectionString);
             var users = connection.Query<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp 
 FROM ApplicationUsers;");
 
@@ -29,7 +30,7 @@ FROM ApplicationUsers;");
 
     public async Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         await connection.ExecuteAsync(@"DECLARE @RoleId int; 
 SELECT @RoleId=(SELECT Id FROM ApplicationRoles where NormalizedName=UPPER(@roleName));
 IF @RoleId is not null
@@ -40,7 +41,7 @@ END;", new { roleName, UserId = user.Id });
 
     public async Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         await connection.ExecuteAsync(@"DELETE FROM ApplicationUsersRoles 
 WHERE UserId=@UserId 
     AND RoleId = (SELECT Id 
@@ -50,7 +51,7 @@ WHERE UserId=@UserId
 
     public async Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         await connection.ExecuteAsync(@"INSERT INTO ApplicationUsers (UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp) 
 VALUES
 (@UserName, @NormalizedUserName, @Email, @NormalizedEmail, @EmailConfirmed, @PasswordHash, @PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled, @SecurityStamp);", user);
@@ -60,7 +61,7 @@ VALUES
 
     public async Task<IdentityResult> DeleteAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         await connection.ExecuteAsync(@"DELETE FROM ApplicationUsers WHERE Id=@Id;", new { user.Id });
 
         return IdentityResult.Success;
@@ -68,7 +69,7 @@ VALUES
 
     public async Task<ApplicationUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
 FROM ApplicationUsers 
 WHERE NormalizedEmail = @normalizedEmail;", new { normalizedEmail });
@@ -78,17 +79,17 @@ WHERE NormalizedEmail = @normalizedEmail;", new { normalizedEmail });
 
     public async Task<ApplicationUser?> FindByIdAsync(string userId, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
 FROM ApplicationUsers 
-WHERE Id = @Id;", new { Id = userId });
+WHERE Id = @Id;", new { Id = Convert.ToInt64(userId) });
 
         return applicationUser;
     }
 
     public async Task<ApplicationUser?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
 FROM ApplicationUsers 
 WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
@@ -119,7 +120,7 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
 
     public async Task<IList<string>> GetRolesAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         return (await connection.QueryAsync<string>(@"SELECT Name 
     FROM ApplicationRoles 
     WHERE Id in 
@@ -157,7 +158,7 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
 
     public async Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         var applicationUsers = await connection.QueryAsync<ApplicationUser>(
             @"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, 
                     PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
@@ -180,7 +181,7 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
 
     public async Task<bool> IsInRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         var givenApplicationUserGivenApplicationRolesCount = await connection.QueryFirstAsync<long>(@"SELECT COUNT(*)
 FROM ApplicationUsersRoles
 WHERE UserId = @UserId
@@ -194,7 +195,7 @@ WHERE UserId = @UserId
 
     public async Task<string?> GetTokenAsync(ApplicationUser user, string loginProvider, string name, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         string token = await connection.QueryFirstOrDefaultAsync<string>(@"SELECT Value 
 FROM AccessTokens
 WHERE UserId=@UserId 
@@ -209,7 +210,7 @@ WHERE UserId=@UserId
     }
     public async Task SetTokenAsync(ApplicationUser user, string loginProvider, string name, string? value, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         await connection.ExecuteAsync(@"INSERT INTO AccessTokens(UserId, LoginProvider, Name, Value)
 VALUES(@UserId, @LoginProvider, @Name, @Value);",
 new
@@ -223,7 +224,7 @@ new
 
     public async Task RemoveTokenAsync(ApplicationUser user, string loginProvider, string name, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         await connection.ExecuteAsync(@"DELETE FROM AccessTokens 
 WHERE UserId = @UserId
 and LoginProvider=@LoginProvider
@@ -267,7 +268,7 @@ and Name=@Name", new
 
     public async Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new NpgsqlConnection(_connectionString);
         await connection.ExecuteAsync(@"UPDATE ApplicationUsers 
 SET 
 UserName=@UserName, 

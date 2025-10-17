@@ -11,10 +11,10 @@ public sealed class MoviesDirectorsRepository : Repository, IRepository<MovieDir
 
     public async Task<long> AddAsync(AddMovieDirectorModel entity)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedId = await connection.QueryFirstAsync<long>(@"INSERT INTO MoviesDirectors (Name)
-output inserted.id
+output RETURNING id
 VALUES (@Name)", new { entity.Name });
 
             return insertedId;
@@ -31,7 +31,7 @@ VALUES (@Name)", new { entity.Name });
 
     public async Task<IEnumerable<MovieDirector>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesDirectors = await connection.QueryAsync<MovieDirector>(@"SELECT Id, Name 
 FROM MoviesDirectors;");
@@ -42,7 +42,7 @@ FROM MoviesDirectors;");
 
     public async Task<MovieDirector> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var movieDirector = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"SELECT Id, Name
 FROM MoviesDirectors
@@ -54,7 +54,7 @@ WHERE Id=@id", new { id });
 
     public async Task<IEnumerable<MovieDirector>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesDirectors = await connection.QueryAsync<MovieDirector>(@"SELECT Id, Name 
 FROM MoviesDirectors
@@ -67,7 +67,7 @@ LIMIT @limit;", new { offset, limit });
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
             await connection.ExecuteAsync(@"DELETE FROM MoviesDirectors 
 WHERE Id=@id", new { id });
     }
@@ -82,7 +82,7 @@ WHERE Id=@id", new { id });
 
     public async Task<MovieDirector> UpdateAsync(UpdateMovieDirectorModel entity, long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedMovieDirector = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"UPDATE MoviesDirectors 
 SET Name=@Name

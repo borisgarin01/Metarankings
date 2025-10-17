@@ -12,12 +12,12 @@ public sealed class CreateViewersMoviesReviewsTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE ViewersMoviesReviews
 (
-Id bigint not null primary key identity(1,1),
+Id bigserial not null primary key,
 ViewerId bigint not null, 
 MovieId bigint not null, 
 Score float not null, 
-TextContent nvarchar(max), 
-Date datetime not null,
+TextContent text, 
+Date timestamp not null,
 UNIQUE(ViewerId, MovieId));");
     }
 }

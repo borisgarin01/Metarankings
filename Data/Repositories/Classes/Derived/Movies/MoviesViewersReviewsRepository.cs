@@ -14,11 +14,11 @@ public sealed class MoviesViewersReviewsRepository : Repository, IMoviesViewersR
 
     public async Task<long> AddAsync(AddMovieViewerReviewWithUserIdAndDateModel entity)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedMovieViewerReviewId = await connection.QueryFirstOrDefaultAsync<long>(@"
 INSERT INTO ViewersMoviesReviews(ViewerId, MovieId, Score, TextContent, Date)
-OUTPUT inserted.Id
+RETURNING Id
 VALUES(@ViewerId, @MovieId, @Score, @TextContent, @Date);",
  new
  {
@@ -35,7 +35,7 @@ VALUES(@ViewerId, @MovieId, @Score, @TextContent, @Date);",
 
     public async Task<IEnumerable<MovieReview>> GetByTimespanAsync(DateTime dateFrom, DateTime dateTo)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieReview, Movie, ApplicationUser, MovieReview>(@"
 SELECT 
@@ -64,7 +64,7 @@ on vmr.ViewerId=au.Id;", (movieReview, movie, applicationUser) =>
 
     public async Task<MovieReview> GetUserReviewForMovieAsync(long userId, long movieId)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieReview, Movie, ApplicationUser, MovieReview>(@"
 SELECT vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
@@ -100,7 +100,7 @@ WHERE ViewerId=@userId and MovieId=@movieId;", (movieReview, movie, applicationU
 
     public async Task<MovieReview> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieReview, Movie, ApplicationUser, MovieReview>(@"
 SELECT vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
@@ -126,7 +126,7 @@ WHERE vmr.Id=@id;", (movieReview, movie, applicationUser) =>
 
     public async Task<IEnumerable<MovieReview>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieReview, Movie, ApplicationUser, MovieReview>(@"
 SELECT vmr.Id, vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,

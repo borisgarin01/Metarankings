@@ -11,9 +11,9 @@ public sealed class CreateGamesScreenshotsTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE GamesScreenshots 
-(Id bigint not null primary key identity(1,1),
+(Id bigserial not null primary key,
 GameId bigint not null,
-ImageUrl nvarchar(1023) not null unique,
+ImageUrl varchar(1023) not null unique,
 FOREIGN KEY(GameId) 
 REFERENCES Games(Id) 
 ON DELETE CASCADE 

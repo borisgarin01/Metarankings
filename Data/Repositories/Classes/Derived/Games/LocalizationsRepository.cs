@@ -2,9 +2,6 @@
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.RequestsModels.Games.Localizations;
-using Microsoft.Data.SqlClient;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -16,11 +13,11 @@ public sealed class LocalizationsRepository : Repository, ILocalizationsReposito
 
     public async Task<long> AddAsync(AddLocalizationModel localization)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Localizations
 (Name)
-output inserted.id
+RETURNING id
 VALUES (@Name);"
  , new
  {
@@ -38,7 +35,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Localization>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var localizationsDictionary = new Dictionary<string, Localization>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -115,7 +112,7 @@ VALUES (@Name);"
 
     public async Task<Localization> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var localizationDictionary = new Dictionary<long, Localization>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -192,7 +189,7 @@ VALUES (@Name);"
 
     public async Task<Localization> GetByPlatformAsync(long id, long platformId)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var localizationDictionary = new Dictionary<long, Localization>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -272,7 +269,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Localization>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var localizationDictionary = new Dictionary<long, Localization>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -348,7 +345,7 @@ VALUES (@Name);"
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Localizations WHERE Id=@id", new { id });
@@ -365,10 +362,10 @@ Localizations WHERE Id=@id", new { id });
 
     public async Task<Localization> UpdateAsync(UpdateLocalizationModel localization, long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name
-output inserted.name, inserted.href, inserted.id
+RETURNING name, href, id
 where Id=@Id", new
             {
                 localization.Name,
