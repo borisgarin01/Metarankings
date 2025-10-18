@@ -10,12 +10,12 @@ public sealed class MoviesStudiosRepository : Repository, IRepository<MovieStudi
 
     public async Task<long> AddAsync(AddMovieStudioModel entity)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedId = await connection.QueryFirstOrDefaultAsync<long>(@"INSERT INTO MoviesStudios 
 (Name) 
-output inserted.id
-VALUES(@Name)", new { Name = entity.Name });
+VALUES(@Name)
+RETURNING Id;", new { Name = entity.Name });
 
             return insertedId;
         }
@@ -31,7 +31,7 @@ VALUES(@Name)", new { Name = entity.Name });
 
     public async Task<IEnumerable<MovieStudio>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesStudios = await connection.QueryAsync<MovieStudio>(@"
 SELECT Id, Name 
@@ -43,7 +43,7 @@ FROM MoviesStudios;");
 
     public async Task<MovieStudio> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var movieStudio = await connection.QueryFirstOrDefaultAsync<MovieStudio>(@"SELECT Id, Name 
 FROM MoviesStudios
@@ -55,7 +55,7 @@ WHERE Id=@id", new { id });
 
     public async Task<IEnumerable<MovieStudio>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesStudios = await connection.QueryAsync<MovieStudio>(@"
 SELECT Id, Name 
@@ -69,7 +69,7 @@ LIMIT @limit;", new { offset, limit });
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
             await connection.ExecuteAsync(@"DELETE FROM MoviesStudios
 WHERE Id=@id", new { id });
     }
@@ -84,13 +84,13 @@ WHERE Id=@id", new { id });
 
     public async Task<MovieStudio> UpdateAsync(UpdateMovieStudioModel entity, long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedMovieStudio = await connection.QueryFirstOrDefaultAsync<MovieStudio>(@"UPDATE MoviesStudios 
 SET
 Name=@Name
-output inserted.id, inserted.name
-WHERE Id=@id", new { entity.Name, id });
+WHERE Id=@Id
+RETURNING Id, Name", new { entity.Name, Id = id });
 
             return updatedMovieStudio;
         }

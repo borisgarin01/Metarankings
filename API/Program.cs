@@ -6,7 +6,9 @@ using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 using IdentityLibrary.Telegram;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.AspNetCore.SignalR;
+using Settings;
+
+namespace API;
 
 internal class Program
 {
@@ -19,17 +21,23 @@ internal class Program
 
         var tokenValidationParameters = new TokenValidationParameters
         {
-            RequireExpirationTime = false,
-            RequireSignedTokens = false,
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Auth:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Auth:Audience"],
-            ValidateLifetime = false,
-            ClockSkew = TimeSpan.Zero,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth:Secret"]))
+            RequireExpirationTime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:RequireExpirationTime"]),
+            RequireSignedTokens = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:RequireSignedTokens"]),
+            ValidateIssuerSigningKey = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateIssuerSigningKey"]),
+            ValidateIssuer = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateIssuer"]),
+            ValidIssuer = builder.Configuration["TokenValidationParameters:ValidIssuer"],
+            ValidateAudience = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateAudience"]),
+            ValidAudience = builder.Configuration["TokenValidationParameters:Audience"],
+            ValidateLifetime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateLifetime"]),
+            ClockSkew = TimeSpan.FromSeconds(Convert.ToInt64(builder.Configuration["TokenValidationParameters:ClockSkew"])),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenValidationParameters:IssuerSigningKey"]))
         };
+
+        builder.Services.Configure<TokenValidationParameters>(builder.Configuration.GetSection(nameof(TokenValidationParameters)));
+
+        builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection(nameof(AuthSettings)));
+
+        builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 
         builder.Services.AddLogging();
         builder.Logging.ClearProviders();
@@ -41,9 +49,9 @@ internal class Program
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
         }).AddJwtBearer(options =>
         {
-            options.Authority = builder.Configuration["Auth:Authority"];
-            options.Audience = builder.Configuration["Auth:Audience"];
-            options.ClaimsIssuer = builder.Configuration["Auth:Issuer"];
+            options.Authority = builder.Configuration["AuthSettings:Authority"];
+            options.Audience = builder.Configuration["AuthSettings:Audience"];
+            options.ClaimsIssuer = builder.Configuration["AuthSettings:Issuer"];
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = tokenValidationParameters;
             options.SaveToken = true;
@@ -181,9 +189,9 @@ internal class Program
             .AddFluentMigratorCore()
             .ConfigureRunner(rb => rb
                 // Add SQLite support to FluentMigrator
-                .AddSqlServer()
+                .AddPostgres()
                 // Set the connection string
-                .WithGlobalConnectionString(configurationManager.GetConnectionString("MetarankingsConnection"))
+                .WithGlobalConnectionString(configurationManager.GetConnectionString("DockerPostgresConnection"))
                 // Define the assembly containing the migrations, maintenance migrations and other customizations
                 .ScanIn(typeof(CreateGamesTableMigration).Assembly, typeof(CreateApplicationRolesTableMigration).Assembly).For.Migrations())
             // Enable logging to console in the FluentMigrator way

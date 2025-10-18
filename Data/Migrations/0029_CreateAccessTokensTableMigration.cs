@@ -13,9 +13,9 @@ public sealed class CreateAccessTokensTableMigration : Migration
         Execute.Sql(@"CREATE TABLE AccessTokens
 (
     UserId bigint not null, 
-    LoginProvider nvarchar(127) not null,
-    Name nvarchar(127) not null,
-    Value nvarchar(511) not null
+    LoginProvider varchar(127) not null,
+    Name varchar(127) not null,
+    Value varchar(511) not null
 );");
     }
 }

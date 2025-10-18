@@ -24,6 +24,7 @@ public partial class Login : ComponentBase
         try
         {
             string token = await AuthService.LoginAsync(LoginModel);
+
             if (!string.IsNullOrWhiteSpace(token))
             {
                 // No need to call GetAuthenticationStateAsync here
@@ -38,6 +39,11 @@ public partial class Login : ComponentBase
         {
             await JSRuntime.InvokeVoidAsync("alert", ex.Message);
         }
+    }
+
+    public async Task DisplayErrors()
+    {
+        await JSRuntime.InvokeVoidAsync("alert", "DisplayErrors");
     }
 
     public Task SendResetPasswordMessageAsync()

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.IdentityModel.Tokens;
 
 namespace BlazorClient.Pages.Games.Games.Chat;
 

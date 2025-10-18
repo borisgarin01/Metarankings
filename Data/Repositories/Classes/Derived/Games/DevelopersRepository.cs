@@ -1,7 +1,10 @@
 ﻿using Domain.Games;
 using Data.Repositories.Interfaces;
 using Domain.RequestsModels.Games.Developers;
+using Npgsql;
+
 namespace Data.Repositories.Classes.Derived.Games;
+
 public sealed class DevelopersRepository : Repository, IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel>
 {
     public DevelopersRepository(string connectionString) : base(connectionString)
@@ -10,12 +13,12 @@ public sealed class DevelopersRepository : Repository, IRepository<Developer, Ad
 
     public async Task<long> AddAsync(AddDeveloperModel developer)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Developers
 (Name)
-OUTPUT inserted.Id
-VALUES (@Name);"
+VALUES (@Name)
+RETURNING Id;"
  , new
  {
      developer.Name
@@ -34,7 +37,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Developer>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var developersDictionary = new Dictionary<long, Developer>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -91,7 +94,7 @@ VALUES (@Name);"
 
     public async Task<Developer> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var developersDictionary = new Dictionary<long, Developer>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -150,7 +153,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Developer>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var developersDictionary = new Dictionary<long, Developer>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -212,7 +215,7 @@ VALUES (@Name);"
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Developers WHERE Id=@id", new { id });
@@ -229,11 +232,11 @@ Developers WHERE Id=@id", new { id });
 
     public async Task<Developer> UpdateAsync(UpdateDeveloperModel developer, long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"UPDATE Developers set Name=@Name
-OUTPUT inserted.Name, inserted.Id
-where Id=@id", new
+            var updatedDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"UPDATE Developers SET Name=@Name
+WHERE Id=@id
+RETURNING Name, Id;", new
             {
                 developer.Name,
                 id

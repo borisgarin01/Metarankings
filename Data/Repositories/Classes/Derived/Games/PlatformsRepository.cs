@@ -12,12 +12,12 @@ public sealed class PlatformsRepository : Repository, IRepository<Platform, AddP
 
     public async Task<long> AddAsync(AddPlatformModel platform)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Platforms
 (Name)
-output inserted.id
-VALUES (@Name);"
+VALUES (@Name)
+RETURNING Id;"
  , new
  {
      platform.Name
@@ -36,7 +36,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Platform>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var platformDictionary = new Dictionary<long, Platform>();
             var gameDictionary = new Dictionary<long, Game>();
@@ -96,7 +96,7 @@ VALUES (@Name);"
 
     public async Task<Platform> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var platformDictionary = new Dictionary<long, Platform>();
             var gameDictionary = new Dictionary<long, Game>();
@@ -158,7 +158,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Platform>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var platformDictionary = new Dictionary<long, Platform>();
             var gameDictionary = new Dictionary<long, Game>();
@@ -221,7 +221,7 @@ VALUES (@Name);"
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Platforms WHERE Id=@id", new { id });
@@ -238,11 +238,11 @@ Platforms WHERE Id=@id", new { id });
 
     public async Task<Platform> UpdateAsync(UpdatePlatformModel platform, long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name 
-output inserted.name, inserted.href, inserted.id
-where Id=@id", new
+WHERE Id=@Id
+RETURNING Name, Href, Id;", new
             {
                 platform.Name,
                 id

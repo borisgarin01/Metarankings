@@ -15,7 +15,7 @@ public sealed class GamesRepository : Repository, IRepository<Game, AddGameModel
 
     public async Task<long> AddAsync(AddGameModel entity)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             connection.Open();
 
@@ -23,9 +23,9 @@ public sealed class GamesRepository : Repository, IRepository<Game, AddGameModel
             {
                 var insertedGame = await connection.QueryFirstAsync<Game>(@"INSERT INTO Games 
 (Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer) 
-output inserted.Id, inserted.Name, inserted.Image, inserted.LocalizationId, inserted.PublisherId, inserted.ReleaseDate, inserted.Description, inserted.Trailer
 VALUES
-(@Name, @Image, @LocalizationId, @PublisherId, @ReleaseDate, @Description, @Trailer);", new
+(@Name, @Image, @LocalizationId, @PublisherId, @ReleaseDate, @Description, @Trailer)
+RETURNING Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer;", new
                 {
                     entity.Name,
                     entity.Image,
@@ -40,8 +40,8 @@ VALUES
                 {
                     {
                         var insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(@"INSERT INTO GamesGenres (GameId, GenreId) 
-OUTPUT inserted.Id, inserted.GameId, inserted.GenreId
-VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = genreId }, transaction: transaction);
+VALUES (@GameId, @GenreId)
+RETURNING Id, GameId, GenreId;", new { GameId = insertedGame.Id, GenreId = genreId }, transaction: transaction);
                     }
                 }
 
@@ -49,15 +49,15 @@ VALUES (@GameId, @GenreId);", new { GameId = insertedGame.Id, GenreId = genreId 
                 {
                     var insertedGamePlatform = await connection.QueryFirstAsync<GamePlatform>(@"INSERT INTO GamesPlatforms 
 (GameId, PlatformId)
-output inserted.GameId, inserted.PlatformId
-VALUES (@GameId, @PlatformId);", new { GameId = insertedGame.Id, PlatformId = platformId }, transaction: transaction);
+VALUES (@GameId, @PlatformId)
+RETURNING GameId, PlatformId;", new { GameId = insertedGame.Id, PlatformId = platformId }, transaction: transaction);
                 }
 
                 foreach (var developerId in entity.DevelopersIds)
                 {
                     var insertedGameDeveloper = await connection.QueryAsync(@"INSERT INTO GamesDevelopers(GameId, DeveloperId)
-output inserted.Id, inserted.GameId, inserted.DeveloperId
-VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = developerId }, transaction: transaction);
+VALUES(@GameId, @DeveloperId)
+RETURNING Id, GameId, DeveloperId;", new { GameId = insertedGame.Id, DeveloperId = developerId }, transaction: transaction);
                 }
 
                 await transaction.CommitAsync();
@@ -75,7 +75,7 @@ VALUES(@GameId, @DeveloperId)", new { GameId = insertedGame.Id, DeveloperId = de
 
     public async Task<IEnumerable<Game>> GetAsync(int offset, int limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
@@ -146,7 +146,7 @@ gs.Id, gs.GameId, gs.ImageUrl
 
     public async Task<IEnumerable<Game>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
@@ -214,7 +214,7 @@ gs.id, gs.gameid, gs.imageUrl
 
     public async Task<Game> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
@@ -295,7 +295,7 @@ WHERE g.Id=@id";
 
     public async Task<IEnumerable<Game>> GetByGenreIdAsync(long genreId)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
@@ -371,7 +371,7 @@ ORDER BY g.id, gen.id;";
 
     public async Task<IEnumerable<Game>> GetByPlatformIdAsync(long platformId)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
@@ -448,7 +448,7 @@ ORDER BY g.id, gen.id;";
 
     public async Task<IEnumerable<Game>> GetByDeveloperIdAsync(long developerId)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
@@ -526,7 +526,7 @@ ORDER BY g.id, gen.id;";
 
     public async Task<IEnumerable<Game>> GetByPublisherIdAsync(long publisherId)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
@@ -607,7 +607,7 @@ ORDER BY g.id, gen.id;";
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM Games
 WHERE Id=@id", new { id });
@@ -629,7 +629,7 @@ WHERE Id=@id", new { id });
 
     public async Task<IEnumerable<Game>> GetByReleaseYearAsync(int year)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id

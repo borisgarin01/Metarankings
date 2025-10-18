@@ -11,8 +11,8 @@ public sealed class CreateDevelopersTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE Developers
-(Id bigint not null primary key identity(1,1),
-Name nvarchar(511) not null unique,
+(Id bigserial not null primary key,
+Name varchar(511) not null unique,
 CONSTRAINT UNIQUE_NAME UNIQUE(Name));");
     }
 }

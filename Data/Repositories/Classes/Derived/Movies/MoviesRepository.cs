@@ -14,7 +14,7 @@ public sealed class MoviesRepository : Repository, IMoviesRepository
 
     public async Task<long> AddAsync(AddMovieModel entity)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedMovieGenres = new List<MovieGenre>();
             var insertedMovieStudios = new List<MovieStudio>();
@@ -30,8 +30,8 @@ WHERE Name=@Name;", new { movieGenre.Name });
                 {
                     var insertedMovieGenre = await connection.QueryFirstAsync<MovieGenre>(@"INSERT INTO MoviesGenres 
 (Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { movieGenre.Name });
+VALUES (@Name)
+RETURNING Id, Name;", new { movieGenre.Name });
                     insertedMovieGenres.Add(insertedMovieGenre);
                 }
                 else
@@ -47,8 +47,8 @@ WHERE Name=@Name;", new { movieStudio.Name });
                 {
                     var insertedMovieStudio = await connection.QueryFirstAsync<MovieStudio>(@"INSERT INTO MoviesStudios 
 (Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { movieStudio.Name });
+VALUES (@Name)
+RETURNING Id, Name;", new { movieStudio.Name });
                     insertedMovieStudios.Add(insertedMovieStudio);
                 }
                 else
@@ -67,8 +67,8 @@ WHERE Name=@Name;", new { movieDirector.Name });
                 {
                     var insertedMovieDirector = await connection.QueryFirstAsync<MovieDirector>(@"INSERT INTO MoviesDirectors 
 (Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { movieDirector.Name });
+VALUES (@Name)
+RETURNING Id, Name;", new { movieDirector.Name });
                     insertedMovieDirectors.Add(insertedMovieDirector);
                 }
                 else
@@ -79,9 +79,9 @@ VALUES (@Name);", new { movieDirector.Name });
 
             var insertedMovie = await connection.QueryFirstAsync<Movie>(@"INSERT INTO Movies 
 (Name, OriginalName, ImageSource, PremierDate, Description) 
-output inserted.id, inserted.name, inserted.originalname, inserted.imagesource, inserted.premierdate, inserted.description
 VALUES
-(@Name, @OriginalName, @ImageSource, @PremierDate, @Description);", new
+(@Name, @OriginalName, @ImageSource, @PremierDate, @Description)
+RETURNING Id, Name, OriginalName, ImageSource, PremierDate, Description;", new
             {
                 entity.Name,
                 entity.OriginalName,
@@ -125,7 +125,7 @@ VALUES (@MovieId, @MovieDirectorId);",
 
     public async Task<IEnumerable<Movie>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
@@ -177,7 +177,7 @@ md.id, md.name
 
     public async Task<Movie> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"select m.Id, m.Name, m.ImageSource as Image, m.OriginalName, m.PremierDate, m.Description,
 ms.Id, ms.Name,
@@ -242,7 +242,7 @@ WHERE m.id=@id";
 
     public async Task<IEnumerable<Movie>> GetAsync(DateTime dateFrom, DateTime dateTo)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
@@ -296,7 +296,7 @@ ORDER BY Id DESC;";
 
     public async Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,

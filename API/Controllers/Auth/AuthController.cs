@@ -3,7 +3,9 @@ using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using IdentityLibrary.Telegram;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Options;
 using MimeKit;
+using Settings;
 using System.Net;
 
 namespace API.Controllers.Auth;
@@ -17,14 +19,19 @@ public sealed class AuthController : ControllerBase
     private readonly TelegramAuthenticator _telegramAuthenticator;
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger)
+    private readonly IOptionsMonitor<AuthSettings> _authSettingsOptionsMonitor;
+    private readonly IOptionsMonitor<TokenValidationParameters> _tokenValidationParameters;
+    private readonly IOptionsMonitor<EmailSettings> _emailSettings;
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters)
     {
         _configuration = configuration;
         _usersManager = usersManager;
         _telegramAuthenticator = telegramAuthenticator;
         _passwordHasher = passwordHasher;
         _logger = logger;
-
+        _authSettingsOptionsMonitor = authSettingsOptionsMonitor;
+        _emailSettings = emailSettings;
+        _tokenValidationParameters = tokenValidationParameters;
     }
 
     [HttpPost("login")]
@@ -47,7 +54,7 @@ public sealed class AuthController : ControllerBase
         if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
 
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
 
         var userClaims = new List<Claim>();
@@ -59,7 +66,7 @@ public sealed class AuthController : ControllerBase
 
         userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
 
-        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
+        var tokenOptions = new JwtSecurityToken(issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer, audience: _authSettingsOptionsMonitor.CurrentValue.Audience, userClaims, expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours), signingCredentials: signingCredentials);
 
         userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
 
@@ -131,6 +138,16 @@ public sealed class AuthController : ControllerBase
 
         if (userCreationResult.Succeeded)
         {
+            if (string.Equals(registerModel.UserEmail, _authSettingsOptionsMonitor.CurrentValue.AdminEmail) && string.Equals(registerModel.Password, _authSettingsOptionsMonitor.CurrentValue.AdminPassword))
+            {
+                ApplicationUser? userToBindToAdminRole = await _usersManager.FindByEmailAsync(user.Email);
+                IdentityResult addingToAdminRoleIdentityResult = await _usersManager.AddToRoleAsync(userToBindToAdminRole, "Admin");
+                if (!addingToAdminRoleIdentityResult.Succeeded)
+                {
+                    _logger.LogError($"Ошибка добавления к роли администратора. {string.Join(", ", addingToAdminRoleIdentityResult.Errors.Select(b => $"{b.Code}, {b.Description}"))}");
+                }
+            }
+
             user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
             string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
@@ -138,7 +155,7 @@ public sealed class AuthController : ControllerBase
 
             var emailMessage = new MimeMessage();
 
-            emailMessage.From.Add(new MailboxAddress(_configuration["EmailSettings:Sender:Name"], _configuration["EmailSettings:Sender:Email"]));
+            emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
             emailMessage.To.Add(new MailboxAddress("", user.Email));
             emailMessage.Subject = "Confirm email";
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -148,8 +165,8 @@ public sealed class AuthController : ControllerBase
 
             using (var client = new SmtpClient())
             {
-                await client.ConnectAsync(_configuration["EmailSettings:Host"], int.Parse(_configuration["EmailSettings:Port"]), bool.Parse(_configuration["EmailSettings:UseSsl"]));
-                await client.AuthenticateAsync(_configuration["EmailSettings:UserName"], _configuration["EmailSettings:Password"]);
+                await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
+                await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
                 await client.SendAsync(emailMessage);
 
                 await client.DisconnectAsync(true);
@@ -213,7 +230,7 @@ public sealed class AuthController : ControllerBase
 
         var emailMessage = new MimeMessage();
 
-        emailMessage.From.Add(new MailboxAddress(_configuration["EmailSettings:Sender:Name"], _configuration["EmailSettings:Sender:Email"]));
+        emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
         emailMessage.To.Add(new MailboxAddress("", user.Email));
         emailMessage.Subject = "Reset password";
         emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -223,8 +240,8 @@ public sealed class AuthController : ControllerBase
 
         using (var client = new SmtpClient())
         {
-            await client.ConnectAsync(_configuration["EmailSettings:Host"], int.Parse(_configuration["EmailSettings:Port"]), bool.Parse(_configuration["EmailSettings:UseSsl"]));
-            await client.AuthenticateAsync(_configuration["EmailSettings:UserName"], _configuration["EmailSettings:Password"]);
+            await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
+            await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
             await client.SendAsync(emailMessage);
 
             await client.DisconnectAsync(true);

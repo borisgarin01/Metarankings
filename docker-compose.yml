@@ -1,0 +1,38 @@
+networks:
+  myAppNetwork:
+    driver: bridge
+
+services:
+  Db:
+    container_name: Db
+    image: postgres:latest
+    networks:
+      - myAppNetwork
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U borisgarin -d Metarankings" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "borisgarin"
+      POSTGRES_PASSWORD: "borisgarin"
+      POSTGRES_DB: "Metarankings"
+
+  WebApi:
+    container_name: APIContainer
+    image: ${DOCKER_REGISTRY-}api
+    ports:
+      - 8080:8080
+    networks:
+      - myAppNetwork
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    depends_on:
+      Db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
