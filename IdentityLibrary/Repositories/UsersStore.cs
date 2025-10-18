@@ -9,7 +9,7 @@ public sealed class UsersStore : IUserSecurityStampStore<ApplicationUser>, IUser
 
     public UsersStore(IConfiguration configuration)
     {
-        _connectionString = configuration.GetConnectionString("PostgresConnection");
+        _connectionString = configuration.GetConnectionString("DockerPostgresConnection");
     }
 
     public void Dispose()

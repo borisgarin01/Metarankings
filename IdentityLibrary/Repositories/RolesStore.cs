@@ -8,7 +8,7 @@ public sealed class RolesStore : IRoleStore<ApplicationRole>
 
     public RolesStore(IConfiguration configuration)
     {
-        _connectionString = configuration.GetConnectionString("PostgresConnection");
+        _connectionString = configuration.GetConnectionString("DockerPostgresConnection");
     }
 
     public async Task<IdentityResult> CreateAsync(ApplicationRole role, CancellationToken cancellationToken)

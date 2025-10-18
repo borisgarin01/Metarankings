@@ -25,13 +25,15 @@ internal class Program
             RequireSignedTokens = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:RequireSignedTokens"]),
             ValidateIssuerSigningKey = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateIssuerSigningKey"]),
             ValidateIssuer = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateIssuer"]),
-            ValidIssuer = builder.Configuration["TokenValidationParameters:Issuer"],
+            ValidIssuer = builder.Configuration["TokenValidationParameters:ValidIssuer"],
             ValidateAudience = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateAudience"]),
             ValidAudience = builder.Configuration["TokenValidationParameters:Audience"],
             ValidateLifetime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateLifetime"]),
             ClockSkew = TimeSpan.FromSeconds(Convert.ToInt64(builder.Configuration["TokenValidationParameters:ClockSkew"])),
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AuthSettings:Secret"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenValidationParameters:IssuerSigningKey"]))
         };
+
+        builder.Services.Configure<TokenValidationParameters>(builder.Configuration.GetSection(nameof(TokenValidationParameters)));
 
         builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection(nameof(AuthSettings)));
 
@@ -140,8 +142,6 @@ internal class Program
 
         var app = builder.Build();
 
-        var cs = app.Configuration.GetConnectionString("PostgresConnection");
-
         if (app.Environment.IsDevelopment())
         {
             app.UseWebAssemblyDebugging();
@@ -191,7 +191,7 @@ internal class Program
                 // Add SQLite support to FluentMigrator
                 .AddPostgres()
                 // Set the connection string
-                .WithGlobalConnectionString(configurationManager.GetConnectionString("PostgresConnection"))
+                .WithGlobalConnectionString(configurationManager.GetConnectionString("DockerPostgresConnection"))
                 // Define the assembly containing the migrations, maintenance migrations and other customizations
                 .ScanIn(typeof(CreateGamesTableMigration).Assembly, typeof(CreateApplicationRolesTableMigration).Assembly).For.Migrations())
             // Enable logging to console in the FluentMigrator way
