@@ -19,6 +19,7 @@ COPY ["Shared/Shared.csproj", "Shared/"]
 COPY ["WebClientServices/WebManagers.csproj", "WebClientServices/"]
 COPY ["Data/Data.csproj", "Data/"]
 COPY ["ExcelProcessors/ExcelProcessors.csproj", "ExcelProcessors/"]
+COPY ["Settings/Settings.csproj", "Settings/"]
 RUN dotnet restore "./API/API.csproj"
 COPY . .
 WORKDIR "/src/API"
