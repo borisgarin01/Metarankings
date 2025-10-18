@@ -33,8 +33,9 @@ internal class Program
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AuthSettings:Secret"]))
         };
 
-        builder.Services.Configure<AuthSettings>(
-         builder.Configuration.GetSection("AuthSettings"));
+        builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection(nameof(AuthSettings)));
+
+        builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 
         builder.Services.AddLogging();
         builder.Logging.ClearProviders();
