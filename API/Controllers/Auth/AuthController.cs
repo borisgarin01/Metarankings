@@ -20,8 +20,9 @@ public sealed class AuthController : ControllerBase
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
     private readonly IOptionsMonitor<AuthSettings> _authSettingsOptionsMonitor;
+    private readonly IOptionsMonitor<TokenValidationParameters> _tokenValidationParameters;
     private readonly IOptionsMonitor<EmailSettings> _emailSettings;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings)
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters)
     {
         _configuration = configuration;
         _usersManager = usersManager;
@@ -30,6 +31,7 @@ public sealed class AuthController : ControllerBase
         _logger = logger;
         _authSettingsOptionsMonitor = authSettingsOptionsMonitor;
         _emailSettings = emailSettings;
+        _tokenValidationParameters = tokenValidationParameters;
     }
 
     [HttpPost("login")]

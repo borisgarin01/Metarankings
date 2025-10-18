@@ -16,6 +16,6 @@ public sealed record AuthSettings
     public bool ValidateAudience { get; set; }
     public string ValidAudience { get; set; }
     public bool ValidateLifetime { get; set; }
-    public byte TokenLifetimeHours { get; set; }
+    public int TokenLifetimeHours { get; set; }
     public Telegram Telegram { get; set; }
 }
