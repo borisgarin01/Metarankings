@@ -1,6 +1,6 @@
 ﻿@page "/auth/login"
 
-<EditForm Model="LoginModel" OnValidSubmit="LoginAsync">
+<EditForm Model="LoginModel" OnValidSubmit="LoginAsync" OnInvalidSubmit="DisplayErrors">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
