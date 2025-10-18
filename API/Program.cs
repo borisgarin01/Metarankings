@@ -140,7 +140,7 @@ internal class Program
 
         var app = builder.Build();
 
-        var cs = app.Configuration.GetConnectionString("MetarankingsConnection");
+        var cs = app.Configuration.GetConnectionString("PostgresConnection");
 
         if (app.Environment.IsDevelopment())
         {
@@ -191,7 +191,7 @@ internal class Program
                 // Add SQLite support to FluentMigrator
                 .AddPostgres()
                 // Set the connection string
-                .WithGlobalConnectionString(configurationManager.GetConnectionString("MetarankingsConnection"))
+                .WithGlobalConnectionString(configurationManager.GetConnectionString("PostgresConnection"))
                 // Define the assembly containing the migrations, maintenance migrations and other customizations
                 .ScanIn(typeof(CreateGamesTableMigration).Assembly, typeof(CreateApplicationRolesTableMigration).Assembly).For.Migrations())
             // Enable logging to console in the FluentMigrator way
