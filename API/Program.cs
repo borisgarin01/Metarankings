@@ -153,8 +153,6 @@ internal class Program
             app.UseDeveloperExceptionPage();
         }
 
-        Debug.WriteLine(app.Configuration.GetConnectionString("MetarankingsConnection"));
-
         app.UseBlazorFrameworkFiles();
 
         app.UseStaticFiles();

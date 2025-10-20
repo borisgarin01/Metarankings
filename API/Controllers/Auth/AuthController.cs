@@ -19,19 +19,17 @@ public sealed class AuthController : ControllerBase
     private readonly TelegramAuthenticator _telegramAuthenticator;
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
-    private readonly IOptionsMonitor<AuthSettings> _authSettingsOptionsMonitor;
-    private readonly IOptionsMonitor<TokenValidationParameters> _tokenValidationParameters;
     private readonly IOptionsMonitor<EmailSettings> _emailSettings;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters)
+    private readonly IOptionsMonitor<AuthSettings> _authSettings;
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<AuthSettings> authSettings)
     {
         _configuration = configuration;
         _usersManager = usersManager;
         _telegramAuthenticator = telegramAuthenticator;
         _passwordHasher = passwordHasher;
         _logger = logger;
-        _authSettingsOptionsMonitor = authSettingsOptionsMonitor;
         _emailSettings = emailSettings;
-        _tokenValidationParameters = tokenValidationParameters;
+        _authSettings = authSettings;
     }
 
     [HttpPost("login")]
@@ -40,65 +38,46 @@ public sealed class AuthController : ControllerBase
         if (loginModel is null)
             return BadRequest("Неверный логин");
 
+
         if (string.IsNullOrWhiteSpace(loginModel.UserEmail) || string.IsNullOrWhiteSpace(loginModel.Password))
             return BadRequest("Email и пароль должны быть указаны");
 
         var userToCheckExistance = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
+
         if (userToCheckExistance is null)
             return NotFound("Пользователь не зарегистрирован");
 
-        PasswordVerificationResult passwordVerificationResult = _passwordHasher.VerifyHashedPassword(
-            userToCheckExistance, userToCheckExistance.PasswordHash, loginModel.Password);
-
-        if (userToCheckExistance.SecurityStamp is null)
-            userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
+        PasswordVerificationResult passwordVerificationResult = _passwordHasher.VerifyHashedPassword(userToCheckExistance, userToCheckExistance.PasswordHash, loginModel.Password);
 
         if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
 
-        // FIX: Ensure the secret key is exactly 64 bytes for HMAC-SHA512
-        var secretString = _authSettingsOptionsMonitor.CurrentValue.Secret;
-        var keyBytes = Encoding.UTF8.GetBytes(secretString);
-
-        // Pad or truncate to exactly 64 bytes for HMAC-SHA512
-        if (keyBytes.Length != 64)
-        {
-            var newKey = new byte[64];
-            Array.Copy(keyBytes, newKey, Math.Min(keyBytes.Length, 64));
-            keyBytes = newKey;
-        }
-
-        var secretKey = new SymmetricSecurityKey(keyBytes);
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettings.CurrentValue.Secret));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
 
-        var userClaims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()),
-        new Claim(ClaimTypes.Email, userToCheckExistance.Email),
-        new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString())
-    };
+        var userClaims = new List<Claim>();
 
-        // Add role claims properly
-        var roles = await _usersManager.GetRolesAsync(userToCheckExistance);
-        foreach (var role in roles)
-        {
-            userClaims.Add(new Claim(ClaimTypes.Role, role));
-        }
+        if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
+            userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
 
-        var tokenOptions = new JwtSecurityToken(
-            issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
-            audience: _authSettingsOptionsMonitor.CurrentValue.Audience,
-            claims: userClaims,
-            expires: DateTime.UtcNow.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours),
-            signingCredentials: signingCredentials
-        );
+        userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
+
+        userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
+
+        var tokenOptions = new JwtSecurityToken(issuer: _authSettings.CurrentValue.Issuer, audience: _authSettings.CurrentValue.Audience, userClaims, expires: DateTime.Now.AddHours(_authSettings.CurrentValue.TokenLifetimeHours), signingCredentials: signingCredentials);
+
+        userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
+
+        string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        // Store token (optional)
-        await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
+        IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
 
-        return Ok(tokenString);
+        if (identityResult.Succeeded)
+            return Ok(tokenString);
+
+        return StatusCode(500, "Authentication token setting has been failed");
     }
 
     [HttpPost("logout")]
@@ -157,16 +136,6 @@ public sealed class AuthController : ControllerBase
 
         if (userCreationResult.Succeeded)
         {
-            if (string.Equals(registerModel.UserEmail, _authSettingsOptionsMonitor.CurrentValue.AdminEmail) && string.Equals(registerModel.Password, _authSettingsOptionsMonitor.CurrentValue.AdminPassword))
-            {
-                ApplicationUser? userToBindToAdminRole = await _usersManager.FindByEmailAsync(user.Email);
-                IdentityResult addingToAdminRoleIdentityResult = await _usersManager.AddToRoleAsync(userToBindToAdminRole, "Admin");
-                if (!addingToAdminRoleIdentityResult.Succeeded)
-                {
-                    _logger.LogError($"Ошибка добавления к роли администратора. {string.Join(", ", addingToAdminRoleIdentityResult.Errors.Select(b => $"{b.Code}, {b.Description}"))}");
-                }
-            }
-
             user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
             string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
