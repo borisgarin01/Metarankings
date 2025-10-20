@@ -136,6 +136,15 @@ public sealed class AuthController : ControllerBase
 
         if (userCreationResult.Succeeded)
         {
+            if (string.Equals(registerModel.UserEmail, _authSettings.CurrentValue.AdminEmail) && string.Equals(registerModel.Password, _authSettings.CurrentValue.AdminPassword))
+            {
+                ApplicationUser? userToBindToAdminRole = await _usersManager.FindByEmailAsync(user.Email);
+                IdentityResult addingToAdminRoleIdentityResult = await _usersManager.AddToRoleAsync(userToBindToAdminRole, "Admin");
+                if (!addingToAdminRoleIdentityResult.Succeeded)
+                {
+                    _logger.LogError($"Ошибка добавления к роли администратора. {string.Join(", ", addingToAdminRoleIdentityResult.Errors.Select(b => $"{b.Code}, {b.Description}"))}");
+                }
+            }
             user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
             string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
