@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using BlazorClient.PagesModels.Games.Chat;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace BlazorClient.Pages.Games.Games.Chat;
 
@@ -12,7 +13,6 @@ public partial class Chat : ComponentBase, IAsyncDisposable
 
     private HubConnection? hubConnection;
     private List<string> messages = [];
-    private string? messageInput;
 
     private string joinRoomStyle = "display:block";
     private string sendMessageStyle = "display:none";
@@ -65,15 +65,16 @@ public partial class Chat : ComponentBase, IAsyncDisposable
     }
 
     [CascadingParameter]
-    private Task<AuthenticationState>? authenticationState { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    public ChatComponentModel ChatComponentModel { get; } = new();
 
     private ClaimsPrincipal currentUser;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (authenticationState is not null)
+        if (AuthenticationState is not null)
         {
-            AuthenticationState authState = await authenticationState;
+            AuthenticationState authState = await AuthenticationState;
             currentUser = authState?.User;
         }
         await JoinRoom();
@@ -97,15 +98,16 @@ public partial class Chat : ComponentBase, IAsyncDisposable
         }
     }
 
-    private async Task SendMessage()
+
+    public async Task SendMessageAsync()
     {
-        if (hubConnection is not null && !string.IsNullOrEmpty(messageInput))
+        if (hubConnection is not null && !string.IsNullOrEmpty(ChatComponentModel.MessageInput))
         {
             try
             {
-                await hubConnection.SendAsync("SendMessage", GameId.ToString(), 
-                    currentUser.Claims.First(b => b.Type == ClaimTypes.NameIdentifier).Value, messageInput);
-                messageInput = string.Empty; // Clear input after sending
+                await hubConnection.SendAsync("SendMessage", GameId.ToString(),
+                    currentUser.Claims.First(b => b.Type == ClaimTypes.NameIdentifier).Value, ChatComponentModel.MessageInput);
+                ChatComponentModel.MessageInput = string.Empty; // Clear input after sending
             }
             catch (Exception ex)
             {

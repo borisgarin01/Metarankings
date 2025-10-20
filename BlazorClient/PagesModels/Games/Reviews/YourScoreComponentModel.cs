@@ -1,6 +1,6 @@
 ﻿namespace BlazorClient.PagesModels.Games.Reviews;
 
-public class YourScoreComponentModel : ComponentBase
+public sealed class YourScoreComponentModel : ComponentBase
 {
     [Parameter, EditorRequired]
     [Range(0.0, 10.0)]
