@@ -40,46 +40,65 @@ public sealed class AuthController : ControllerBase
         if (loginModel is null)
             return BadRequest("Неверный логин");
 
-
         if (string.IsNullOrWhiteSpace(loginModel.UserEmail) || string.IsNullOrWhiteSpace(loginModel.Password))
             return BadRequest("Email и пароль должны быть указаны");
 
         var userToCheckExistance = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
-
         if (userToCheckExistance is null)
             return NotFound("Пользователь не зарегистрирован");
 
-        PasswordVerificationResult passwordVerificationResult = _passwordHasher.VerifyHashedPassword(userToCheckExistance, userToCheckExistance.PasswordHash, loginModel.Password);
+        PasswordVerificationResult passwordVerificationResult = _passwordHasher.VerifyHashedPassword(
+            userToCheckExistance, userToCheckExistance.PasswordHash, loginModel.Password);
+
+        if (userToCheckExistance.SecurityStamp is null)
+            userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
 
         if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
 
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
+        // FIX: Ensure the secret key is exactly 64 bytes for HMAC-SHA512
+        var secretString = _authSettingsOptionsMonitor.CurrentValue.Secret;
+        var keyBytes = Encoding.UTF8.GetBytes(secretString);
+
+        // Pad or truncate to exactly 64 bytes for HMAC-SHA512
+        if (keyBytes.Length != 64)
+        {
+            var newKey = new byte[64];
+            Array.Copy(keyBytes, newKey, Math.Min(keyBytes.Length, 64));
+            keyBytes = newKey;
+        }
+
+        var secretKey = new SymmetricSecurityKey(keyBytes);
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
 
-        var userClaims = new List<Claim>();
+        var userClaims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()),
+        new Claim(ClaimTypes.Email, userToCheckExistance.Email),
+        new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString())
+    };
 
-        if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
-            userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
+        // Add role claims properly
+        var roles = await _usersManager.GetRolesAsync(userToCheckExistance);
+        foreach (var role in roles)
+        {
+            userClaims.Add(new Claim(ClaimTypes.Role, role));
+        }
 
-        userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
-
-        userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
-
-        var tokenOptions = new JwtSecurityToken(issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer, audience: _authSettingsOptionsMonitor.CurrentValue.Audience, userClaims, expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours), signingCredentials: signingCredentials);
-
-        userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
-
-        string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
+        var tokenOptions = new JwtSecurityToken(
+            issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
+            audience: _authSettingsOptionsMonitor.CurrentValue.Audience,
+            claims: userClaims,
+            expires: DateTime.UtcNow.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours),
+            signingCredentials: signingCredentials
+        );
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
+        // Store token (optional)
+        await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
 
-        if (identityResult.Succeeded)
-            return Ok(tokenString);
-
-        return StatusCode(500, "Authentication token setting has been failed");
+        return Ok(tokenString);
     }
 
     [HttpPost("logout")]

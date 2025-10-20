@@ -21,22 +21,34 @@ public class AuthService : IAuthService
 
     public async Task<string> LoginAsync(LoginModel loginModel)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/login", loginModel);
-
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            if (response.StatusCode == HttpStatusCode.BadRequest
-                ^ response.StatusCode == HttpStatusCode.NotFound)
-                throw new Exception(await response.Content.ReadAsStringAsync());
+            var response = await _httpClient.PostAsJsonAsync("api/auth/login", loginModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var token = await response.Content.ReadAsStringAsync();
+
+                // Clean the token (remove quotes if any)
+                token = token.Trim('"');
+
+                await _localStorage.SetItemAsync("authToken", token);
+
+                // Mark user as authenticated
+                ((JwtAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(token);
+
+                return token;
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Login failed: {error}");
+            }
         }
-
-        var token = await response.Content.ReadAsStringAsync();
-        await _localStorage.SetItemAsync("authToken", token);
-
-        ((JwtAuthenticationStateProvider)_authenticationStateProvider)
-            .MarkUserAsAuthenticated(token); // Pass the token instead of email
-
-        return token;
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 
     public async Task LogoutAsync()
@@ -46,7 +58,7 @@ public class AuthService : IAuthService
         {
             await _localStorage.RemoveItemAsync("authToken");
             ((JwtAuthenticationStateProvider)_authenticationStateProvider)
-                .MarkUserAsLoggedOut();
+                .MarkUserAsLoggedOutAsync();
         }
     }
 

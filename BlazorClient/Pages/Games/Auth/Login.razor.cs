@@ -27,17 +27,16 @@ public partial class Login : ComponentBase
 
             if (!string.IsNullOrWhiteSpace(token))
             {
-                // No need to call GetAuthenticationStateAsync here
-                NavigationManager.NavigateTo("/", forceLoad: true); // forceLoad ensures full state refresh
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("alert", "Неверный логин или пароль");
+                // Verify token is saved
+                var savedToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+                NavigationManager.NavigateTo("/", forceLoad: true);
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+            Console.WriteLine($"Login error: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Login failed: {ex.Message}");
         }
     }
 

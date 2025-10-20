@@ -18,7 +18,7 @@ public static class RepositoriesRegistrator
 {
     public static IServiceCollection RegisterRepositories(this IServiceCollection services, IConfiguration configuration)
     {
-        string metarankingsConnectionString = configuration.GetConnectionString("DockerPostgresConnection");
+        string metarankingsConnectionString = configuration.GetConnectionString("MetarankingsConnection");
 
         services.AddScoped<IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel>, DevelopersRepository>(instance => new DevelopersRepository(metarankingsConnectionString));
 

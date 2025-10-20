@@ -15,7 +15,7 @@ public sealed class CreateAccessTokensTableMigration : Migration
     UserId bigint not null, 
     LoginProvider varchar(127) not null,
     Name varchar(127) not null,
-    Value varchar(511) not null
+    Value varchar(4095) not null
 );");
     }
 }

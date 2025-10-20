@@ -1,131 +1,76 @@
-﻿namespace BlazorClient.Auth;
+﻿using Microsoft.Extensions.Configuration;
+using System.IdentityModel.Tokens.Jwt;
+
+namespace BlazorClient.Auth;
 
 public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 {
     private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorage;
     private readonly ILogger<JwtAuthenticationStateProvider> _logger;
+    private readonly IConfiguration _configuration;
 
     public JwtAuthenticationStateProvider(
         HttpClient httpClient,
         ILocalStorageService localStorage,
-        ILogger<JwtAuthenticationStateProvider> logger)
+        ILogger<JwtAuthenticationStateProvider> logger,
+        IConfiguration configuration)
     {
         _httpClient = httpClient;
         _localStorage = localStorage;
         _logger = logger;
+        _configuration = configuration;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var savedToken = await _localStorage.GetItemAsync<string>("authToken");
+        var token = await _localStorage.GetItemAsync<string>("authToken");
 
-        if (string.IsNullOrWhiteSpace(savedToken))
+        if (string.IsNullOrWhiteSpace(token))
         {
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
+        return CreateAuthenticationState(token);
+    }
+
+    public void MarkUserAsAuthenticated(string token)
+    {
+        var authState = CreateAuthenticationState(token);
+        NotifyAuthenticationStateChanged(Task.FromResult(authState));
+
+        // Set default authorization header
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+    }
+
+    public async Task MarkUserAsLoggedOutAsync()
+    {
+        await _localStorage.RemoveItemAsync("authToken");
+        var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
+        var authState = Task.FromResult(new AuthenticationState(anonymousUser));
+        NotifyAuthenticationStateChanged(authState);
+        _httpClient.DefaultRequestHeaders.Authorization = null;
+    }
+
+    private AuthenticationState CreateAuthenticationState(string token)
+    {
         try
         {
-            var claims = ParseClaimsFromJwt(savedToken);
-            var expiry = claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
 
-            if (expiry == null || DateTimeOffset.FromUnixTimeSeconds(long.Parse(expiry)) < DateTimeOffset.UtcNow)
-            {
-                await _localStorage.RemoveItemAsync("authToken");
-                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-            }
-
-            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", savedToken);
+            // Create claims from the token without full validation for client-side
+            var claims = jwtToken.Claims.ToList();
+            var identity = new ClaimsIdentity(claims, "jwt");
+            var user = new ClaimsPrincipal(identity);
 
             return new AuthenticationState(user);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error parsing JWT");
-            await _localStorage.RemoveItemAsync("authToken");
+            _logger.LogError(ex, "Error creating authentication state from token");
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
-    }
-
-    public void MarkUserAsAuthenticated(string token)
-    {
-        try
-        {
-            var claims = ParseClaimsFromJwt(token);
-            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
-            var authState = Task.FromResult(new AuthenticationState(user));
-            NotifyAuthenticationStateChanged(authState);
-
-            // Also update HttpClient header
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error marking user as authenticated");
-            MarkUserAsLoggedOut();
-        }
-    }
-
-    public void MarkUserAsLoggedOut()
-    {
-        var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
-        var authState = Task.FromResult(new AuthenticationState(anonymousUser));
-        NotifyAuthenticationStateChanged(authState);
-    }
-
-
-    private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
-    {
-        var claims = new List<Claim>();
-        string payload = jwt.Split('.')[1];
-        byte[] jsonBytes = ParseBase64WithoutPadding(payload);
-        var claimsStringsDictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
-
-        claimsStringsDictionary.TryGetValue(ClaimTypes.Role, out object roles);
-
-        if (roles is not null)
-        {
-            if (IsItArray(roles.ToString()))
-            {
-                var parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString());
-
-                foreach (string parsedRole in parsedRoles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, parsedRole));
-                }
-            }
-            else
-            {
-                //Only one role
-                claims.Add(new Claim(ClaimTypes.Role, roles.ToString()));
-            }
-
-            claimsStringsDictionary.Remove(ClaimTypes.Role);
-        }
-
-        claims.AddRange(claimsStringsDictionary.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString())));
-
-        return claims;
-    }
-
-    private static bool IsItArray(string value)
-    {
-        return value.ToString().Trim().StartsWith("[");
-    }
-
-    private byte[] ParseBase64WithoutPadding(string payload)
-    {
-        switch (payload.Length % 4)
-        {
-            case 2:
-                payload += "==";
-                break;
-            case 3:
-                payload += "=";
-                break;
-        }
-        return Convert.FromBase64String(payload);
     }
 }

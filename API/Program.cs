@@ -7,6 +7,7 @@ using IdentityLibrary.Repositories;
 using IdentityLibrary.Telegram;
 using Microsoft.AspNetCore.ResponseCompression;
 using Settings;
+using System.Diagnostics;
 
 namespace API;
 
@@ -29,7 +30,7 @@ internal class Program
             ValidateAudience = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateAudience"]),
             ValidAudience = builder.Configuration["TokenValidationParameters:Audience"],
             ValidateLifetime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateLifetime"]),
-            ClockSkew = TimeSpan.FromSeconds(Convert.ToInt64(builder.Configuration["TokenValidationParameters:ClockSkew"])),
+            ClockSkew = TimeSpan.FromHours(Convert.ToInt64(builder.Configuration["TokenValidationParameters:ClockSkew"])),
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenValidationParameters:IssuerSigningKey"]))
         };
 
@@ -43,19 +44,23 @@ internal class Program
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole();
 
-        builder.Services.AddAuthentication(options =>
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
-        }).AddJwtBearer(options =>
-        {
-            options.Authority = builder.Configuration["AuthSettings:Authority"];
-            options.Audience = builder.Configuration["AuthSettings:Audience"];
-            options.ClaimsIssuer = builder.Configuration["AuthSettings:Issuer"];
-            options.RequireHttpsMetadata = false;
-            options.TokenValidationParameters = tokenValidationParameters;
-            options.SaveToken = true;
-        });
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                builder.Configuration["AuthSettings:Secret"])),
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["AuthSettings:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["AuthSettings:Audience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
 
         builder.Services.AddAuthorization(options =>
         {
@@ -148,6 +153,8 @@ internal class Program
             app.UseDeveloperExceptionPage();
         }
 
+        Debug.WriteLine(app.Configuration.GetConnectionString("MetarankingsConnection"));
+
         app.UseBlazorFrameworkFiles();
 
         app.UseStaticFiles();
@@ -191,7 +198,7 @@ internal class Program
                 // Add SQLite support to FluentMigrator
                 .AddPostgres()
                 // Set the connection string
-                .WithGlobalConnectionString(configurationManager.GetConnectionString("DockerPostgresConnection"))
+                .WithGlobalConnectionString(configurationManager.GetConnectionString("MetarankingsConnection"))
                 // Define the assembly containing the migrations, maintenance migrations and other customizations
                 .ScanIn(typeof(CreateGamesTableMigration).Assembly, typeof(CreateApplicationRolesTableMigration).Assembly).For.Migrations())
             // Enable logging to console in the FluentMigrator way

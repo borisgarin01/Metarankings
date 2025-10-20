@@ -33,6 +33,8 @@ services:
     depends_on:
       Db:
         condition: service_healthy
+    environment:
+        - ConnectionStrings__MetarankingsConnection=Host=Db; Port=5432; Database=Metarankings; Username=borisgarin; Password=borisgarin;
 
 volumes:
   postgres_data:
