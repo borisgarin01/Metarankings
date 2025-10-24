@@ -47,16 +47,16 @@ public class ImagesController : ControllerBase
         {
             string pathToImage;
             if (year is not null && month is not null)
-                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Movies/Images/Uploads/{year}/{month}/{formFile.FileName}";
+                pathToImage = $"{_webHostEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}Movies{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}{year}{Path.DirectorySeparatorChar}{month}{Path.DirectorySeparatorChar}{formFile.FileName}";
             else
-                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Movies/Images/Uploads/{formFile.FileName}";
+                pathToImage = $"{_webHostEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}Movies{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}{formFile.FileName}";
 
             string imageFolder = Path.GetDirectoryName(pathToImage);
 
             if (!Directory.Exists(imageFolder))
                 Directory.CreateDirectory(imageFolder);
 
-            using (var fileStream = new FileStream($"{imageFolder}/{formFile.FileName}", FileMode.Create))
+            using (var fileStream = new FileStream($"{imageFolder}{Path.DirectorySeparatorChar}{formFile.FileName}", FileMode.Create))
             {
                 await formFile.CopyToAsync(fileStream);
             }
@@ -70,7 +70,7 @@ public class ImagesController : ControllerBase
     [HttpGet("{year:int}/{month:int}/{imagePath}")]
     public IActionResult GetImage(int year, int month, string imagePath)
     {
-        if (!System.IO.File.Exists($"{_webHostEnvironment.ContentRootPath}/Movies/Images/Uploads/{year}/{month}/{imagePath}"))
+        if (!System.IO.File.Exists($"{_webHostEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}Movies{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}{year}{Path.DirectorySeparatorChar}{month}{Path.DirectorySeparatorChar}{imagePath}"))
             return Problem(
                 title: "Image doesn't exist",
                 detail: $"Image {_webHostEnvironment.ContentRootPath}/Movies/Images/{imagePath} doesn't exist",
