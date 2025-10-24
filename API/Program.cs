@@ -138,8 +138,6 @@ internal class Program
 
         builder.Services.AddSingleton<TelegramAuthenticator>();
 
-        builder.Services.AddHostedService<NotificationsBackgroundService>();
-
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
