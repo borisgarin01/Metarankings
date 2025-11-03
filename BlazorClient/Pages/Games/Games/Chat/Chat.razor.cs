@@ -1,5 +1,4 @@
-﻿using BlazorClient.PagesModels.Games.Chat;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 
 namespace BlazorClient.Pages.Games.Games.Chat;
 
@@ -13,6 +12,7 @@ public partial class Chat : ComponentBase, IAsyncDisposable
 
     private HubConnection? hubConnection;
     private List<string> messages = [];
+    private string? messageInput;
 
     private string joinRoomStyle = "display:block";
     private string sendMessageStyle = "display:none";
@@ -65,16 +65,15 @@ public partial class Chat : ComponentBase, IAsyncDisposable
     }
 
     [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationState { get; set; }
-    public ChatComponentModel ChatComponentModel { get; } = new();
+    private Task<AuthenticationState>? authenticationState { get; set; }
 
     private ClaimsPrincipal currentUser;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (AuthenticationState is not null)
+        if (authenticationState is not null)
         {
-            AuthenticationState authState = await AuthenticationState;
+            AuthenticationState authState = await authenticationState;
             currentUser = authState?.User;
         }
         await JoinRoom();
@@ -98,16 +97,15 @@ public partial class Chat : ComponentBase, IAsyncDisposable
         }
     }
 
-
-    public async Task SendMessageAsync()
+    private async Task SendMessage()
     {
-        if (hubConnection is not null && !string.IsNullOrEmpty(ChatComponentModel.MessageInput))
+        if (hubConnection is not null && !string.IsNullOrEmpty(messageInput))
         {
             try
             {
                 await hubConnection.SendAsync("SendMessage", GameId.ToString(),
-                    currentUser.Claims.First(b => b.Type == ClaimTypes.NameIdentifier).Value, ChatComponentModel.MessageInput);
-                ChatComponentModel.MessageInput = string.Empty; // Clear input after sending
+                    currentUser.Claims.First(b => b.Type == ClaimTypes.NameIdentifier).Value, messageInput);
+                messageInput = string.Empty; // Clear input after sending
             }
             catch (Exception ex)
             {

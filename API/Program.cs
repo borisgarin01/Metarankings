@@ -8,7 +8,6 @@ using IdentityLibrary.Telegram;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
 using Settings;
-using System.Diagnostics;
 
 namespace API;
 
@@ -31,7 +30,7 @@ internal class Program
             ValidateAudience = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateAudience"]),
             ValidAudience = builder.Configuration["TokenValidationParameters:Audience"],
             ValidateLifetime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateLifetime"]),
-            ClockSkew = TimeSpan.FromHours(Convert.ToInt64(builder.Configuration["TokenValidationParameters:ClockSkew"])),
+            ClockSkew = TimeSpan.FromSeconds(Convert.ToInt64(builder.Configuration["TokenValidationParameters:ClockSkew"])),
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenValidationParameters:IssuerSigningKey"]))
         };
 
@@ -55,18 +54,17 @@ internal class Program
 
         builder.Services.AddAuthentication(options =>
         {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                builder.Configuration["AuthSettings:Secret"])),
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["AuthSettings:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["AuthSettings:Audience"],
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
-
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
+        }).AddJwtBearer(options =>
+        {
+            options.Authority = builder.Configuration["AuthSettings:Authority"];
+            options.Audience = builder.Configuration["AuthSettings:Audience"];
+            options.ClaimsIssuer = builder.Configuration["AuthSettings:Issuer"];
+            options.RequireHttpsMetadata = false;
+            options.TokenValidationParameters = tokenValidationParameters;
+            options.SaveToken = true;
+        });
 
         builder.Services.AddAuthorization(options =>
         {
@@ -77,11 +75,6 @@ internal class Program
             options.AddPolicy("AuthorizedWithEmailConfirmed", options =>
             {
                 options.RequireAuthenticatedUser();
-                options.RequireClaim("EmailConfirmed", true.ToString());
-            });
-            options.AddPolicy("AdminWithEmailConfirmed", options =>
-            {
-                options.RequireRole("Admin");
                 options.RequireClaim("EmailConfirmed", true.ToString());
             });
         });
@@ -122,9 +115,9 @@ internal class Program
 
         builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
             .AddJsonOptions(options =>
-         {
-             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-         });
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
 
         builder.Services.AddSignalR();
 
@@ -207,7 +200,7 @@ internal class Program
                 // Add SQLite support to FluentMigrator
                 .AddPostgres()
                 // Set the connection string
-                .WithGlobalConnectionString(configurationManager.GetConnectionString("MetarankingsConnection"))
+                .WithGlobalConnectionString(configurationManager.GetConnectionString("DockerPostgresConnection"))
                 // Define the assembly containing the migrations, maintenance migrations and other customizations
                 .ScanIn(typeof(CreateGamesTableMigration).Assembly, typeof(CreateApplicationRolesTableMigration).Assembly).For.Migrations())
             // Enable logging to console in the FluentMigrator way

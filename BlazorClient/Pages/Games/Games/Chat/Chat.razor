@@ -2,33 +2,25 @@
 
 <PageTitle>Chat</PageTitle>
 
-<AuthorizeView>
-    <Authorized>
-        @if (!IsConnected)
-        {
-            <p>Loading...</p>
-        }
-        else
-        {
-            <EditForm Model="ChatComponentModel" OnValidSubmit="SendMessageAsync" Context="myContext">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <InputText @bind-Value="ChatComponentModel.MessageInput" />
-                <input type="submit" value="Отправить" />
-            </EditForm>
+@if (!IsConnected)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="form-group" style="@sendMessageStyle">
+        <label>
+            Message:
+            <input @bind="messageInput" size="50" />
+        </label>
+        <button @onclick="SendMessage" disabled="@(!IsConnected)">Send</button>
+    </div>
+}
+<hr>
 
-            <hr>
-
-            <ul id="messagesList">
-                @foreach (var message in messages)
-                {
-                    <li>@message</li>
-                }
-            </ul>
-
-        }
-    </Authorized>
-    <NotAuthorized>
-        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a>, чтобы вступить в беседу
-    </NotAuthorized>
-</AuthorizeView>
+<ul id="messagesList">
+    @foreach (var message in messages)
+    {
+        <li>@message</li>
+    }
+</ul>

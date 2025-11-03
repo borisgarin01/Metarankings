@@ -19,17 +19,19 @@ public sealed class AuthController : ControllerBase
     private readonly TelegramAuthenticator _telegramAuthenticator;
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
+    private readonly IOptionsMonitor<AuthSettings> _authSettingsOptionsMonitor;
+    private readonly IOptionsMonitor<TokenValidationParameters> _tokenValidationParameters;
     private readonly IOptionsMonitor<EmailSettings> _emailSettings;
-    private readonly IOptionsMonitor<AuthSettings> _authSettings;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<AuthSettings> authSettings)
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters)
     {
         _configuration = configuration;
         _usersManager = usersManager;
         _telegramAuthenticator = telegramAuthenticator;
         _passwordHasher = passwordHasher;
         _logger = logger;
+        _authSettingsOptionsMonitor = authSettingsOptionsMonitor;
         _emailSettings = emailSettings;
-        _authSettings = authSettings;
+        _tokenValidationParameters = tokenValidationParameters;
     }
 
     [HttpPost("login")]
@@ -52,7 +54,7 @@ public sealed class AuthController : ControllerBase
         if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
 
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettings.CurrentValue.Secret));
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
 
         var userClaims = new List<Claim>();
@@ -64,7 +66,7 @@ public sealed class AuthController : ControllerBase
 
         userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
 
-        var tokenOptions = new JwtSecurityToken(issuer: _authSettings.CurrentValue.Issuer, audience: _authSettings.CurrentValue.Audience, userClaims, expires: DateTime.Now.AddHours(_authSettings.CurrentValue.TokenLifetimeHours), signingCredentials: signingCredentials);
+        var tokenOptions = new JwtSecurityToken(issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer, audience: _authSettingsOptionsMonitor.CurrentValue.Audience, userClaims, expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours), signingCredentials: signingCredentials);
 
         userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
 
@@ -136,7 +138,7 @@ public sealed class AuthController : ControllerBase
 
         if (userCreationResult.Succeeded)
         {
-            if (string.Equals(registerModel.UserEmail, _authSettings.CurrentValue.AdminEmail) && string.Equals(registerModel.Password, _authSettings.CurrentValue.AdminPassword))
+            if (string.Equals(registerModel.UserEmail, _authSettingsOptionsMonitor.CurrentValue.AdminEmail) && string.Equals(registerModel.Password, _authSettingsOptionsMonitor.CurrentValue.AdminPassword))
             {
                 ApplicationUser? userToBindToAdminRole = await _usersManager.FindByEmailAsync(user.Email);
                 IdentityResult addingToAdminRoleIdentityResult = await _usersManager.AddToRoleAsync(userToBindToAdminRole, "Admin");
@@ -145,6 +147,7 @@ public sealed class AuthController : ControllerBase
                     _logger.LogError($"Ошибка добавления к роли администратора. {string.Join(", ", addingToAdminRoleIdentityResult.Errors.Select(b => $"{b.Code}, {b.Description}"))}");
                 }
             }
+
             user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
             string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
