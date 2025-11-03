@@ -79,15 +79,6 @@ public sealed class GamesController : ControllerBase
         return Ok(game);
     }
 
-    [HttpGet("images/uploads/{year:int}/{month:int}/{image}")]
-    public async Task<IActionResult> GetImage(int year, int month, string image)
-    {
-        byte[]? file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}/images/uploads/{year}/{month}/{image}");
-        if (file is null)
-            return NotFound();
-        return File(file, "image/jpeg");
-    }
-
     [HttpGet("genres/{genreId:long}")]
     public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfGenre(long genreId)
     {

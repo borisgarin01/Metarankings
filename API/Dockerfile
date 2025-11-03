@@ -34,4 +34,5 @@ RUN dotnet publish "./API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:Use
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV ASPNETCORE_URLS="https://+:8081;http://+:8080"
 ENTRYPOINT ["dotnet", "API.dll"]

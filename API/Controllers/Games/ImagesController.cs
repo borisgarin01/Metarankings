@@ -49,9 +49,9 @@ public class ImagesController : ControllerBase
         {
             string pathToImage;
             if (year is not null && month is not null)
-                pathToImage = $"{_webHostEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}Games{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}Uploads{Path.DirectorySeparatorChar}{year}{Path.DirectorySeparatorChar}{month}{Path.DirectorySeparatorChar}{formFile.FileName}";
+                pathToImage = $"{_webHostEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}Games{Path.DirectorySeparatorChar}{year}{Path.DirectorySeparatorChar}{month}{Path.DirectorySeparatorChar}{formFile.FileName}";
             else
-                pathToImage = $"{_webHostEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}Games{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}Uploads{Path.DirectorySeparatorChar}{formFile.FileName}";
+                pathToImage = $"{_webHostEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}Games{Path.DirectorySeparatorChar}{formFile.FileName}";
 
             string imageFolder = Path.GetDirectoryName(pathToImage);
 
@@ -72,7 +72,7 @@ public class ImagesController : ControllerBase
     [HttpGet("{year:int}/{month:int}/{imagePath}")]
     public IActionResult GetImage(int year, int month, string imagePath)
     {
-        string pathToImage = $@"{_webHostEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}Games{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}Uploads{Path.DirectorySeparatorChar}{year}{Path.DirectorySeparatorChar}{month}{Path.DirectorySeparatorChar}{imagePath}";
+        string pathToImage = $"{_webHostEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}Games{Path.DirectorySeparatorChar}{year}{Path.DirectorySeparatorChar}{month}{Path.DirectorySeparatorChar}{imagePath}";
 
         if (!System.IO.File.Exists(pathToImage))
             return Problem(

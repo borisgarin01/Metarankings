@@ -5,6 +5,7 @@ using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 using IdentityLibrary.Telegram;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
 using Settings;
 using System.Diagnostics;
@@ -44,10 +45,15 @@ internal class Program
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole();
 
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            // Known networks for Docker
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
+
+        builder.Services.AddAuthentication(options =>
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
@@ -148,9 +154,9 @@ internal class Program
 
         builder.Services.AddSingleton<TelegramAuthenticator>();
 
-        builder.Services.AddHostedService<NotificationsBackgroundService>();
-
         var app = builder.Build();
+
+        app.UseForwardedHeaders();
 
         if (app.Environment.IsDevelopment())
         {
