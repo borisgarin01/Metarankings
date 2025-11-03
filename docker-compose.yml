@@ -25,6 +25,7 @@ services:
     image: ${DOCKER_REGISTRY-}api
     ports:
       - 8080:8080
+      - 8081:8081
     networks:
       - myAppNetwork
     build:
@@ -34,8 +35,13 @@ services:
       Db:
         condition: service_healthy
     environment:
+      - ASPNETCORE_URLS=https://+:8081;http://+:8080
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=UmbracoFuse8_2023!
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+      - ~/.aspnet/https:/https:ro
 volumes:
   postgres_data:
