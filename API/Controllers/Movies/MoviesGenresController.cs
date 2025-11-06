@@ -1,5 +1,4 @@
-﻿using Data.Repositories.Classes.Derived.Movies;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
 using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 
@@ -69,6 +68,33 @@ public class MoviesGenresController : ControllerBase
         }
 
         return BadRequest();
+    }
+
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    public async Task<ActionResult<MovieGenre>> DeleteAsync(long id)
+    {
+        try
+        {
+            MovieGenre movieGenre = await _moviesGenresRepository.GetAsync(id);
+
+            if (movieGenre is null)
+                return NotFound();
+
+            try
+            {
+                await _moviesGenresRepository.RemoveAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
     }
 }
 

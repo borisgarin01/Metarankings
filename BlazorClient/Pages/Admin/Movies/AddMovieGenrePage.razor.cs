@@ -11,8 +11,19 @@ public partial class AddMovieGenrePage : ComponentBase
     [Inject]
     public IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresManager { get; set; }
 
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+
     public async Task AddMovieGenreAsync()
     {
-        await MoviesGenresManager.AddAsync(new AddMovieGenreModel(Name));
+        HttpResponseMessage httpResponseMessage = await MoviesGenresManager.AddAsync(new AddMovieGenreModel(Name));
+        if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
+            NavigationManager.NavigateTo("/admin/movies/movies-genres/movies-genres-list");
+        else
+            if (httpResponseMessage is not null)
+            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

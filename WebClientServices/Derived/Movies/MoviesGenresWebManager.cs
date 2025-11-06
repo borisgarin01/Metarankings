@@ -2,6 +2,7 @@
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace WebManagers.Derived.Movies;
 
@@ -13,7 +14,7 @@ public sealed class MoviesGenresWebManager : WebManager, IWebManager<MovieGenre,
 
     public async Task<HttpResponseMessage> AddAsync(AddMovieGenreModel addMovieGenreModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddMovieGenreModel>("api/movies/moviesGenres", addMovieGenreModel);
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddMovieGenreModel>("/api/movies/moviesGenres", addMovieGenreModel);
         return httpResponseMessage;
     }
 
@@ -27,28 +28,36 @@ public sealed class MoviesGenresWebManager : WebManager, IWebManager<MovieGenre,
         throw new NotImplementedException();
     }
 
-    public Task<HttpResponseMessage> DeleteAsync(long id)
+    public async Task<HttpResponseMessage> DeleteAsync(long id)
     {
-        throw new NotImplementedException();
+        return await HttpClient.DeleteAsync($"/api/movies/moviesGenres/{id}");
     }
 
-    public Task<IEnumerable<MovieGenre>> GetAllAsync()
+    public async Task<IEnumerable<MovieGenre>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        IEnumerable<MovieGenre> moviesGenres = await HttpClient.GetFromJsonAsync<IEnumerable<MovieGenre>>("/api/movies/moviesGenres");
+        return moviesGenres;
     }
 
-    public Task<IEnumerable<MovieGenre>> GetAllAsync(long offset, long limit)
+    public async Task<IEnumerable<MovieGenre>> GetAllAsync(long offset, long limit)
     {
-        throw new NotImplementedException();
+        IEnumerable<MovieGenre> moviesGenres = await HttpClient.GetFromJsonAsync<IEnumerable<MovieGenre>>($"/api/movies/moviesGenres/{offset}/{limit}");
+        return moviesGenres;
     }
 
-    public Task<MovieGenre> GetAsync(long id)
+    public async Task<MovieGenre> GetAsync(long id)
     {
-        throw new NotImplementedException();
+        MovieGenre movieGenre = await HttpClient.GetFromJsonAsync<MovieGenre>($"/api/Movies/MoviesGenres/{id}");
+        return movieGenre;
     }
 
-    public Task<MovieGenre> UpdateAsync(long id, UpdateMovieGenreModel tUpdate)
+    public async Task<MovieGenre> UpdateAsync(long id, UpdateMovieGenreModel updateMovieGenreModel)
     {
-        throw new NotImplementedException();
+        var httpResponseMessage = await HttpClient.PutAsJsonAsync($"/api/Movies/MoviesGenres/{id}", updateMovieGenreModel);
+
+        if (httpResponseMessage.IsSuccessStatusCode)
+            return await JsonSerializer.DeserializeAsync<MovieGenre>(await httpResponseMessage.Content.ReadAsStreamAsync());
+
+        return null;
     }
 }
