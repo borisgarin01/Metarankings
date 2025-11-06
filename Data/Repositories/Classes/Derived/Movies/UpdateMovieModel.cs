@@ -1,4 +1,5 @@
 ﻿using Domain.RequestsModels.Movies.MoviesDirectors;
+using Domain.RequestsModels.Movies.MoviesGenres;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 

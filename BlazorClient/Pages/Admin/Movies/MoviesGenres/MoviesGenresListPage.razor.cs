@@ -1,5 +1,5 @@
 ﻿using Domain.Movies;
-using Domain.RequestsModels.Movies.MoviesDirectors;
+using Domain.RequestsModels.Movies.MoviesGenres;
 using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesGenres

@@ -10,6 +10,7 @@ using Domain.RequestsModels.Games.Localizations;
 using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Games.Publishers;
 using Domain.RequestsModels.Movies.MoviesDirectors;
+using Domain.RequestsModels.Movies.MoviesGenres;
 using Domain.Reviews;
 
 namespace API.IServiceCollectionExtensions;

@@ -1,5 +1,5 @@
 ﻿using Domain.Movies;
-using Domain.RequestsModels.Movies.MoviesDirectors;
+using Domain.RequestsModels.Movies.MoviesGenres;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
