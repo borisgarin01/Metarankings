@@ -2,7 +2,7 @@
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using WebManagers;
 
-namespace BlazorClient.Pages.Admin.Movies
+namespace BlazorClient.Pages.Admin.Movies.MoviesGenres
 {
     public partial class RemoveMovieGenrePage : ComponentBase
     {
