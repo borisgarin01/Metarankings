@@ -1,7 +1,6 @@
 ﻿@page "/admin/movies/movies-genres/add-movie-genre"
 
-<h3>AddMovieGenrePage</h3>
-
-@code {
-
-}
+<form method="post" @onsubmit="@AddMovieGenreAsync">
+    <input type="text" @bind-value="@Name" />
+    <button type="submit">Add</button>
+</form>

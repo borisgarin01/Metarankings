@@ -1,14 +1,20 @@
 ﻿using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Microsoft.AspNetCore.Http;
+using System.Net.Http.Json;
 
 namespace WebManagers.Derived.Movies;
 
-public sealed class MoviesGenresWebManager : IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>
+public sealed class MoviesGenresWebManager : WebManager, IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>
 {
-    public Task<HttpResponseMessage> AddAsync(AddMovieGenreModel tAdd)
+    public MoviesGenresWebManager(HttpClient httpClient) : base(httpClient)
     {
-        throw new NotImplementedException();
+    }
+
+    public async Task<HttpResponseMessage> AddAsync(AddMovieGenreModel addMovieGenreModel)
+    {
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddMovieGenreModel>("api/movies/moviesGenres", addMovieGenreModel);
+        return httpResponseMessage;
     }
 
     public Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile)

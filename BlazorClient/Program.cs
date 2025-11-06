@@ -36,6 +36,7 @@ internal class Program
         builder.Services.AddScoped<IWebManager<Game, AddGameModel, UpdateGameModel>, GamesWebManager>();
 
         builder.Services.AddScoped<IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsWebManager>();
+        builder.Services.AddScoped<IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>();
 
 
         builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();

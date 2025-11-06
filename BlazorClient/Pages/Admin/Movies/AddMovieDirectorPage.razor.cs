@@ -9,10 +9,10 @@ public partial class AddMovieDirectorPage : ComponentBase
     public string Name { get; set; }
 
     [Inject]
-    public IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> MovieDirectorManager { get; set; }
+    public IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> MoviesDirectorsManager { get; set; }
 
     public async Task AddMovieDirectorAsync()
     {
-        await MovieDirectorManager.AddAsync(new AddMovieDirectorModel(Name));
+        await MoviesDirectorsManager.AddAsync(new AddMovieDirectorModel(Name));
     }
 }
