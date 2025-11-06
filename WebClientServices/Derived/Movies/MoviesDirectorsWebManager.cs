@@ -1,8 +1,8 @@
-﻿
-using Domain.Movies;
+﻿using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace WebManagers.Derived.Movies;
 
@@ -28,28 +28,35 @@ public sealed class MoviesDirectorsWebManager : WebManager, IWebManager<MovieDir
         throw new NotImplementedException();
     }
 
-    public Task<HttpResponseMessage> DeleteAsync(long id)
+    public async Task<HttpResponseMessage> DeleteAsync(long id)
     {
-        throw new NotImplementedException();
+        HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"api/movies/moviesDirectors/{id}");
+        return httpResponseMessage;
     }
 
-    public Task<IEnumerable<MovieDirector>> GetAllAsync()
+    public async Task<IEnumerable<MovieDirector>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        var moviesDirectors = await HttpClient.GetFromJsonAsync<IEnumerable<MovieDirector>>("api/movies/moviesDirectors");
+        return moviesDirectors;
     }
 
-    public Task<IEnumerable<MovieDirector>> GetAllAsync(long offset, long limit)
+    public async Task<IEnumerable<MovieDirector>> GetAllAsync(long offset, long limit)
     {
-        throw new NotImplementedException();
+        var moviesDirectors = await HttpClient.GetFromJsonAsync<IEnumerable<MovieDirector>>($"api/movies/moviesDirectors/{offset}/{limit}");
+        return moviesDirectors;
     }
 
-    public Task<MovieDirector> GetAsync(long id)
+    public async Task<MovieDirector> GetAsync(long id)
     {
-        throw new NotImplementedException();
+        var movieDirector = await HttpClient.GetFromJsonAsync<MovieDirector>($"api/movies/moviesDirectors/{id}");
+        return movieDirector;
     }
 
-    public Task<MovieDirector> UpdateAsync(long id, UpdateMovieDirectorModel tUpdate)
+    public async Task<MovieDirector> UpdateAsync(long id, UpdateMovieDirectorModel updateMovieDirectorModel)
     {
-        throw new NotImplementedException();
+        HttpResponseMessage updateMovieDirectorHttpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateMovieDirectorModel>($"api/movies/moviesDirectors/{id}", updateMovieDirectorModel);
+        if (updateMovieDirectorHttpResponseMessage.IsSuccessStatusCode)
+            return await JsonSerializer.DeserializeAsync<MovieDirector>(await updateMovieDirectorHttpResponseMessage.Content.ReadAsStreamAsync());
+        return null;
     }
 }
