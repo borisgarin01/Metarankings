@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace WebManagers.Derived;
+namespace WebManagers.Derived.Games;
 
 public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel, UpdateGameModel>
 {
@@ -14,7 +14,7 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
 
     public async Task<HttpResponseMessage> AddAsync(AddGameModel addGameModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddGameModel>("/api/Games/Games", addGameModel);
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Games", addGameModel);
         return httpResponseMessage;
     }
 
@@ -55,7 +55,7 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
 
     public async Task<Game> UpdateAsync(long id, UpdateGameModel updateGameModel)
     {
-        HttpResponseMessage publisherUpdateHttpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateGameModel>($"/api/Games/Games/{id}", updateGameModel);
+        HttpResponseMessage publisherUpdateHttpResponseMessage = await HttpClient.PutAsJsonAsync($"/api/Games/Games/{id}", updateGameModel);
         if (publisherUpdateHttpResponseMessage.IsSuccessStatusCode)
             return await JsonSerializer.DeserializeAsync<Game>(await publisherUpdateHttpResponseMessage.Content.ReadAsStreamAsync());
         return null;

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace WebManagers.Derived;
+namespace WebManagers.Derived.Games;
 
 public sealed class PlatformsWebManager : WebManager, IWebManager<Platform, AddPlatformModel, UpdatePlatformModel>
 {

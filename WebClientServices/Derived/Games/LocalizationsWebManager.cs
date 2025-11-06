@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace WebManagers.Derived;
+namespace WebManagers.Derived.Games;
 
 public sealed class LocalizationsWebManager : WebManager, IWebManager<Localization, AddLocalizationModel, UpdateLocalizationModel>
 {
@@ -57,7 +57,7 @@ public sealed class LocalizationsWebManager : WebManager, IWebManager<Localizati
 
     public async Task<Localization> UpdateAsync(long id, UpdateLocalizationModel tUpdate)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateLocalizationModel>($"/api/Games/Localizations/{id}", tUpdate);
+        HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync($"/api/Games/Localizations/{id}", tUpdate);
         if (httpResponseMessage.IsSuccessStatusCode)
         {
             return await JsonSerializer.DeserializeAsync<Localization>(await httpResponseMessage.Content.ReadAsStreamAsync());

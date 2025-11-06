@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace WebManagers.Derived;
+namespace WebManagers.Derived.Games;
 
 public sealed class PublishersWebManager : WebManager, IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel>
 {
@@ -14,7 +14,7 @@ public sealed class PublishersWebManager : WebManager, IWebManager<Publisher, Ad
 
     public async Task<HttpResponseMessage> AddAsync(AddPublisherModel addPublisherModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddPublisherModel>("/api/Games/Publishers", addPublisherModel);
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Publishers", addPublisherModel);
         return httpResponseMessage;
     }
 
@@ -55,7 +55,7 @@ public sealed class PublishersWebManager : WebManager, IWebManager<Publisher, Ad
 
     public async Task<Publisher> UpdateAsync(long id, UpdatePublisherModel updatePublisherModel)
     {
-        HttpResponseMessage publisherUpdateHttpResponseMessage = await HttpClient.PutAsJsonAsync<UpdatePublisherModel>($"/api/Games/Publishers/{id}", updatePublisherModel);
+        HttpResponseMessage publisherUpdateHttpResponseMessage = await HttpClient.PutAsJsonAsync($"/api/Games/Publishers/{id}", updatePublisherModel);
         if (publisherUpdateHttpResponseMessage.IsSuccessStatusCode)
             return await JsonSerializer.DeserializeAsync<Publisher>(await publisherUpdateHttpResponseMessage.Content.ReadAsStreamAsync());
         return null;

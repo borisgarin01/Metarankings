@@ -1,7 +1,6 @@
 ﻿@page "/admin/movies/movies-directors/add-movie-director"
 
-<h3>AddMovieDirectorPage</h3>
-
-@code {
-
-}
+<form method="post" @onsubmit="@AddMovieDirectorAsync">
+    <input type="text" @bind-value="@Name" />
+    <button type="submit">Add</button>
+</form>
