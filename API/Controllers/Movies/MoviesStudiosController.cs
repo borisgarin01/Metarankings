@@ -27,10 +27,35 @@ public sealed class MoviesStudiosController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult<MovieStudio>> AddAsync(AddMovieStudioModel movieStudio)
     {
-        var createdMovieStudioId = await _moviesStudiosRepository.AddAsync(movieStudio);
+        long createdMovieStudioId = await _moviesStudiosRepository.AddAsync(movieStudio);
 
-        var createdMovieStudio = await _moviesStudiosRepository.GetAsync(createdMovieStudioId);
+        MovieStudio createdMovieStudio = await _moviesStudiosRepository.GetAsync(createdMovieStudioId);
 
         return Created($"/api/movies/moviesStudios/{createdMovieStudioId}", createdMovieStudio);
+    }
+
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    public async Task<ActionResult> DeleteAsync(long id)
+    {
+        MovieStudio movieStudio = await _moviesStudiosRepository.GetAsync(id);
+
+        if (movieStudio is null)
+            return NotFound();
+
+        await _moviesStudiosRepository.RemoveAsync(id);
+        return NoContent();
+    }
+
+    [HttpGet("{id:long}")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    public async Task<ActionResult<MovieStudio>> GetAsync(long id)
+    {
+        MovieStudio movieStudio = await _moviesStudiosRepository.GetAsync(id);
+
+        if (movieStudio is null)
+            return NotFound();
+
+        return Ok(movieStudio);
     }
 }

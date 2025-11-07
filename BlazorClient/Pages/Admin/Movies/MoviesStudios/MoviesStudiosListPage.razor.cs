@@ -4,9 +4,9 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesStudios;
 
-public partial class AddMovieStudioPage : ComponentBase
+public partial class MoviesStudiosListPage : ComponentBase
 {
-    public string Name { get; set; }
+    public IEnumerable<MovieStudio> MoviesStudios { get; private set; }
 
     [Inject]
     public IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel> MoviesStudiosManager { get; set; }
@@ -17,10 +17,8 @@ public partial class AddMovieStudioPage : ComponentBase
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
 
-    public async Task AddMovieStudioAsync()
+    protected override async Task OnInitializedAsync()
     {
-        await MoviesStudiosManager.AddAsync(new AddMovieStudioModel(Name));
-
-        NavigationManager.NavigateTo("/admin/movies/movies-studios/movies-studios-list");
+        MoviesStudios = await MoviesStudiosManager.GetAllAsync();
     }
 }

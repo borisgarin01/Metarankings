@@ -3,6 +3,7 @@
 <AuthorizeView Policy="Admin">
     <Authorized>
         <EditForm Model="AddDeveloperModel" OnValidSubmit="AddDeveloperAsync" Context="myContext">
+            <a href="/admin/games/developers/list-developers" class="list-group-item link-dark">Разработчики</a>
             <DataAnnotationsValidator />
             <ValidationSummary />
             <InputText @bind-Value="AddDeveloperModel.Name" />

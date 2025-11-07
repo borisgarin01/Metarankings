@@ -3,6 +3,7 @@
 <AuthorizeView Policy="Admin">
     <Authorized>
         <EditForm Model="AddPlatformModel" OnValidSubmit="AddPlatformAsync" Context="myContext">
+            <a href="/admin/games/platforms/list-platforms" class="list-group-item link-dark">Платформы</a>
             <DataAnnotationsValidator />
             <ValidationSummary />
             <InputText @bind-Value="AddPlatformModel.Name" />

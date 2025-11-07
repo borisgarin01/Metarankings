@@ -9,6 +9,7 @@ using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Games.Publishers;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Domain.RequestsModels.Movies.MoviesGenres;
+using Domain.RequestsModels.Movies.MoviesStudios;
 using WebManagers;
 using WebManagers.Derived.Games;
 using WebManagers.Derived.Movies;
@@ -38,6 +39,7 @@ internal class Program
 
         builder.Services.AddScoped<IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsWebManager>();
         builder.Services.AddScoped<IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>();
+        builder.Services.AddScoped<IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosWebManager>();
 
 
         builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();

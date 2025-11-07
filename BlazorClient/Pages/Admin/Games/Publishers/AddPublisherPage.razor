@@ -3,6 +3,7 @@
 <AuthorizeView Policy="Admin">
     <Authorized>
         <EditForm Model="AddPublisherModel" OnValidSubmit="AddPublisherAsync" Context="myContext">
+            <a href="/admin/games/publishers/list-publishers" class="list-group-item link-dark">Издатели</a>
             <DataAnnotationsValidator />
             <ValidationSummary />
             <InputText @bind-Value="AddPublisherModel.Name" />
