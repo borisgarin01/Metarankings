@@ -1,0 +1,29 @@
+﻿@page "/admin/movies/movies/movies-list"
+@using Domain.Movies
+
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        <a href="/admin/movies/movies/add-movie">Добавить фильм</a>
+        <div class="moviesList">
+            @if (Movies is null)
+            {
+                <p>Загружается...</p>
+            }
+            else
+            {
+                foreach (Movie movie in Movies)
+                {
+                    <div class="movie">
+                        <h4>@movie.Name</h4>
+                        <a href="/admin/movies/remove-movie/@movie.Id">Remove movie</a>
+                        <a href="/games/Details/@movie.Id">Details</a>
+                    </div>
+                }
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a>, чтобы добавить игру
+    </NotAuthorized>
+</AuthorizeView>
+
