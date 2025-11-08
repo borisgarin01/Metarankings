@@ -634,7 +634,7 @@ WHERE Id=@id", new { id });
             var sql = @"WITH FilteredGames AS (
     SELECT DISTINCT g.id
     FROM games g
-    WHERE year (g.ReleaseDate) = @year
+    WHERE EXTRACT(year from g.ReleaseDate) = @year
 )
 SELECT
     g.Id, g.Name, g.Image, g.ReleaseDate, g.Description,
