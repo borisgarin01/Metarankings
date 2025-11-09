@@ -19,9 +19,9 @@ public class ImagesController : ControllerBase
         _baseImagesPath = Path.Combine(_webHostEnvironment.ContentRootPath, "Games");
     }
 
-    [HttpPost("{year:int}/{month:int}/{imageName}")]
+    [HttpPost("{year:int}/{month:int}/{name}")]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int year, int month, string imageName)
+    public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int year, int month, string name)
     {
         // Validate file type
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".svg", ".gif", ".tiff", ".webp", ".bmp", ".heif" };
@@ -53,7 +53,7 @@ public class ImagesController : ControllerBase
             }
 
             // Use the provided imageName but keep the original extension
-            var fileName = $"{Path.GetFileNameWithoutExtension(imageName)}{fileExtension}";
+            var fileName = $"{Path.GetFileNameWithoutExtension(name)}{fileExtension}";
             var fullPath = Path.Combine(yearMonthPath, fileName);
 
             // Save the file

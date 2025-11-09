@@ -14,3 +14,5 @@ BlazorClient/Properties/PublishProfiles
 BlazorClient/bin
 bin
 *.sln
+API/Movies/Images
+API/Games/Images

@@ -13,7 +13,7 @@ public sealed class CreateMoviesTableMigration : Migration
         Execute.Sql(@"CREATE TABLE Movies 
 (Id bigserial not null primary key,
 Name varchar(255) not null unique,
-ImageSource varchar(1023) null unique,
+ImageSource text null unique,
 OriginalName varchar(255) not null unique,
 PremierDate date not null,
 Description varchar(1023) null);");

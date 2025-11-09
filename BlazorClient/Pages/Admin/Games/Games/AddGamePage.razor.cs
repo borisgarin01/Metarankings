@@ -68,8 +68,11 @@ public partial class AddGamePage : ComponentBase
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
                 content.Add(fileContent, "formFile", ImageToUpload.Name);
 
+                string uploadingImageName = Uri.EscapeDataString(Path.GetRandomFileName());
+                string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
+
                 // Build the URL with parameters
-                var url = $"api/games/images/{ReleaseDate.Year}/{ReleaseDate.Month}/{Uri.EscapeDataString(ImageToUpload.Name)}";
+                var url = $"api/games/images/{ReleaseDate.Year}/{ReleaseDate.Month}/{uploadingImageName}";
 
                 // Send the request with authentication token
                 var response = await HttpClient.PostAsync(url, content);
@@ -79,7 +82,7 @@ public partial class AddGamePage : ComponentBase
                     // Extract the URL from the response
                     var responseContent = await response.Content.ReadAsStringAsync();
 
-                    var addGameModel = new AddGameModel(Name, ImageToUpload.Name, SelectedDevelopersIds, SelectedPublisherId, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
+                    var addGameModel = new AddGameModel(Name, uploadingFileNameWithCorrectExtention, SelectedDevelopersIds, SelectedPublisherId, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
 
                     HttpResponseMessage addingGameResponseMessage = await GetWebManager.AddAsync(addGameModel);
 

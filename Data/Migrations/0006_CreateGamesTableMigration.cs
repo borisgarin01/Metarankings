@@ -13,7 +13,7 @@ public sealed class CreateGamesTableMigration : Migration
         Execute.Sql(@"CREATE TABLE Games
 (Id bigserial not null primary key,
 Name varchar(1023) not null unique,
-Image varchar(1023) null unique,
+Image text null unique,
 LocalizationId bigint null,
 PublisherId bigint not null,
 ReleaseDate date null,

@@ -28,7 +28,7 @@
             <p>
                 <label>
                     Enter premier date:
-                    <input @bind="@PremierDate" />
+                    <input type="date" @bind="@PremierDate" />
                 </label>
             </p>
             <p>
@@ -40,7 +40,7 @@
             <p>
                 <label>
                     Select movie director:
-                    <select @onchange="SelectMovieDirector">
+                    <select @onchange="SelectMovieDirector" multiple>
                         <option value="-1" selected>None</option>
                         @foreach (MovieDirector movieDirector in MoviesDirectorsToSelectFrom)
                         {
@@ -52,7 +52,7 @@
             <p>
                 <label>
                     Select movie genre:
-                    <select @onchange="SelectMovieGenre">
+                    <select @onchange="SelectMovieGenre" multiple>
                         <option value="-1" selected>None</option>
                         @foreach (MovieGenre movieGenre in MoviesGenresToSelectFrom)
                         {
@@ -64,7 +64,7 @@
             <p>
                 <label>
                     Select movie studio:
-                    <select @onchange="SelectMovieStudio">
+                    <select @onchange="SelectMovieStudio" multiple>
                         <option value="-1" selected>None</option>
                         @foreach (MovieStudio movieStudio in MoviesStudiosToSelectFrom)
                         {
@@ -83,6 +83,6 @@
                 </div>
             </p>
         }
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Submit" @onclick="@AddMovieAsync" />
     </Authorized>
 </AuthorizeView>

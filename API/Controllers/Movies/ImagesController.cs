@@ -1,4 +1,5 @@
 ﻿using IdentityLibrary.Telegram;
+using SixLabors.ImageSharp;
 
 namespace API.Controllers.Movies;
 
@@ -7,64 +8,72 @@ namespace API.Controllers.Movies;
 public class ImagesController : ControllerBase
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
-
     private readonly TelegramAuthenticator _telegramAuthenticator;
+    private readonly string _baseImagesPath;
 
     public ImagesController(IWebHostEnvironment webHostEnvironment, TelegramAuthenticator telegramAuthenticator)
     {
         _webHostEnvironment = webHostEnvironment;
         _telegramAuthenticator = telegramAuthenticator;
+
+        // Use a consistent base path for images
+        _baseImagesPath = Path.Combine(_webHostEnvironment.ContentRootPath, "Movies");
     }
 
-    [HttpPost("{year:int}/{month:int}/{imagePath}")]
+    [HttpPost("{year:int}/{month:int}/{imageName}")]
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int? year, int? month, string imagePath)
+    public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int? year, int? month, string imageName)
     {
-        //JPEG, PNG, GIF, TIFF, WebP, SVG, BMP, and HEIF
+        // Validate file type
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".svg", ".gif", ".tiff", ".webp", ".bmp", ".heif" };
+        var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
 
-        if (!formFile.FileName.EndsWith(".jpg")
-            && !formFile.FileName.EndsWith(".png")
-            && !formFile.FileName.EndsWith(".svg")
-            && !formFile.FileName.EndsWith(".jpeg")
-            && !formFile.FileName.EndsWith(".gif")
-            && !formFile.FileName.EndsWith(".tiff")
-            && !formFile.FileName.EndsWith(".webp")
-            && !formFile.FileName.EndsWith(".bmp")
-            && !formFile.FileName.EndsWith(".heif"))
-
-            return Problem(title: "Wrong image format",
-            detail: $"Image {formFile.FileName} has wrong format.{Environment.NewLine}Available formats: .jpg, .png, .svg, .jpeg, .gif, .tiff, .webp, .bmp, .heif",
-            statusCode: StatusCodes.Status400BadRequest);
-
-        if (string.IsNullOrWhiteSpace(imagePath))
-            return Problem(
-                title: "Image path is null or white space",
-                detail: "Image path is null or white space",
-                statusCode: StatusCodes.Status422UnprocessableEntity
-                );
-
-        if (formFile.Length > 0)
+        if (!allowedExtensions.Contains(fileExtension))
         {
-            string pathToImage;
-            if (year is not null && month is not null)
-                pathToImage = $"{_webHostEnvironment.WebRootPath}{Path.DirectorySeparatorChar}Movies{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}{year}{Path.DirectorySeparatorChar}{month}{Path.DirectorySeparatorChar}{formFile.FileName}";
-            else
-                pathToImage = $"{_webHostEnvironment.WebRootPath}{Path.DirectorySeparatorChar}Movies{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}{formFile.FileName}";
+            return Problem(
+                title: "Wrong image format",
+                detail: $"Image {formFile.FileName} has wrong format.{Environment.NewLine}Available formats: {string.Join(", ", allowedExtensions)}",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
 
-            string imageFolder = Path.GetDirectoryName(pathToImage);
+        if (formFile.Length == 0)
+        {
+            return Problem(
+                title: "Empty file",
+                detail: "Form file length is 0",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
 
-            if (!Directory.Exists(imageFolder))
-                Directory.CreateDirectory(imageFolder);
+        try
+        {
+            // Create directory structure
+            var yearMonthPath = Path.Combine(_baseImagesPath, year.ToString(), month.ToString());
+            if (!Directory.Exists(yearMonthPath))
+            {
+                Directory.CreateDirectory(yearMonthPath);
+            }
 
-            using (var fileStream = new FileStream($"{imageFolder}{Path.DirectorySeparatorChar}{formFile.FileName}", FileMode.Create))
+            // Use the provided imageName but keep the original extension
+            var fileName = $"{Path.GetFileNameWithoutExtension(imageName)}{fileExtension}";
+            var fullPath = Path.Combine(yearMonthPath, fileName);
+
+            // Save the file
+            using (var fileStream = new FileStream(fullPath, FileMode.Create))
             {
                 await formFile.CopyToAsync(fileStream);
             }
 
-            return Created($"api/Movies/images/{formFile.FileName}", formFile);
+            // Return the URL to access the image
+            var imageUrl = Url.Action("GetImage", new { year, month, imagePath = fileName });
+            return Created(imageUrl, new { fileName, size = formFile.Length, url = imageUrl });
         }
-
-        return Problem(title: "Form file length == 0", detail: "Form file length == 0", statusCode: StatusCodes.Status400BadRequest);
+        catch (Exception ex)
+        {
+            return Problem(
+                title: "Error saving image",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
     }
 
     [HttpGet("{year:int}/{month:int}/{imagePath}")]

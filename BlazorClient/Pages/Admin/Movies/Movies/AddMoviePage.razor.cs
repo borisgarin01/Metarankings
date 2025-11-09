@@ -73,15 +73,7 @@ public sealed partial class AddMoviePage : ComponentBase
     public IEnumerable<long> SelectedMoviesGenresIds { get; private set; }
     public IEnumerable<long> SelectedMoviesStudiosIds { get; private set; }
 
-
-
     public IBrowserFile ImageToUpload { get; private set; }
-
-
-    public async Task AddMovie()
-    {
-        await JSRuntime.InvokeVoidAsync("alert", "Submit");
-    }
 
     private Task SelectMovieDirector(ChangeEventArgs e)
     {
@@ -141,8 +133,11 @@ public sealed partial class AddMoviePage : ComponentBase
             fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
             content.Add(fileContent, "formFile", ImageToUpload.Name);
 
+            string uploadingImageName = Uri.EscapeDataString(Path.GetRandomFileName());
+            string uploadingFileNameWithCorrectExtension=Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
+
             // Build the URL with parameters
-            var url = $"api/movies/images/{PremierDate.Value.Year}/{PremierDate.Value.Month}/{Uri.EscapeDataString(ImageToUpload.Name)}";
+            var url = $"api/movies/images/{PremierDate.Value.Year}/{PremierDate.Value.Month}/{uploadingImageName}";
 
             // Send the request with authentication token
             var response = await HttpClient.PostAsync(url, content);
@@ -152,7 +147,7 @@ public sealed partial class AddMoviePage : ComponentBase
                 // Extract the URL from the response
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                var addGameModel = new AddMovieModel(Name, OriginalName, Description, ImageSource, PremierDate.Value, SelectedMoviesDirectorsIds, SelectedMoviesGenresIds, SelectedMoviesStudiosIds);
+                var addGameModel = new AddMovieModel(Name, OriginalName, Description, uploadingFileNameWithCorrectExtension, PremierDate.Value, SelectedMoviesDirectorsIds, SelectedMoviesGenresIds, SelectedMoviesStudiosIds);
 
                 HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addGameModel);
 

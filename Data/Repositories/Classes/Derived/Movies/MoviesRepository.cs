@@ -1,9 +1,7 @@
-﻿using Data.Repositories.Interfaces;
-using Data.Repositories.Interfaces.Derived;
+﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 public sealed class MoviesRepository : Repository, IMoviesRepository
