@@ -201,11 +201,11 @@ WHERE loc.Id = @id",
             var result = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
             SELECT 
                 loc.Id, loc.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer,
                 p.Id, p.Name,
                 d.Id, d.Name,
-                pub.Id, pub.Name
+                publ.Id, publ.Name
             FROM Localizations loc
             LEFT JOIN Games g ON g.LocalizationId = loc.Id AND g.Id IN (
                 SELECT GameId FROM GamesPlatforms WHERE PlatformId = @platformId
@@ -214,7 +214,8 @@ WHERE loc.Id = @id",
             LEFT JOIN Platforms p ON p.Id = gp.PlatformId
             LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
             LEFT JOIN Developers d ON d.Id = gd.DeveloperId
-            LEFT JOIN Publishers pub ON pub.Id = g.PublisherId
+            LEFT JOIN GamesPublishers gpubl ON gpubl.GameId = g.Id
+            LEFT JOIN Publishers publ on publ.Id = gpubl.PublisherId
             WHERE loc.Id = @id",
                 (loc, game, platform, developer, publisher) =>
                 {
