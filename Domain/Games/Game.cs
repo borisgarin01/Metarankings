@@ -15,10 +15,8 @@ public sealed record Game
     [JsonPropertyName("image")]
     public required string Image { get; set; }
 
-    [JsonPropertyName("publisherId")]
-    public required long PublisherId { get; set; }
-    [JsonPropertyName("publisher")]
-    public required Publisher Publisher { get; set; }
+    [JsonPropertyName("publishers")]
+    public required List<Publisher> Publishers { get; set; } = new();
 
     [JsonPropertyName("releaseDate")]
     public required DateTime? ReleaseDate { get; set; }

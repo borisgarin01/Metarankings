@@ -22,15 +22,14 @@ public sealed class GamesRepository : Repository, IRepository<Game, AddGameModel
             using (var transaction = connection.BeginTransaction())
             {
                 var insertedGame = await connection.QueryFirstAsync<Game>(@"INSERT INTO Games 
-(Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer) 
+(Name, Image, LocalizationId, ReleaseDate, Description, Trailer) 
 VALUES
-(@Name, @Image, @LocalizationId, @PublisherId, @ReleaseDate, @Description, @Trailer)
-RETURNING Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description, Trailer;", new
+(@Name, @Image, @LocalizationId, @ReleaseDate, @Description, @Trailer)
+RETURNING Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer;", new
                 {
                     entity.Name,
                     entity.Image,
                     entity.LocalizationId,
-                    entity.PublisherId,
                     ReleaseDate = entity.ReleaseDate.Value,
                     entity.Description,
                     entity.Trailer
@@ -38,11 +37,16 @@ RETURNING Id, Name, Image, LocalizationId, PublisherId, ReleaseDate, Description
 
                 foreach (var genreId in entity.GenresIds)
                 {
-                    {
-                        var insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(@"INSERT INTO GamesGenres (GameId, GenreId) 
+                    var insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(@"INSERT INTO GamesGenres (GameId, GenreId) 
 VALUES (@GameId, @GenreId)
 RETURNING Id, GameId, GenreId;", new { GameId = insertedGame.Id, GenreId = genreId }, transaction: transaction);
-                    }
+                }
+
+                foreach (var publisherId in entity.PublishersIds)
+                {
+                    var insertedGamePublisher = await connection.QueryFirstAsync<GamePublisher>(@"INSERT INTO GamesPublishers (GameId, PublisherId) 
+VALUES (@GameId, @PublisherId)
+RETURNING GameId, PublisherId;", new { GameId = insertedGame.Id, PublisherId = publisherId }, transaction: transaction);
                 }
 
                 foreach (var platformId in entity.PlatformsIds)
@@ -85,17 +89,18 @@ gen.id, gen.name,
 l.id, l.name,
 plat.id, plat.name, 
 gs.Id, gs.GameId, gs.ImageUrl
-    FROM (select Id, Name, Image, ReleaseDate, Description, PublisherId, LocalizationId 
+    FROM (select Id, Name, Image, ReleaseDate, Description, LocalizationId 
         from Games ORDER BY id asc
         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
-    LEFT JOIN publishers p ON p.id = g.publisherid
+    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+    LEFT JOIN publishers p on p.id = gpub.publisherid
     LEFT JOIN gamesgenres gg ON gg.gameid = g.id
     LEFT JOIN genres gen ON gen.id = gg.genreid
     LEFT JOIN localizations l ON l.id = g.localizationid
-    LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gplatf.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id";
 
             var gameDictionary = new Dictionary<long, Game>();
@@ -117,8 +122,8 @@ gs.Id, gs.GameId, gs.ImageUrl
                     if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
                         gameEntry.Developers.Add(developer);
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
 
                     if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
                         gameEntry.Genres.Add(genre);
@@ -154,17 +159,18 @@ d.id, d.name,
 p.id, p.name, 
 gen.id, gen.name, 
 l.id, l.name,
-plat.id, plat.name, 
+platf.id, platf.name, 
 gs.id, gs.gameid, gs.imageUrl
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
-    LEFT JOIN publishers p ON p.id = g.publisherid
+    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+    LEFT JOIN publishers p on p.id = gpub.publisherid
     LEFT JOIN gamesgenres gg ON gg.gameid = g.id
     LEFT JOIN genres gen ON gen.id = gg.genreid
     LEFT JOIN localizations l ON l.id = g.localizationid
-    LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms platf ON platf.id = gplatf.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id";
 
             var gameDictionary = new Dictionary<string, Game>();
@@ -180,14 +186,15 @@ gs.id, gs.gameid, gs.imageUrl
                         gameEntry.Genres = new List<Genre>();
                         gameEntry.Platforms = new List<Platform>();
                         gameEntry.Screenshots = new List<GameScreenshot>();
+                        gameEntry.Publishers = new List<Publisher>();
                         gameDictionary.Add(gameEntry.Name, gameEntry);
                     }
 
                     if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
                         gameEntry.Developers.Add(developer);
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
 
                     if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
                         gameEntry.Genres.Add(genre);
@@ -220,21 +227,22 @@ gs.id, gs.gameid, gs.imageUrl
 g.Id, g.name, g.image, g.releasedate, g.description,
 d.id, d.name, 
 p.id, p.name, 
-gen.id, gen.name,
+gen.id, gen.name, 
 l.id, l.name,
-plat.id, plat.name,
-gs.Id, gs.GameId, gs.ImageUrl,
+platf.id, platf.name, 
+gs.id, gs.gameid, gs.imageUrl,
 gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
 au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
-    LEFT JOIN publishers p ON p.id = g.publisherid
+    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+    LEFT JOIN publishers p on p.id = gpub.publisherid
     LEFT JOIN gamesgenres gg ON gg.gameid = g.id
     LEFT JOIN genres gen ON gen.id = gg.genreid
     LEFT JOIN localizations l ON l.id = g.localizationid
-    LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms platf ON platf.id = gplatf.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
     LEFT JOIN GamesPlayersReviews gpr on gpr.gameid=g.Id
     LEFT JOIN ApplicationUsers au on au.Id=gpr.UserId
@@ -254,14 +262,15 @@ WHERE g.Id=@id";
                         gameEntry.Platforms = new List<Platform>();
                         gameEntry.Screenshots = new List<GameScreenshot>();
                         gameEntry.GamesPlayersReviews = new List<GameReview>();
+                        gameEntry.Publishers = new List<Publisher>();
                         gameDictionary.Add(gameEntry.Name, gameEntry);
                     }
 
                     if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
                         gameEntry.Developers.Add(developer);
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
 
                     if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
                         gameEntry.Genres.Add(genre);
@@ -312,15 +321,16 @@ SELECT
     plat.id, plat.name,
     gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+    LEFT JOIN publishers p on p.id = gp.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
@@ -342,8 +352,8 @@ ORDER BY g.id, gen.id;";
                     if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
                         gameEntry.Developers.Add(developer);
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
 
                     if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
                         gameEntry.Genres.Add(genre);
@@ -388,15 +398,16 @@ SELECT
     plat.id, plat.name,
     gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+    LEFT JOIN publishers p on p.id = gp.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
@@ -419,8 +430,8 @@ ORDER BY g.id, gen.id;";
                     if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
                         gameEntry.Developers.Add(developer);
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
 
                     if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
                         gameEntry.Genres.Add(genre);
@@ -465,15 +476,16 @@ SELECT
     plat.id, plat.name,
     gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+    LEFT JOIN publishers p on p.id = gp.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
@@ -496,8 +508,8 @@ ORDER BY g.id, gen.id;";
                     if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
                         gameEntry.Developers.Add(developer);
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
 
                     if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
                         gameEntry.Genres.Add(genre);
@@ -542,15 +554,16 @@ SELECT
     plat.id, plat.name,
     gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+    LEFT JOIN publishers p on p.id = gp.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
@@ -573,8 +586,8 @@ ORDER BY g.id, gen.id;";
                     if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
                         gameEntry.Developers.Add(developer);
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
 
                     if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
                         gameEntry.Genres.Add(genre);
@@ -645,15 +658,16 @@ SELECT
     plat.Id, plat.Name,
     gs.Id, gs.GameId, gs.ImageUrl
 FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN publishers p ON p.id = g.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gp ON gp.gameid = g.id
-LEFT JOIN platforms plat ON plat.id = gp.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+    LEFT JOIN publishers p on p.id = gp.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gp.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
@@ -676,8 +690,8 @@ ORDER BY g.id, gen.id;";
                     if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
                         gameEntry.Developers.Add(developer);
 
-                    if (publisher is not null && gameEntry.Publisher == null)
-                        gameEntry.Publisher = publisher;
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
 
                     if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
                         gameEntry.Genres.Add(genre);

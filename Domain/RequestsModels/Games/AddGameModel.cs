@@ -17,9 +17,10 @@ public sealed record AddGameModel(
     [MinLength(1,ErrorMessage ="Developers ids should be not empty")]
     IEnumerable<long> DevelopersIds,
 
-    [property: JsonPropertyName("publisherId")]
-    [Required(ErrorMessage ="Publisher id should be set")]
-    long PublisherId,
+    [property: JsonPropertyName("publishersIds")]
+    [Required(ErrorMessage ="Publishers ids should be set")]
+    [MinLength(1,ErrorMessage ="Publishers ids should be not empty")]
+    IEnumerable<long> PublishersIds,
 
     [property: JsonPropertyName("genresIds")]
     [Required(ErrorMessage ="Genres ids should be set")]

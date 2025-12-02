@@ -46,7 +46,7 @@ RETURNING Id;", new
         {
             var gameReviewToCheckExistance = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
-Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
 INNER JOIN Games
@@ -75,7 +75,7 @@ WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, applicationUser) =
         {
             IEnumerable<GameReview> gamesReviews = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
-Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
 INNER JOIN Games
@@ -102,7 +102,7 @@ WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, applicationUser) =
         {
             var gamesReviews = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
-Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
 INNER JOIN Games
@@ -129,7 +129,7 @@ WHERE GamesPlayersReviews.Id = @id;", (gameReview, game, applicationUser) =>
         {
             return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
-Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
 INNER JOIN Games
@@ -189,7 +189,7 @@ WHERE Id=@id", new
         {
             return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
-Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
 INNER JOIN Games
@@ -215,7 +215,7 @@ ORDER BY GamesPlayersReviews.Id;", (gameReview, game, applicationUser) =>
         {
             return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
-Games.Id, Games.Name, Games.Image, Games.PublisherId, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
+Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
 INNER JOIN Games

@@ -43,7 +43,7 @@ RETURNING Id;"
             await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
             SELECT 
                 Localizations.Id, Localizations.Name,
-                Games.Id, Games.Name, Games.Image, Games.LocalizationId, Games.PublisherId,
+                Games.Id, Games.Name, Games.Image, Games.LocalizationId,
                 Games.ReleaseDate, Games.Description, Games.Trailer,
                 Platforms.Id, Platforms.Name,
                 Developers.Id, Developers.Name,
@@ -54,7 +54,8 @@ RETURNING Id;"
                 LEFT JOIN Platforms ON Platforms.Id = GamesPlatforms.PlatformId
                 LEFT JOIN GamesDevelopers ON GamesDevelopers.GameId = Games.Id
                 LEFT JOIN Developers ON Developers.Id = GamesDevelopers.DeveloperId
-                LEFT JOIN Publishers ON Publishers.Id = Games.PublisherId",
+                LEFT JOIN GamesPublishers gp ON gp.GameId = Games.Id
+                LEFT JOIN Publishers on Publishers.Id = gp.PublisherId",
                 (localization, game, platform, developer, publisher) =>
                 {
                     // Get or create the localization entry
@@ -95,9 +96,9 @@ RETURNING Id;"
                         }
 
                         // Set publisher if it exists and isn't already set
-                        if (publisher != null && gameEntry.Publisher == null)
+                        if (publisher != null && !gameEntry.Publishers.Any(d => d.Id == publisher.Id))
                         {
-                            gameEntry.Publisher = publisher;
+                            gameEntry.Publishers.Add(publisher);
                         }
                     }
 
@@ -122,20 +123,20 @@ RETURNING Id;"
 
             var localization = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
             SELECT 
-                loc.Id, loc.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
-                g.ReleaseDate, g.Description, g.Trailer,
-                p.Id, p.Name,
-                d.Id, d.Name,
-                pub.Id, pub.Name
-            FROM Localizations loc
-            LEFT JOIN Games g ON g.LocalizationId = loc.Id
-            LEFT JOIN GamesPlatforms gp ON gp.GameId = g.Id
-            LEFT JOIN Platforms p ON p.Id = gp.PlatformId
-            LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
-            LEFT JOIN Developers d ON d.Id = gd.DeveloperId
-            LEFT JOIN Publishers pub ON pub.Id = g.PublisherId
-            WHERE loc.Id = @id",
+loc.Id, loc.Name,
+g.Id, g.Name, g.Image, g.LocalizationId, g.ReleaseDate, g.Description, g.Trailer,                 
+p.Id, p.Name,
+d.Id, d.Name,
+publ.Id, publ.Name
+FROM Localizations loc
+LEFT JOIN Games g ON g.LocalizationId = loc.Id
+LEFT JOIN GamesPlatforms gplatf ON gplatf.GameId = g.Id
+LEFT JOIN Platforms p ON p.Id = gplatf.PlatformId
+LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
+LEFT JOIN Developers d ON d.Id = gd.DeveloperId
+LEFT JOIN GamesPublishers gpubl ON gpubl.GameId = g.Id
+LEFT JOIN Publishers publ on publ.Id = gpubl.PublisherId
+WHERE loc.Id = @id",
                 (loc, game, platform, developer, publisher) =>
                 {
                     // Get or create localization
@@ -171,9 +172,9 @@ RETURNING Id;"
                         }
 
                         // Set publisher if exists and not set
-                        if (publisher != null && gameEntry.Publisher == null)
+                        if (publisher != null && gameEntry.Publishers.Any(p => p.Id == publisher.Id))
                         {
-                            gameEntry.Publisher = publisher;
+                            gameEntry.Publishers.Add(publisher);
                         }
                     }
 
@@ -251,9 +252,9 @@ RETURNING Id;"
                         }
 
                         // Set publisher if exists and not set
-                        if (publisher != null && gameEntry.Publisher == null)
+                        if (publisher != null && !gameEntry.Publishers.Any(d => d.Id == publisher.Id))
                         {
-                            gameEntry.Publisher = publisher;
+                            gameEntry.Publishers.Add(publisher);
                         }
                     }
 
@@ -327,9 +328,9 @@ RETURNING Id;"
                             gameEntry.Developers.Add(developer);
                         }
 
-                        if (publisher != null && gameEntry.Publisher == null)
+                        if (publisher != null && !gameEntry.Publishers.Any(d => d.Id == publisher.Id))
                         {
-                            gameEntry.Publisher = publisher;
+                            gameEntry.Publishers.Add(publisher);
                         }
                     }
 

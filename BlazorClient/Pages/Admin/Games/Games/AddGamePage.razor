@@ -87,7 +87,7 @@ else
     <p>
         <label>
             Select publisher:
-            <select @onchange="SelectPublisher">
+            <select @onchange="SelectPublisher" multiple>
                 <option value="-1" selected>None</option>
                 @foreach (Publisher publisher in PublishersToSelectFrom)
                 {

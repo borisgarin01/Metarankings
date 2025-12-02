@@ -147,9 +147,9 @@ public sealed partial class AddMoviePage : ComponentBase
                 // Extract the URL from the response
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                var addGameModel = new AddMovieModel(Name, OriginalName, Description, uploadingFileNameWithCorrectExtension, PremierDate.Value, SelectedMoviesDirectorsIds, SelectedMoviesGenresIds, SelectedMoviesStudiosIds);
+                var addMovieModel = new AddMovieModel(Name, OriginalName, Description, uploadingFileNameWithCorrectExtension, PremierDate.Value, SelectedMoviesDirectorsIds, SelectedMoviesGenresIds, SelectedMoviesStudiosIds);
 
-                HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addGameModel);
+                HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addMovieModel);
 
                 if (addingMovieResponseMessage.IsSuccessStatusCode)
                     NavigationManager.NavigateTo("/admin/movies/movies/list-movies");

@@ -44,7 +44,7 @@ RETURNING Id;"
             await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
             SELECT 
                 p1.Id, p1.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer,
                 p2.Id, p2.Name
             FROM Platforms p1
@@ -104,7 +104,7 @@ RETURNING Id;"
             await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
             SELECT 
                 p1.Id, p1.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer,
                 p2.Id, p2.Name
             FROM Platforms p1

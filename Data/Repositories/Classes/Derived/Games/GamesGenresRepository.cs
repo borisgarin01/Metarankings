@@ -41,7 +41,7 @@ RETURNING Id;"
             var genres = await connection.QueryAsync<Genre, Game, Genre>(@"
 SELECT Genres.Id, Genres.Name, 
 	Games.Id, Games.Name, Games.Image, 
-	Games.LocalizationId, Games.PublisherId, Games.ReleaseDate, 
+	Games.LocalizationId, Games.ReleaseDate, 
 	Games.Description, Games.Trailer
 FROM 
 Genres 
@@ -77,7 +77,7 @@ Genres
             var genres = await connection.QueryAsync<Genre, Game, Genre>(@"
 SELECT Genres.Id, Genres.Name, 
 	Games.Id, Games.Name, Games.Image, 
-	Games.LocalizationId, Games.PublisherId, Games.ReleaseDate, 
+	Games.LocalizationId, Games.ReleaseDate, 
 	Games.Description, Games.Trailer
 FROM 
 Genres 

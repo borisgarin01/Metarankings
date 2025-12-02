@@ -5,10 +5,6 @@ namespace BlazorClient.Pages.Admin.Movies.Movies;
 
 public partial class MoviesListPage : ComponentBase
 {
-    public MoviesListPage()
-    {
-    }
-
     [Inject]
     public HttpClient HttpClient { get; set; }
 

@@ -43,10 +43,11 @@ RETURNING Id;"
             await connection.QueryAsync<Publisher, Game, Publisher>(
                 @"SELECT 
                 p.Id, p.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer
               FROM Publishers p
-              LEFT JOIN Games g ON g.PublisherId = p.Id",
+              LEFT JOIN GamesPublishers gp on gp.PublisherId = p.Id
+              LEFT JOIN Games g ON g.Id = gp.GameId",
                 (publisher, game) =>
                 {
                     if (!publisherDictionary.TryGetValue(publisher.Id, out var publisherEntry))
@@ -79,10 +80,11 @@ RETURNING Id;"
             await connection.QueryAsync<Publisher, Game, Publisher>(
                 @"SELECT 
                 p.Id, p.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer
               FROM Publishers p
-              LEFT JOIN Games g ON g.PublisherId = p.Id
+              LEFT JOIN GamesPublishers gp on gp.PublisherId = p.Id
+              LEFT JOIN Games g ON g.Id = gp.GameId
               WHERE p.Id = @id",
                 (publisher, game) =>
                 {
@@ -117,7 +119,7 @@ RETURNING Id;"
             await connection.QueryAsync<Publisher, Game, Publisher>(@"
             SELECT 
                 p.Id, p.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer
             FROM (
                 SELECT Id, Name 
@@ -125,7 +127,8 @@ RETURNING Id;"
                 ORDER BY Id
                 OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY
             ) p
-            LEFT JOIN Games g ON g.PublisherId = p.Id",
+            LEFT JOIN GamesPublishers gp on gp.PublisherId = p.Id
+            LEFT JOIN Games g ON g.Id = gp.GameId",
                 (publisher, game) =>
                 {
                     if (!publisherDictionary.TryGetValue(publisher.Id, out var publisherEntry))

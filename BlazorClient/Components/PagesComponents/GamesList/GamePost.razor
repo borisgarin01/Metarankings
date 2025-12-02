@@ -1,4 +1,5 @@
 ﻿@using BlazorClient.Components.PagesComponents.Common
+@using BlazorClient.Components.PagesComponents.GameDetails
 
 @inject HttpClient HttpClient
 
@@ -13,7 +14,7 @@
         <link itemprop="image" href="@Image">
         <meta itemprop="dateCreated" content="@ReleaseDate!.Value.Year">
         <h3 itemprop="name"><a class="name" href="/games/Details/@Id">@Name</a></h3>
-        <div class="post-meta"><p>@Publisher.Name</p></div>
+        <GamePublishersComponent Publishers="@Publishers" />
         <PlatformsComponent Platforms="@Platforms" />
         <GenresComponent Genres="@Genres" />
     </div>

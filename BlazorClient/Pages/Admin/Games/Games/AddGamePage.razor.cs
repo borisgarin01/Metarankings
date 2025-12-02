@@ -53,7 +53,7 @@ public partial class AddGamePage : ComponentBase
     public List<long> SelectedGenresIds { get; private set; } = new List<long>();
     public long SelectedLocalizationId { get; private set; }
     public List<long> SelectedPlatformsIds { get; private set; } = new List<long>();
-    public long SelectedPublisherId { get; private set; }
+    public List<long> SelectedPublishersIds { get; private set; } = new List<long>();
     public string ImageSource { get; private set; }
     public IBrowserFile ImageToUpload { get; private set; }
     public async Task AddGameAsync()
@@ -82,7 +82,7 @@ public partial class AddGamePage : ComponentBase
                     // Extract the URL from the response
                     var responseContent = await response.Content.ReadAsStringAsync();
 
-                    var addGameModel = new AddGameModel(Name, uploadingFileNameWithCorrectExtention, SelectedDevelopersIds, SelectedPublisherId, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
+                    var addGameModel = new AddGameModel(Name, uploadingFileNameWithCorrectExtention, SelectedDevelopersIds, SelectedPublishersIds, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
 
                     HttpResponseMessage addingGameResponseMessage = await GetWebManager.AddAsync(addGameModel);
 
@@ -108,7 +108,7 @@ public partial class AddGamePage : ComponentBase
             && !SelectedGenresIds.Contains(-1)
             && SelectedLocalizationId != -1
             && !SelectedPlatformsIds.Contains(-1)
-            && SelectedPublisherId != -1
+            && !SelectedPublishersIds.Contains(-1)
             && ImageToUpload is not null;
     }
 
@@ -130,7 +130,9 @@ public partial class AddGamePage : ComponentBase
 
     private Task SelectPublisher(ChangeEventArgs e)
     {
-        SelectedPublisherId = long.Parse((string)e.Value);
+        SelectedPublishersIds = ((string[])e.Value)
+        .Select(idString => long.Parse(idString))
+            .ToList();
         return Task.CompletedTask;
     }
 

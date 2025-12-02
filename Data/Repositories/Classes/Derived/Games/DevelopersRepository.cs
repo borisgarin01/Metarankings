@@ -46,7 +46,7 @@ RETURNING Id;"
             select 
                 developers.id, developers.name, 
                 games.Id, games.Name, games.Image, 
-                games.publisherId, games.releasedate, 
+                games.releasedate, 
                 games.description, games.trailer,
                 platforms.id, platforms.name
             from developers
@@ -103,7 +103,7 @@ RETURNING Id;"
             select 
                 developers.id, developers.name, 
                 games.Id, games.Name, games.Image, 
-                games.publisherId, games.releasedate, 
+                games.releasedate, 
                 games.description, games.trailer,
                 platforms.id, platforms.name
             from developers
@@ -162,7 +162,7 @@ RETURNING Id;"
             SELECT 
                 developers.id, developers.name, 
                 games.Id, games.Name, games.Image, 
-                games.publisherId, games.releasedate, 
+                games.releasedate, 
                 games.description, games.trailer,
                 platforms.id, platforms.name
             FROM (

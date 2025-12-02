@@ -23,7 +23,7 @@ public partial class GamePost : ComponentBase
     public required IEnumerable<Developer> Developers { get; set; } = Enumerable.Empty<Developer>();
 
     [Parameter, EditorRequired]
-    public required Publisher Publisher { get; set; }
+    public required IEnumerable<Publisher> Publishers { get; set; } = Enumerable.Empty<Publisher>();
 
     [Parameter, EditorRequired]
     public required IEnumerable<Platform> Platforms { get; set; } = Enumerable.Empty<Platform>();

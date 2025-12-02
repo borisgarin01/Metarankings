@@ -2,8 +2,8 @@
 
 namespace BlazorClient.Components.PagesComponents.GameDetails;
 
-public partial class GamePublisher : ComponentBase
+public partial class GamePublishersComponent : ComponentBase
 {
     [Parameter, EditorRequired]
-    public Publisher Publisher { get; set; }
+    public IEnumerable<Publisher> Publishers { get; set; }
 }
