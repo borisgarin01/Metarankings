@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Domain.Games.Collections;
 using Domain.Reviews;
 
 namespace Domain.Games;
@@ -49,7 +50,6 @@ public sealed record Game
     public long LocalizationId { get; set; }
 
     [JsonPropertyName("links")]
-    public IEnumerable<Link> Links { get; set; } = new Link[] { new Link("Лучшие игры для PS4","/best-ps4-games/"),
-        new Link("Лучшие приключенческие игры", "/top-igry-priklyucheniya/") };
+    public List<GameCollection> GameCollections { get; set; } = new();
 
 }

@@ -15,9 +15,9 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GameCol
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedGameCollectionId = await connection.QuerySingleAsync<long>(@"
-INSERT INTO GamesCollections(Name) 
-VALUES(@Name)
-RETURNING Id;", new { entity.Name });
+INSERT INTO GamesCollections(Name,Description) 
+VALUES(@Name, @Description)
+RETURNING Id;", new { entity.Name, entity.Description });
 
             return insertedGameCollectionId;
         }
@@ -38,7 +38,7 @@ RETURNING Id;", new { entity.Name });
         var gamesCollectionsDictionary = new Dictionary<long, GameCollection>();
 
         await connection.QueryAsync<GameCollection, Game, GameCollection>(
-            @"SELECT gc.Id, gc.Name,
+            @"SELECT gc.Id, gc.Name, gc.Description,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
           LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
@@ -73,7 +73,7 @@ RETURNING Id;", new { entity.Name });
         var dictionary = new Dictionary<long, GameCollection>();
 
         await connection.QueryAsync<GameCollection, Game, GameCollection>(
-            @"SELECT gc.Id, gc.Name,
+            @"SELECT gc.Id, gc.Name, gc.Description,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
           LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
@@ -108,7 +108,7 @@ RETURNING Id;", new { entity.Name });
         var gamesCollectionsDictionary = new Dictionary<long, GameCollection>();
 
         await connection.QueryAsync<GameCollection, Game, GameCollection>(
-            @"SELECT gc.Id, gc.Name,
+            @"SELECT gc.Id, gc.Name, gc.Description,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
           LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId

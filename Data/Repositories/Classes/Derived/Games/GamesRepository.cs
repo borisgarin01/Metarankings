@@ -5,6 +5,7 @@ using Data.Extensions;
 using Dapper;
 using Domain.Reviews;
 using Domain.RequestsModels.Games;
+using Domain.Games.Collections;
 
 namespace Data.Repositories.Classes.Derived.Games;
 public sealed class GamesRepository : Repository, IRepository<Game, AddGameModel, UpdateGameModel>
@@ -88,7 +89,8 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 plat.id, plat.name, 
-gs.Id, gs.GameId, gs.ImageUrl
+gs.Id, gs.GameId, gs.ImageUrl,
+gc.Id, gc.Name, gc.Description
     FROM (select Id, Name, Image, ReleaseDate, Description, LocalizationId 
         from Games ORDER BY id asc
         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
@@ -101,13 +103,15 @@ gs.Id, gs.GameId, gs.ImageUrl
     LEFT JOIN localizations l ON l.id = g.localizationid
     LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
     LEFT JOIN platforms plat ON plat.id = gplatf.platformid
-    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id";
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
+    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId";
 
             var gameDictionary = new Dictionary<long, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
                     if (!gameDictionary.TryGetValue(game.Id, out Game? gameEntry))
                     {
@@ -137,9 +141,12 @@ gs.Id, gs.GameId, gs.ImageUrl
                     if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                         gameEntry.Screenshots.Add(screenshot);
 
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(b => b.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
                     return gameEntry;
                 }, new { offset, limit },
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+                splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
             );
 
             var result = gameDictionary.Values.ToList();
@@ -160,7 +167,8 @@ p.id, p.name,
 gen.id, gen.name, 
 l.id, l.name,
 platf.id, platf.name, 
-gs.id, gs.gameid, gs.imageUrl
+gs.id, gs.gameid, gs.imageUrl,
+gc.Id, gc.Name, gc.Description
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -171,13 +179,15 @@ gs.id, gs.gameid, gs.imageUrl
     LEFT JOIN localizations l ON l.id = g.localizationid
     LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
     LEFT JOIN platforms platf ON platf.id = gplatf.platformid
-    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id";
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
+    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
                     if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
                     {
@@ -187,6 +197,7 @@ gs.id, gs.gameid, gs.imageUrl
                         gameEntry.Platforms = new List<Platform>();
                         gameEntry.Screenshots = new List<GameScreenshot>();
                         gameEntry.Publishers = new List<Publisher>();
+                        gameEntry.GameCollections = new List<GameCollection>();
                         gameDictionary.Add(gameEntry.Name, gameEntry);
                     }
 
@@ -208,9 +219,12 @@ gs.id, gs.gameid, gs.imageUrl
                     if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                         gameEntry.Screenshots.Add(screenshot);
 
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(b => b.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
                     return gameEntry;
                 },
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+                splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
             );
 
             var result = gameDictionary.Values.ToList();
@@ -231,6 +245,7 @@ gen.id, gen.name,
 l.id, l.name,
 platf.id, platf.name, 
 gs.id, gs.gameid, gs.imageUrl,
+gc.Id, gc.Name, gc.Description,
 gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
 au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
     FROM games g
@@ -244,15 +259,17 @@ au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.Emai
     LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
     LEFT JOIN platforms platf ON platf.id = gplatf.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
+    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId
     LEFT JOIN GamesPlayersReviews gpr on gpr.gameid=g.Id
     LEFT JOIN ApplicationUsers au on au.Id=gpr.UserId
 WHERE g.Id=@id";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameReview, ApplicationUser, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, GameReview, ApplicationUser, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot, gamePlayerReview, applicationUser) =>
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection, gamePlayerReview, applicationUser) =>
                 {
                     if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
                     {
@@ -291,6 +308,10 @@ WHERE g.Id=@id";
                         if (!gameEntry.GamesPlayersReviews.Any(s => s.Id == gamePlayerReview.Id))
                             gameEntry.GamesPlayersReviews.Add(gamePlayerReview);
                     }
+
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(b => b.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
                     return gameEntry;
                 },
                 new { id } // Parameter passed here
@@ -319,26 +340,28 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.Id, gs.GameId, gs.ImageUrl
+    gs.Id, gs.GameId, gs.ImageUrl,
+    gc.Id, gc.Name, gc.Description
 FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
     LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
-    LEFT JOIN publishers p on p.id = gp.publisherid
+    LEFT JOIN publishers p on p.id = gpub.publisherid
     LEFT JOIN gamesgenres gg ON gg.gameid = g.id
     LEFT JOIN genres gen ON gen.id = gg.genreid
     LEFT JOIN localizations l ON l.id = g.localizationid
     LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
     LEFT JOIN platforms plat ON plat.id = gp.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamescollections gc on gc.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
                     if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
                     {
@@ -367,10 +390,13 @@ ORDER BY g.id, gen.id;";
                     if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                         gameEntry.Screenshots.Add(screenshot);
 
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(gc => gc.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
                     return gameEntry;
                 },
                 new { genreId }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+                splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
             );
 
             var result = gameDictionary.Values;
@@ -396,7 +422,8 @@ SELECT
     gen.id, gen.name, 
     l.id, l.name,
     plat.id, plat.name,
-    gs.Id, gs.GameId, gs.ImageUrl
+    gs.Id, gs.GameId, gs.ImageUrl,
+    gc.Id, gc.Name, gc.Description
 FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -408,14 +435,15 @@ FROM games g
     LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
     LEFT JOIN platforms plat ON plat.id = gp.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamescollections gc on gc.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
                     if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
                     {
@@ -445,10 +473,13 @@ ORDER BY g.id, gen.id;";
                     if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                         gameEntry.Screenshots.Add(screenshot);
 
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(gc => gc.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
                     return gameEntry;
                 },
                 new { platformId }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+                splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
             );
 
             var result = gameDictionary.Values;
@@ -474,7 +505,8 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.Id, gs.GameId, gs.ImageUrl
+    gs.Id, gs.GameId, gs.ImageUrl,
+    gc.Id, gc.Name, gc.Description
 FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -486,14 +518,15 @@ FROM games g
     LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
     LEFT JOIN platforms plat ON plat.id = gp.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamescollections gc on gc.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
                     if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
                     {
@@ -523,10 +556,13 @@ ORDER BY g.id, gen.id;";
                     if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                         gameEntry.Screenshots.Add(screenshot);
 
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(gc => gc.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
                     return gameEntry;
                 },
                 new { developerId }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+                splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
             );
 
             var result = gameDictionary.Values;
@@ -552,7 +588,8 @@ SELECT
     gen.id, gen.name,
     l.id, l.name,
     plat.id, plat.name,
-    gs.Id, gs.GameId, gs.ImageUrl
+    gs.Id, gs.GameId, gs.ImageUrl,
+    gc.Id, gc.Name, gc.Description
 FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid
@@ -564,14 +601,15 @@ FROM games g
     LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
     LEFT JOIN platforms plat ON plat.id = gp.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamescollections gc on gc.gameid = g.id
 WHERE g.id IN (SELECT id FROM FilteredGames)
 ORDER BY g.id, gen.id;";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
                     if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
                     {
@@ -601,21 +639,19 @@ ORDER BY g.id, gen.id;";
                     if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                         gameEntry.Screenshots.Add(screenshot);
 
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(s => s.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
                     return gameEntry;
                 },
                 new { publisherId }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+                splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
             );
 
             var result = gameDictionary.Values;
 
             return result.ToArray();
         }
-    }
-
-    public Task<IEnumerable<Game>> GetAsync(long offset, long limit)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task RemoveAsync(long id)
@@ -635,7 +671,7 @@ WHERE Id=@id", new { id });
         }
     }
 
-    public Task<Game> UpdateAsync(UpdateGameModel entity, long id)
+    public async Task<Game> UpdateAsync(UpdateGameModel entity, long id)
     {
         throw new NotImplementedException();
     }
@@ -644,38 +680,35 @@ WHERE Id=@id", new { id });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var sql = @"WITH FilteredGames AS (
-    SELECT DISTINCT g.id
-    FROM games g
-    WHERE EXTRACT(year from g.ReleaseDate) = @year
-)
-SELECT
+            var sql = @"SELECT DISTINCT
     g.Id, g.Name, g.Image, g.ReleaseDate, g.Description,
     d.Id, d.Name,
     p.Id, p.Name,
     gen.Id, gen.Name,
     l.Id, l.Name,
-    plat.Id, plat.Name,
-    gs.Id, gs.GameId, gs.ImageUrl
+    platf.Id, platf.Name,
+    gs.Id, gs.GameId, gs.ImageUrl,
+    gc.Id, gc.Name, gc.Description
 FROM games g
-    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-    LEFT JOIN developers d ON d.id = gd.developerid
-    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
-    LEFT JOIN publishers p on p.id = gp.publisherid
-    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-    LEFT JOIN genres gen ON gen.id = gg.genreid
-    LEFT JOIN localizations l ON l.id = g.localizationid
-    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
-    LEFT JOIN platforms plat ON plat.id = gp.platformid
-    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-WHERE g.id IN (SELECT id FROM FilteredGames)
-ORDER BY g.id, gen.id;";
+LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+LEFT JOIN developers d ON d.id = gd.developerid
+LEFT JOIN gamespublishers gpub on gpub.gameid = g.id
+LEFT JOIN publishers p on p.id = gpub.publisherid
+LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+LEFT JOIN genres gen ON gen.id = gg.genreid
+LEFT JOIN localizations l ON l.id = g.localizationid
+LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+LEFT JOIN platforms platf ON platf.id = gplatf.platformid
+LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
+LEFT JOIN gamescollections gc on gc.Id = gci.GameCollectionId
+WHERE EXTRACT(YEAR FROM g.ReleaseDate) = @Year;";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot) =>
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
                     if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
                     {
@@ -684,6 +717,8 @@ ORDER BY g.id, gen.id;";
                         gameEntry.Genres = new List<Genre>();
                         gameEntry.Platforms = new List<Platform>();
                         gameEntry.Screenshots = new List<GameScreenshot>();
+                        gameEntry.Publishers = new List<Publisher>();
+                        gameEntry.GameCollections = new List<GameCollection>();
                         gameDictionary.Add(gameEntry.Name, gameEntry);
                     }
 
@@ -705,15 +740,23 @@ ORDER BY g.id, gen.id;";
                     if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                         gameEntry.Screenshots.Add(screenshot);
 
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(b => b.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
                     return gameEntry;
                 },
-                new { year }, // Parameter passed here
-                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+                new { Year = year },
+                splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
             );
 
-            var result = gameDictionary.Values;
+            var result = gameDictionary.Values.ToList();
 
-            return result.ToArray();
+            return result;
         }
+    }
+
+    public Task<IEnumerable<Game>> GetAsync(long offset, long limit)
+    {
+        throw new NotImplementedException();
     }
 }
