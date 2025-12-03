@@ -5,6 +5,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
+        <a href="/admin">К странице админа</a>
         <a href="/admin/movies/movies-directors/add-movie-director">Добавить режиссера</a>
         <div class="moviesDirectorsList">
             @if (MoviesDirectors is null)

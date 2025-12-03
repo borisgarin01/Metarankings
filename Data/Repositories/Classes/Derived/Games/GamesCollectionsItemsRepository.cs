@@ -37,16 +37,31 @@ new { entity.GameId, entity.GameCollectionId });
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var gamesCollectionsItems = await connection.QueryAsync<GameCollectionItem, Game, GameCollectionItem>(@"SELECT gci.Id, gci.Name,
-g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId
+            var gamesCollectionsItems = await connection.QueryAsync<GameCollectionItem, Game, GameCollection, GameCollectionItem>(@"
+SELECT gci.GameId, gci.GameCollectionId,
+g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId,
+gc.Id, gc.Name
 FROM GamesCollectionsItems gci
 LEFT JOIN Games g
-on g.Id=gci.GameId;", (gameCollectionItem, game) =>
+on g.Id=gci.GameId
+LEFT JOIN GamesCollections gc 
+ON gc.Id=gci.GameCollectionId;", (gameCollectionItem, game, gameCollection) =>
             {
-                gameCollectionItem.Game = game;
+                if (game is not null)
+                {
+                    if (gameCollection is not null)
+                    {
+                        if (!gameCollection.Games.Any(g => g.Id == game.Id))
+                        {
+                            gameCollectionItem.Game = game;
+                            gameCollectionItem.GameCollectionId = gameCollection.Id;
+                            gameCollection.Games.Add(game);
+                        }
+                    }
+                }
 
                 return gameCollectionItem;
-            });
+            }, splitOn: "Id,Id");
 
             return gamesCollectionsItems;
         }
@@ -69,7 +84,7 @@ WHERE gc.Id=@Id;", (gameCollectionItem, game) =>
             }, new { Id = id });
 
             var gamesCollectionsItemsResult = gamesCollectionsItems
-                .GroupBy(b => new { b.GameId, b.CollectionId })
+                .GroupBy(b => new { b.GameId, b.GameCollectionId })
                 .Select(g =>
                 {
                     GameCollectionItem gameCollection = gamesCollectionsItems.First();
@@ -99,7 +114,7 @@ OFFSET @Offset LIMIT @Limit;", (gameCollectionItem, game) =>
             }, new { Offset = offset, Limit = limit });
 
             var gamesCollectionsItemsResult = gamesCollectionsItems
-                .GroupBy(b => new { b.GameId, b.CollectionId })
+                .GroupBy(b => new { b.GameId, b.GameCollectionId })
                 .Select(g =>
                 {
                     return g.First();

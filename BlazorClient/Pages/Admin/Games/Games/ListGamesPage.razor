@@ -3,6 +3,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
+        <a href="/admin">К странице админа</a>
         <a href="/admin/Games/games/add-game">Добавить игру</a>
         <div class="gamesList">
             @if (Games is null)

@@ -3,6 +3,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
+        <a href="/admin">К странице админа</a>
         <a href="/admin/games/developers/add-developer">Добавить разраба</a>
         <div class="developersList">
             @if (Developers is null)

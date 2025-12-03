@@ -2,6 +2,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
+        <a href="/admin">К странице админа</a>
         <EditForm Model="AddDeveloperModel" OnValidSubmit="AddDeveloperAsync" Context="myContext">
             <a href="/admin/games/developers/list-developers" class="list-group-item link-dark">Разработчики</a>
             <DataAnnotationsValidator />

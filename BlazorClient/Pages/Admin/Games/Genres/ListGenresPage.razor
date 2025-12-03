@@ -3,6 +3,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
+        <a href="/admin">К странице админа</a>
         <a href="/admin/Games/genres/add-genre">Добавить жанр</a>
         <div class="genresList">
             @if (Genres is null)

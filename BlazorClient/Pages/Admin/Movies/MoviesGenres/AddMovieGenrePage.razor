@@ -1,5 +1,6 @@
 ﻿@page "/admin/movies/movies-genres/add-movie-genre"
 
+<a href="/admin">К странице админа</a>
 <form method="post" @onsubmit="@AddMovieGenreAsync">
     <input type="text" @bind-value="@Name" />
     <button type="submit">Add</button>

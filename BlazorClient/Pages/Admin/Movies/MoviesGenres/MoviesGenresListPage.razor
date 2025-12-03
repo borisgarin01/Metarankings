@@ -5,6 +5,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
+        <a href="/admin">К странице админа</a>
         <a href="/admin/movies/movies-genres/add-movie-genre">Добавить жанр</a>
         <div class="genresList">
             @if (MoviesGenres is null)

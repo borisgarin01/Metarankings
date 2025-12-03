@@ -3,6 +3,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
+        <a href="/admin">К странице админа</a>
         <a href="/admin/Games/platforms/add-platform">Добавить платформу</a>
         <div class="platformsList">
             @if (Platforms is null)

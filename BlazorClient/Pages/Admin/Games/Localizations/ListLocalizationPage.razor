@@ -3,6 +3,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
+        <a href="/admin">К странице админа</a>
         <a href="/admin/Games/localizations/add-localization">Добавить локализацию</a>
         <div class="localizationsList">
             @if (Localizations is null)

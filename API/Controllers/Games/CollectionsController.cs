@@ -6,6 +6,7 @@ namespace API.Controllers.Games;
 
 [ApiController]
 [Route("api/games/[controller]")]
+[Authorize(Policy = "Admin", AuthenticationSchemes = "Bearer")]
 public sealed class CollectionsController : ControllerBase
 {
     private readonly IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> _gamesCollectionsRepository;
@@ -16,6 +17,7 @@ public sealed class CollectionsController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<GameCollection>>> GetAllAsync()
     {
         try
@@ -34,8 +36,8 @@ public sealed class CollectionsController : ControllerBase
     {
         try
         {
-            long insertedCollectionId = await _gamesCollectionsRepository.AddAsync(addGameCollectionModel);
-            return Ok(insertedCollectionId);
+            long insertedGameCollectionId = await _gamesCollectionsRepository.AddAsync(addGameCollectionModel);
+            return Ok(insertedGameCollectionId);
         }
         catch (Exception ex)
         {
@@ -43,15 +45,15 @@ public sealed class CollectionsController : ControllerBase
         }
     }
 
-    [HttpDelete("{collectionId:long}")]
-    public async Task<ActionResult<long>> DeleteAsync(long collectionId)
+    [HttpDelete("{gameCollectionId:long}")]
+    public async Task<ActionResult<long>> DeleteAsync(long gameCollectionId)
     {
-        GameCollection collection = await _gamesCollectionsRepository.GetAsync(collectionId);
+        GameCollection collection = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
         if (collection is null)
             return NotFound();
         try
         {
-            await _gamesCollectionsRepository.RemoveAsync(collectionId);
+            await _gamesCollectionsRepository.RemoveAsync(gameCollectionId);
             return NoContent();
         }
         catch (Exception ex)
@@ -60,15 +62,16 @@ public sealed class CollectionsController : ControllerBase
         }
     }
 
-    [HttpPut("{collectionId:long}")]
-    public async Task<ActionResult<GameCollection>> UpdateAsync(long collectionId, UpdateGameCollectionModel updateGameCollectionModel)
+
+    [HttpPut("{gameCollectionId:long}")]
+    public async Task<ActionResult<GameCollection>> UpdateAsync(long gameCollectionId, UpdateGameCollectionModel updateGameCollectionModel)
     {
-        GameCollection gameCollectionToUpdate = await _gamesCollectionsRepository.GetAsync(collectionId);
+        GameCollection gameCollectionToUpdate = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
         if (gameCollectionToUpdate is null)
             return NotFound();
         try
         {
-            GameCollection updatedGamesCollection = await _gamesCollectionsRepository.UpdateAsync(updateGameCollectionModel, collectionId);
+            GameCollection updatedGamesCollection = await _gamesCollectionsRepository.UpdateAsync(updateGameCollectionModel, gameCollectionId);
             return Ok(updateGameCollectionModel);
         }
         catch (Exception ex)

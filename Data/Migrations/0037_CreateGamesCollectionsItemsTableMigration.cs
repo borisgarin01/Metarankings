@@ -11,7 +11,9 @@ public sealed class CreateGameCollectionItemsTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE GamesCollectionsItems
-(GameCollectionId BIGINT NOT NULL, 
+(
+Id BIGSERIAL not null primary key,
+GameCollectionId BIGINT NOT NULL, 
 GameId BIGINT NOT NULL, 
 FOREIGN KEY(GameCollectionId) 
 REFERENCES GamesCollections(Id) 

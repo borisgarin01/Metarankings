@@ -3,6 +3,7 @@
 
 <AuthorizeView Policy="Admin">
     <Authorized>
+        <a href="/admin">К странице админа</a>
         <a href="/admin/movies/movies/add-movie">Добавить фильм</a>
         <div class="moviesList">
             @if (Movies is null)
