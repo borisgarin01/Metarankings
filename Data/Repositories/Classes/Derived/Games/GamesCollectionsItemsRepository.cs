@@ -38,7 +38,7 @@ new { entity.GameId, entity.GameCollectionId });
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var gamesCollectionsItems = await connection.QueryAsync<GameCollectionItem, Game, GameCollection, GameCollectionItem>(@"
-SELECT gci.GameId, gci.GameCollectionId,
+SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId,
 gc.Id, gc.Name
 FROM GamesCollectionsItems gci
@@ -54,6 +54,8 @@ ON gc.Id=gci.GameCollectionId;", (gameCollectionItem, game, gameCollection) =>
                         if (!gameCollection.Games.Any(g => g.Id == game.Id))
                         {
                             gameCollectionItem.Game = game;
+                            gameCollectionItem.GameId = game.Id;
+                            gameCollectionItem.GameCollection = gameCollection;
                             gameCollectionItem.GameCollectionId = gameCollection.Id;
                             gameCollection.Games.Add(game);
                         }
@@ -71,12 +73,12 @@ ON gc.Id=gci.GameCollectionId;", (gameCollectionItem, game, gameCollection) =>
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var gamesCollectionsItems = await connection.QueryAsync<GameCollectionItem, Game, GameCollectionItem>(@"SELECT gci.Id, gci.Name,
+            var gamesCollectionsItems = await connection.QueryAsync<GameCollectionItem, Game, GameCollectionItem>(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId
 FROM GamesCollectionsItems gci
 LEFT JOIN Games g
 on g.Id=gci.GameId
-WHERE gc.Id=@Id;", (gameCollectionItem, game) =>
+WHERE gci.Id=@Id;", (gameCollectionItem, game) =>
             {
                 gameCollectionItem.Game = game;
 
@@ -99,7 +101,7 @@ WHERE gc.Id=@Id;", (gameCollectionItem, game) =>
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var gamesCollectionsItems = await connection.QueryAsync<GameCollectionItem, Game, GameCollectionItem>(@"SELECT gci.Id, gci.Name,
+            var gamesCollectionsItems = await connection.QueryAsync<GameCollectionItem, Game, GameCollectionItem>(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId
 FROM GamesCollectionsItems gci
 ON gc.Id=gci.GameCollectionId

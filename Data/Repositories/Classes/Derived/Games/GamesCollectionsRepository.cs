@@ -33,33 +33,37 @@ RETURNING Id;", new { entity.Name });
 
     public async Task<IEnumerable<GameCollection>> GetAllAsync()
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
-        {
-            var gamesCollectionsDictionary = new Dictionary<long, GameCollection>();
+        using var connection = new NpgsqlConnection(ConnectionString);
 
-            await connection.QueryAsync<GameCollection, Game, GameCollection>(
-                @"SELECT gc.Id, gc.Name,
+        var gamesCollectionsDictionary = new Dictionary<long, GameCollection>();
+
+        await connection.QueryAsync<GameCollection, Game, GameCollection>(
+            @"SELECT gc.Id, gc.Name,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
           LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
           LEFT JOIN Games g ON g.Id = gci.GameId
           ORDER BY gc.Id",
-                (gameCollection, game) =>
+            (gameCollection, game) =>
+            {
+                if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out var existingCollection))
                 {
-                    if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out GameCollection? existingCollection))
-                    {
-                        gamesCollectionsDictionary.Add(gameCollection.Id, gameCollection);
-                    }
+                    // Initialize Games list
+                    gameCollection.Games = new List<Game>();
+                    gamesCollectionsDictionary.Add(gameCollection.Id, gameCollection);
+                    existingCollection = gameCollection;
+                }
 
-                    if (game is not null)
-                        gameCollection.Games.Add(game);
+                if (game != null)
+                {
+                    existingCollection.Games.Add(game);
+                }
 
-                    return gameCollection;
-                },
-                splitOn: "Id");
+                return existingCollection;
+            },
+            splitOn: "Id");
 
-            return gamesCollectionsDictionary.Values;
-        }
+        return gamesCollectionsDictionary.Values;
     }
 
     public async Task<GameCollection?> GetAsync(long id)
@@ -84,7 +88,7 @@ RETURNING Id;", new { entity.Name });
                     dictionary.Add(gc.Id, collection);
                 }
 
-                if (g != null && !collection.Games.Any(b => b.Id == g.Id))
+                if (g is not null && !collection.Games.Any(b => b.Id == g.Id))
                 {
                     collection.Games.Add(g);
                 }
@@ -99,38 +103,44 @@ RETURNING Id;", new { entity.Name });
 
     public async Task<IEnumerable<GameCollection>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
-        {
-            var gamesCollectionsDictionary = new Dictionary<long, GameCollection>();
+        using var connection = new NpgsqlConnection(ConnectionString);
 
-            var gamesCollections = await connection.QueryAsync<GameCollection, Game, GameCollection>(
-                @"SELECT gc.Id, gc.Name,
-g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
-FROM GamesCollections gc
-LEFT JOIN GamesCollectionsItems gci
-ON gc.Id=gci.GameCollectionId
-LEFT JOIN Games g
-ON g.Id=gci.GameId
-WHERE gc.Id in 
-(SELECT Id 
-FROM GamesCollections
-OFFSET @offset LIMIT @limit
-ORDER BY Id ASC);", (gameCollection, game) =>
+        var gamesCollectionsDictionary = new Dictionary<long, GameCollection>();
+
+        await connection.QueryAsync<GameCollection, Game, GameCollection>(
+            @"SELECT gc.Id, gc.Name,
+                 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
+          FROM GamesCollections gc
+          LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
+          LEFT JOIN Games g ON g.Id = gci.GameId
+          WHERE gc.Id IN (
+              SELECT Id 
+              FROM GamesCollections 
+              ORDER BY Id ASC 
+              OFFSET @offset LIMIT @limit
+          )
+          ORDER BY gc.Id",
+            (gameCollection, game) =>
+            {
+                if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out var existingCollection))
                 {
-                    if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out var existingCollection))
-                    {
-                        gamesCollectionsDictionary.Add(gameCollection.Id, gameCollection);
-                    }
+                    // Initialize Games list
+                    gameCollection.Games = new List<Game>();
+                    gamesCollectionsDictionary.Add(gameCollection.Id, gameCollection);
+                    existingCollection = gameCollection;
+                }
 
-                    if (game is not null)
-                        gameCollection.Games.Add(game);
+                if (game is not null)
+                {
+                    existingCollection.Games.Add(game);
+                }
 
-                    return gameCollection;
-                }, new { offset, limit },
-                splitOn: "Id");
+                return existingCollection;
+            },
+            new { offset, limit },
+            splitOn: "Id");
 
-            return gamesCollectionsDictionary.Values;
-        }
+        return gamesCollectionsDictionary.Values;
     }
 
     public async Task RemoveAsync(long id)
