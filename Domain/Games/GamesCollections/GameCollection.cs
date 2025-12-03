@@ -9,5 +9,7 @@ public sealed record GameCollection
     [MinLength(1)]
     public string Name { get; set; }
 
+    public string Description { get; set; }
+
     public List<Game> Games { get; set; } = new();
 }

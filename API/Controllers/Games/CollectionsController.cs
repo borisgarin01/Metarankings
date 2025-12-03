@@ -31,6 +31,21 @@ public sealed class CollectionsController : ControllerBase
         }
     }
 
+    [HttpGet("{gameCollectionId:long}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<GameCollection>> GetAsync(long gameCollectionId)
+    {
+        try
+        {
+            GameCollection gamesCollection = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
+            return Ok(gamesCollection);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
+
     [HttpPost]
     public async Task<ActionResult<long>> AddAsync(AddGameCollectionModel addGameCollectionModel)
     {

@@ -1,0 +1,25 @@
+﻿@page "/collections"
+
+@using Domain.Games.Collections
+
+<div id="loop" class="news list">
+    @if (GamesCollections is null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        @foreach (GameCollection item in GamesCollections)
+        {
+            <div class="post clear">
+                <a href="/collections/@item.Id" title="@item.Name" class="news-thumb">
+                    <img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" alt="@item.Name">
+                </a>
+
+                <a class="news-title" href="/collections/@item.Id">@item.Name</a>
+                <div class="post-content">@item.Description</div>
+                <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+            </div>
+        }
+    }
+</div>

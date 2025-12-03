@@ -71,15 +71,14 @@ RETURNING Id;", new { entity.Name });
         {
             var gamesCollectionsDictionary = new Dictionary<long, GameCollection>();
 
-            var gamesCollections = await connection.QueryAsync<GameCollection, Game, GameCollection>(
+            await connection.QueryAsync<GameCollection, Game, GameCollection>(
                 @"SELECT gc.Id, gc.Name,
-g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
-FROM GamesCollections gc
-LEFT JOIN GamesCollectionsItems gci
-ON gc.Id=gci.GameCollectionId
-LEFT JOIN Games g
-ON g.Id=gci.GameId
-WHERE gc.Id=@Id;", (gameCollection, game) =>
+                 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
+          FROM GamesCollections gc
+          LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
+          LEFT JOIN Games g ON g.Id = gci.GameId
+          WHERE gc.Id=@Id",
+                (gameCollection, game) =>
                 {
                     if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out var existingCollection))
                     {
@@ -87,13 +86,11 @@ WHERE gc.Id=@Id;", (gameCollection, game) =>
                         gamesCollectionsDictionary.Add(gameCollection.Id, existingCollection);
                     }
 
-                    if (game != null)
-                    {
+                    if (game != null && !existingCollection.Games.Any(b => b.Id == game.Id))
                         existingCollection.Games.Add(game);
-                    }
 
                     return existingCollection;
-                },
+                }, new { Id = id },
                 splitOn: "Id");
 
             return gamesCollectionsDictionary.Values.SingleOrDefault();

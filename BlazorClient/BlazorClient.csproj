@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Pages\Collections\25fe2jrs.lfm~" />
+    <None Remove="Pages\Collections\2c0vfrkx.ihs~" />
+    <None Remove="Pages\Collections\Details.razor.cs~RF1f7cde0.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.18" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.11" />
