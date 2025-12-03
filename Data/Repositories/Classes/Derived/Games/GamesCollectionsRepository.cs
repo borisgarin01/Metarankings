@@ -37,23 +37,29 @@ RETURNING Id;", new { entity.Name });
         {
             var gamesCollectionsDictionary = new Dictionary<long, GameCollection>();
 
-            var gamesCollections = await connection.QueryAsync<GameCollection, Game, GameCollection>(
+            await connection.QueryAsync<GameCollection, Game, GameCollection>(
                 @"SELECT gc.Id, gc.Name,
-g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
-FROM GamesCollections gc
-LEFT JOIN GamesCollectionsItems gci
-ON gc.Id=gci.GameCollectionId
-LEFT JOIN Games g
-ON g.Id=gci.GameId;", (gameCollection, game) =>
+                 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
+          FROM GamesCollections gc
+          LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
+          LEFT JOIN Games g ON g.Id = gci.GameId
+          ORDER BY gc.Id",
+                (gameCollection, game) =>
                 {
-                    if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out GameCollection gc))
+                    if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out var existingCollection))
                     {
-                        if (game is not null && !gameCollection.Games.Any(b => b.Id == game.Id))
-                            gameCollection.Games.Add(game);
-                        gamesCollectionsDictionary.Add(gameCollection.Id, gameCollection);
+                        existingCollection = gameCollection;
+                        gamesCollectionsDictionary.Add(gameCollection.Id, existingCollection);
                     }
-                    return gameCollection;
-                });
+
+                    if (game != null)
+                    {
+                        existingCollection.Games.Add(game);
+                    }
+
+                    return existingCollection;
+                },
+                splitOn: "Id");
 
             return gamesCollectionsDictionary.Values;
         }
