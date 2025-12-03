@@ -81,14 +81,20 @@ LEFT JOIN Games g
 ON g.Id=gci.GameId
 WHERE gc.Id=@Id;", (gameCollection, game) =>
                 {
-                    if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out GameCollection gc))
+                    if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out var existingCollection))
                     {
-                        if (game is not null && !gameCollection.Games.Any(b => b.Id == game.Id))
-                            gameCollection.Games.Add(game);
-                        gamesCollectionsDictionary.Add(game.Id, gameCollection);
+                        existingCollection = gameCollection;
+                        gamesCollectionsDictionary.Add(gameCollection.Id, existingCollection);
                     }
-                    return gameCollection;
-                }, new { Id = id });
+
+                    if (game != null)
+                    {
+                        existingCollection.Games.Add(game);
+                    }
+
+                    return existingCollection;
+                },
+                splitOn: "Id");
 
             return gamesCollectionsDictionary.Values.SingleOrDefault();
         }
@@ -114,15 +120,20 @@ FROM GamesCollections
 OFFSET @offset LIMIT @limit
 ORDER BY Id ASC);", (gameCollection, game) =>
                 {
-                    if (!gamesCollectionsDictionary.TryGetValue(game.Id, out GameCollection gc))
+                    if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out var existingCollection))
                     {
-                        if (game is not null && !gameCollection.Games.Any(b => b.Id == game.Id))
-                            gameCollection.Games.Add(game);
-                        gamesCollectionsDictionary.Add(game.Id, gameCollection);
+                        existingCollection = gameCollection;
+                        gamesCollectionsDictionary.Add(gameCollection.Id, existingCollection);
                     }
 
-                    return gameCollection;
-                }, new { offset, limit });
+                    if (game != null)
+                    {
+                        existingCollection.Games.Add(game);
+                    }
+
+                    return existingCollection;
+                }, new { offset, limit },
+                splitOn: "Id");
 
             return gamesCollectionsDictionary.Values;
         }
