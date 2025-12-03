@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Pages.Games.Games;
 
-public partial class GamesList : ComponentBase
+public partial class GamesListPage : ComponentBase
 {
     [Inject]
     public HttpClient HttpClient { get; set; }

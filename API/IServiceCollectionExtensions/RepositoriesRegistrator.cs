@@ -3,7 +3,9 @@ using Data.Repositories.Classes.Derived.Movies;
 using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
+using Domain.Games.Collections;
 using Domain.Movies;
+using Domain.RequestsModels.Games.Collections;
 using Domain.RequestsModels.Games.Developers;
 using Domain.RequestsModels.Games.Genres;
 using Domain.RequestsModels.Games.Localizations;
@@ -46,6 +48,10 @@ public static class RepositoriesRegistrator
         services.AddScoped(instance => new GamesPlayersReviewsRepository(metarankingsConnectionString));
 
         services.AddScoped<IMoviesViewersReviewsRepository, MoviesViewersReviewsRepository>(instance => new MoviesViewersReviewsRepository(metarankingsConnectionString));
+
+        services.AddScoped<IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel>, GamesCollectionsRepository>(instance => new GamesCollectionsRepository(metarankingsConnectionString));
+
+        services.AddScoped<IRepository<GameCollectionItem, AddGameCollectionItemModel, UpdateGameCollectionItemModel>, GamesCollectionsItemsRepository>(instance => new GamesCollectionsItemsRepository(metarankingsConnectionString));
 
         return services;
     }
