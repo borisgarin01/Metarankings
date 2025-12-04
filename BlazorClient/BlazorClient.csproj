@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Pages\Admin\Games\Collections\ManageCollectionPage.razor.cs~RF12032bf.TMP" />
     <None Remove="Pages\Collections\25fe2jrs.lfm~" />
     <None Remove="Pages\Collections\2c0vfrkx.ihs~" />
     <None Remove="Pages\Collections\Details.razor.cs~RF1f7cde0.TMP" />

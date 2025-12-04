@@ -26,6 +26,17 @@
                 <a class="news-title" href="/games/collections/@item.Id">@item.Name</a>
                 <div class="post-content">@item.Description</div>
                 <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+
+                <AuthorizeView Policy="Admin">
+                    <Authorized>
+                        <div style="display:flex">
+                            <a href="/admin/games/collections/@item.Id/manage-collection/">Управление подборкой</a>
+                        </div>
+                        <div style="display:flex">
+                            <a @onclick="(() => DeleteCollectionAsync(item.Id))">Удалить</a>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
             </div>
         }
     }

@@ -1,5 +1,8 @@
 ﻿
 using Domain.Games.Collections;
+using Domain.RequestsModels.Games.Collections;
+using WebManagers;
+using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Collections;
 
@@ -8,7 +11,7 @@ public partial class CollectionsList : ComponentBase
     private IEnumerable<GameCollection> gamesCollections;
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IWebManager<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> GamesCollectionsWebManager { get; set; }
 
     public IEnumerable<GameCollection> GamesCollections
     {
@@ -22,6 +25,12 @@ public partial class CollectionsList : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        GamesCollections = await HttpClient.GetFromJsonAsync<IEnumerable<GameCollection>>(@"/api/Games/Collections");
+        GamesCollections = await GamesCollectionsWebManager.GetAllAsync();
+    }
+
+    public async Task DeleteCollectionAsync(long id)
+    {
+        await GamesCollectionsWebManager.DeleteAsync(id);
+        GamesCollections = await GamesCollectionsWebManager.GetAllAsync();
     }
 }

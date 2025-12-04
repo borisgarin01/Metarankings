@@ -1,4 +1,6 @@
-﻿using Domain.Games.Collections;
+﻿using Domain.Games;
+using Domain.Games.Collections;
+using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Games.Collections;
 using WebManagers;
 
@@ -6,6 +8,9 @@ namespace BlazorClient.Pages.Admin.Games.Collections;
 
 public partial class AddCollectionPage : ComponentBase
 {
+    [Inject]
+    public IWebManager<Game, AddGameModel, UpdateGameModel> GamesWebManager { get; set; }
+
     [Inject]
     public IWebManager<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> GamesCollectionsWebManager { get; set; }
 
@@ -25,9 +30,26 @@ public partial class AddCollectionPage : ComponentBase
     [MinLength(1)]
     public string Description { get; set; }
 
+    public IEnumerable<Game> GamesToSelectFrom { get; set; }
+
+    public IEnumerable<long> SelectedGamesIds { get; private set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GamesToSelectFrom = await GamesWebManager.GetAllAsync();
+    }
+
+    public Task SelectGames(ChangeEventArgs e)
+    {
+        SelectedGamesIds = ((string[])e.Value)
+            .Select(idString => long.Parse(idString))
+            .ToList();
+        return Task.CompletedTask;
+    }
+
     public async Task AddGameCollectionAsync()
     {
-        var addGameCollectionModel = new AddGameCollectionModel(CollectionName, Description);
+        var addGameCollectionModel = new AddGameCollectionModel(CollectionName, Description, SelectedGamesIds);
 
         HttpResponseMessage gameCreationHttpResponseMessage = await GamesCollectionsWebManager.AddAsync(addGameCollectionModel);
 

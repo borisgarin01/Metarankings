@@ -10,10 +10,12 @@ namespace API.Controllers.Games;
 public sealed class CollectionsController : ControllerBase
 {
     private readonly IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> _gamesCollectionsRepository;
+    private readonly IRepository<GameCollectionItem, AddGameCollectionItemModel, UpdateGameCollectionItemModel> _gamesCollectionsItemsRepository;
 
-    public CollectionsController(IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> gamesCollectionsRepository)
+    public CollectionsController(IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> gamesCollectionsRepository, IRepository<GameCollectionItem, AddGameCollectionItemModel, UpdateGameCollectionItemModel> gamesCollectionsItemsRepository)
     {
         _gamesCollectionsRepository = gamesCollectionsRepository;
+        _gamesCollectionsItemsRepository = gamesCollectionsItemsRepository;
     }
 
     [HttpGet]
@@ -67,6 +69,12 @@ public sealed class CollectionsController : ControllerBase
         try
         {
             long insertedGameCollectionId = await _gamesCollectionsRepository.AddAsync(addGameCollectionModel);
+
+            foreach (long seletedGameId in addGameCollectionModel.SelectedGamesIds)
+            {
+                await _gamesCollectionsItemsRepository.AddAsync(new AddGameCollectionItemModel(seletedGameId, insertedGameCollectionId));
+            }
+
             return Ok(insertedGameCollectionId);
         }
         catch (Exception ex)
