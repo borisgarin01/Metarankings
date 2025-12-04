@@ -1,11 +1,13 @@
 ﻿using Domain.Games;
 using Domain.RequestsModels.Games;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO;
 using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Games.Games;
 
+[Authorize(Policy = "Admin")]
 public partial class AddGamePage : ComponentBase
 {
     protected override async Task OnInitializedAsync()

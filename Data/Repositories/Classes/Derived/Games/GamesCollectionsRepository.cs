@@ -71,35 +71,31 @@ RETURNING Id;", new { entity.Name, entity.Description });
     {
         using var connection = new NpgsqlConnection(ConnectionString);
 
-        var dictionary = new Dictionary<long, GameCollection>();
-
-        await connection.QueryAsync<GameCollection, Game, GameCollection>(
+        var gamesCollection = await connection.QueryAsync<GameCollection, Game, GameCollection>(
             @"SELECT gc.Id, gc.Name, gc.Description,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
           LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
           LEFT JOIN Games g ON g.Id = gci.GameId
           WHERE gc.Id = @Id",
-            (gc, g) =>
+            (gamesCollection, game) =>
             {
-                if (!dictionary.TryGetValue(gc.Id, out var collection))
-                {
-                    collection = gc;
-                    collection.Games = new List<Game>();
-                    dictionary.Add(gc.Id, collection);
-                }
-
-                if (g is not null && !collection.Games.Any(b => b.Id == g.Id))
-                {
-                    collection.Games.Add(g);
-                }
-
-                return collection;
+                if (!gamesCollection.Games.Any(b => b.Id == game.Id))
+                    gamesCollection.Games.Add(game);
+                return gamesCollection;
             },
             new { Id = id },
             splitOn: "Id");
 
-        return dictionary.Values.SingleOrDefault();
+        IEnumerable<GameCollection> gamesCollectionGrouped = gamesCollection.GroupBy(b => new { b.Id })
+                .Select(g =>
+                {
+                    GameCollection gameCollection = g.First();
+                    gameCollection.Games = g.SelectMany(b => b.Games).ToList();
+                    return gameCollection;
+                });
+
+        return gamesCollectionGrouped.SingleOrDefault();
     }
 
     public async Task<IEnumerable<GameCollection>> GetAsync(long offset, long limit)
