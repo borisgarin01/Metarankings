@@ -1,6 +1,7 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
 using Domain.Games.Collections;
+using Domain.RequestsModels.Games.Collections;
 
 namespace Data.Repositories.Classes.Derived.Games;
 

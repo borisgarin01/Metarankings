@@ -22,7 +22,7 @@ public partial class Details : ComponentBase
     [Inject]
     public HttpClient HttpClient { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
         GameCollection = await HttpClient.GetFromJsonAsync<GameCollection>($"/api/games/collections/{GameCollectionId}");
     }

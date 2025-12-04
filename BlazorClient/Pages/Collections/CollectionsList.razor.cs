@@ -20,7 +20,7 @@ public partial class CollectionsList : ComponentBase
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
         GamesCollections = await HttpClient.GetFromJsonAsync<IEnumerable<GameCollection>>(@"/api/Games/Collections");
     }

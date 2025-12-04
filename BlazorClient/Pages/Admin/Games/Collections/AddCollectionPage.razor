@@ -1,0 +1,10 @@
+﻿@page "/admin/games/collections/add-collection"
+
+<h3>Добавь подборку</h3>
+
+<EditForm OnValidSubmit="@AddGameCollectionAsync" Model="this">
+    <DataAnnotationsValidator />
+    <InputText @bind-Value="@CollectionName" />
+    <InputTextArea @bind-Value="@Description" />
+    <input type="submit" value="Add" />
+</EditForm>

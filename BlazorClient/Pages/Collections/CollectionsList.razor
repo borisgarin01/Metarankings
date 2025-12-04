@@ -9,6 +9,13 @@
     }
     else
     {
+        <AuthorizeView Policy="Admin">
+            <Authorized>
+                <div>
+                    <a href="/admin/games/collections/add-collection">Добавить подборку</a>
+                </div>
+            </Authorized>
+        </AuthorizeView>
         @foreach (GameCollection item in GamesCollections)
         {
             <div class="post clear">

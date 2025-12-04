@@ -1,7 +1,9 @@
 using BlazorClient.Auth;
 using Domain.Games;
+using Domain.Games.Collections;
 using Domain.Movies;
 using Domain.RequestsModels.Games;
+using Domain.RequestsModels.Games.Collections;
 using Domain.RequestsModels.Games.Developers;
 using Domain.RequestsModels.Games.Genres;
 using Domain.RequestsModels.Games.Localizations;
@@ -37,6 +39,7 @@ internal class Program
         builder.Services.AddScoped<IWebManager<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsWebManager>();
         builder.Services.AddScoped<IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersWebManager>();
         builder.Services.AddScoped<IWebManager<Game, AddGameModel, UpdateGameModel>, GamesWebManager>();
+        builder.Services.AddScoped<IWebManager<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel>, GamesCollectionsWebManager>();
 
         builder.Services.AddScoped<IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsWebManager>();
         builder.Services.AddScoped<IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>();

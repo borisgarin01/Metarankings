@@ -1,6 +1,6 @@
-﻿using Data.Repositories.Classes.Derived.Games;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
 using Domain.Games.Collections;
+using Domain.RequestsModels.Games.Collections;
 
 namespace API.Controllers.Games;
 
@@ -23,6 +23,21 @@ public sealed class CollectionsController : ControllerBase
         try
         {
             IEnumerable<GameCollection> gamesCollections = await _gamesCollectionsRepository.GetAllAsync();
+            return Ok(gamesCollections);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
+
+    [HttpGet("{offset:long}/{limit:long}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<GameCollection>>> GetAllAsync(long offset, long limit)
+    {
+        try
+        {
+            IEnumerable<GameCollection> gamesCollections = await _gamesCollectionsRepository.GetAsync(offset, limit);
             return Ok(gamesCollections);
         }
         catch (Exception ex)
