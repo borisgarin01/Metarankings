@@ -1,14 +1,15 @@
-﻿using Data.Repositories.Interfaces;
-using Domain.Games;
-using IdentityLibrary.DTOs;
+﻿using Dapper;
 using Data.Extensions;
-using Dapper;
-using Domain.Reviews;
-using Domain.RequestsModels.Games;
+using Data.Repositories.Interfaces;
+using Data.Repositories.Interfaces.Derived;
+using Domain.Games;
 using Domain.Games.Collections;
+using Domain.RequestsModels.Games;
+using Domain.Reviews;
+using IdentityLibrary.DTOs;
 
 namespace Data.Repositories.Classes.Derived.Games;
-public sealed class GamesRepository : Repository, IRepository<Game, AddGameModel, UpdateGameModel>
+public sealed class GamesRepository : Repository, IGamesRepository
 {
     public GamesRepository(string connectionString) : base(connectionString)
     {
@@ -758,5 +759,129 @@ WHERE EXTRACT(YEAR FROM g.ReleaseDate) = @Year;";
     public Task<IEnumerable<Game>> GetAsync(long offset, long limit)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<Game>> GetByParametersAsync(
+    long[]? genresIds,
+    long[]? platformsIds,
+    long[]? years,
+    long[]? developersIds,
+    long[]? publishersIds,
+    int skip,
+    int take)
+    {
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            // Build the base SQL with all joins
+            var sqlBuilder = new StringBuilder(@"SELECT DISTINCT
+    g.Id, g.Name, g.Image, g.ReleaseDate, g.Description,
+    d.Id, d.Name,
+    p.Id, p.Name,
+    gen.Id, gen.Name,
+    l.Id, l.Name,
+    platf.Id, platf.Name,
+    gs.Id, gs.GameId, gs.ImageUrl,
+    gc.Id, gc.Name, gc.Description
+FROM games g
+LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+LEFT JOIN developers d ON d.id = gd.developerid
+LEFT JOIN gamespublishers gpub on gpub.gameid = g.id
+LEFT JOIN publishers p on p.id = gpub.publisherid
+LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+LEFT JOIN genres gen ON gen.id = gg.genreid
+LEFT JOIN localizations l ON l.id = g.localizationid
+LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+LEFT JOIN platforms platf ON platf.id = gplatf.platformid
+LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
+LEFT JOIN gamescollections gc on gc.Id = gci.GameCollectionId
+WHERE 1=1");
+
+            var parameters = new DynamicParameters();
+
+            // Add filters conditionally
+            if (genresIds != null && genresIds.Length > 0)
+            {
+                sqlBuilder.Append(" AND gg.genreid = ANY(@GenresIds)");
+                parameters.Add("GenresIds", genresIds);
+            }
+
+            if (platformsIds != null && platformsIds.Length > 0)
+            {
+                sqlBuilder.Append(" AND gplatf.platformid = ANY(@PlatformsIds)");
+                parameters.Add("PlatformsIds", platformsIds);
+            }
+
+            if (years != null && years.Length > 0)
+            {
+                sqlBuilder.Append(" AND EXTRACT(YEAR FROM g.ReleaseDate) = ANY(@Years)");
+                parameters.Add("Years", years);
+            }
+
+            if (developersIds != null && developersIds.Length > 0)
+            {
+                sqlBuilder.Append(" AND gd.developerid = ANY(@DevelopersIds)");
+                parameters.Add("DevelopersIds", developersIds);
+            }
+
+            if (publishersIds != null && publishersIds.Length > 0)
+            {
+                sqlBuilder.Append(" AND gpub.publisherid = ANY(@PublishersIds)");
+                parameters.Add("PublishersIds", publishersIds);
+            }
+
+            // Add pagination
+            sqlBuilder.Append(" ORDER BY g.Name OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY");
+            parameters.Add("Skip", skip);
+            parameters.Add("Take", take);
+
+            var gameDictionary = new Dictionary<string, Game>();
+
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+                sqlBuilder.ToString(),
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
+                {
+                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    {
+                        gameEntry = game;
+                        gameEntry.Developers = new List<Developer>();
+                        gameEntry.Genres = new List<Genre>();
+                        gameEntry.Platforms = new List<Platform>();
+                        gameEntry.Screenshots = new List<GameScreenshot>();
+                        gameEntry.Publishers = new List<Publisher>();
+                        gameEntry.GameCollections = new List<GameCollection>();
+                        gameDictionary.Add(gameEntry.Name, gameEntry);
+                    }
+
+                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
+                        gameEntry.Developers.Add(developer);
+
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
+
+                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
+                        gameEntry.Genres.Add(genre);
+
+                    if (localization is not null && gameEntry.Localization == null)
+                        gameEntry.Localization = localization;
+
+                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                        gameEntry.Platforms.Add(platform);
+
+                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
+                        gameEntry.Screenshots.Add(screenshot);
+
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(b => b.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
+                    return gameEntry;
+                },
+                parameters,
+                splitOn: "Id,Id,Id,Id,Id,Id,Id"
+            );
+
+            var result = gameDictionary.Values.ToList();
+            return result;
+        }
     }
 }

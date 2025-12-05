@@ -1,6 +1,7 @@
 ﻿using API.Json;
 using Data.Repositories.Classes.Derived.Games;
 using Domain.Games;
+using Domain.RequestsModels;
 using Domain.RequestsModels.Games;
 using IdentityLibrary.Telegram;
 
@@ -79,83 +80,19 @@ public sealed class GamesController : ControllerBase
         return Ok(game);
     }
 
-    [HttpGet("genres/{genreId:long}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfGenre(long genreId)
+    [HttpPost("byParameters")]
+    public async Task<ActionResult<IEnumerable<Game>>> GetByParametersAsync(GameFilterRequest filter)
     {
-        try
-        {
-            IEnumerable<Game>? gamesOfGenre = await _gamesRepository.GetByGenreIdAsync(genreId);
-            if (gamesOfGenre is null)
-                return NotFound();
-            return Ok(gamesOfGenre);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex);
-        }
-    }
+        IEnumerable<Game> games = await _gamesRepository.GetByParametersAsync(
+            filter.GenresIds,
+            filter.PlatformsIds,
+            filter.Years,
+            filter.DevelopersIds,
+            filter.PublishersIds,
+            filter.Skip,
+            filter.Take
+        );
 
-    [HttpGet("platforms/{platformId:long}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfPlatform(long platformId)
-    {
-        try
-        {
-            IEnumerable<Game>? gamesOfPlatform = await _gamesRepository.GetByPlatformIdAsync(platformId);
-            if (gamesOfPlatform is null)
-                return NotFound();
-            return Ok(gamesOfPlatform);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex);
-        }
-    }
-
-    [HttpGet("developers/{developerId:long}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfDeveloper(long developerId)
-    {
-        try
-        {
-            IEnumerable<Game>? gamesOfDeveloper = await _gamesRepository.GetByDeveloperIdAsync(developerId);
-            if (gamesOfDeveloper is null)
-                return NotFound();
-            return Ok(gamesOfDeveloper);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex);
-        }
-    }
-
-    [HttpGet("publishers/{publisherId:long}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfPublisher(long publisherId)
-    {
-        try
-        {
-            IEnumerable<Game>? gamesOfDeveloper = await _gamesRepository.GetByPublisherIdAsync(publisherId);
-            if (gamesOfDeveloper is null)
-                return NotFound();
-            return Ok(gamesOfDeveloper);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex);
-        }
-    }
-
-    [HttpGet("year/{year:int}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetGamesOfYear(int year)
-    {
-        try
-        {
-            IEnumerable<Game>? gamesOfYear = await _gamesRepository.GetByReleaseYearAsync(year);
-            if (gamesOfYear is null)
-                return NotFound();
-            return Ok(gamesOfYear);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex);
-        }
+        return Ok(games);
     }
 }

@@ -3,5 +3,5 @@
 public partial class BestGamesOfYearByPlatformsComponent : ComponentBase
 {
     [Parameter, EditorRequired]
-    public int Year { get; set; }
+    public long Year { get; set; }
 }
