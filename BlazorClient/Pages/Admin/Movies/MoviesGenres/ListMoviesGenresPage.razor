@@ -1,23 +1,24 @@
-﻿@page "/admin/movies/movies/movies-list"
+﻿@page "/admin/movies/movies-genres/list-genres"
+@using Domain.Games
 @using Domain.Movies
 
 <AuthorizeView Policy="Admin">
     <Authorized>
         <a href="/admin">К странице админа</a>
-        <a href="/admin/movies/movies/add-movie">Добавить фильм</a>
-        <div class="moviesList">
-            @if (Movies is null)
+        <a href="/admin/movies/movies-genres/add-movie-genre">Добавить жанр</a>
+        <div class="gamesList">
+            @if (Genres is null)
             {
                 <p>Загружается...</p>
             }
             else
             {
-                foreach (Movie movie in Movies)
+                foreach (Genre genre in Genres)
                 {
                     <div class="movie">
-                        <h4>@movie.Name</h4>
-                        <a href="/admin/movies/remove-movie/@movie.Id">Remove movie</a>
-                        <a href="/games/Details/@movie.Id">Details</a>
+                        <h4>@genre.Name</h4>
+                        <a href="/admin/genres/remove-genre/@genre.Id">Remove movie</a>
+                        <a href="/movies/Details/@genre.Id">Details</a>
                     </div>
                 }
             }
@@ -27,4 +28,3 @@
         <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a>, чтобы добавить игру
     </NotAuthorized>
 </AuthorizeView>
-

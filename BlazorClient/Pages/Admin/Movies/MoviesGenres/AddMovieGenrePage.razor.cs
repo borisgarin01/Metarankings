@@ -21,7 +21,7 @@ public partial class AddMovieGenrePage : ComponentBase
     {
         HttpResponseMessage httpResponseMessage = await MoviesGenresManager.AddAsync(new AddMovieGenreModel(Name));
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
-            NavigationManager.NavigateTo("/admin/movies/movies-genres/movies-genres-list");
+            NavigationManager.NavigateTo("/movies/movies-genres/list-genres");
         else
             if (httpResponseMessage is not null)
             await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());

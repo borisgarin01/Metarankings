@@ -5,6 +5,9 @@ namespace BlazorClient.Components.PagesComponents.MovieDetails;
 
 public partial class MovieMetadata : ComponentBase
 {
+    [Parameter]
+    public string OriginalName { get; set; }
+
     [Parameter, EditorRequired]
     public IEnumerable<Genre> Genres { get; set; }
 

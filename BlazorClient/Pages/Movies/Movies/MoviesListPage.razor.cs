@@ -1,7 +1,6 @@
-﻿
-using Domain.Movies;
+﻿using Domain.Movies;
 
-namespace BlazorClient.Pages.Admin.Movies.Movies;
+namespace BlazorClient.Pages.Movies.Movies;
 
 public partial class MoviesListPage : ComponentBase
 {
