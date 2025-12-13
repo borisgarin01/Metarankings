@@ -41,9 +41,15 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
         return games;
     }
 
-    public async Task<IEnumerable<Game>> GetAllAsync(long offset, long limit)
+    public async Task<IEnumerable<Game>> GetFirstAsync(long offset, long limit)
     {
-        var games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/{offset}/{limit}");
+        var games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/First/{offset}/{limit}");
+        return games;
+    }
+
+    public async Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    {
+        var games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/Last/{offset}/{limit}");
         return games;
     }
 

@@ -43,7 +43,7 @@ public sealed class LocalizationsWebManager : WebManager, IWebManager<Localizati
         return localizations;
     }
 
-    public async Task<IEnumerable<Localization>> GetAllAsync(long offset, long limit)
+    public async Task<IEnumerable<Localization>> GetFirstAsync(long offset, long limit)
     {
         var localizations = await HttpClient.GetFromJsonAsync<IEnumerable<Localization>>($"/api/Games/Localizations/{offset}/{limit}");
         return localizations;
@@ -66,5 +66,10 @@ public sealed class LocalizationsWebManager : WebManager, IWebManager<Localizati
         {
             return null;
         }
+    }
+
+    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    {
+        throw new NotImplementedException();
     }
 }

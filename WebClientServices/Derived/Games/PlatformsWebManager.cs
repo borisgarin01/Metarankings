@@ -41,7 +41,7 @@ public sealed class PlatformsWebManager : WebManager, IWebManager<Platform, AddP
         return platforms;
     }
 
-    public Task<IEnumerable<Platform>> GetAllAsync(long offset, long limit)
+    public Task<IEnumerable<Platform>> GetFirstAsync(long offset, long limit)
     {
         var platforms = HttpClient.GetFromJsonAsync<IEnumerable<Platform>>($"/api/Games/Platforms/{offset}/{limit}");
         return platforms;
@@ -58,5 +58,10 @@ public sealed class PlatformsWebManager : WebManager, IWebManager<Platform, AddP
         HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync($"/api/Games/Platforms/{id}", tUpdate);
         var platform = await JsonSerializer.DeserializeAsync<Platform>(await httpResponseMessage.Content.ReadAsStreamAsync());
         return platform;
+    }
+
+    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    {
+        throw new NotImplementedException();
     }
 }

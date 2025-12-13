@@ -42,7 +42,7 @@ public sealed class DevelopersWebManager : WebManager, IWebManager<Developer, Ad
         return developers;
     }
 
-    public async Task<IEnumerable<Developer>> GetAllAsync(long offset, long limit)
+    public async Task<IEnumerable<Developer>> GetFirstAsync(long offset, long limit)
     {
         var developers = await HttpClient.GetFromJsonAsync<IEnumerable<Developer>>($"/api/Games/Developers/{offset}/{limit}");
         return developers;
@@ -65,5 +65,10 @@ public sealed class DevelopersWebManager : WebManager, IWebManager<Developer, Ad
         {
             return null;
         }
+    }
+
+    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    {
+        throw new NotImplementedException();
     }
 }

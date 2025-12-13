@@ -42,7 +42,7 @@ public sealed class GenresWebManager : WebManager, IWebManager<Genre, AddGenreMo
         return genres;
     }
 
-    public async Task<IEnumerable<Genre>> GetAllAsync(long offset, long limit)
+    public async Task<IEnumerable<Genre>> GetFirstAsync(long offset, long limit)
     {
         var genres = await HttpClient.GetFromJsonAsync<IEnumerable<Genre>>($"/api/Games/Genres/{offset}/{limit}");
         return genres;
@@ -65,5 +65,10 @@ public sealed class GenresWebManager : WebManager, IWebManager<Genre, AddGenreMo
         {
             return null;
         }
+    }
+
+    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    {
+        throw new NotImplementedException();
     }
 }

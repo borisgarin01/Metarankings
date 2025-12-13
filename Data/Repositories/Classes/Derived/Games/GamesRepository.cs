@@ -79,7 +79,7 @@ RETURNING Id, GameId, DeveloperId;", new { GameId = insertedGame.Id, DeveloperId
             await AddAsync(entity);
     }
 
-    public async Task<IEnumerable<Game>> GetAsync(int offset, int limit)
+    public async Task<IEnumerable<Game>> GetFirstAsync(int offset, int limit)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -94,6 +94,82 @@ gs.Id, gs.GameId, gs.ImageUrl,
 gc.Id, gc.Name, gc.Description
     FROM (select Id, Name, Image, ReleaseDate, Description, LocalizationId 
         from Games ORDER BY id asc
+        OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+    LEFT JOIN publishers p on p.id = gpub.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms plat ON plat.id = gplatf.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
+    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId";
+
+            var gameDictionary = new Dictionary<long, Game>();
+
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+                sql,
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
+                {
+                    if (!gameDictionary.TryGetValue(game.Id, out Game? gameEntry))
+                    {
+                        gameEntry = game;
+                        gameEntry.Developers = new List<Developer>();
+                        gameEntry.Genres = new List<Genre>();
+                        gameEntry.Platforms = new List<Platform>();
+                        gameEntry.Screenshots = new List<GameScreenshot>();
+                        gameDictionary.Add(gameEntry.Id, gameEntry);
+                    }
+
+                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
+                        gameEntry.Developers.Add(developer);
+
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
+
+                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
+                        gameEntry.Genres.Add(genre);
+
+                    if (localization is not null && gameEntry.Localization == null)
+                        gameEntry.Localization = localization;
+
+                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                        gameEntry.Platforms.Add(platform);
+
+                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
+                        gameEntry.Screenshots.Add(screenshot);
+
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(b => b.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
+                    return gameEntry;
+                }, new { offset, limit },
+                splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+            );
+
+            var result = gameDictionary.Values.ToList();
+
+            return result;
+        }
+    }
+    public async Task<IEnumerable<Game>> GetLastAsync(int offset, int limit)
+    {
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            var sql = @"SELECT         
+g.Id, g.name, g.image, g.releasedate, g.description,
+d.id, d.name, 
+p.id, p.name, 
+gen.id, gen.name, 
+l.id, l.name,
+plat.id, plat.name, 
+gs.Id, gs.GameId, gs.ImageUrl,
+gc.Id, gc.Name, gc.Description
+    FROM (select Id, Name, Image, ReleaseDate, Description, LocalizationId 
+        from Games ORDER BY id desc
         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN developers d ON d.id = gd.developerid

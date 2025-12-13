@@ -1,4 +1,5 @@
-﻿using Domain.Games.Collections;
+﻿using Domain.Games;
+using Domain.Games.Collections;
 using Domain.RequestsModels.Games.Collections;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
@@ -40,7 +41,7 @@ public sealed class GamesCollectionsWebManager : WebManager, IWebManager<GameCol
         return gamesCollections;
     }
 
-    public async Task<IEnumerable<GameCollection>> GetAllAsync(long offset, long limit)
+    public async Task<IEnumerable<GameCollection>> GetFirstAsync(long offset, long limit)
     {
         var gameCollections = await HttpClient.GetFromJsonAsync<IEnumerable<GameCollection>>($"/api/Games/Collections/{offset}/{limit}");
         return gameCollections;
@@ -63,5 +64,10 @@ public sealed class GamesCollectionsWebManager : WebManager, IWebManager<GameCol
         }
 
         return null;
+    }
+
+    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    {
+        throw new NotImplementedException();
     }
 }

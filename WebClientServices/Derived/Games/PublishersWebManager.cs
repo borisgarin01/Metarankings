@@ -41,7 +41,7 @@ public sealed class PublishersWebManager : WebManager, IWebManager<Publisher, Ad
         return publishers;
     }
 
-    public async Task<IEnumerable<Publisher>> GetAllAsync(long offset, long limit)
+    public async Task<IEnumerable<Publisher>> GetFirstAsync(long offset, long limit)
     {
         var publishers = await HttpClient.GetFromJsonAsync<IEnumerable<Publisher>>($"/api/Games/Publishers/{offset}/{limit}");
         return publishers;
@@ -59,5 +59,10 @@ public sealed class PublishersWebManager : WebManager, IWebManager<Publisher, Ad
         if (publisherUpdateHttpResponseMessage.IsSuccessStatusCode)
             return await JsonSerializer.DeserializeAsync<Publisher>(await publisherUpdateHttpResponseMessage.Content.ReadAsStreamAsync());
         return null;
+    }
+
+    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    {
+        throw new NotImplementedException();
     }
 }

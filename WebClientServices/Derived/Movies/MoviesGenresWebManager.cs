@@ -1,4 +1,5 @@
-﻿using Domain.Movies;
+﻿using Domain.Games;
+using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesGenres;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
@@ -39,7 +40,7 @@ public sealed class MoviesGenresWebManager : WebManager, IWebManager<MovieGenre,
         return moviesGenres;
     }
 
-    public async Task<IEnumerable<MovieGenre>> GetAllAsync(long offset, long limit)
+    public async Task<IEnumerable<MovieGenre>> GetFirstAsync(long offset, long limit)
     {
         IEnumerable<MovieGenre> moviesGenres = await HttpClient.GetFromJsonAsync<IEnumerable<MovieGenre>>($"/api/movies/moviesGenres/{offset}/{limit}");
         return moviesGenres;
@@ -59,5 +60,10 @@ public sealed class MoviesGenresWebManager : WebManager, IWebManager<MovieGenre,
             return await JsonSerializer.DeserializeAsync<MovieGenre>(await httpResponseMessage.Content.ReadAsStreamAsync());
 
         return null;
+    }
+
+    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    {
+        throw new NotImplementedException();
     }
 }

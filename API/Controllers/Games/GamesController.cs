@@ -4,6 +4,7 @@ using Domain.Games;
 using Domain.RequestsModels;
 using Domain.RequestsModels.Games;
 using IdentityLibrary.Telegram;
+using NPOI.SS.Formula.Functions;
 
 namespace API.Controllers.Games;
 
@@ -24,10 +25,17 @@ public sealed class GamesController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet("{pageNumber:int}/{pageSize:int}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
+    [HttpGet("First/{offset:int}/{limit:int}")]
+    public async Task<ActionResult<IEnumerable<Game>>> GetFirstAsync(int offset = 0, int limit = 25, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Game> games = await _gamesRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
+        IEnumerable<Game> games = await _gamesRepository.GetFirstAsync(offset, limit);
+        return Ok(games);
+    }
+
+    [HttpGet("Last/{offset:int}/{limit:int}")]
+    public async Task<ActionResult<IEnumerable<Game>>> GetLastAsync(int offset = 0, int limit = 25, CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Game> games = await _gamesRepository.GetLastAsync(offset, limit);
         return Ok(games);
     }
 
