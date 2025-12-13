@@ -74,7 +74,7 @@ public partial class AddGamePage : ComponentBase
                 string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
 
                 // Build the URL with parameters
-                var url = $"api/games/images/{ReleaseDate.Year}/{ReleaseDate.Month}/{uploadingImageName}";
+                var url = $"api/games/images/{ReleaseDate.Year}/{ReleaseDate.Month}/{uploadingFileNameWithCorrectExtention}";
 
                 // Send the request with authentication token
                 var response = await HttpClient.PostAsync(url, content);

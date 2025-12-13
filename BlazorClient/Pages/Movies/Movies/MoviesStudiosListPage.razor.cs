@@ -2,7 +2,7 @@
 using Domain.RequestsModels.Movies.MoviesStudios;
 using WebManagers;
 
-namespace BlazorClient.Pages.Admin.Movies.MoviesStudios;
+namespace BlazorClient.Pages.Movies.Movies;
 
 public partial class MoviesStudiosListPage : ComponentBase
 {

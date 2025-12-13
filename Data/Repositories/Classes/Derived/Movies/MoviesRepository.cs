@@ -1,5 +1,6 @@
 ﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
+using Domain.RequestsModels.Movies.Movies;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
 
@@ -18,35 +19,35 @@ public sealed class MoviesRepository : Repository, IMoviesRepository
             var insertedMovieStudios = new List<MovieStudio>();
             var insertedMovieDirectors = new List<MovieDirector>();
 
-            foreach (var movieGenre in entity.AddMovieGenresModels)
+            foreach (var movieGenreName in entity.MoviesGenresNames)
             {
                 var movieGenreToFind = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"SELECT Id, Name
 FROM MoviesGenres
-WHERE Name=@Name;", new { movieGenre.Name });
+WHERE Name=@Name;", new { Name = movieGenreName });
 
                 if (movieGenreToFind is null)
                 {
                     var insertedMovieGenre = await connection.QueryFirstAsync<MovieGenre>(@"INSERT INTO MoviesGenres 
 (Name)
 VALUES (@Name)
-RETURNING Id, Name;", new { movieGenre.Name });
+RETURNING Id, Name;", new { Name = movieGenreName });
                     insertedMovieGenres.Add(insertedMovieGenre);
                 }
                 else
                     insertedMovieGenres.Add(movieGenreToFind);
             }
-            foreach (var movieStudio in entity.AddMovieStudiosModels)
+            foreach (string movieStudioName in entity.MoviesStudiosNames)
             {
                 var moviesStudioToFind = await connection.QueryFirstOrDefaultAsync<MovieStudio>(@"SELECT Id, Name
 FROM MoviesStudios
-WHERE Name=@Name;", new { movieStudio.Name });
+WHERE Name=@Name;", new { Name = movieStudioName });
 
                 if (moviesStudioToFind is null)
                 {
                     var insertedMovieStudio = await connection.QueryFirstAsync<MovieStudio>(@"INSERT INTO MoviesStudios 
 (Name)
 VALUES (@Name)
-RETURNING Id, Name;", new { movieStudio.Name });
+RETURNING Id, Name;", new { Name = movieStudioName });
                     insertedMovieStudios.Add(insertedMovieStudio);
                 }
                 else
@@ -55,18 +56,18 @@ RETURNING Id, Name;", new { movieStudio.Name });
                 }
             }
 
-            foreach (var movieDirector in entity.AddMovieDirectorsModels)
+            foreach (var movieDirectorName in entity.MoviesDirectorsNames)
             {
                 var moviesDirectorToFind = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"SELECT Id, Name
 FROM MoviesDirectors
-WHERE Name=@Name;", new { movieDirector.Name });
+WHERE Name=@Name;", new { Name = movieDirectorName });
 
                 if (moviesDirectorToFind is null)
                 {
                     var insertedMovieDirector = await connection.QueryFirstAsync<MovieDirector>(@"INSERT INTO MoviesDirectors 
 (Name)
 VALUES (@Name)
-RETURNING Id, Name;", new { movieDirector.Name });
+RETURNING Id, Name;", new { Name = movieDirectorName });
                     insertedMovieDirectors.Add(insertedMovieDirector);
                 }
                 else
@@ -126,10 +127,10 @@ VALUES (@MovieId, @MovieDirectorId);",
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
-m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
-ms.id, ms.name,
-mg.id, mg.name,
-md.id, md.name
+m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
+mg.Id, mg.Name,
+ms.Id, ms.Name,
+md.Id, md.Name
     FROM movies m
     LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
     LEFT JOIN moviesGenres mg ON mg.id = mmg.moviegenreid
@@ -177,9 +178,9 @@ md.id, md.name
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var sql = @"select m.Id, m.Name, m.ImageSource as Image, m.OriginalName, m.PremierDate, m.Description,
-ms.Id, ms.Name,
+            var sql = @"select m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
 mg.Id, mg.Name,
+ms.Id, ms.Name,
 md.Id, md.Name,
 vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
 au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
@@ -244,8 +245,8 @@ WHERE m.id=@id";
         {
             var sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
-ms.id, ms.name,
 mg.id, mg.name,
+ms.id, ms.name,
 md.id, md.name
     FROM movies m
     LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
@@ -298,8 +299,8 @@ ORDER BY Id DESC;";
         {
             var sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
-ms.id, ms.name,
 mg.id, mg.name,
+ms.id, ms.name,
 md.id, md.name
      FROM (
                 select Id, Name, ImageSource, OriginalName, PremierDate, Description from Movies

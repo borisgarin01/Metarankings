@@ -1,4 +1,5 @@
 ﻿using Domain.Movies;
+using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Movies.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Domain.RequestsModels.Movies.MoviesGenres;
@@ -115,7 +116,7 @@ public sealed partial class AddMoviePage : ComponentBase
         }
     }
 
-    private bool GameModelToAddConfigured()
+    private bool MovieModelToAddConfigured()
     {
         return !SelectedMoviesDirectorsIds.Contains(-1)
             && !SelectedMoviesGenresIds.Contains(-1)
@@ -125,44 +126,67 @@ public sealed partial class AddMoviePage : ComponentBase
 
     private async Task AddMovieAsync()
     {
-        try
+        if (MovieModelToAddConfigured())
         {
-            // Create multipart form data
-            var content = new MultipartFormDataContent();
-            var fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024)); // 50MB max
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
-            content.Add(fileContent, "formFile", ImageToUpload.Name);
-
-            string uploadingImageName = Uri.EscapeDataString(Path.GetRandomFileName());
-            string uploadingFileNameWithCorrectExtension=Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
-
-            // Build the URL with parameters
-            var url = $"api/movies/images/{PremierDate.Value.Year}/{PremierDate.Value.Month}/{uploadingImageName}";
-
-            // Send the request with authentication token
-            var response = await HttpClient.PostAsync(url, content);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                // Extract the URL from the response
-                var responseContent = await response.Content.ReadAsStringAsync();
+                // Create multipart form data
+                var content = new MultipartFormDataContent();
+                var fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024)); // 50MB max
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
+                content.Add(fileContent, "formFile", ImageToUpload.Name);
 
-                var addMovieModel = new AddMovieModel(Name, OriginalName, Description, uploadingFileNameWithCorrectExtension, PremierDate.Value, SelectedMoviesDirectorsIds, SelectedMoviesGenresIds, SelectedMoviesStudiosIds);
+                string uploadingImageName = Uri.EscapeDataString(Path.GetRandomFileName());
+                string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
 
-                HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addMovieModel);
+                var url = $"api/movies/Images/{PremierDate.Value.Year}/{PremierDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
 
-                if (addingMovieResponseMessage.IsSuccessStatusCode)
-                    NavigationManager.NavigateTo("/admin/movies/movies/list-movies");
+                // Send the request with authentication token
+                var response = await HttpClient.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var addMovieModel = new AddMovieModel(
+                        Name: Name,
+                        OriginalName: OriginalName,
+                        Description: Description,
+                        ImageSource: uploadingFileNameWithCorrectExtention,
+                        PremierDate: PremierDate.Value,
+                        MoviesDirectorsNames: MoviesDirectorsToSelectFrom
+                            .Where(d => SelectedMoviesDirectorsIds.Contains(d.Id)).Select(b => b.Name)
+                            .ToList(),
+                        MoviesGenresNames: MoviesGenresToSelectFrom
+                            .Where(g => SelectedMoviesGenresIds.Contains(g.Id))
+                            .Select(b => b.Name)
+                            .ToList(),
+                        MoviesStudiosNames: MoviesStudiosToSelectFrom
+                            .Where(s => SelectedMoviesStudiosIds.Contains(s.Id))
+                            .Select(b => b.Name)
+                            .ToList()
+                    );
+
+                    HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addMovieModel);
+
+                    if (addingMovieResponseMessage.IsSuccessStatusCode)
+                    {
+                        NavigationManager.NavigateTo("/movies/movies/movies-list");
+                    }
+                    else
+                    {
+                        var error = await addingMovieResponseMessage.Content.ReadAsStringAsync();
+                        await JSRuntime.InvokeVoidAsync("alert", $"Failed to add movie: {error}");
+                    }
+                }
+                else
+                {
+                    var problemDetails = await response.Content.ReadAsStringAsync();
+                    await JSRuntime.InvokeVoidAsync("alert", problemDetails);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var problemDetails = await response.Content.ReadAsStringAsync();
-                await JSRuntime.InvokeVoidAsync("alert", problemDetails);
+                await JSRuntime.InvokeVoidAsync("alert", ex.Message);
             }
-        }
-        catch (Exception ex)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
         }
     }
 }

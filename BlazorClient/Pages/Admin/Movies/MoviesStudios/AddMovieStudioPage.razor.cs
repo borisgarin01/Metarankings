@@ -21,6 +21,6 @@ public partial class AddMovieStudioPage : ComponentBase
     {
         await MoviesStudiosManager.AddAsync(new AddMovieStudioModel(Name));
 
-        NavigationManager.NavigateTo("/admin/movies/movies-studios/movies-studios-list");
+        NavigationManager.NavigateTo("/movies/movies-studios/movies-studios-list");
     }
 }

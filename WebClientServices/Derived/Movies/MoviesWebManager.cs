@@ -16,7 +16,7 @@ public sealed class MoviesWebManager : WebManager, IWebManager<Movie, AddMovieMo
 
     public async Task<HttpResponseMessage> AddAsync(AddMovieModel addMovieModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/movies/movies", addMovieModel);
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddMovieModel>("/api/movies/movies", addMovieModel);
         return httpResponseMessage;
     }
 

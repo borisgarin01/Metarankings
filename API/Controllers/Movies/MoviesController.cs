@@ -1,6 +1,7 @@
 ﻿using Data.Repositories.Classes.Derived.Movies;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
+using Domain.RequestsModels.Movies.Movies;
 
 namespace API.Controllers.Movies;
 

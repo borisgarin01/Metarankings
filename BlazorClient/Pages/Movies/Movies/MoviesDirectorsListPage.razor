@@ -1,0 +1,30 @@
+﻿@page "/movies/movies-directors/movies-directors-list"
+
+@using Domain.Games
+@using Domain.Movies
+
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        <a href="/admin">К странице админа</a>
+        <a href="/admin/movies/movies-directors/add-movie-director">Добавить режиссера</a>
+        <div class="moviesDirectorsList">
+            @if (MoviesDirectors is null)
+            {
+                <p>Загружается...</p>
+            }
+            else
+            {
+                foreach (MovieDirector movieDirector in MoviesDirectors)
+                {
+                    <div class="movieDirector">
+                        <h4>@movieDirector.Name</h4>
+                        <a href="/admin/movies/movies-directors/remove-movie-director/@movieDirector.Id">Remove movie director</a>
+                    </div>
+                }
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a>, чтобы добавить режиссера
+    </NotAuthorized>
+</AuthorizeView>

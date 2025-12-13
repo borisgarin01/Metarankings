@@ -1,6 +1,10 @@
 ﻿@using BlazorClient.Components.PagesComponents.Common;
 
 <div class="featured-movie">
+    @if (!string.IsNullOrWhiteSpace(OriginalName))
+    {
+        <p><span class="label">Оригинальное название:</span> <span itemprop="alternativeHeadline">@OriginalName</span></p>
+    }
     <GenresComponent Genres="@Genres" />
     <MoviesStudiosComponent MoviesStudios="@MoviesStudios" />
     <PremierDateComponent PremierDate="@PremierDate" />
