@@ -3,7 +3,7 @@
 @using BlazorClient.Pages.Games.Developers
 
 <BlazorClient.Components.PagesComponents.Common.Headerer />
-<BlazorClient.Components.PagesComponents.Common.GameMenu />
+<BlazorClient.Components.PagesComponents.Common.GameMenu Year="@DateTime.Today.Year" />
 
 <div class="content-title">
     <h1>Лучшие игры @Year года</h1>
@@ -15,7 +15,7 @@
     <span class="read-more">Читать полностью</span>
 </div>
 <div id="filter">
-    <BestGamesOfYearsComponent />
+    <BestGamesOfYearsComponent Year="@Year.Value" />
     <BestGamesOfYearByPlatformsComponent Year="@Year.Value" />
 </div>
 

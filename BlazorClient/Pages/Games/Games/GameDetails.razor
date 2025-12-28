@@ -6,7 +6,7 @@
 @using Domain.Reviews
 
 <Headerer />
-<GameMenu />
+<GameMenu Year="@Game.ReleaseDate.Value.Year" />
 
 @if (Game is null)
 {

@@ -1,9 +1,12 @@
 ﻿@page "/developers/{DeveloperId:int}"
+@using BlazorClient.Components.PagesComponents.Common
+@using BlazorClient.Components.PagesComponents.DeveloperDetails
+@using BlazorClient.Pages.Games.Games
 @using Domain
 @using System.Globalization
 
-<BlazorClient.Components.PagesComponents.Common.Headerer />
-<BlazorClient.Components.PagesComponents.Common.GameMenu />
+<Headerer />
+<GameMenu Year="@DateTime.Today.Year" />
 
 @if (Developer is null)
 {
@@ -16,11 +19,9 @@ else
     </div>
 
     <div id="filter">
-        <BlazorClient.Components.PagesComponents.DeveloperDetails.OtherNumberOfDevelopersComponent DevelopersGettingLimit="11" DevelopersGettingOffset="0" />
+        <OtherNumberOfDevelopersComponent DevelopersGettingLimit="11" DevelopersGettingOffset="0" />
 
-        <BestGamesOfYearsComponent />
-        
-        <BestGamesOfYearsComponent />
+        <BestGamesOfYearsComponent Year="@DateTime.Today.Year" />
 
         <h2>Новые игры</h2>
     </div>

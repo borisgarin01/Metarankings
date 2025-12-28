@@ -7,7 +7,7 @@
 @using Domain.Reviews
 
 <BlazorClient.Components.PagesComponents.Common.Headerer />
-<BlazorClient.Components.PagesComponents.Common.GameMenu />
+<BlazorClient.Components.PagesComponents.Common.GameMenu Year="@DateTime.Today.Year" />
 
 <AuthorizeView Policy="Admin">
     <Authorized>

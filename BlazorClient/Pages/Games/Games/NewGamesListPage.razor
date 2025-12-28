@@ -1,7 +1,7 @@
 ﻿@page "/games/new-games/{PageSize:int?}/{PageNumber:int?}"
 
 <BlazorClient.Components.PagesComponents.Common.Headerer />
-<BlazorClient.Components.PagesComponents.Common.GameMenu />
+<BlazorClient.Components.PagesComponents.Common.GameMenu Year="@DateTime.Today.Year" />
 
 @if (Games is null)
 {

@@ -7,7 +7,7 @@ namespace BlazorClient.Pages.Games.Games;
 public partial class BestGamesOfYearListPage : ComponentBase
 {
     [SupplyParameterFromQuery]
-    public long? Year { get; set; }
+    public int? Year { get; set; }
 
     [SupplyParameterFromQuery]
     public long? GenreId { get; set; }

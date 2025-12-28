@@ -840,7 +840,7 @@ WHERE EXTRACT(YEAR FROM g.ReleaseDate) = @Year;";
     public async Task<IEnumerable<Game>> GetByParametersAsync(
     long[]? genresIds,
     long[]? platformsIds,
-    long[]? years,
+    int[]? years,
     long[]? developersIds,
     long[]? publishersIds,
     int skip,
