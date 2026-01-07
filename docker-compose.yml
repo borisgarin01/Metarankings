@@ -36,7 +36,7 @@ services:
         condition: service_healthy
     environment:
       - ASPNETCORE_URLS=https://+:8081;http://+:8080
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
       - ASPNETCORE_Kestrel__Certificates__Default__Password=UmbracoFuse8_2023!
