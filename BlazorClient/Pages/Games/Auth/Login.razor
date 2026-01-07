@@ -1,28 +1,64 @@
 ﻿@page "/auth/login"
 
-<EditForm Model="LoginModel" OnValidSubmit="LoginAsync" OnInvalidSubmit="DisplayErrors">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<div class="login-container">
+    @if (!IsTwoFactorRequired)
+    {
+        <h3>Вход в систему</h3>
 
-    <div class="form-group">
-        <label for="email">Email</label>
-        <InputText id="email" class="form-control" @bind-Value="LoginModel.UserEmail" />
-        <ValidationMessage For="@(() => LoginModel.UserEmail)" />
-    </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control"
+                   @bind="LoginModel.UserEmail"
+                   @bind:event="oninput" />
+        </div>
 
-    <div class="form-group">
-        <label for="password">Password</label>
-        <InputText id="password" type="password" class="form-control" @bind-Value="LoginModel.Password" />
-        <ValidationMessage For="@(() => LoginModel.Password)" />
-    </div>
+        <div class="form-group">
+            <label>Пароль</label>
+            <input type="password" class="form-control"
+                   @bind="LoginModel.Password"
+                   @bind:event="oninput" />
+        </div>
 
-    <div class="form-group">
-        <label for="resetPasswordMessage">Forgot password?</label>
-        <button type="button" class="btn btn-danger" @onclick="SendResetPasswordMessageAsync">Reset password</button>
-    </div>
+        <button class="btn btn-primary" @onclick="LoginAsync" disabled="@IsLoading">
+            @if (IsLoading)
+            {
+                <span class="spinner-border spinner-border-sm"></span>
+            }
+            Войти
+        </button>
+    }
+    else
+    {
+        <h3>Двухфакторная аутентификация</h3>
+        <p>Введите код подтверждения, отправленный на вашу почту</p>
 
-    <div class="form-group">
-        <p>Are you not registered? <a class="link-opacity-10" href="/auth/register">Register</a></p>
-        <input type="submit" class="btn btn-primary" value="Login" />
-    </div>
-</EditForm>
+        <div class="form-group">
+            <label>Код подтверждения</label>
+            <input type="text" class="form-control"
+                   @bind="TwoFactorCode"
+                   @bind:event="oninput"
+                   maxlength="6"
+                   placeholder="6-значный код" />
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" @onclick="LoginAsync" disabled="@IsLoading">
+                @if (IsLoading)
+                {
+                    <span class="spinner-border spinner-border-sm"></span>
+                }
+                Подтвердить
+            </button>
+
+            <button class="btn btn-secondary" @onclick="CancelTwoFactor" disabled="@IsLoading">
+                Назад
+            </button>
+        </div>
+
+        <div class="mt-3">
+            <button class="btn btn-link" @onclick="ResendTwoFactorCode">
+                Отправить код повторно
+            </button>
+        </div>
+    }
+</div>

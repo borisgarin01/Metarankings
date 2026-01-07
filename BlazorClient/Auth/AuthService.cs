@@ -20,24 +20,42 @@ public class AuthService : IAuthService
         _authenticationStateProvider = authenticationStateProvider;
     }
 
-    public async Task<string> LoginAsync(LoginModel loginModel)
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+
+    public async Task<LoginResponse> LoginAsync(LoginModel loginModel)
     {
         var response = await _httpClient.PostAsJsonAsync("api/auth/login", loginModel);
 
-        if (!response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
-            if (response.StatusCode == HttpStatusCode.BadRequest
-                ^ response.StatusCode == HttpStatusCode.NotFound)
-                throw new Exception(await response.Content.ReadAsStringAsync());
+            return await response.Content.ReadFromJsonAsync<LoginResponse>();
         }
 
-        var token = await response.Content.ReadAsStringAsync();
-        await _localStorage.SetItemAsync("authToken", token);
+        return new LoginResponse();
+    }
 
-        ((JwtAuthenticationStateProvider)_authenticationStateProvider)
-            .MarkUserAsAuthenticated(token); // Pass the token instead of email
+    public async Task<TokenResponse> VerifyTwoFactorAsync(string userId, string token)
+    {
+        var request = new { UserId = userId, TwoFactorToken = token };
+        var response = await _httpClient.PostAsJsonAsync("api/auth/ConfirmLoginViaEmail", request);
 
-        return token;
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<TokenResponse>();
+        }
+
+        return new TokenResponse { Error = "Ошибка верификации" };
+    }
+
+    public async Task StoreTokenAsync(string token)
+    {
+        // Store token in localStorage
+        await _localStorage.SetItemAsync<string>("authToken", token);
+
+        // Also set in HTTP client headers
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
     }
 
     public async Task LogoutAsync()

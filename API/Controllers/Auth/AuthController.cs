@@ -78,10 +78,10 @@ public sealed class AuthController : ControllerBase
             }
 
             // Return specific response indicating 2FA is required
-            return Ok(new
+            return Ok(new LoginResponse
             {
-                RequiresTwoFactor = true,
-                UserId = userToCheckExistance.Id,
+                RequiresTwoFactor = userToCheckExistance.TwoFactorEnabled,
+                UserId = userToCheckExistance.Id.ToString(),
                 Message = "2FA code sent to email"
             });
         }
