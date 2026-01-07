@@ -1,4 +1,5 @@
-﻿using Domain.Movies;
+﻿using Data.Repositories.Classes;
+using Domain.Movies;
 using Domain.RequestsModels.Movies.Movies;
 
 namespace Data.Repositories.Interfaces.Derived;

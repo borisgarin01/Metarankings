@@ -35,11 +35,10 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<string>> Login(LoginModel loginModel)
+    public async Task<ActionResult> Login(LoginModel loginModel)
     {
         if (loginModel is null)
             return BadRequest("Неверный логин");
-
 
         if (string.IsNullOrWhiteSpace(loginModel.UserEmail) || string.IsNullOrWhiteSpace(loginModel.Password))
             return BadRequest("Email и пароль должны быть указаны");
@@ -54,6 +53,40 @@ public sealed class AuthController : ControllerBase
         if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
 
+        // If 2FA is enabled, send email and return specific response
+        if (userToCheckExistance.TwoFactorEnabled is true)
+        {
+            string twoFactorAuthToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
+
+            var emailMessage = new MimeMessage();
+
+            emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
+            emailMessage.To.Add(new MailboxAddress("", userToCheckExistance.Email));
+            emailMessage.Subject = "Confirm login";
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+            {
+                Text = $"Your 2FA verification code is: <strong>{twoFactorAuthToken}</strong><br><br>" +
+                       $"Enter this code to complete your login."
+            };
+
+            using (var client = new SmtpClient())
+            {
+                await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
+                await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
+                await client.SendAsync(emailMessage);
+                await client.DisconnectAsync(true);
+            }
+
+            // Return specific response indicating 2FA is required
+            return Ok(new
+            {
+                RequiresTwoFactor = true,
+                UserId = userToCheckExistance.Id,
+                Message = "2FA code sent to email"
+            });
+        }
+
+        // If no 2FA, generate token immediately
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
 
@@ -63,23 +96,71 @@ public sealed class AuthController : ControllerBase
             userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
 
         userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
-
         userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
 
-        var tokenOptions = new JwtSecurityToken(issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer, audience: _authSettingsOptionsMonitor.CurrentValue.Audience, userClaims, expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours), signingCredentials: signingCredentials);
+        var tokenOptions = new JwtSecurityToken(
+            issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
+            audience: _authSettingsOptionsMonitor.CurrentValue.Audience,
+            claims: userClaims,
+            expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours),
+            signingCredentials: signingCredentials);
 
         userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
-
-        string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
         IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
 
         if (identityResult.Succeeded)
-            return Ok(tokenString);
+            return Ok(new { Token = tokenString });
 
         return StatusCode(500, "Authentication token setting has been failed");
+    }
+
+    [HttpPost("ConfirmLoginViaEmail")]
+    public async Task<ActionResult> ConfirmLoginViaEmail(ConfirmLoginModel model)
+    {
+        if (string.IsNullOrWhiteSpace(model.UserId) || string.IsNullOrWhiteSpace(model.TwoFactorToken))
+            return BadRequest("User ID and token are required");
+
+        ApplicationUser? userToCheckExistance = await _usersManager.FindByIdAsync(model.UserId);
+
+        if (userToCheckExistance is null)
+            return NotFound();
+
+        bool isValidTwoFactorToken = await _usersManager.VerifyTwoFactorTokenAsync(userToCheckExistance, "Email", model.TwoFactorToken);
+
+        if (isValidTwoFactorToken)
+        {
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
+            var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
+
+            userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
+
+            var userClaims = new List<Claim>();
+
+            if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
+                userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
+
+            userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
+            userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
+
+            var tokenOptions = new JwtSecurityToken(
+                issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
+                audience: _authSettingsOptionsMonitor.CurrentValue.Audience,
+                claims: userClaims,
+                expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours),
+                signingCredentials: signingCredentials);
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+            IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
+
+            if (identityResult.Succeeded)
+                return Ok(new { Token = tokenString });
+        }
+
+        return BadRequest("Invalid 2FA token");
     }
 
     [HttpPost("logout")]
@@ -214,7 +295,7 @@ public sealed class AuthController : ControllerBase
             if (identityResult is null)
                 return NotFound();
             if (!identityResult.Succeeded)
-                return BadRequest(identityResult);
+                return StatusCode(StatusCodes.Status500InternalServerError, identityResult);
             return Ok(identityResult);
         }
     }
@@ -259,6 +340,20 @@ public sealed class AuthController : ControllerBase
         IdentityResult passwordResettingResult = await _usersManager.ResetPasswordAsync(user, resetPasswordModel.ResetPasswordToken, resetPasswordModel.NewPassword);
         if (passwordResettingResult.Succeeded)
             return Ok("Password has been changed successfully");
-        return BadRequest();
+        return StatusCode(StatusCodes.Status500InternalServerError);
+    }
+
+    [HttpPost("setTwoFactorEnabled")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult> SetTwoFactorEnabled(SetTwoFactorEnabledModel setTwoFactorEnabledModel)
+    {
+        Claim? userId = User.FindFirst(ClaimTypes.NameIdentifier);
+        ApplicationUser applicationUser = await _usersManager.FindByIdAsync(userId.Value);
+        if (applicationUser is null)
+            return NotFound();
+        IdentityResult settingTwoFactorEnabledResult = await _usersManager.SetTwoFactorEnabledAsync(applicationUser, setTwoFactorEnabledModel.TwoFactorEnabled);
+        if (settingTwoFactorEnabledResult.Succeeded)
+            return Ok("Two factor enabled fact has been changed successfully");
+        return StatusCode(StatusCodes.Status500InternalServerError);
     }
 }

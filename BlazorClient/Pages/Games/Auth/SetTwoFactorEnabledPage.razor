@@ -1,0 +1,14 @@
+﻿@page "/two-factor-enabled"
+
+<AuthorizeView>
+    <Authorized>
+        <h3>Входить по двухфакторке?</h3>
+
+        <InputCheckbox @bind-Value="SetTwoFactorEnabledModel!.TwoFactorEnabled" />
+
+        <button type="submit" @onclick="@(() => SetTwoFactorEnabledAsync())">Подтвердить</button>
+    </Authorized>
+    <NotAuthorized>
+        Вы не авторизованы для доступа к этой странице
+    </NotAuthorized>
+</AuthorizeView>

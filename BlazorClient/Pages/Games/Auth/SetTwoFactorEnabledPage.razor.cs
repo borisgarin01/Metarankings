@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Authorization;
 namespace BlazorClient.Pages.Games.Auth;
 
 [Authorize]
-public partial class ResetPasswordPage : ComponentBase
+public partial class SetTwoFactorEnabledPage : ComponentBase
 {
+
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
 
@@ -16,17 +17,20 @@ public partial class ResetPasswordPage : ComponentBase
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    public ResetPasswordModel ResetPasswordModel { get; } = new();
+    public SetTwoFactorEnabledModel SetTwoFactorEnabledModel { get; } = new();
 
-    public async Task ResetPasswordAsync()
+    public async Task SetTwoFactorEnabledAsync()
     {
         try
         {
-            HttpResponseMessage resetPasswordHttpResponseMessage = await AuthService.SendResetPasswordMessage(new Domain.Auth.ResetPasswordModel(ResetPasswordModel.Email));
+            HttpResponseMessage resetPasswordHttpResponseMessage = await AuthService.SendTwoFactorEnabledMessage(new Domain.Auth.SetTwoFactorEnabledModel(SetTwoFactorEnabledModel.TwoFactorEnabled));
 
             if (resetPasswordHttpResponseMessage.IsSuccessStatusCode)
             {
-                NavigationManager.NavigateTo($"/auth/ResetPasswordConfirm?email={ResetPasswordModel.Email}");
+                if (SetTwoFactorEnabledModel.TwoFactorEnabled)
+                    await JSRuntime.InvokeVoidAsync("alert", "Теперь вы будете авторизоваться по 2Auth");
+                else
+                    await JSRuntime.InvokeVoidAsync("alert", "Теперь вы не будете авторизоваться по 2Auth");
             }
             else
             {

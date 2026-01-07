@@ -10,4 +10,5 @@ public interface IAuthService
     public Task LogoutAsync();
     public Task<HttpResponseMessage> SendResetPasswordMessage(ResetPasswordModel resetPasswordModel);
     public Task<HttpResponseMessage> SendResetPasswordConfirmMessage(ResetPasswordConfirmModel resetPasswordModel);
+    public Task<HttpResponseMessage> SendTwoFactorEnabledMessage(SetTwoFactorEnabledModel setTwoFactorEnabledModel);
 }

@@ -140,10 +140,14 @@ internal class Program
         builder.Services.RegisterRepositories(builder.Configuration);
         builder.Services.RegisterFilesDataReaders();
 
-        builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
-            .AddUserStore<UsersStore>()
-            .AddRoleStore<RolesStore>()
-            .AddDefaultTokenProviders();
+        builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+        {
+            options.Tokens.EmailConfirmationTokenProvider = "Email";
+            options.Tokens.PasswordResetTokenProvider = "Email";
+        }).AddUserStore<UsersStore>()
+          .AddRoleStore<RolesStore>()
+          .AddTokenProvider<EmailTokenProvider<ApplicationUser>>("Email")
+          .AddDefaultTokenProviders();
 
         builder.Services.AddSingleton<TelegramAuthenticator>();
 

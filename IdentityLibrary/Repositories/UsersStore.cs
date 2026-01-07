@@ -3,13 +3,13 @@ using System;
 
 namespace IdentityLibrary.Repositories;
 
-public sealed class UsersStore : IUserSecurityStampStore<ApplicationUser>, IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>, IUserAuthenticationTokenStore<ApplicationUser>
+public sealed class UsersStore : IUserSecurityStampStore<ApplicationUser>, IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>, IUserAuthenticationTokenStore<ApplicationUser>, IUserTwoFactorStore<ApplicationUser>
 {
     private readonly string _connectionString;
 
     public UsersStore(IConfiguration configuration)
     {
-        _connectionString = configuration.GetConnectionString("DockerPostgresConnection");
+        _connectionString = configuration.GetConnectionString("PostgresConnection");
     }
 
     public void Dispose()
@@ -282,5 +282,16 @@ SecurityStamp=@SecurityStamp
 WHERE Id=@Id;", user);
 
         return IdentityResult.Success;
+    }
+
+    public Task SetTwoFactorEnabledAsync(ApplicationUser user, bool enabled, CancellationToken cancellationToken)
+    {
+        user.TwoFactorEnabled = enabled;
+        return Task.CompletedTask;
+    }
+
+    public Task<bool> GetTwoFactorEnabledAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(user.TwoFactorEnabled);
     }
 }

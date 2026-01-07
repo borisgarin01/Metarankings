@@ -46,7 +46,6 @@ internal class Program
         builder.Services.AddScoped<IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosWebManager>();
         builder.Services.AddScoped<IWebManager<Movie, AddMovieModel, UpdateMovieModel>, MoviesWebManager>();
 
-
         builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["HttpClientSettings:BaseUrl"]) });

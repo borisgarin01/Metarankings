@@ -1,6 +1,7 @@
 ﻿using Domain.Auth;
 using IdentityLibrary.Models;
 using System.Net;
+using System.Text;
 
 namespace BlazorClient.Auth;
 
@@ -41,7 +42,16 @@ public class AuthService : IAuthService
 
     public async Task LogoutAsync()
     {
-        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsync("api/auth/logout", null);
+        var token = await _localStorage.GetItemAsync<string>("authToken");
+
+        if (token is null)
+            return;
+
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/auth/logout");
+        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
+
         if (httpResponseMessage.IsSuccessStatusCode)
         {
             await _localStorage.RemoveItemAsync("authToken");
@@ -60,13 +70,67 @@ public class AuthService : IAuthService
 
     public async Task<HttpResponseMessage> SendResetPasswordConfirmMessage(ResetPasswordConfirmModel resetPasswordConfirmModel)
     {
-        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/resetPasswordConfirm", resetPasswordConfirmModel);
-        return httpResponseMessage;
+        var token = await _localStorage.GetItemAsync<string>("authToken");
+
+        if (token is not null)
+        {
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/auth/resetPasswordConfirm");
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                await _localStorage.RemoveItemAsync("authToken");
+                ((JwtAuthenticationStateProvider)_authenticationStateProvider)
+                    .MarkUserAsLoggedOut();
+                return httpResponseMessage;
+            }
+        }
+        return null;
     }
 
     public async Task<HttpResponseMessage> SendResetPasswordMessage(ResetPasswordModel resetPasswordModel)
     {
-        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/resetPassword", resetPasswordModel);
-        return httpResponseMessage;
+        var token = await _localStorage.GetItemAsync<string>("authToken");
+
+        if (token is not null)
+        {
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/auth/resetPassword");
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                await _localStorage.RemoveItemAsync("authToken");
+                ((JwtAuthenticationStateProvider)_authenticationStateProvider)
+                    .MarkUserAsLoggedOut();
+                return httpResponseMessage;
+            }
+        }
+        return null;
+    }
+
+    public async Task<HttpResponseMessage> SendTwoFactorEnabledMessage(SetTwoFactorEnabledModel setTwoFactorEnabledModel)
+    {
+        var token = await _localStorage.GetItemAsync<string>("authToken");
+
+        if (token is not null)
+        {
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/auth/setTwoFactorEnabled");
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            string jsonBody = System.Text.Json.JsonSerializer.Serialize(setTwoFactorEnabledModel);
+
+            // 2. Create StringContent with the JSON string and set Content-Type header
+            HttpContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+            httpRequest.Content = content;
+
+            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
+
+            return httpResponseMessage;
+        }
+
+        return null;
     }
 }
