@@ -1,3 +1,5 @@
+version: '3.8'
+
 networks:
   myAppNetwork:
     driver: bridge
@@ -6,26 +8,30 @@ services:
   Db:
     container_name: Db
     image: postgres:17.7
+    restart: unless-stopped  # Add automatic restart
     networks:
       - myAppNetwork
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U borisgarin -d Metarankings" ]
+      test: ["CMD-SHELL", "pg_isready -U borisgarin || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 30
+      retries: 5
+      start_period: 30s
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: "borisgarin"
       POSTGRES_PASSWORD: "borisgarin"
       POSTGRES_DB: "Metarankings"
+    ports:
+      - "5432:5432"  # Optional, for debugging
 
   WebApi:
     container_name: APIContainer
     image: ${DOCKER_REGISTRY-}api
+    restart: unless-stopped
     ports:
       - 8080:8080
-      - 8081:8081
     networks:
       - myAppNetwork
     build:
@@ -35,15 +41,12 @@ services:
       Db:
         condition: service_healthy
     environment:
-      - ASPNETCORE_URLS=https://+:8081;http://+:8080
+      - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=UmbracoFuse8_2023!
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - ConnectionStrings__DefaultConnection=Host=Db;Database=Metarankings;User Id=borisgarin;Password=borisgarin
     volumes:
       - ~/.aspnet/https:/https:ro
-      - ./API/Games/Images:/app/Games:rw  # Mount local directory to container
+      - ./API/Games/Images:/app/Games:rw
       - ./API/Movies/Images:/app/Movies:rw
 
 volumes:

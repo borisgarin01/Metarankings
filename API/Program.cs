@@ -204,7 +204,7 @@ internal class Program
                 // Add SQLite support to FluentMigrator
                 .AddPostgres()
                 // Set the connection string
-                .WithGlobalConnectionString(configurationManager.GetConnectionString("DockerPostgresConnection"))
+                .WithGlobalConnectionString(configurationManager.GetConnectionString("PostgresConnection"))
                 // Define the assembly containing the migrations, maintenance migrations and other customizations
                 .ScanIn(typeof(CreateGamesTableMigration).Assembly, typeof(CreateApplicationRolesTableMigration).Assembly).For.Migrations())
             // Enable logging to console in the FluentMigrator way
