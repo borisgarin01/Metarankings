@@ -69,6 +69,7 @@
                     </li>
                     <AuthorizeView>
                         <Authorized>
+                            <li class="single-line">Привет, @context.User.FindFirst("UserName").Value</li>
                             <li class="single-line"><a href="/auth/logout">Выйти</a></li>
                         </Authorized>
                         <NotAuthorized>

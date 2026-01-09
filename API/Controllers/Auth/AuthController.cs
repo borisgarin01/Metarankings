@@ -98,6 +98,7 @@ public sealed class AuthController : ControllerBase
         userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
         userClaims.Add(new Claim("TwoFactorEnabled", userToCheckExistance.TwoFactorEnabled.ToString()));
         userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
+        userClaims.Add(new Claim("UserName", userToCheckExistance.UserName));
 
         var tokenOptions = new JwtSecurityToken(
             issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
@@ -146,6 +147,7 @@ public sealed class AuthController : ControllerBase
             userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
             userClaims.Add(new Claim("TwoFactorEnabled", userToCheckExistance.TwoFactorEnabled.ToString()));
             userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
+            userClaims.Add(new Claim("UserName", userToCheckExistance.UserName));
 
             var tokenOptions = new JwtSecurityToken(
                 issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
