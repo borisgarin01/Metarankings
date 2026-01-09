@@ -4,9 +4,9 @@
     <Authorized>
         <h3>Входить по двухфакторке?</h3>
 
-        <InputCheckbox @bind-Value="SetTwoFactorEnabledModel!.TwoFactorEnabled" />
+        <h3>@(TwoFactorEnabled ? "2FA включена" : "2FA отключена")</h3>
 
-        <button type="submit" @onclick="@(() => SetTwoFactorEnabledAsync())">Подтвердить</button>
+        <InputCheckbox @bind-Value="TwoFactorEnabled" />
     </Authorized>
     <NotAuthorized>
         Вы не авторизованы для доступа к этой странице

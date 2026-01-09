@@ -1,12 +1,31 @@
 ﻿using BlazorClient.Auth;
-using BlazorClient.PagesModels;
+using Domain.Auth;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 
 namespace BlazorClient.Pages.Games.Auth;
 
 [Authorize]
 public partial class SetTwoFactorEnabledPage : ComponentBase
 {
+    private bool _twoFactorEnabled;
+    private bool _isInitializing = true;
+
+    public bool TwoFactorEnabled
+    {
+        get => _twoFactorEnabled;
+        set
+        {
+            // Don't trigger change during initialization
+            if (_twoFactorEnabled != value && !_isInitializing)
+            {
+                _twoFactorEnabled = value;
+                _ = CheckboxChanged(value); // Fire and forget, or handle differently
+            }
+        }
+    }
 
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
@@ -17,29 +36,45 @@ public partial class SetTwoFactorEnabledPage : ComponentBase
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    public SetTwoFactorEnabledModel SetTwoFactorEnabledModel { get; } = new();
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
-    public async Task SetTwoFactorEnabledAsync()
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Using CascadingParameter approach
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+
+        var claim = user.FindFirst("TwoFactorEnabled");
+        if (claim != null && bool.TryParse(claim.Value, out var enabled))
+        {
+            // Set the private field directly without triggering the property setter
+            _twoFactorEnabled = enabled;
+        }
+
+        _isInitializing = false;
+    }
+
+    private async Task CheckboxChanged(bool newValue)
     {
         try
         {
-            HttpResponseMessage resetPasswordHttpResponseMessage = await AuthService.SendTwoFactorEnabledMessage(new Domain.Auth.SetTwoFactorEnabledModel(SetTwoFactorEnabledModel.TwoFactorEnabled));
+            // Update on the server
+            await AuthService.SendTwoFactorEnabledMessage(new SetTwoFactorEnabledModel(newValue));
 
-            if (resetPasswordHttpResponseMessage.IsSuccessStatusCode)
-            {
-                if (SetTwoFactorEnabledModel.TwoFactorEnabled)
-                    await JSRuntime.InvokeVoidAsync("alert", "Теперь вы будете авторизоваться по 2Auth");
-                else
-                    await JSRuntime.InvokeVoidAsync("alert", "Теперь вы не будете авторизоваться по 2Auth");
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("alert", await resetPasswordHttpResponseMessage.Content.ReadAsStringAsync());
-            }
+            await AuthService.LogoutAsync();
+
+            await JSRuntime.InvokeVoidAsync("alert", "Настройки обновлены!");
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"{ex.Message}\t{ex.StackTrace}");
+            // Revert UI state if update fails
+            _twoFactorEnabled = !newValue;
+            StateHasChanged();
+            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {ex.Message}");
         }
     }
 }
