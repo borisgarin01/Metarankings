@@ -1,4 +1,5 @@
-﻿using API.Hubs;
+﻿using API.Auth;
+using API.Hubs;
 using API.IServiceCollectionExtensions;
 using Data.Migrations;
 using IdentityLibrary.DTOs;
@@ -7,6 +8,7 @@ using IdentityLibrary.Repositories;
 using IdentityLibrary.Telegram;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
+using Scalar.AspNetCore;
 using Settings;
 
 namespace API;
@@ -79,45 +81,18 @@ internal class Program
             });
         });
 
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "MyAPI",
-                Version = "v1"
-            });
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Description = "Please enter token",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                BearerFormat = "JWT",
-                Scheme = "bearer"
-            });
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference=new OpenApiReference
-                        {
-                            Type=ReferenceType.SecurityScheme,
-                            Id="Bearer"
-                        }
-                    },
-                    new string[]{}
-                }
-            });
-        });
-
-
         builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
+
+        builder.Services.AddEndpointsApiExplorer();
+
+        builder.Services.AddOpenApi("v1", options =>
+        {
+            options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+        });
 
         builder.Services.AddSignalR();
 
@@ -170,6 +145,16 @@ internal class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.MapOpenApi();
+        app.MapScalarApiReference(options =>
+        {
+            options.AddPreferredSecuritySchemes(["Bearer"]);
+            options.AddHttpAuthentication("Bearer", bearer =>
+            {
+                bearer.Token = "Token";
+            });
+        });
+
         app.MapControllers();
 
         app.UseResponseCompression();
@@ -185,9 +170,6 @@ internal class Program
             // that all resources will be disposed.
             UpdateDatabase(scope.ServiceProvider);
         }
-
-        app.UseSwagger();
-        app.UseSwaggerUI();
 
         // Use CORS middleware
         app.UseCors("AllowBlazorFrontend");
