@@ -2,7 +2,7 @@
 using BlazorClient.PagesModels;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BlazorClient.Pages.Games.Auth;
+namespace BlazorClient.Pages.Auth;
 
 [Authorize]
 public partial class ResetPasswordConfirmPage : ComponentBase

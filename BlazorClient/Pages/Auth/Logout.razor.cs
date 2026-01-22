@@ -1,8 +1,7 @@
-﻿
-using BlazorClient.Auth;
+﻿using BlazorClient.Auth;
 using IdentityLibrary.Models;
 
-namespace BlazorClient.Pages.Games.Auth;
+namespace BlazorClient.Pages.Auth;
 
 public partial class Logout : ComponentBase
 {
