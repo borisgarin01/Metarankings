@@ -2,7 +2,7 @@
 using IdentityLibrary.Models;
 using System.Linq;
 
-namespace BlazorClient.Pages.Games.Auth;
+namespace BlazorClient.Pages.Auth;
 
 public partial class Login : ComponentBase
 {

@@ -8,7 +8,8 @@ services:
   Db:
     container_name: Db
     image: postgres:17.7
-    restart: unless-stopped  # Add automatic restart
+    ports:
+     - 5432:5432 
     networks:
       - myAppNetwork
     healthcheck:
@@ -31,7 +32,7 @@ services:
     image: ${DOCKER_REGISTRY-}api
     restart: unless-stopped
     ports:
-      - 8080:8080
+      - 8081:8081
     networks:
       - myAppNetwork
     build:
@@ -41,13 +42,29 @@ services:
       Db:
         condition: service_healthy
     environment:
-      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_URLS=https://+:8081
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Host=Db;Database=Metarankings;User Id=borisgarin;Password=borisgarin
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=UmbracoFuse8_2023!
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
     volumes:
       - ~/.aspnet/https:/https:ro
       - ./API/Games/Images:/app/Games:rw
       - ./API/Movies/Images:/app/Movies:rw
+
+  nginx:
+    container_name: nginx_container
+    image: nginx:alpine
+    ports:
+      - 443:443
+    networks:
+      - myAppNetwork
+    depends_on:
+      - WebApi
+      - Db
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ~/.aspnet/https:/etc/nginx/ssl:ro
 
 volumes:
   postgres_data:
