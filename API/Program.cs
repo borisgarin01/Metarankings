@@ -66,6 +66,11 @@ internal class Program
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = tokenValidationParameters;
             options.SaveToken = true;
+        }).AddGoogle(googleOptions =>
+        {
+            googleOptions.ClientId = builder.Configuration["AuthSettings:Google:ClientId"];
+            googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
+            googleOptions.CallbackPath = "/api/Auth/callback-uri"; // Match your controller route
         });
 
         builder.Services.AddAuthorization(options =>

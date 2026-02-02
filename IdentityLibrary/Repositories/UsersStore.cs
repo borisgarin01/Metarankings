@@ -3,7 +3,7 @@ using System;
 
 namespace IdentityLibrary.Repositories;
 
-public sealed class UsersStore : IUserSecurityStampStore<ApplicationUser>, IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>, IUserAuthenticationTokenStore<ApplicationUser>, IUserTwoFactorStore<ApplicationUser>
+public sealed class UsersStore : IUserSecurityStampStore<ApplicationUser>, IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>, IUserAuthenticationTokenStore<ApplicationUser>, IUserTwoFactorStore<ApplicationUser>, IUserLoginStore<ApplicationUser>
 {
     private readonly string _connectionString;
 
@@ -293,5 +293,58 @@ WHERE Id=@Id;", user);
     public Task<bool> GetTwoFactorEnabledAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         return Task.FromResult(user.TwoFactorEnabled);
+    }
+
+    public async Task AddLoginAsync(ApplicationUser user, UserLoginInfo login, CancellationToken cancellationToken)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        await connection.ExecuteAsync(@"INSERT INTO AspNetUserLogins 
+(LoginProvider, ProviderKey, ProviderDisplayName, UserId)
+VALUES(@LoginProvider, @ProviderKey, @ProviderDisplayName, @UserId);",
+new
+{
+    LoginProvider = login.LoginProvider,
+    ProviderKey = login.ProviderKey,
+    ProviderDisplayName = login.ProviderDisplayName,
+    UserId = user.Id
+});
+    }
+
+    public async Task RemoveLoginAsync(ApplicationUser user, string loginProvider, string providerKey, CancellationToken cancellationToken)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        await connection.ExecuteAsync(@"DELETE FROM AspNetUserLogins
+WHERE 
+    UserId=@UserId 
+    AND LoginProvider=@LoginProvider 
+    AND ProviderKey=@ProviderKey;",
+    new
+    {
+        UserId = user.Id,
+        LoginProvider = loginProvider,
+        ProviderKey = providerKey
+    });
+    }
+
+    public async Task<IList<UserLoginInfo>> GetLoginsAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        var userLoginsInfos = await connection.QueryAsync<UserLoginInfo>(@"SELECT LoginProvider, ProviderKey, ProviderDisplayName, UserId
+    FROM AspNetUserLogins 
+    WHERE UserId=@UserId;", new { UserId = user.Id });
+
+        return userLoginsInfos.ToList();
+    }
+
+    public async Task<ApplicationUser?> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        var applicationUser = await connection.QuerySingleOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
+    FROM ApplicationUsers
+    INNER JOIN AspNetUserLogins ON AspNetUserLogins.UserId=ApplicationUsers.Id
+    WHERE LoginProvider=@LoginProvider 
+        AND ProviderKey=@ProviderKey;", new { LoginProvider = loginProvider, ProviderKey = providerKey });
+
+        return applicationUser;
     }
 }

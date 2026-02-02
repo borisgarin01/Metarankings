@@ -16,13 +16,14 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly TelegramAuthenticator _telegramAuthenticator;
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
     private readonly IOptionsMonitor<AuthSettings> _authSettingsOptionsMonitor;
     private readonly IOptionsMonitor<TokenValidationParameters> _tokenValidationParameters;
     private readonly IOptionsMonitor<EmailSettings> _emailSettings;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters)
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters, SignInManager<ApplicationUser> signInManager)
     {
         _configuration = configuration;
         _usersManager = usersManager;
@@ -32,18 +33,142 @@ public sealed class AuthController : ControllerBase
         _authSettingsOptionsMonitor = authSettingsOptionsMonitor;
         _emailSettings = emailSettings;
         _tokenValidationParameters = tokenValidationParameters;
+        _signInManager = signInManager;
+    }
+
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpPost("addExternalLogin")]
+    public async Task<ActionResult> AddExternalLogin()
+    {
+        try
+        {
+            ApplicationUser? authUser = await _usersManager.FindByIdAsync(HttpContext.User.Claims.Single(b => b.Type == ClaimTypes.NameIdentifier).Value);
+            if (authUser is null)
+                return NotFound();
+
+            IdentityResult identityResult = await _usersManager.AddLoginAsync(authUser, new UserLoginInfo("VK", "VK", "VK"));
+            if (identityResult.Succeeded)
+            {
+                return Ok(identityResult);
+            }
+            return BadRequest(identityResult);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpGet("external-login")]
+    public IActionResult ExternalLogin(string provider, string returnUrl = null)
+    {
+        // Request a redirect to the external login provider
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider,
+            Url.Action("callback-uri", "Auth", new { returnUrl }));
+
+        return Challenge(properties, provider);
+    }
+
+    [HttpGet("callback-uri")]
+    public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+    {
+        returnUrl = returnUrl ?? Url.Content("~/");
+
+        if (remoteError != null)
+        {
+            _logger.LogError($"Error from external provider: {remoteError}");
+            return RedirectToPage("/Login", new { ReturnUrl = returnUrl });
+        }
+
+        var info = await _signInManager.GetExternalLoginInfoAsync();
+        if (info == null)
+        {
+            _logger.LogError("Error loading external login information.");
+            return RedirectToPage("/Login", new { ReturnUrl = returnUrl });
+        }
+
+        // Sign in the user with this external login provider if the user already has a login
+        var signInResult = await _signInManager.ExternalLoginSignInAsync(
+            info.LoginProvider,
+            info.ProviderKey,
+            isPersistent: false,
+            bypassTwoFactor: true);
+
+        if (signInResult.Succeeded)
+        {
+            // User already exists and is signed in
+            // Generate JWT token for API access
+            var user = await _usersManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            // If no 2FA, generate token immediately
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
+            var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
+
+            var userClaims = new List<Claim>();
+
+            if (await _usersManager.IsInRoleAsync(user, "Admin"))
+                userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
+
+            userClaims.Add(new Claim("EmailConfirmed", user.EmailConfirmed.ToString()));
+            userClaims.Add(new Claim("TwoFactorEnabled", user.TwoFactorEnabled.ToString()));
+            userClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            userClaims.Add(new Claim("UserName", user.UserName));
+
+            var tokenOptions = new JwtSecurityToken(
+                issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
+                audience: _authSettingsOptionsMonitor.CurrentValue.Audience,
+                claims: userClaims,
+                expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours),
+                signingCredentials: signingCredentials);
+
+            user.SecurityStamp = DateTime.Now.ToString();
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+            IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(user, "SQLServer", "AuthToken", tokenString);
+
+            if (identityResult.Succeeded)
+                return Ok(new { Token = tokenString });
+
+            return StatusCode(500, "Authentication token setting has been failed");
+        }
+
+        if (signInResult.IsLockedOut)
+        {
+            return RedirectToPage("/Lockout");
+        }
+        else
+        {
+            // If the user does not have an account, then ask the user to create an account
+            HttpContext.Response.Headers.Add("ReturnUrl", returnUrl);
+            HttpContext.Response.Headers.Add("ProviderDisplayName", info.ProviderDisplayName);
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+
+            // Return the email/name to the client so they can complete registration
+            return Ok(new
+            {
+                Email = email,
+                Name = name,
+                LoginProvider = info.LoginProvider,
+                ProviderKey = info.ProviderKey,
+                ReturnUrl = returnUrl
+            });
+        }
     }
 
     [HttpPost("login")]
     public async Task<ActionResult> Login(LoginModel loginModel)
     {
+        Microsoft.AspNetCore.Identity.SignInResult signinResult = await _signInManager.ExternalLoginSignInAsync("VK", "VK", true);
+
         if (loginModel is null)
             return BadRequest("Неверный логин");
 
         if (string.IsNullOrWhiteSpace(loginModel.UserEmail) || string.IsNullOrWhiteSpace(loginModel.Password))
             return BadRequest("Email и пароль должны быть указаны");
 
-        var userToCheckExistance = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
+        ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
 
         if (userToCheckExistance is null)
             return NotFound("Пользователь не зарегистрирован");
@@ -52,6 +177,8 @@ public sealed class AuthController : ControllerBase
 
         if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
+
+        Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync("VK", "VK", true);
 
         // If 2FA is enabled, send email and return specific response
         if (userToCheckExistance.TwoFactorEnabled is true)
@@ -262,6 +389,8 @@ public sealed class AuthController : ControllerBase
 
         return StatusCode(500, "User creation error");
     }
+
+
 
     [HttpGet("ConfirmEmail")]
     public async Task<IActionResult> ConfirmEmail(string userId, string code)
