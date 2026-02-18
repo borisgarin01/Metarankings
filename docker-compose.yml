@@ -65,7 +65,7 @@ services:
     depends_on:
         WebApi:
           condition: service_healthy
-    image: nginx:alpine
+    image: nginx:latest
     ports:
       - 8443:443
     networks:
