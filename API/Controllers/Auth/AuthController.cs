@@ -37,8 +37,8 @@ public sealed class AuthController : ControllerBase
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
-    [HttpPost("addExternalLogin")]
-    public async Task<ActionResult> AddExternalLogin()
+    [HttpPost("addExternalLogin/{providerUserId}")]
+    public async Task<ActionResult> AddExternalLogin(string providerUserId)
     {
         try
         {
@@ -46,11 +46,10 @@ public sealed class AuthController : ControllerBase
             if (authUser is null)
                 return NotFound();
 
-            IdentityResult identityResult = await _usersManager.AddLoginAsync(authUser, new UserLoginInfo("VK", "VK", "VK"));
+            IdentityResult identityResult = await _usersManager.AddLoginAsync(authUser, new UserLoginInfo("Google", providerUserId, "Google"));
+
             if (identityResult.Succeeded)
-            {
                 return Ok(identityResult);
-            }
             return BadRequest(identityResult);
         }
         catch (Exception ex)
@@ -60,13 +59,17 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpGet("external-login")]
-    public IActionResult ExternalLogin(string provider, string returnUrl = null)
+    public async Task<IActionResult> ExternalLogin()
     {
-        // Request a redirect to the external login provider
-        var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider,
-            Url.Action("callback-uri", "Auth", new { returnUrl }));
+        ExternalLoginInfo? externalLoginInfo = await _signInManager.GetExternalLoginInfoAsync();
 
-        return Challenge(properties, provider);
+        Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync(
+           externalLoginInfo.LoginProvider,
+           externalLoginInfo.ProviderKey,
+           isPersistent: false,
+           bypassTwoFactor: true);
+
+        return Ok(signInResult);
     }
 
     [HttpGet("callback-uri")]
@@ -80,7 +83,7 @@ public sealed class AuthController : ControllerBase
             return RedirectToPage("/Login", new { ReturnUrl = returnUrl });
         }
 
-        var info = await _signInManager.GetExternalLoginInfoAsync();
+        ExternalLoginInfo? info = await _signInManager.GetExternalLoginInfoAsync();
         if (info == null)
         {
             _logger.LogError("Error loading external login information.");
@@ -88,7 +91,7 @@ public sealed class AuthController : ControllerBase
         }
 
         // Sign in the user with this external login provider if the user already has a login
-        var signInResult = await _signInManager.ExternalLoginSignInAsync(
+        Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync(
             info.LoginProvider,
             info.ProviderKey,
             isPersistent: false,
@@ -98,7 +101,7 @@ public sealed class AuthController : ControllerBase
         {
             // User already exists and is signed in
             // Generate JWT token for API access
-            var user = await _usersManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            ApplicationUser? user = await _usersManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
             // If no 2FA, generate token immediately
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
             var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
@@ -122,7 +125,7 @@ public sealed class AuthController : ControllerBase
 
             user.SecurityStamp = DateTime.Now.ToString();
 
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            string tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
             IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(user, "SQLServer", "AuthToken", tokenString);
 
@@ -142,8 +145,8 @@ public sealed class AuthController : ControllerBase
             HttpContext.Response.Headers.Add("ReturnUrl", returnUrl);
             HttpContext.Response.Headers.Add("ProviderDisplayName", info.ProviderDisplayName);
 
-            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+            string? email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            string? name = info.Principal.FindFirstValue(ClaimTypes.Name);
 
             // Return the email/name to the client so they can complete registration
             return Ok(new
@@ -236,7 +239,7 @@ public sealed class AuthController : ControllerBase
 
         userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
 
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        string tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
         IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
 
@@ -283,7 +286,7 @@ public sealed class AuthController : ControllerBase
                 expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours),
                 signingCredentials: signingCredentials);
 
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            string tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
             IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
 
@@ -318,7 +321,7 @@ public sealed class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<string>> Register(RegisterModel registerModel)
     {
-        var userToCheckExistance = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
+        ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
         if (userToCheckExistance is not null)
             return BadRequest($"Пользователь с {registerModel.UserEmail} уже существует");
@@ -330,7 +333,7 @@ public sealed class AuthController : ControllerBase
         if (!string.Equals(registerModel.Password, registerModel.PasswordConfirmation))
             return BadRequest("Пароль не совпадает с подтверждением пароля");
 
-        var passwordHash = _passwordHasher.HashPassword(null, registerModel.Password);
+        string passwordHash = _passwordHasher.HashPassword(null, registerModel.Password);
 
         var user = new ApplicationUser
         {
@@ -363,7 +366,7 @@ public sealed class AuthController : ControllerBase
             user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
             string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
-            var callbackUrl = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+            string? callbackUrl = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
             var emailMessage = new MimeMessage();
 
@@ -401,11 +404,11 @@ public sealed class AuthController : ControllerBase
         // URL decode the code if needed
         code = WebUtility.UrlDecode(code);
 
-        var user = await _usersManager.FindByIdAsync(userId);
+        ApplicationUser? user = await _usersManager.FindByIdAsync(userId);
         if (user is null)
             return NotFound("User not found");
 
-        var emailConfirmationResult = await _usersManager.ConfirmEmailAsync(user, code);
+        IdentityResult emailConfirmationResult = await _usersManager.ConfirmEmailAsync(user, code);
 
         if (!emailConfirmationResult.Succeeded)
             return StatusCode(StatusCodes.Status400BadRequest, userId);
@@ -417,7 +420,7 @@ public sealed class AuthController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult> AssignToAdmin(string humanToAssignToAdminEmail)
     {
-        var humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
+        ApplicationUser? humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
 
         if (humanToAssignToAdmin is null)
             return NotFound("Human to assign to admin not found");

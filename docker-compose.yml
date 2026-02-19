@@ -6,6 +6,7 @@ networks:
     
 volumes:
   postgres_data:
+  etc-letsencrypt:
 
 services:
   Db:
@@ -67,15 +68,29 @@ services:
           condition: service_healthy
     image: nginx:latest
     ports:
-      - 8443:443
+      - 8180:80 # HTTP (для валидации Certbot)
+      - 8443:443 # HTTPS
     networks:
       - myAppNetwork
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    # Исправляем healthcheck
+      - ./nginx/conf.d:/etc/nginx/conf.d          # Nginx конфиг
+      - ./static-files:/usr/share/nginx/html      # Добавляем статические файлы в nginx в Docker'е
+      - ./certbot/www:/var/www/certbot            # Certbot HTTP challenge
+      - ./certbot/conf:/etc/letsencrypt           # SSL certificates    # Исправляем healthcheck
     healthcheck:
       test: [ "CMD-SHELL", "curl -f https://localhost:443 || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  certbot:
+    image: certbot/certbot:latest
+    depends_on:
+     - nginx
+    container_name: certbot
+    volumes:
+     - ./certbot/conf:/etc/letsencrypt
+     - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email boris.garin01job@mail.ru --agree-tos -d localhost
+    restart: unless-stopped

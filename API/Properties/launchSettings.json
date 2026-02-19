@@ -35,10 +35,9 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
       "environmentVariables": {
-        "ASPNETCORE_URLS": "http://+:8080",
+        "ASPNETCORE_URLS": "https://+:8081",
         "ASPNETCORE_ENVIRONMENT": "Docker"
-      },
-      "httpPort": 8080
+      }
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json",

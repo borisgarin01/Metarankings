@@ -1,6 +1,5 @@
 ﻿using BlazorClient.Auth;
 using IdentityLibrary.Models;
-using System.Linq;
 
 namespace BlazorClient.Pages.Auth;
 
@@ -35,7 +34,7 @@ public partial class Login : ComponentBase
             StateHasChanged();
 
             // First, try to login
-            var loginResponse = await AuthService.LoginAsync(LoginModel);
+            LoginResponse loginResponse = await AuthService.LoginAsync(LoginModel);
 
             if (loginResponse.RequiresTwoFactor)
             {
@@ -80,7 +79,7 @@ public partial class Login : ComponentBase
             StateHasChanged();
 
             // Verify 2FA code
-            var verifyResponse = await AuthService.VerifyTwoFactorAsync(UserIdFor2FA, TwoFactorCode);
+            TokenResponse verifyResponse = await AuthService.VerifyTwoFactorAsync(UserIdFor2FA, TwoFactorCode);
 
             if (!string.IsNullOrWhiteSpace(verifyResponse.Token))
             {
@@ -110,7 +109,7 @@ public partial class Login : ComponentBase
         try
         {
             // Resend by calling login again
-            var loginResponse = await AuthService.LoginAsync(LoginModel);
+            LoginResponse loginResponse = await AuthService.LoginAsync(LoginModel);
 
             if (loginResponse.RequiresTwoFactor)
             {
