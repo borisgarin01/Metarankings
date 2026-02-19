@@ -58,14 +58,12 @@ public sealed class AuthController : ControllerBase
         }
     }
 
-    [HttpGet("external-login")]
-    public async Task<IActionResult> ExternalLogin()
+    [HttpGet("external-login/{userExternalId}")]
+    public async Task<IActionResult> ExternalLogin(string userExternalId)
     {
-        ExternalLoginInfo? externalLoginInfo = await _signInManager.GetExternalLoginInfoAsync();
-
         Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync(
-           externalLoginInfo.LoginProvider,
-           externalLoginInfo.ProviderKey,
+           "Google",
+           userExternalId,
            isPersistent: false,
            bypassTwoFactor: true);
 
@@ -163,8 +161,6 @@ public sealed class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult> Login(LoginModel loginModel)
     {
-        Microsoft.AspNetCore.Identity.SignInResult signinResult = await _signInManager.ExternalLoginSignInAsync("VK", "VK", true);
-
         if (loginModel is null)
             return BadRequest("Неверный логин");
 
@@ -180,8 +176,6 @@ public sealed class AuthController : ControllerBase
 
         if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
-
-        Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync("VK", "VK", true);
 
         // If 2FA is enabled, send email and return specific response
         if (userToCheckExistance.TwoFactorEnabled is true)
