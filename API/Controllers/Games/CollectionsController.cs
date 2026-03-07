@@ -72,7 +72,7 @@ public sealed class CollectionsController : ControllerBase
 
             foreach (long seletedGameId in addGameCollectionModel.SelectedGamesIds)
             {
-                await _gamesCollectionsItemsRepository.AddAsync(new AddGameCollectionItemModel(seletedGameId, insertedGameCollectionId));
+                _ = await _gamesCollectionsItemsRepository.AddAsync(new AddGameCollectionItemModel(seletedGameId, insertedGameCollectionId));
             }
 
             return Ok(insertedGameCollectionId);

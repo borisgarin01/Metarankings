@@ -1,4 +1,5 @@
 ﻿@page "/auth/login"
+@using Domain.Auth
 
 <div class="login-container">
     @if (!IsTwoFactorRequired)
@@ -26,6 +27,26 @@
             }
             Войти
         </button>
+
+        <div class="form-group">
+            @if (ExternalLogins is null)
+            {
+                <p>Loading authentication providers...</p>
+            }
+            else if (!ExternalLogins.Any())
+            {
+                <p>No external login providers configured.</p>
+            }
+            else
+            {
+                <ul>
+                    @foreach (AuthenticationScheme login in ExternalLogins)
+                    {
+                        <li>@login.DisplayName</li>
+                    }
+                </ul>
+            }
+        </div>
     }
     else
     {

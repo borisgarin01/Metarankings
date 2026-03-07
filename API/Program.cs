@@ -6,6 +6,8 @@ using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 using IdentityLibrary.Telegram;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
 using Scalar.AspNetCore;
@@ -58,6 +60,7 @@ internal class Program
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
+            options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
             options.Authority = builder.Configuration["AuthSettings:Authority"];
@@ -71,6 +74,12 @@ internal class Program
             googleOptions.ClientId = builder.Configuration["AuthSettings:Google:ClientId"];
             googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
             googleOptions.CallbackPath = "/api/Auth/callback-uri"; // Match your controller route
+            googleOptions.SaveTokens = true;
+            googleOptions.Scope.Add("email");
+            googleOptions.Scope.Add("profile");
+            googleOptions.ClaimActions.MapJsonKey("picture","picture");
+            googleOptions.ClaimActions.MapJsonKey("email","email");
+            googleOptions.ClaimActions.MapJsonKey("name","name");
         });
 
         builder.Services.AddAuthorization(options =>

@@ -4,7 +4,6 @@ using Domain.Games;
 using Domain.RequestsModels;
 using Domain.RequestsModels.Games;
 using IdentityLibrary.Telegram;
-using NPOI.SS.Formula.Functions;
 
 namespace API.Controllers.Games;
 
@@ -12,7 +11,7 @@ namespace API.Controllers.Games;
 [Route("api/games/[controller]")]
 public sealed class GamesController : ControllerBase
 {
-    private JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
+    private JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
     private readonly GamesRepository _gamesRepository;
     private readonly ILogger<GamesController> _logger;
     private readonly TelegramAuthenticator _telegramAuthenticator;
@@ -47,7 +46,7 @@ public sealed class GamesController : ControllerBase
 
         Game createdGame = await _gamesRepository.GetAsync(createdGameId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New game {addGameModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/Details/{createdGameId}");
+        await _telegramAuthenticator.SendMessageAsync($"New game {addGameModel.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/games/Details/{createdGameId}");
         return Created($"api/games/{createdGame.Id}", createdGame);
     }
 
@@ -73,7 +72,7 @@ public sealed class GamesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Game>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var games = await _gamesRepository.GetAllAsync();
+        IEnumerable<Game> games = await _gamesRepository.GetAllAsync();
         return Ok(games);
     }
 

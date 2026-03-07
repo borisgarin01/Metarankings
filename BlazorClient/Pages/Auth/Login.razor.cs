@@ -1,10 +1,13 @@
 ﻿using BlazorClient.Auth;
+using Domain.Auth;
 using IdentityLibrary.Models;
 
 namespace BlazorClient.Pages.Auth;
 
 public partial class Login : ComponentBase
 {
+    private IEnumerable<AuthenticationScheme> externalLogins = Enumerable.Empty<AuthenticationScheme>();
+
     [Inject] private IAuthService AuthService { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private IJSRuntime JSRuntime { get; set; }
@@ -14,6 +17,19 @@ public partial class Login : ComponentBase
     private string UserIdFor2FA { get; set; } = string.Empty;
     private bool IsTwoFactorRequired { get; set; } = false;
     private bool IsLoading { get; set; } = false;
+    private IEnumerable<AuthenticationScheme> ExternalLogins
+    {
+        get => externalLogins;
+        set
+        {
+            externalLogins = value;
+            StateHasChanged();
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        ExternalLogins = await AuthService.GetAuthenticationSchemesAsync();
+    }
 
     public async Task LoginAsync()
     {
@@ -141,4 +157,15 @@ public partial class Login : ComponentBase
     }
 
     public async Task DisplayErrors() => await JSRuntime.InvokeVoidAsync("alert", "DisplayErrors");
+
+    public async Task<IEnumerable<AuthenticationScheme>> GetExternalLogins()
+    {
+        IEnumerable<AuthenticationScheme> authenticationSchemes = await AuthService.GetAuthenticationSchemesAsync();
+        return authenticationSchemes;
+    }
+
+    public async Task ExternalLogin()
+    {
+        await JSRuntime.InvokeVoidAsync("alert", "External login");
+    }
 }

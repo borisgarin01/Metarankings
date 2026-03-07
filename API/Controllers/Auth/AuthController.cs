@@ -58,104 +58,11 @@ public sealed class AuthController : ControllerBase
         }
     }
 
-    [HttpGet("external-login/{userExternalId}")]
-    public async Task<IActionResult> ExternalLogin(string userExternalId)
+    [HttpGet("external-providers")]
+    public async Task<ActionResult<IEnumerable<AuthenticationScheme>>> GetExternalProviders()
     {
-        Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync(
-           "Google",
-           userExternalId,
-           isPersistent: false,
-           bypassTwoFactor: true);
-
-        return Ok(signInResult);
-    }
-
-    [HttpGet("callback-uri")]
-    public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
-    {
-        returnUrl = returnUrl ?? Url.Content("~/");
-
-        if (remoteError != null)
-        {
-            _logger.LogError($"Error from external provider: {remoteError}");
-            return RedirectToPage("/Login", new { ReturnUrl = returnUrl });
-        }
-
-        ExternalLoginInfo? info = await _signInManager.GetExternalLoginInfoAsync();
-        if (info == null)
-        {
-            _logger.LogError("Error loading external login information.");
-            return RedirectToPage("/Login", new { ReturnUrl = returnUrl });
-        }
-
-        // Sign in the user with this external login provider if the user already has a login
-        Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync(
-            info.LoginProvider,
-            info.ProviderKey,
-            isPersistent: false,
-            bypassTwoFactor: true);
-
-        if (signInResult.Succeeded)
-        {
-            // User already exists and is signed in
-            // Generate JWT token for API access
-            ApplicationUser? user = await _usersManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
-            // If no 2FA, generate token immediately
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
-            var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
-
-            var userClaims = new List<Claim>();
-
-            if (await _usersManager.IsInRoleAsync(user, "Admin"))
-                userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
-
-            userClaims.Add(new Claim("EmailConfirmed", user.EmailConfirmed.ToString()));
-            userClaims.Add(new Claim("TwoFactorEnabled", user.TwoFactorEnabled.ToString()));
-            userClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-            userClaims.Add(new Claim("UserName", user.UserName));
-
-            var tokenOptions = new JwtSecurityToken(
-                issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
-                audience: _authSettingsOptionsMonitor.CurrentValue.Audience,
-                claims: userClaims,
-                expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours),
-                signingCredentials: signingCredentials);
-
-            user.SecurityStamp = DateTime.Now.ToString();
-
-            string tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-
-            IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(user, "SQLServer", "AuthToken", tokenString);
-
-            if (identityResult.Succeeded)
-                return Ok(new { Token = tokenString });
-
-            return StatusCode(500, "Authentication token setting has been failed");
-        }
-
-        if (signInResult.IsLockedOut)
-        {
-            return RedirectToPage("/Lockout");
-        }
-        else
-        {
-            // If the user does not have an account, then ask the user to create an account
-            HttpContext.Response.Headers.Add("ReturnUrl", returnUrl);
-            HttpContext.Response.Headers.Add("ProviderDisplayName", info.ProviderDisplayName);
-
-            string? email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            string? name = info.Principal.FindFirstValue(ClaimTypes.Name);
-
-            // Return the email/name to the client so they can complete registration
-            return Ok(new
-            {
-                Email = email,
-                Name = name,
-                LoginProvider = info.LoginProvider,
-                ProviderKey = info.ProviderKey,
-                ReturnUrl = returnUrl
-            });
-        }
+        IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalProviders = await _signInManager.GetExternalAuthenticationSchemesAsync();
+        return Ok(externalProviders.Select(ep => new AuthenticationScheme(ep.Name, ep.DisplayName)));
     }
 
     [HttpPost("login")]
@@ -182,7 +89,7 @@ public sealed class AuthController : ControllerBase
         {
             string twoFactorAuthToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
 
-            var emailMessage = new MimeMessage();
+            MimeMessage emailMessage = new();
 
             emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
             emailMessage.To.Add(new MailboxAddress("", userToCheckExistance.Email));
@@ -193,11 +100,11 @@ public sealed class AuthController : ControllerBase
                        $"Enter this code to complete your login."
             };
 
-            using (var client = new SmtpClient())
+            using (SmtpClient client = new())
             {
                 await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
                 await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
-                await client.SendAsync(emailMessage);
+                _ = await client.SendAsync(emailMessage);
                 await client.DisconnectAsync(true);
             }
 
@@ -211,10 +118,10 @@ public sealed class AuthController : ControllerBase
         }
 
         // If no 2FA, generate token immediately
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
-        var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
+        SymmetricSecurityKey secretKey = new(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
+        SigningCredentials signingCredentials = new(secretKey, SecurityAlgorithms.HmacSha512);
 
-        var userClaims = new List<Claim>();
+        List<Claim> userClaims = new();
 
         if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
             userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
@@ -224,7 +131,7 @@ public sealed class AuthController : ControllerBase
         userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
         userClaims.Add(new Claim("UserName", userToCheckExistance.UserName));
 
-        var tokenOptions = new JwtSecurityToken(
+        JwtSecurityToken tokenOptions = new(
             issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
             audience: _authSettingsOptionsMonitor.CurrentValue.Audience,
             claims: userClaims,
@@ -258,12 +165,12 @@ public sealed class AuthController : ControllerBase
 
         if (isValidTwoFactorToken)
         {
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
-            var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
+            SymmetricSecurityKey secretKey = new(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
+            SigningCredentials signingCredentials = new(secretKey, SecurityAlgorithms.HmacSha512);
 
             userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
 
-            var userClaims = new List<Claim>();
+            List<Claim> userClaims = new();
 
             if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
                 userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
@@ -273,7 +180,7 @@ public sealed class AuthController : ControllerBase
             userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
             userClaims.Add(new Claim("UserName", userToCheckExistance.UserName));
 
-            var tokenOptions = new JwtSecurityToken(
+            JwtSecurityToken tokenOptions = new(
                 issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
                 audience: _authSettingsOptionsMonitor.CurrentValue.Audience,
                 claims: userClaims,
@@ -329,7 +236,7 @@ public sealed class AuthController : ControllerBase
 
         string passwordHash = _passwordHasher.HashPassword(null, registerModel.Password);
 
-        var user = new ApplicationUser
+        ApplicationUser? user = new()
         {
             Email = registerModel.UserEmail,
             PasswordHash = passwordHash,
@@ -362,7 +269,7 @@ public sealed class AuthController : ControllerBase
             string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
             string? callbackUrl = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
-            var emailMessage = new MimeMessage();
+            MimeMessage emailMessage = new();
 
             emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
             emailMessage.To.Add(new MailboxAddress("", user.Email));
@@ -372,11 +279,11 @@ public sealed class AuthController : ControllerBase
                 Text = $"Confirm email: go to email confirmation <a href=\"{callbackUrl}\">link</a> to confirm your email"
             };
 
-            using (var client = new SmtpClient())
+            using (SmtpClient client = new())
             {
                 await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
                 await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
-                await client.SendAsync(emailMessage);
+                _ = await client.SendAsync(emailMessage);
 
                 await client.DisconnectAsync(true);
             }
@@ -439,7 +346,7 @@ public sealed class AuthController : ControllerBase
 
         string resetPasswordToken = await _usersManager.GeneratePasswordResetTokenAsync(user);
 
-        var emailMessage = new MimeMessage();
+        MimeMessage emailMessage = new();
 
         emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
         emailMessage.To.Add(new MailboxAddress("", user.Email));
@@ -449,11 +356,11 @@ public sealed class AuthController : ControllerBase
             Text = $"Reset password token - {resetPasswordToken}"
         };
 
-        using (var client = new SmtpClient())
+        using (SmtpClient client = new())
         {
             await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
             await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
-            await client.SendAsync(emailMessage);
+            _ = await client.SendAsync(emailMessage);
 
             await client.DisconnectAsync(true);
         }

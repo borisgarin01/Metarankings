@@ -22,7 +22,7 @@ public sealed class PlatformsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Platform>>> GetAllAsync()
     {
-        var developers = await _platformsRepository.GetAllAsync();
+        IEnumerable<Platform> developers = await _platformsRepository.GetAllAsync();
 
         return Ok(developers);
     }
@@ -36,18 +36,18 @@ public sealed class PlatformsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var insertedPlatformId = await _platformsRepository.AddAsync(addPlatformModel);
+        long insertedPlatformId = await _platformsRepository.AddAsync(addPlatformModel);
 
-        var insertedPlatform = await _platformsRepository.GetAsync(insertedPlatformId);
+        Platform insertedPlatform = await _platformsRepository.GetAsync(insertedPlatformId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New platform {addPlatformModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/platforms/{insertedPlatformId}");
+        await _telegramAuthenticator.SendMessageAsync($"New platform {addPlatformModel.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/games/platforms/{insertedPlatformId}");
         return Created($"api/games/platforms/{insertedPlatform.Id}", insertedPlatform);
     }
 
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Platform>> GetAsync(long id)
     {
-        var platform = await _platformsRepository.GetAsync(id);
+        Platform? platform = await _platformsRepository.GetAsync(id);
         if (platform is null)
             return NotFound();
         else
@@ -58,7 +58,7 @@ public sealed class PlatformsController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
-        var platform = await _platformsRepository.GetAsync(id);
+        Platform? platform = await _platformsRepository.GetAsync(id);
         if (platform is null)
             return NotFound();
         else
@@ -84,12 +84,12 @@ public sealed class PlatformsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var platformToUpdate = await _platformsRepository.GetAsync(id);
+        Platform? platformToUpdate = await _platformsRepository.GetAsync(id);
         if (platformToUpdate is null)
             return NotFound();
 
         // Update and return the updated entity
-        var updatedPlatform = await _platformsRepository.UpdateAsync(updatePlatformModel, id);
+        Platform updatedPlatform = await _platformsRepository.UpdateAsync(updatePlatformModel, id);
 
         return Ok(updatedPlatform);
     }

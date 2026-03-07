@@ -22,7 +22,7 @@ public sealed class GenresController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Genre>>> GetAllAsync()
     {
-        var genres = await _genresRepository.GetAllAsync();
+        IEnumerable<Genre> genres = await _genresRepository.GetAllAsync();
 
         return Ok(genres);
     }
@@ -36,9 +36,9 @@ public sealed class GenresController : ControllerBase
             return BadRequest(addGenreModel);
         }
 
-        var insertedGenreId = await _genresRepository.AddAsync(addGenreModel);
+        long insertedGenreId = await _genresRepository.AddAsync(addGenreModel);
 
-        await _telegramAuthenticator.SendMessageAsync($"New genre {addGenreModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/genres/{insertedGenreId}");
+        await _telegramAuthenticator.SendMessageAsync($"New genre {addGenreModel.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/games/genres/{insertedGenreId}");
 
         Genre insertedGenre = await _genresRepository.GetAsync(insertedGenreId);
 
@@ -48,7 +48,7 @@ public sealed class GenresController : ControllerBase
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Genre>> GetAsync(long id)
     {
-        var genre = await _genresRepository.GetAsync(id);
+        Genre? genre = await _genresRepository.GetAsync(id);
         if (genre is null)
             return NotFound();
         else
@@ -59,7 +59,7 @@ public sealed class GenresController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
-        var developer = await _genresRepository.GetAsync(id);
+        Genre? developer = await _genresRepository.GetAsync(id);
         if (developer is null)
             return NotFound();
         else
@@ -85,12 +85,12 @@ public sealed class GenresController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var genreToUpdate = await _genresRepository.GetAsync(id);
+        Genre? genreToUpdate = await _genresRepository.GetAsync(id);
         if (genreToUpdate is null)
             return NotFound();
 
         // Update and return the updated entity
-        var updatedGenre = await _genresRepository.UpdateAsync(updateGenreModel, id);
+        Genre updatedGenre = await _genresRepository.UpdateAsync(updateGenreModel, id);
 
         return Ok(updatedGenre);
     }

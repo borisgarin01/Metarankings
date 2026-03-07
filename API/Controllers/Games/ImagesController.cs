@@ -24,8 +24,8 @@ public class ImagesController : ControllerBase
     public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int year, int month, string name)
     {
         // Validate file type
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".svg", ".gif", ".tiff", ".webp", ".bmp", ".heif" };
-        var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
+        string[] allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".svg", ".gif", ".tiff", ".webp", ".bmp", ".heif" };
+        string fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
 
         if (!allowedExtensions.Contains(fileExtension))
         {
@@ -46,18 +46,18 @@ public class ImagesController : ControllerBase
         try
         {
             // Create directory structure
-            var yearMonthPath = Path.Combine(_baseImagesPath, year.ToString(), month.ToString());
+            string yearMonthPath = Path.Combine(_baseImagesPath, year.ToString(), month.ToString());
             if (!Directory.Exists(yearMonthPath))
             {
-                Directory.CreateDirectory(yearMonthPath);
+                _ = Directory.CreateDirectory(yearMonthPath);
             }
 
             // Use the provided imageName but keep the original extension
-            var fileName = $"{Path.GetFileNameWithoutExtension(name)}{fileExtension}";
-            var fullPath = Path.Combine(yearMonthPath, fileName);
+            string fileName = $"{Path.GetFileNameWithoutExtension(name)}{fileExtension}";
+            string fullPath = Path.Combine(yearMonthPath, fileName);
 
             // Save the file
-            using (var fileStream = new FileStream(fullPath, FileMode.Create))
+            using (FileStream fileStream = new(fullPath, FileMode.Create))
             {
                 await formFile.CopyToAsync(fileStream);
             }
@@ -80,7 +80,7 @@ public class ImagesController : ControllerBase
     {
         try
         {
-            var fullPath = Path.Combine(_baseImagesPath, year.ToString(), month.ToString(), imagePath);
+            string fullPath = Path.Combine(_baseImagesPath, year.ToString(), month.ToString(), imagePath);
 
             if (!System.IO.File.Exists(fullPath))
             {
@@ -88,14 +88,14 @@ public class ImagesController : ControllerBase
             }
 
             // Get content type based on file extension
-            var contentType = GetContentType(fullPath);
+            string contentType = GetContentType(fullPath);
             if (contentType == null)
             {
                 return BadRequest("Unsupported image format");
             }
 
             // Use FileStreamResult for better performance with large files
-            var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
+            FileStream fileStream = new(fullPath, FileMode.Open, FileAccess.Read);
             return File(fileStream, contentType, enableRangeProcessing: true);
         }
         catch (Exception ex)
@@ -109,7 +109,7 @@ public class ImagesController : ControllerBase
 
     private string GetContentType(string filePath)
     {
-        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+        string extension = Path.GetExtension(filePath).ToLowerInvariant();
         return extension switch
         {
             ".jpg" or ".jpeg" => "image/jpeg",
@@ -130,14 +130,14 @@ public class ImagesController : ControllerBase
     {
         try
         {
-            var directoryPath = Path.Combine(_baseImagesPath, year.ToString(), month.ToString());
+            string directoryPath = Path.Combine(_baseImagesPath, year.ToString(), month.ToString());
 
             if (!Directory.Exists(directoryPath))
             {
                 return new List<string>();
             }
 
-            var images = Directory.GetFiles(directoryPath)
+            List<string?> images = Directory.GetFiles(directoryPath)
                 .Select(Path.GetFileName)
                 .ToList();
 

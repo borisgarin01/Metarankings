@@ -33,7 +33,7 @@ public sealed class PublishersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Publisher>>> GetAllAsync()
     {
-        var publishers = await _publishersRepository.GetAllAsync();
+        IEnumerable<Publisher> publishers = await _publishersRepository.GetAllAsync();
 
         return Ok(publishers);
     }
@@ -51,7 +51,7 @@ public sealed class PublishersController : ControllerBase
 
         Publisher insertedPublisher = await _publishersRepository.GetAsync(insertedPublisherId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New publisher {insertedPublisher.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/api/games/publishers/{insertedPublisher.Id}");
+        await _telegramAuthenticator.SendMessageAsync($"New publisher {insertedPublisher.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/api/games/publishers/{insertedPublisher.Id}");
 
         return Created($"api/games/publishers/{insertedPublisher.Id}", insertedPublisher);
     }
@@ -71,11 +71,11 @@ public sealed class PublishersController : ControllerBase
             string uploadsFolderPath = $"{Directory.GetCurrentDirectory()}\\Uploads";
 
             if (!Directory.Exists(uploadsFolderPath))
-                Directory.CreateDirectory(uploadsFolderPath);
+                _ = Directory.CreateDirectory(uploadsFolderPath);
 
             string filePath = Path.Combine(uploadsFolderPath, excelFileWithPublishers.FileName);
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            using (FileStream fileStream = new(filePath, FileMode.Create))
             {
                 await excelFileWithPublishers.CopyToAsync(fileStream);
             }
@@ -144,7 +144,7 @@ public sealed class PublishersController : ControllerBase
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Publisher>> GetAsync(long id)
     {
-        var publisher = await _publishersRepository.GetAsync(id);
+        Publisher? publisher = await _publishersRepository.GetAsync(id);
         if (publisher is null)
             return NotFound();
         else
@@ -155,7 +155,7 @@ public sealed class PublishersController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
-        var publisher = await _publishersRepository.GetAsync(id);
+        Publisher? publisher = await _publishersRepository.GetAsync(id);
         if (publisher is null)
             return NotFound();
         else
@@ -181,11 +181,11 @@ public sealed class PublishersController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var publisherToUpdate = await _publishersRepository.GetAsync(id);
+        Publisher? publisherToUpdate = await _publishersRepository.GetAsync(id);
         if (publisherToUpdate is null)
             return NotFound();
 
-        var updatePublisher = await _publishersRepository.UpdateAsync(updatePublisherModel, id);
+        Publisher updatePublisher = await _publishersRepository.UpdateAsync(updatePublisherModel, id);
 
         return Ok(updatePublisher);
     }

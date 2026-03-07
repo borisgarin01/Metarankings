@@ -22,7 +22,7 @@ public sealed class LocalizationsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Localization>>> GetAllAsync()
     {
-        var developers = await _localizationsRepository.GetAllAsync();
+        IEnumerable<Localization> developers = await _localizationsRepository.GetAllAsync();
 
         return Ok(developers);
     }
@@ -40,7 +40,7 @@ public sealed class LocalizationsController : ControllerBase
 
         Localization insertedLocalization = await _localizationsRepository.GetAsync(insertedLocalizationId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New localization {addLocalizationModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/localizations/{insertedLocalizationId}");
+        await _telegramAuthenticator.SendMessageAsync($"New localization {addLocalizationModel.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/games/localizations/{insertedLocalizationId}");
         return Created($"api/games/localizations/{insertedLocalizationId}", insertedLocalization);
     }
 
@@ -48,8 +48,7 @@ public sealed class LocalizationsController : ControllerBase
     [HttpGet("{id:long}/{platformId:long}")]
     public async Task<ActionResult<Localization>> GetAsync(long id, long? platformId)
     {
-        Localization localization = null;
-
+        Localization localization;
         if (!platformId.HasValue)
             localization = await _localizationsRepository.GetAsync(id);
         else
@@ -64,7 +63,7 @@ public sealed class LocalizationsController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
-        var localization = await _localizationsRepository.GetAsync(id);
+        Localization? localization = await _localizationsRepository.GetAsync(id);
         if (localization is null)
             return NotFound();
         else
@@ -90,12 +89,12 @@ public sealed class LocalizationsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var localizationToUpdate = await _localizationsRepository.GetAsync(id);
+        Localization? localizationToUpdate = await _localizationsRepository.GetAsync(id);
         if (localizationToUpdate is null)
             return NotFound();
 
         // Update and return the updated entity
-        var updatedLocalization = await _localizationsRepository.UpdateAsync(updateLocalizationModel, id);
+        Localization updatedLocalization = await _localizationsRepository.UpdateAsync(updateLocalizationModel, id);
 
         return Ok(updatedLocalization);
     }
