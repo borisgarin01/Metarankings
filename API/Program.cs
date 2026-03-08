@@ -19,12 +19,12 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
-        var tokenValidationParameters = new TokenValidationParameters
+        TokenValidationParameters tokenValidationParameters = new()
         {
             RequireExpirationTime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:RequireExpirationTime"]),
             RequireSignedTokens = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:RequireSignedTokens"]),
@@ -38,17 +38,17 @@ internal class Program
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenValidationParameters:IssuerSigningKey"]))
         };
 
-        builder.Services.Configure<TokenValidationParameters>(builder.Configuration.GetSection(nameof(TokenValidationParameters)));
+        _ = builder.Services.Configure<TokenValidationParameters>(builder.Configuration.GetSection(nameof(TokenValidationParameters)));
 
-        builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection(nameof(AuthSettings)));
+        _ = builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection(nameof(AuthSettings)));
 
-        builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
+        _ = builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 
-        builder.Services.AddLogging();
-        builder.Logging.ClearProviders();
-        builder.Logging.AddConsole();
+        _ = builder.Services.AddLogging();
+        _ = builder.Logging.ClearProviders();
+        _ = builder.Logging.AddConsole();
 
-        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        _ = builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             // Known networks for Docker
@@ -56,7 +56,7 @@ internal class Program
             options.KnownProxies.Clear();
         });
 
-        builder.Services.AddAuthentication(options =>
+        _ = builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
@@ -77,59 +77,61 @@ internal class Program
             googleOptions.SaveTokens = true;
             googleOptions.Scope.Add("email");
             googleOptions.Scope.Add("profile");
-            googleOptions.ClaimActions.MapJsonKey("picture","picture");
-            googleOptions.ClaimActions.MapJsonKey("email","email");
-            googleOptions.ClaimActions.MapJsonKey("name","name");
+            googleOptions.ClaimActions.MapJsonKey("picture", "picture");
+            googleOptions.ClaimActions.MapJsonKey("email", "email");
+            googleOptions.ClaimActions.MapJsonKey("name", "name");
         });
 
-        builder.Services.AddAuthorization(options =>
+        _ = builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy("Admin", options =>
             {
-                options.RequireRole("Admin");
+                _ = options.RequireRole("Admin");
             });
             options.AddPolicy("AuthorizedWithEmailConfirmed", options =>
             {
-                options.RequireAuthenticatedUser();
-                options.RequireClaim("EmailConfirmed", true.ToString());
+                _ = options.RequireAuthenticatedUser();
+                _ = options.RequireClaim("EmailConfirmed", true.ToString());
             });
         });
 
-        builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
+        _ = builder.Services.AddScoped<AuthTokenGenerator>();
+
+        _ = builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
-        builder.Services.AddEndpointsApiExplorer();
+        _ = builder.Services.AddEndpointsApiExplorer();
 
-        builder.Services.AddOpenApi("v1", options =>
+        _ = builder.Services.AddOpenApi("v1", options =>
         {
-            options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+            _ = options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
         });
 
-        builder.Services.AddSignalR();
+        _ = builder.Services.AddSignalR();
 
-        builder.Services.AddResponseCompression(opts =>
+        _ = builder.Services.AddResponseCompression(opts =>
         {
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                 ["application/octet-stream"]);
         });
 
-        builder.Services.AddCors(options =>
+        _ = builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowBlazorFrontend", builder =>
             {
-                builder.AllowAnyOrigin()
+                _ = builder.AllowAnyOrigin()
                        .AllowAnyMethod()
                        .AllowAnyHeader();
             });
         });
 
-        builder.Services.RegisterRepositories(builder.Configuration);
-        builder.Services.RegisterFilesDataReaders();
+        _ = builder.Services.RegisterRepositories(builder.Configuration);
+        _ = builder.Services.RegisterFilesDataReaders();
 
-        builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+        _ = builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
         {
             options.Tokens.EmailConfirmationTokenProvider = "Email";
             options.Tokens.PasswordResetTokenProvider = "Email";
@@ -138,47 +140,47 @@ internal class Program
           .AddTokenProvider<EmailTokenProvider<ApplicationUser>>("Email")
           .AddDefaultTokenProviders();
 
-        builder.Services.AddSingleton<TelegramAuthenticator>();
+        _ = builder.Services.AddSingleton<TelegramAuthenticator>();
 
-        var app = builder.Build();
+        WebApplication app = builder.Build();
 
-        app.UseForwardedHeaders();
+        _ = app.UseForwardedHeaders();
 
         if (app.Environment.IsDevelopment())
         {
             app.UseWebAssemblyDebugging();
-            app.UseDeveloperExceptionPage();
+            _ = app.UseDeveloperExceptionPage();
         }
 
-        app.UseBlazorFrameworkFiles();
+        _ = app.UseBlazorFrameworkFiles();
 
-        app.UseStaticFiles();
+        _ = app.UseStaticFiles();
 
-        app.UseRouting();
+        _ = app.UseRouting();
 
-        app.UseAuthentication();
-        app.UseAuthorization();
+        _ = app.UseAuthentication();
+        _ = app.UseAuthorization();
 
-        app.MapOpenApi();
-        app.MapScalarApiReference(options =>
+        _ = app.MapOpenApi();
+        _ = app.MapScalarApiReference(options =>
         {
-            options.AddPreferredSecuritySchemes(["Bearer"]);
-            options.AddHttpAuthentication("Bearer", bearer =>
+            _ = options.AddPreferredSecuritySchemes(["Bearer"]);
+            _ = options.AddHttpAuthentication("Bearer", bearer =>
             {
                 bearer.Token = "Token";
             });
         });
 
-        app.MapControllers();
+        _ = app.MapControllers();
 
-        app.UseResponseCompression();
+        _ = app.UseResponseCompression();
 
-        app.MapHub<ChatHub>("/chathub");
+        _ = app.MapHub<ChatHub>("/chathub");
 
-        app.MapFallbackToFile("index.html");
+        _ = app.MapFallbackToFile("index.html");
 
-        using (var serviceProvider = CreateServices(builder.Configuration))
-        using (var scope = serviceProvider.CreateScope())
+        using (ServiceProvider serviceProvider = CreateServices(builder.Configuration))
+        using (IServiceScope scope = serviceProvider.CreateScope())
         {
             // Put the database update into a scope to ensure
             // that all resources will be disposed.
@@ -186,7 +188,7 @@ internal class Program
         }
 
         // Use CORS middleware
-        app.UseCors("AllowBlazorFrontend");
+        _ = app.UseCors("AllowBlazorFrontend");
 
         app.Run();
     }
@@ -215,7 +217,7 @@ internal class Program
     private static void UpdateDatabase(IServiceProvider serviceProvider)
     {
         // Instantiate the runner
-        var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+        IMigrationRunner runner = serviceProvider.GetRequiredService<IMigrationRunner>();
         runner.ListMigrations();
         // Execute the migrations
         runner.MigrateUp();

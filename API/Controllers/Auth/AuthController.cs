@@ -1,8 +1,9 @@
-﻿using Domain.Auth;
+﻿using API.Auth;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using IdentityLibrary.Telegram;
 using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Settings;
@@ -18,12 +19,15 @@ public sealed class AuthController : ControllerBase
     private readonly UserManager<ApplicationUser> _usersManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly TelegramAuthenticator _telegramAuthenticator;
+    private readonly AuthTokenGenerator _authTokenGenerator;
+
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
     private readonly IOptionsMonitor<AuthSettings> _authSettingsOptionsMonitor;
     private readonly IOptionsMonitor<TokenValidationParameters> _tokenValidationParameters;
     private readonly IOptionsMonitor<EmailSettings> _emailSettings;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters, SignInManager<ApplicationUser> signInManager)
+
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters, SignInManager<ApplicationUser> signInManager, AuthTokenGenerator authTokenGenerator)
     {
         _configuration = configuration;
         _usersManager = usersManager;
@@ -34,6 +38,7 @@ public sealed class AuthController : ControllerBase
         _emailSettings = emailSettings;
         _tokenValidationParameters = tokenValidationParameters;
         _signInManager = signInManager;
+        _authTokenGenerator = authTokenGenerator;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -62,7 +67,7 @@ public sealed class AuthController : ControllerBase
     public async Task<ActionResult<IEnumerable<AuthenticationScheme>>> GetExternalProviders()
     {
         IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalProviders = await _signInManager.GetExternalAuthenticationSchemesAsync();
-        return Ok(externalProviders.Select(ep => new AuthenticationScheme(ep.Name, ep.DisplayName)));
+        return Ok(externalProviders.Select(ep => new Domain.Auth.AuthenticationScheme(ep.Name, ep.DisplayName)));
     }
 
     [HttpPost("login")]
@@ -117,30 +122,7 @@ public sealed class AuthController : ControllerBase
             });
         }
 
-        // If no 2FA, generate token immediately
-        SymmetricSecurityKey secretKey = new(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
-        SigningCredentials signingCredentials = new(secretKey, SecurityAlgorithms.HmacSha512);
-
-        List<Claim> userClaims = new();
-
-        if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
-            userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
-
-        userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
-        userClaims.Add(new Claim("TwoFactorEnabled", userToCheckExistance.TwoFactorEnabled.ToString()));
-        userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
-        userClaims.Add(new Claim("UserName", userToCheckExistance.UserName));
-
-        JwtSecurityToken tokenOptions = new(
-            issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
-            audience: _authSettingsOptionsMonitor.CurrentValue.Audience,
-            claims: userClaims,
-            expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours),
-            signingCredentials: signingCredentials);
-
-        userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
-
-        string tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        string tokenString = await _authTokenGenerator.GenerateJwtToken(userToCheckExistance);
 
         IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
 
@@ -165,29 +147,7 @@ public sealed class AuthController : ControllerBase
 
         if (isValidTwoFactorToken)
         {
-            SymmetricSecurityKey secretKey = new(Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.Secret));
-            SigningCredentials signingCredentials = new(secretKey, SecurityAlgorithms.HmacSha512);
-
-            userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
-
-            List<Claim> userClaims = new();
-
-            if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
-                userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
-
-            userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
-            userClaims.Add(new Claim("TwoFactorEnabled", userToCheckExistance.TwoFactorEnabled.ToString()));
-            userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
-            userClaims.Add(new Claim("UserName", userToCheckExistance.UserName));
-
-            JwtSecurityToken tokenOptions = new(
-                issuer: _authSettingsOptionsMonitor.CurrentValue.Issuer,
-                audience: _authSettingsOptionsMonitor.CurrentValue.Audience,
-                claims: userClaims,
-                expires: DateTime.Now.AddHours(_authSettingsOptionsMonitor.CurrentValue.TokenLifetimeHours),
-                signingCredentials: signingCredentials);
-
-            string tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            string tokenString = await _authTokenGenerator.GenerateJwtToken(userToCheckExistance);
 
             IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
 
@@ -338,7 +298,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("resetPassword")]
-    public async Task<ActionResult> ResetPassword(ResetPasswordModel resetPasswordModel)
+    public async Task<ActionResult> ResetPassword(Domain.Auth.ResetPasswordModel resetPasswordModel)
     {
         ApplicationUser user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
         if (user is null)
@@ -369,7 +329,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("resetPasswordConfirm")]
-    public async Task<ActionResult> ResetPasswordConfirm(ResetPasswordConfirmModel resetPasswordModel)
+    public async Task<ActionResult> ResetPasswordConfirm(Domain.Auth.ResetPasswordConfirmModel resetPasswordModel)
     {
         ApplicationUser user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
         if (user is null)
@@ -382,7 +342,7 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("setTwoFactorEnabled")]
     [Authorize(AuthenticationSchemes = "Bearer")]
-    public async Task<ActionResult> SetTwoFactorEnabled(SetTwoFactorEnabledModel setTwoFactorEnabledModel)
+    public async Task<ActionResult> SetTwoFactorEnabled(Domain.Auth.SetTwoFactorEnabledModel setTwoFactorEnabledModel)
     {
         Claim? userId = User.FindFirst(ClaimTypes.NameIdentifier);
         ApplicationUser applicationUser = await _usersManager.FindByIdAsync(userId.Value);
