@@ -393,20 +393,38 @@ public sealed class AuthController : ControllerBase
                 return Unauthorized();
             }
 
-            var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
-            var googleUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
-            var givenName = result.Principal.FindFirst(ClaimTypes.GivenName)?.Value;
-            var surname = result.Principal.FindFirst(ClaimTypes.Surname)?.Value;
+            string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            string? googleUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            _logger.LogInformation("Google user info - Email: {Email}, GoogleUserId: {GoogleUserId}, Name: {Name}, GivenName: {GivenName}, Surname: {Surname}", email, googleUserId, name, givenName, surname);
+            ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(email);
 
-            return Ok("YOU'RE AUTHENTICATED");
+            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync("Google", email, isPersistent: true);
+
+            _logger.LogInformation("External login sign-in result for Google user {Email}: {Result}", email, signInResult.ToString());
+
+            if (userToCheckExistance is not null && signInResult is not null && signInResult.Succeeded)
+            {
+                string tokenString = await _authTokenGenerator.GenerateJwtToken(userToCheckExistance);
+
+                IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
+
+                if (identityResult.Succeeded)
+                {
+                    // Redirect back to Blazor app with token in URL
+                    // The token will be captured by Blazor's callback page
+                    return Redirect($"{Request.Scheme}://{Request.Host}/auth/google-callback?Token={tokenString}");
+                }
+
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=token_generation_failed");
+            }
+
+            // User not found - redirect to registration with email pre-filled
+            return Redirect($"{Request.Scheme}://{Request.Host}/register?email={WebUtility.UrlEncode(email)}&provider=google");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Ошибка при обработке Google callback: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            return StatusCode(500, $"Ошибка при обработке Google callback: {ex.Message}");
+            return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
         }
     }
 }
