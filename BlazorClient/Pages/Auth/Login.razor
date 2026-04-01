@@ -39,12 +39,10 @@
             }
             else
             {
-                <ul>
-                    @foreach (AuthenticationScheme login in ExternalLogins)
-                    {
-                        <li>@login.DisplayName</li>
-                    }
-                </ul>
+                @foreach (AuthenticationScheme login in ExternalLogins)
+                {
+                    <button @onclick="LoginGoogle">@login.DisplayName</button>
+                }
             }
         </div>
     }

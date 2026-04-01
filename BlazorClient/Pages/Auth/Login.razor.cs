@@ -168,4 +168,8 @@ public partial class Login : ComponentBase
     {
         await JSRuntime.InvokeVoidAsync("alert", "External login");
     }
+    public async Task LoginGoogle()
+    {
+        NavigationManager.NavigateTo($"/api/auth/login-google", forceLoad: true);
+    }
 }

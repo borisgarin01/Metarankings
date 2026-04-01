@@ -4,6 +4,8 @@ using IdentityLibrary.Models;
 using IdentityLibrary.Telegram;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Settings;
@@ -352,5 +354,59 @@ public sealed class AuthController : ControllerBase
         if (settingTwoFactorEnabledResult.Succeeded)
             return Ok("Two factor enabled fact has been changed successfully");
         return StatusCode(StatusCodes.Status500InternalServerError);
+    }
+
+    [HttpGet("login-google")]
+    public async Task<ActionResult> LoginViaGoogle()
+    {
+        try
+        {
+            string redirectUrl = Url.Action(nameof(GoogleCallback), "Auth", null, Request.Scheme);
+            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            _logger.LogInformation("AllowRefresh: {AllowRefresh}", properties.AllowRefresh);
+            _logger.LogInformation("ExpiresUtc: {ExpiresUtc}", properties.ExpiresUtc);
+            _logger.LogInformation("IsPersistent: {IsPersistent}", properties.IsPersistent);
+            _logger.LogInformation("IssuedUtc: {IssuedUtc}", properties.IssuedUtc);
+            _logger.LogInformation("RedirectUri: {RedirectUri}", properties.RedirectUri);
+            _logger.LogInformation("Items: {Items}", string.Join(", ", properties.Items.Select(kvp => $"{kvp.Key}: {kvp.Value}")));
+            return Challenge(properties, "Google");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при попытке входа через Google: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"Ошибка при попытке входа через Google: {ex.Message}");
+        }
+    }
+
+    [HttpGet("google-callback")]
+    public async Task<ActionResult> GoogleCallback()
+    {
+        try
+        {
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            _logger.LogInformation("Google callback authentication result succeeded: {Succeeded}", result.Succeeded);
+
+            if (!result.Succeeded || result.Principal is null)
+            {
+                HttpContext.Response.Redirect("/");
+                return Unauthorized();
+            }
+
+            var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            var googleUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
+            var givenName = result.Principal.FindFirst(ClaimTypes.GivenName)?.Value;
+            var surname = result.Principal.FindFirst(ClaimTypes.Surname)?.Value;
+
+            _logger.LogInformation("Google user info - Email: {Email}, GoogleUserId: {GoogleUserId}, Name: {Name}, GivenName: {GivenName}, Surname: {Surname}", email, googleUserId, name, givenName, surname);
+
+            return Ok("YOU'RE AUTHENTICATED");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при обработке Google callback: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"Ошибка при обработке Google callback: {ex.Message}");
+        }
     }
 }

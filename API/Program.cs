@@ -59,7 +59,7 @@ internal class Program
         _ = builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
+            options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
             options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
@@ -73,14 +73,7 @@ internal class Program
         {
             googleOptions.ClientId = builder.Configuration["AuthSettings:Google:ClientId"];
             googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
-            googleOptions.CallbackPath = "/api/Auth/callback-uri"; // Match your controller route
-            googleOptions.SaveTokens = true;
-            googleOptions.Scope.Add("email");
-            googleOptions.Scope.Add("profile");
-            googleOptions.ClaimActions.MapJsonKey("picture", "picture");
-            googleOptions.ClaimActions.MapJsonKey("email", "email");
-            googleOptions.ClaimActions.MapJsonKey("name", "name");
-        });
+        }).AddCookie();
 
         _ = builder.Services.AddAuthorization(options =>
         {
