@@ -356,6 +356,46 @@ public sealed class AuthController : ControllerBase
         return StatusCode(StatusCodes.Status500InternalServerError);
     }
 
+    [HttpPost("addPassword/{password}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult> AddPasswordAsync(string password)
+    {
+        _logger.LogInformation("addPassword");
+
+        try
+        {
+            string emailClaimValue = User.Claims.SingleOrDefault(b => b.Type == ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrWhiteSpace(emailClaimValue))
+            {
+                _logger.LogWarning("Email claim not found in user claims");
+                return BadRequest("Email claim not found");
+            }
+
+            ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(emailClaimValue);
+
+            if (userToCheckExistance is null)
+            {
+                _logger.LogWarning("userToCheckExistance is null");
+                return NotFound();
+            }
+            if (string.IsNullOrWhiteSpace(userToCheckExistance.PasswordHash))
+            {
+                await _usersManager.AddPasswordAsync(userToCheckExistance, password);
+
+                return Ok();
+            }
+
+            return BadRequest("Password is already set for this user");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при добавлении пароля: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"Ошибка при добавлении пароля: {ex.Message}");
+        }
+
+    }
+
     [HttpGet("login-google")]
     public async Task<ActionResult> LoginViaGoogle()
     {
