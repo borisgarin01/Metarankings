@@ -39,7 +39,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<long>> AddAsync(AddGameModel addGameModel)
     {
         long createdGameId = await _gamesRepository.AddAsync(addGameModel);
@@ -51,7 +51,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<long>> RemoveAsync(long id)
     {
         Game game = await _gamesRepository.GetAsync(id);

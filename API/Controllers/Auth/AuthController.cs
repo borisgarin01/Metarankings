@@ -43,9 +43,9 @@ public sealed class AuthController : ControllerBase
         _authTokenGenerator = authTokenGenerator;
     }
 
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [HttpPost("addExternalLogin/{providerUserId}")]
-    public async Task<ActionResult> AddExternalLogin(string providerUserId)
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost("addExternalLogin")]
+    public async Task<ActionResult> AddExternalLogin()
     {
         try
         {
@@ -53,7 +53,7 @@ public sealed class AuthController : ControllerBase
             if (authUser is null)
                 return NotFound();
 
-            IdentityResult identityResult = await _usersManager.AddLoginAsync(authUser, new UserLoginInfo("Google", providerUserId, "Google"));
+            IdentityResult identityResult = await _usersManager.AddLoginAsync(authUser, new UserLoginInfo("Google", authUser.Email, "Google"));
 
             if (identityResult.Succeeded)
                 return Ok(identityResult);
@@ -161,7 +161,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("logout")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult> Logout()
     {
         try
@@ -280,7 +280,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("assignToAdmin")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> AssignToAdmin(string humanToAssignToAdminEmail)
     {
         ApplicationUser? humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
@@ -343,7 +343,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("setTwoFactorEnabled")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult> SetTwoFactorEnabled(Domain.Auth.SetTwoFactorEnabledModel setTwoFactorEnabledModel)
     {
         Claim? userId = User.FindFirst(ClaimTypes.NameIdentifier);

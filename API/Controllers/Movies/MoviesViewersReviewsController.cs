@@ -30,7 +30,7 @@ public sealed class MoviesViewersReviewsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult> AddMovieViewerReviewAsync(AddMovieViewerReviewModel addMovieViewerReviewModel)
     {
         long userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -70,7 +70,7 @@ public sealed class MoviesViewersReviewsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<MovieReview>> UpdateReview(long id, UpdateMovieViewerReviewWithUserIdAndDateModel updateMovieViewerReviewWithUserIdAndDateModel)
     {
         MovieReview movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
@@ -94,7 +94,7 @@ public sealed class MoviesViewersReviewsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<MovieReview>> RemoveReview(long id)
     {
         MovieReview movieReview = await _moviesViewersReviewsRepository.GetAsync(id);

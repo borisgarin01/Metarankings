@@ -20,7 +20,7 @@ public class ImagesController : ControllerBase
     }
 
     [HttpPost("{year:int}/{month:int}/{name}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int year, int month, string name)
     {
         // Validate file type

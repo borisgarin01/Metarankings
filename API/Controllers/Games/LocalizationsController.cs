@@ -28,7 +28,7 @@ public sealed class LocalizationsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Localization>> AddAsync(AddLocalizationModel addLocalizationModel)
     {
         if (!ModelState.IsValid)
@@ -60,7 +60,7 @@ public sealed class LocalizationsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         Localization? localization = await _localizationsRepository.GetAsync(id);
@@ -81,7 +81,7 @@ public sealed class LocalizationsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Localization>> UpdateAsync(long id, UpdateLocalizationModel updateLocalizationModel)
     {
         if (!ModelState.IsValid)

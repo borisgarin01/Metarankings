@@ -46,7 +46,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Developer>> AddAsync(AddDeveloperModel addDeveloperModel)
     {
         if (!ModelState.IsValid)
@@ -74,7 +74,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         Developer? developer = await _developersRepository.GetAsync(id);
@@ -95,7 +95,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Developer>> UpdateAsync(long id, UpdateDeveloperModel updateDeveloperModel)
     {
         if (!ModelState.IsValid)
@@ -114,7 +114,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpPost("upload-developers-from-json")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> AddFromJsonAsync(IEnumerable<AddDeveloperModel> developers)
     {
         if (developers is null)
@@ -144,7 +144,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpPost("developers-excel-upload")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<IEnumerable<Developer>>> AddFromExcelAsync(IFormFile excelFileWithPublishers)
     {
         if (excelFileWithPublishers is null)

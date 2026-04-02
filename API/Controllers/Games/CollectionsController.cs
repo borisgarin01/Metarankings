@@ -6,7 +6,7 @@ namespace API.Controllers.Games;
 
 [ApiController]
 [Route("api/games/[controller]")]
-[Authorize(Policy = "Admin", AuthenticationSchemes = "Bearer")]
+[Authorize(Policy = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class CollectionsController : ControllerBase
 {
     private readonly IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> _gamesCollectionsRepository;

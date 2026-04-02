@@ -24,7 +24,7 @@ public sealed class MoviesStudiosController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieStudio>> AddAsync(AddMovieStudioModel movieStudio)
     {
         long createdMovieStudioId = await _moviesStudiosRepository.AddAsync(movieStudio);
@@ -35,7 +35,7 @@ public sealed class MoviesStudiosController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         MovieStudio movieStudio = await _moviesStudiosRepository.GetAsync(id);
@@ -48,7 +48,7 @@ public sealed class MoviesStudiosController : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieStudio>> GetAsync(long id)
     {
         MovieStudio movieStudio = await _moviesStudiosRepository.GetAsync(id);
