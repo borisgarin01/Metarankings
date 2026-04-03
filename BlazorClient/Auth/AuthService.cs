@@ -1,4 +1,5 @@
-﻿using Domain.Auth;
+﻿using API.Controllers.Auth;
+using Domain.Auth;
 using IdentityLibrary.Models;
 using System.Net;
 using System.Text;
@@ -37,15 +38,15 @@ public class AuthService : IAuthService
 
     public async Task<TokenResponse> VerifyTwoFactorAsync(string userId, string token)
     {
-        var request = new { UserId = userId, TwoFactorToken = token };
+        var request = new ConfirmLoginModel(userId, token);
         HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/ConfirmLoginViaEmail", request);
 
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content.ReadFromJsonAsync<TokenResponse>();
+            return await JsonSerializer.DeserializeAsync<TokenResponse>(await response.Content.ReadAsStreamAsync());
         }
 
-        return new TokenResponse { Error = "Ошибка верификации" };
+        return new TokenResponse(string.Empty, "Ошибка верификации");
     }
 
     public async Task StoreTokenAsync(string token)
