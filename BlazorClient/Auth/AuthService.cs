@@ -1,4 +1,6 @@
-﻿using Domain.Auth;
+﻿using API.Controllers.Auth;
+using Domain.Auth;
+using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using System.Net;
 using System.Text;
@@ -37,15 +39,15 @@ public class AuthService : IAuthService
 
     public async Task<TokenResponse> VerifyTwoFactorAsync(string userId, string token)
     {
-        var request = new { UserId = userId, TwoFactorToken = token };
+        var request = new ConfirmLoginModel(userId, token);
         HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/ConfirmLoginViaEmail", request);
 
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content.ReadFromJsonAsync<TokenResponse>();
+            return await JsonSerializer.DeserializeAsync<TokenResponse>(await response.Content.ReadAsStreamAsync());
         }
 
-        return new TokenResponse { Error = "Ошибка верификации" };
+        return new TokenResponse(string.Empty, "Ошибка верификации");
     }
 
     public async Task StoreTokenAsync(string token)
@@ -156,5 +158,19 @@ public class AuthService : IAuthService
     {
         IEnumerable<AuthenticationScheme>? schemes = await _httpClient.GetFromJsonAsync<IEnumerable<AuthenticationScheme>>("api/auth/external-providers");
         return schemes;
+    }
+
+    public Task<ApplicationUser> GetCurrentUserAsync()
+    {
+        var applicaitonUser = _httpClient.GetFromJsonAsync<ApplicationUser>("api/auth/current-user");
+
+        return applicaitonUser;
+    }
+
+    public async Task<HttpResponseMessage> SendChangePasswordMessageAsync(ChangePasswordModel changePasswordModel)
+    {
+        HttpResponseMessage changingPasswordHttpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/set-password", changePasswordModel);
+
+        return changingPasswordHttpResponseMessage;
     }
 }

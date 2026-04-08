@@ -48,7 +48,7 @@ public class MoviesDirectorsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieDirector>> AddAsync(AddMovieDirectorModel addMovieDirectorModel)
     {
         if (ModelState.IsValid)
@@ -71,7 +71,7 @@ public class MoviesDirectorsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieDirector>> UpdateAsync(long id, UpdateMovieDirectorModel updateMovieDirectorModel)
     {
         var movieDirectorToUpdate = await _moviesDirectorsRepository.GetAsync(id);
@@ -97,7 +97,7 @@ public class MoviesDirectorsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieDirector>> UpdateAsync(long id)
     {
         var movieDirectorToUpdate = await _moviesDirectorsRepository.GetAsync(id);

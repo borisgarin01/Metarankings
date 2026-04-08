@@ -1,10 +1,8 @@
-﻿namespace IdentityLibrary.Models;
+﻿using System.Text.Json.Serialization;
 
-public sealed record TokenResponse
-{
-    [Required]
-    public string Token { get; set; }
+namespace IdentityLibrary.Models;
 
-    [Required]
-    public string Error { get; set; }
-}
+public sealed record TokenResponse(
+    [property: JsonPropertyName("token")] string Token,
+    [property: JsonPropertyName("error")] string Error
+);

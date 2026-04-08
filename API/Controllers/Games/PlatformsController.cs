@@ -28,7 +28,7 @@ public sealed class PlatformsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Platform>> AddAsync(AddPlatformModel addPlatformModel)
     {
         if (!ModelState.IsValid)
@@ -55,7 +55,7 @@ public sealed class PlatformsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         Platform? platform = await _platformsRepository.GetAsync(id);
@@ -76,7 +76,7 @@ public sealed class PlatformsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Platform>> UpdateAsync(long id, UpdatePlatformModel updatePlatformModel)
     {
         if (!ModelState.IsValid)

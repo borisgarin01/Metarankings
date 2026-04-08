@@ -27,7 +27,8 @@ public sealed class AuthTokenGenerator
         new Claim("EmailConfirmed", user.EmailConfirmed.ToString()),
         new Claim("TwoFactorEnabled", user.TwoFactorEnabled.ToString()),
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim("UserName", user.UserName)
+        new Claim("UserName", user.UserName),
+        new Claim(ClaimTypes.Email, user.Email)
     };
 
         if (await _usersManager.IsInRoleAsync(user, "Admin"))

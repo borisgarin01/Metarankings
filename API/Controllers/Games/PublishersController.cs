@@ -39,7 +39,7 @@ public sealed class PublishersController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Publisher>> AddAsync(AddPublisherModel addPublisherModel)
     {
         if (!ModelState.IsValid)
@@ -57,7 +57,7 @@ public sealed class PublishersController : ControllerBase
     }
 
     [HttpPost("publishers-excel-upload")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<IEnumerable<Publisher>>> AddFromExcelAsync(IFormFile excelFileWithPublishers)
     {
         if (excelFileWithPublishers is null)
@@ -111,7 +111,7 @@ public sealed class PublishersController : ControllerBase
     }
 
     [HttpPost("upload-publishers-from-json")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> AddFromJsonAsync(IEnumerable<AddPublisherModel> publishers)
     {
         if (publishers is null)
@@ -152,7 +152,7 @@ public sealed class PublishersController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
         Publisher? publisher = await _publishersRepository.GetAsync(id);
@@ -173,7 +173,7 @@ public sealed class PublishersController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Publisher>> UpdateAsync(long id, UpdatePublisherModel updatePublisherModel)
     {
         if (!ModelState.IsValid)

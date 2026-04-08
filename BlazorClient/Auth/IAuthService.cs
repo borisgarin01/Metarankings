@@ -1,4 +1,5 @@
 ﻿using Domain.Auth;
+using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using System.Net;
 
@@ -15,4 +16,6 @@ public interface IAuthService
     public Task<TokenResponse> VerifyTwoFactorAsync(string userId, string token);
     public Task StoreTokenAsync(string token);
     public Task<IEnumerable<AuthenticationScheme>> GetAuthenticationSchemesAsync();
+    public Task<ApplicationUser> GetCurrentUserAsync();
+    public Task<HttpResponseMessage> SendChangePasswordMessageAsync(ChangePasswordModel changePasswordModel);
 }

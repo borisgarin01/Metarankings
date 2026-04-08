@@ -48,7 +48,7 @@ public class MoviesGenresController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieGenre>> AddAsync(AddMovieGenreModel addMovieGenreModel)
     {
         if (ModelState.IsValid)
@@ -71,7 +71,7 @@ public class MoviesGenresController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieGenre>> DeleteAsync(long id)
     {
         try

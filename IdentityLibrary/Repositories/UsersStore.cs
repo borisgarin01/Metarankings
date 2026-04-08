@@ -1,9 +1,10 @@
 ﻿using IdentityLibrary.DTOs;
+using Microsoft.AspNetCore.Identity;
 using System;
 
 namespace IdentityLibrary.Repositories;
 
-public sealed class UsersStore : IUserSecurityStampStore<ApplicationUser>, IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>, IUserAuthenticationTokenStore<ApplicationUser>, IUserTwoFactorStore<ApplicationUser>, IUserLoginStore<ApplicationUser>
+public sealed class UsersStore : IUserSecurityStampStore<ApplicationUser>, IUserStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IQueryableUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserRoleStore<ApplicationUser>, IUserAuthenticationTokenStore<ApplicationUser>, IUserTwoFactorStore<ApplicationUser>, IUserLoginStore<ApplicationUser>, IUserPhoneNumberStore<ApplicationUser>, IUserAuthenticatorKeyStore<ApplicationUser>
 {
     private readonly string _connectionString;
 
@@ -346,5 +347,47 @@ WHERE
         AND ProviderKey=@ProviderKey;", new { LoginProvider = loginProvider, ProviderKey = providerKey });
 
         return applicationUser;
+    }
+
+    public Task SetPhoneNumberAsync(ApplicationUser user, string? phoneNumber, CancellationToken cancellationToken)
+    {
+        user.PhoneNumber = phoneNumber;
+        return Task.CompletedTask;
+    }
+
+    public Task<string?> GetPhoneNumberAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(user.PhoneNumber);
+    }
+
+    public Task<bool> GetPhoneNumberConfirmedAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(user.PhoneNumberConfirmed);
+    }
+
+    public Task SetPhoneNumberConfirmedAsync(ApplicationUser user, bool confirmed, CancellationToken cancellationToken)
+    {
+        user.PhoneNumberConfirmed = confirmed;
+        return Task.CompletedTask;
+    }
+
+    public Task SetAuthenticatorKeyAsync(ApplicationUser user, string key, CancellationToken cancellationToken)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        return connection.ExecuteAsync(@"INSERT INTO AspNetUserTokens (UserId, LoginProvider, Name, Value) VALUES (@UserId, @LoginProvider, @Name, @Value);", new
+        {
+            UserId = user.Id,
+            LoginProvider = "Google",
+            Name = user.NormalizedUserName,
+            Value = key,
+        });
+    }
+
+    public async Task<string?> GetAuthenticatorKeyAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        return await connection.QueryFirstOrDefaultAsync<string>(@"SELECT Value 
+FROM AspNetUserTokens
+WHERE UserId=@UserId;", new { UserId = user.Id });
     }
 }

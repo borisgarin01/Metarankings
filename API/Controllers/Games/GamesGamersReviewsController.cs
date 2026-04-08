@@ -29,7 +29,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult> AddGameReviewAsync(AddGamePlayerReviewModel addGameReviewModel)
     {
         long userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -69,7 +69,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<GameReview>> UpdateReview(long id, UpdateGamePlayerReviewModel updateGamePlayerReviewModel)
     {
         GameReview gameReview = await _gamesPlayersReviewsRepository.GetAsync(id);
@@ -93,7 +93,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<GameReview>> RemoveReview(long id)
     {
         GameReview gameReview = await _gamesPlayersReviewsRepository.GetAsync(id);
