@@ -12,10 +12,10 @@ public sealed class CreateGamesCriticsReviewsTableMigration : Migration
     {
         Execute.Sql(@"
 CREATE TABLE GamesCriticsReviews
-(Id bigint not null primary key identity(1,1),
+(Id bigserial not null primary key,
 GameId bigint not null,
 UserId bigint not null,
-TextContent nvarchar(MAX) not null,
+TextContent text not null,
 Score float not null,
 Date date not null,
 CHECK (Score >= 0 and Score <= 10),

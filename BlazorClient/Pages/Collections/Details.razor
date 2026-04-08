@@ -1,0 +1,63 @@
+﻿@page "/games/collections/{GameCollectionId:long}"
+@using Domain.Games
+
+@if (GameCollection is null)
+{
+    <p>Loading...</p>
+}
+
+else
+{
+    <div id="content" class="lcol">
+        <div class="news-text entry">
+            <div class="specials post single clear">
+                <div class="post-meta">
+                    <div class="breadcrumbs news-meta">
+                        <a href="https://metarankings.ru/meta/collections/">Подборки</a> → <a href="https://metarankings.ru/meta/collections/films-games/">Контент</a>
+                    </div>
+                    <h1><span>@GameCollection.Name</span></h1>
+                </div>
+                <div class="post-content">
+                    <div class="news-img">
+                        <img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry.jpg" alt="@GameCollection.Name">
+                    </div>
+                    <p>@GameCollection.Description</p>
+                </div>
+                <section id="loop" class="list clear best" itemscope="" itemtype="https://schema.org/ItemList">
+                    @foreach (Game game in GameCollection.Games)
+                    {
+                        <article class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+                            <a href="/games/details/@game.Id" class="thumb">
+                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/{game.ReleaseDate.Value.Year}/{game.ReleaseDate.Value.Month}/{game.Image}")" alt="@game.Name">
+                            </a>
+                            <div itemprop="item" itemscope="" itemtype="https://schema.org/VideoGame">
+                                <link itemprop="url" href="/games/details/@game.Id">
+                                <link itemprop="image" href="@($"{HttpClient.BaseAddress}api/games/images/{game.ReleaseDate.Value.Year}/{game.ReleaseDate.Value.Month}/{game.Image}")">
+                                <meta itemprop="dateCreated" content="@game.ReleaseDate.Value.Year">
+                                <div itemprop="name"><a class="name" href="/games/details/@game.Id">@game.Name</a></div>
+                                <div class="post-meta">@game.ReleaseDate.Value.ToString("dd MMMM yyyy")</div>
+                            </div>
+                            <div class="ratings-graph">
+                                <div class="graph">
+                                    <div class="small-score mark-8">7.5</div>
+                                    <div class="graph-body"><div style="width:75%" class="rating-graph mark-8"></div></div>
+                                </div>
+                            </div>
+                        </article>
+                    }
+                </section>
+                <div class="ads-horizont hor-1">
+                    <!-- Yandex.RTB R-A-201169-7 -->
+                    <div id="yandex_rtb_R-A-201169-7"></div>
+                    <script>
+                        window.yaContextCb.push(()=>{
+                          Ya.Context.AdvManager.render({
+                            renderTo: 'yandex_rtb_R-A-201169-7',
+                            blockId: 'R-A-201169-7'
+                          })
+                        })</script>
+                </div>
+            </div>
+        </div>
+    </div>
+}

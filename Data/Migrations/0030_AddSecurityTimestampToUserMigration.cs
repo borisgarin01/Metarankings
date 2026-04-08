@@ -10,6 +10,6 @@ public sealed class AddSecurityTimestampToUserMigration : Migration
 
     public override void Up()
     {
-        Execute.Sql("ALTER TABLE ApplicationUsers ADD SecurityStamp nvarchar(511) null;");
+        Execute.Sql("ALTER TABLE ApplicationUsers ADD SecurityStamp varchar(511) null;");
     }
 }

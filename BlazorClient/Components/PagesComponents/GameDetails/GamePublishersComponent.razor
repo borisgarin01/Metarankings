@@ -1,0 +1,9 @@
+﻿<p>
+    <span class="label">Издатель:</span>
+    @for (int i = 0; i < Publishers.Count() - 1; i++)
+    {
+        <a itemprop="publisher" href="/publishers/@Publishers.ElementAt(i).Id">@Publishers.ElementAt(i).Name</a>
+        <text>, </text>
+    }
+    <a href="/publishers/@Publishers.ElementAt(Publishers.Count() - 1).Id">@Publishers.ElementAt(Publishers.Count() - 1).Name</a>
+</p>

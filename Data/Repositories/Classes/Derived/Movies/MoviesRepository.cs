@@ -1,8 +1,11 @@
-﻿using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
+using Domain.RequestsModels.Movies.Movies;
+using Domain.Reviews;
+using IdentityLibrary.DTOs;
 
 namespace Data.Repositories.Classes.Derived.Movies;
-public sealed class MoviesRepository : Repository, IRepository<Movie, AddMovieModel, UpdateMovieModel>
+public sealed class MoviesRepository : Repository, IMoviesRepository
 {
     public MoviesRepository(string connectionString) : base(connectionString)
     {
@@ -10,41 +13,41 @@ public sealed class MoviesRepository : Repository, IRepository<Movie, AddMovieMo
 
     public async Task<long> AddAsync(AddMovieModel entity)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedMovieGenres = new List<MovieGenre>();
             var insertedMovieStudios = new List<MovieStudio>();
             var insertedMovieDirectors = new List<MovieDirector>();
 
-            foreach (var movieGenre in entity.AddMovieGenresModels)
+            foreach (var movieGenreName in entity.MoviesGenresNames)
             {
                 var movieGenreToFind = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"SELECT Id, Name
 FROM MoviesGenres
-WHERE Name=@Name;", new { movieGenre.Name });
+WHERE Name=@Name;", new { Name = movieGenreName });
 
                 if (movieGenreToFind is null)
                 {
                     var insertedMovieGenre = await connection.QueryFirstAsync<MovieGenre>(@"INSERT INTO MoviesGenres 
 (Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { movieGenre.Name });
+VALUES (@Name)
+RETURNING Id, Name;", new { Name = movieGenreName });
                     insertedMovieGenres.Add(insertedMovieGenre);
                 }
                 else
                     insertedMovieGenres.Add(movieGenreToFind);
             }
-            foreach (var movieStudio in entity.AddMovieStudiosModels)
+            foreach (string movieStudioName in entity.MoviesStudiosNames)
             {
                 var moviesStudioToFind = await connection.QueryFirstOrDefaultAsync<MovieStudio>(@"SELECT Id, Name
 FROM MoviesStudios
-WHERE Name=@Name;", new { movieStudio.Name });
+WHERE Name=@Name;", new { Name = movieStudioName });
 
                 if (moviesStudioToFind is null)
                 {
                     var insertedMovieStudio = await connection.QueryFirstAsync<MovieStudio>(@"INSERT INTO MoviesStudios 
 (Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { movieStudio.Name });
+VALUES (@Name)
+RETURNING Id, Name;", new { Name = movieStudioName });
                     insertedMovieStudios.Add(insertedMovieStudio);
                 }
                 else
@@ -53,18 +56,18 @@ VALUES (@Name);", new { movieStudio.Name });
                 }
             }
 
-            foreach (var movieDirector in entity.AddMovieDirectorsModels)
+            foreach (var movieDirectorName in entity.MoviesDirectorsNames)
             {
                 var moviesDirectorToFind = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"SELECT Id, Name
 FROM MoviesDirectors
-WHERE Name=@Name;", new { movieDirector.Name });
+WHERE Name=@Name;", new { Name = movieDirectorName });
 
                 if (moviesDirectorToFind is null)
                 {
                     var insertedMovieDirector = await connection.QueryFirstAsync<MovieDirector>(@"INSERT INTO MoviesDirectors 
 (Name)
-output inserted.id, inserted.name
-VALUES (@Name);", new { movieDirector.Name });
+VALUES (@Name)
+RETURNING Id, Name;", new { Name = movieDirectorName });
                     insertedMovieDirectors.Add(insertedMovieDirector);
                 }
                 else
@@ -75,9 +78,9 @@ VALUES (@Name);", new { movieDirector.Name });
 
             var insertedMovie = await connection.QueryFirstAsync<Movie>(@"INSERT INTO Movies 
 (Name, OriginalName, ImageSource, PremierDate, Description) 
-output inserted.id, inserted.name, inserted.originalname, inserted.imagesource, inserted.premierdate, inserted.description
 VALUES
-(@Name, @OriginalName, @ImageSource, @PremierDate, @Description);", new
+(@Name, @OriginalName, @ImageSource, @PremierDate, @Description)
+RETURNING Id, Name, OriginalName, ImageSource, PremierDate, Description;", new
             {
                 entity.Name,
                 entity.OriginalName,
@@ -121,13 +124,13 @@ VALUES (@MovieId, @MovieDirectorId);",
 
     public async Task<IEnumerable<Movie>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
-m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
-ms.id, ms.name,
-mg.id, mg.name,
-md.id, md.name
+m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
+mg.Id, mg.Name,
+ms.Id, ms.Name,
+md.Id, md.Name
     FROM movies m
     LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
     LEFT JOIN moviesGenres mg ON mg.id = mmg.moviegenreid
@@ -173,12 +176,77 @@ md.id, md.name
 
     public async Task<Movie> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            var sql = @"select m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
+mg.Id, mg.Name,
+ms.Id, ms.Name,
+md.Id, md.Name,
+vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
+au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
+au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
+    FROM movies m
+    LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
+    LEFT JOIN moviesGenres mg ON mg.id = mmg.moviegenreid
+    LEFT JOIN moviesMoviesStudios mms ON mms.movieId = m.Id
+    LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
+    LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
+    LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
+    LEFT JOIN viewersMoviesReviews vmr on vmr.movieId = m.Id
+    LEFT JOIN applicationUsers au on au.Id = vmr.ViewerId
+
+WHERE m.id=@id";
+
+            var moviesDictionary = new Dictionary<long, Movie>();
+
+            var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, MovieReview, ApplicationUser, Movie>(
+                sql,
+                (movie, movieGenre, movieStudio, movieDirector, movieReview, applicationUser) =>
+                {
+                    if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                    {
+                        movieEntry = movie;
+                        movieEntry.MovieGenres = new List<MovieGenre>();
+                        movieEntry.MoviesStudios = new List<MovieStudio>();
+                        movieEntry.MoviesDirectors = new List<MovieDirector>();
+                        moviesDictionary.Add(movieEntry.Id, movieEntry);
+                    }
+
+                    if (movieGenre is not null && !movieEntry.MovieGenres.Any(mg => mg.Id == movieGenre.Id))
+                        movieEntry.MovieGenres.Add(movieGenre);
+
+                    if (movieStudio is not null && !movieEntry.MoviesStudios.Any(ms => ms.Id == movieStudio.Id))
+                        movieEntry.MoviesStudios.Add(movieStudio);
+
+                    if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(md => md.Id == movieDirector.Id))
+                        movieEntry.MoviesDirectors.Add(movieDirector);
+
+                    if (movieReview is not null && !movieEntry.MovieReviews.Any(mr => mr.Id == movieReview.Id) && applicationUser is not null)
+                    {
+                        movieReview = movieReview with { ApplicationUser = applicationUser };
+                        movieEntry.MovieReviews.Add(movieReview);
+                    }
+
+                    return movieEntry;
+                },
+                new { id },
+                splitOn: "Id,Id,Id,Id,MovieId,Id" // The columns where each new entity starts
+            );
+
+            var result = moviesDictionary.Values.FirstOrDefault();
+
+            return result;
+        }
+    }
+
+    public async Task<IEnumerable<Movie>> GetAsync(DateTime dateFrom, DateTime dateTo)
+    {
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
-ms.id, ms.name,
 mg.id, mg.name,
+ms.id, ms.name,
 md.id, md.name
     FROM movies m
     LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
@@ -187,7 +255,8 @@ md.id, md.name
     LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
     LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
     LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
-WHERE m.id=@id";
+WHERE m.premierDate between @dateFrom and @dateTo
+ORDER BY Id DESC;";
 
             var moviesDictionary = new Dictionary<long, Movie>();
 
@@ -214,20 +283,70 @@ WHERE m.id=@id";
                         movieEntry.MoviesDirectors.Add(movieDirector);
 
                     return movieEntry;
-                },
-                new { id },
+                }, new { dateFrom, dateTo },
                 splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
             );
 
-            var result = moviesDictionary.Values.FirstOrDefault();
+            var result = moviesDictionary.Values.ToList();
 
             return result;
         }
     }
 
-    public Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
+    public async Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
     {
-        throw new NotImplementedException();
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            var sql = @"SELECT         
+m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
+mg.id, mg.name,
+ms.id, ms.name,
+md.id, md.name
+     FROM (
+                select Id, Name, ImageSource, OriginalName, PremierDate, Description from Movies
+                ORDER BY Id DESC
+                OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
+            ) AS m
+    LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
+    LEFT JOIN moviesGenres mg ON mg.id = mmg.moviegenreid
+    LEFT JOIN moviesMoviesStudios mms ON mms.movieId = m.Id
+    LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
+    LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
+    LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId;";
+
+            var moviesDictionary = new Dictionary<long, Movie>();
+
+            var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
+                sql,
+                (movie, movieGenre, movieStudio, movieDirector) =>
+                {
+                    if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                    {
+                        movieEntry = movie;
+                        movieEntry.MovieGenres = new List<MovieGenre>();
+                        movieEntry.MoviesStudios = new List<MovieStudio>();
+                        movieEntry.MoviesDirectors = new List<MovieDirector>();
+                        moviesDictionary.Add(movieEntry.Id, movieEntry);
+                    }
+
+                    if (movieGenre is not null && !movieEntry.MovieGenres.Any(d => d.Id == movieGenre.Id))
+                        movieEntry.MovieGenres.Add(movieGenre);
+
+                    if (movieStudio is not null && !movieEntry.MoviesStudios.Any(g => g.Id == movieStudio.Id))
+                        movieEntry.MoviesStudios.Add(movieStudio);
+
+                    if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(p => p.Id == movieDirector.Id))
+                        movieEntry.MoviesDirectors.Add(movieDirector);
+
+                    return movieEntry;
+                }, new { Offset = offset, Limit = limit },
+                splitOn: "Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+            );
+
+            var result = moviesDictionary.Values.ToList();
+
+            return result;
+        }
     }
 
     public Task RemoveAsync(long id)

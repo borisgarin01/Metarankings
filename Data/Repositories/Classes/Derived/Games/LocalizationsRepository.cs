@@ -2,9 +2,6 @@
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.RequestsModels.Games.Localizations;
-using Microsoft.Data.SqlClient;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -16,12 +13,12 @@ public sealed class LocalizationsRepository : Repository, ILocalizationsReposito
 
     public async Task<long> AddAsync(AddLocalizationModel localization)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Localizations
 (Name)
-output inserted.id
-VALUES (@Name);"
+VALUES (@Name)
+RETURNING Id;"
  , new
  {
      localization.Name,
@@ -38,7 +35,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Localization>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var localizationsDictionary = new Dictionary<string, Localization>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -46,7 +43,7 @@ VALUES (@Name);"
             await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
             SELECT 
                 Localizations.Id, Localizations.Name,
-                Games.Id, Games.Name, Games.Image, Games.LocalizationId, Games.PublisherId,
+                Games.Id, Games.Name, Games.Image, Games.LocalizationId,
                 Games.ReleaseDate, Games.Description, Games.Trailer,
                 Platforms.Id, Platforms.Name,
                 Developers.Id, Developers.Name,
@@ -57,7 +54,8 @@ VALUES (@Name);"
                 LEFT JOIN Platforms ON Platforms.Id = GamesPlatforms.PlatformId
                 LEFT JOIN GamesDevelopers ON GamesDevelopers.GameId = Games.Id
                 LEFT JOIN Developers ON Developers.Id = GamesDevelopers.DeveloperId
-                LEFT JOIN Publishers ON Publishers.Id = Games.PublisherId",
+                LEFT JOIN GamesPublishers gp ON gp.GameId = Games.Id
+                LEFT JOIN Publishers on Publishers.Id = gp.PublisherId",
                 (localization, game, platform, developer, publisher) =>
                 {
                     // Get or create the localization entry
@@ -98,9 +96,9 @@ VALUES (@Name);"
                         }
 
                         // Set publisher if it exists and isn't already set
-                        if (publisher != null && gameEntry.Publisher == null)
+                        if (publisher != null && !gameEntry.Publishers.Any(d => d.Id == publisher.Id))
                         {
-                            gameEntry.Publisher = publisher;
+                            gameEntry.Publishers.Add(publisher);
                         }
                     }
 
@@ -115,7 +113,7 @@ VALUES (@Name);"
 
     public async Task<Localization> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var localizationDictionary = new Dictionary<long, Localization>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -125,20 +123,20 @@ VALUES (@Name);"
 
             var localization = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
             SELECT 
-                loc.Id, loc.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
-                g.ReleaseDate, g.Description, g.Trailer,
-                p.Id, p.Name,
-                d.Id, d.Name,
-                pub.Id, pub.Name
-            FROM Localizations loc
-            LEFT JOIN Games g ON g.LocalizationId = loc.Id
-            LEFT JOIN GamesPlatforms gp ON gp.GameId = g.Id
-            LEFT JOIN Platforms p ON p.Id = gp.PlatformId
-            LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
-            LEFT JOIN Developers d ON d.Id = gd.DeveloperId
-            LEFT JOIN Publishers pub ON pub.Id = g.PublisherId
-            WHERE loc.Id = @id",
+loc.Id, loc.Name,
+g.Id, g.Name, g.Image, g.LocalizationId, g.ReleaseDate, g.Description, g.Trailer,                 
+p.Id, p.Name,
+d.Id, d.Name,
+publ.Id, publ.Name
+FROM Localizations loc
+LEFT JOIN Games g ON g.LocalizationId = loc.Id
+LEFT JOIN GamesPlatforms gplatf ON gplatf.GameId = g.Id
+LEFT JOIN Platforms p ON p.Id = gplatf.PlatformId
+LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
+LEFT JOIN Developers d ON d.Id = gd.DeveloperId
+LEFT JOIN GamesPublishers gpubl ON gpubl.GameId = g.Id
+LEFT JOIN Publishers publ on publ.Id = gpubl.PublisherId
+WHERE loc.Id = @id",
                 (loc, game, platform, developer, publisher) =>
                 {
                     // Get or create localization
@@ -174,9 +172,9 @@ VALUES (@Name);"
                         }
 
                         // Set publisher if exists and not set
-                        if (publisher != null && gameEntry.Publisher == null)
+                        if (publisher != null && gameEntry.Publishers.Any(p => p.Id == publisher.Id))
                         {
-                            gameEntry.Publisher = publisher;
+                            gameEntry.Publishers.Add(publisher);
                         }
                     }
 
@@ -192,7 +190,7 @@ VALUES (@Name);"
 
     public async Task<Localization> GetByPlatformAsync(long id, long platformId)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var localizationDictionary = new Dictionary<long, Localization>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -203,11 +201,11 @@ VALUES (@Name);"
             var result = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
             SELECT 
                 loc.Id, loc.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer,
                 p.Id, p.Name,
                 d.Id, d.Name,
-                pub.Id, pub.Name
+                publ.Id, publ.Name
             FROM Localizations loc
             LEFT JOIN Games g ON g.LocalizationId = loc.Id AND g.Id IN (
                 SELECT GameId FROM GamesPlatforms WHERE PlatformId = @platformId
@@ -216,7 +214,8 @@ VALUES (@Name);"
             LEFT JOIN Platforms p ON p.Id = gp.PlatformId
             LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
             LEFT JOIN Developers d ON d.Id = gd.DeveloperId
-            LEFT JOIN Publishers pub ON pub.Id = g.PublisherId
+            LEFT JOIN GamesPublishers gpubl ON gpubl.GameId = g.Id
+            LEFT JOIN Publishers publ on publ.Id = gpubl.PublisherId
             WHERE loc.Id = @id",
                 (loc, game, platform, developer, publisher) =>
                 {
@@ -254,9 +253,9 @@ VALUES (@Name);"
                         }
 
                         // Set publisher if exists and not set
-                        if (publisher != null && gameEntry.Publisher == null)
+                        if (publisher != null && !gameEntry.Publishers.Any(d => d.Id == publisher.Id))
                         {
-                            gameEntry.Publisher = publisher;
+                            gameEntry.Publishers.Add(publisher);
                         }
                     }
 
@@ -272,7 +271,7 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Localization>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var localizationDictionary = new Dictionary<long, Localization>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -330,9 +329,9 @@ VALUES (@Name);"
                             gameEntry.Developers.Add(developer);
                         }
 
-                        if (publisher != null && gameEntry.Publisher == null)
+                        if (publisher != null && !gameEntry.Publishers.Any(d => d.Id == publisher.Id))
                         {
-                            gameEntry.Publisher = publisher;
+                            gameEntry.Publishers.Add(publisher);
                         }
                     }
 
@@ -348,7 +347,7 @@ VALUES (@Name);"
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Localizations WHERE Id=@id", new { id });
@@ -365,11 +364,11 @@ Localizations WHERE Id=@id", new { id });
 
     public async Task<Localization> UpdateAsync(UpdateLocalizationModel localization, long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name
-output inserted.name, inserted.href, inserted.id
-where Id=@Id", new
+WHERE Id=@Id
+RETURNING Name, Href, Id;", new
             {
                 localization.Name,
                 id

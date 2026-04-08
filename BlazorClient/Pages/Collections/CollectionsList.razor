@@ -1,0 +1,43 @@
+﻿@page "/games/collections"
+
+@using Domain.Games.Collections
+
+<div id="loop" class="news list">
+    @if (GamesCollections is null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <AuthorizeView Policy="Admin">
+            <Authorized>
+                <div>
+                    <a href="/admin/games/collections/add-collection">Добавить подборку</a>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+        @foreach (GameCollection item in GamesCollections)
+        {
+            <div class="post clear">
+                <a href="/games/collections/@item.Id" title="@item.Name" class="news-thumb">
+                    <img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" alt="@item.Name">
+                </a>
+
+                <a class="news-title" href="/games/collections/@item.Id">@item.Name</a>
+                <div class="post-content">@item.Description</div>
+                <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+
+                <AuthorizeView Policy="Admin">
+                    <Authorized>
+                        <div style="display:flex">
+                            <a href="/admin/games/collections/@item.Id/manage-collection/">Управление подборкой</a>
+                        </div>
+                        <div style="display:flex">
+                            <a @onclick="(() => DeleteCollectionAsync(item.Id))">Удалить</a>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
+        }
+    }
+</div>

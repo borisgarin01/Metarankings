@@ -5,7 +5,7 @@ using Domain.RequestsModels.Movies.MoviesDirectors;
 namespace API.Controllers.Movies;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/movies/[controller]")]
 public class MoviesDirectorsController : ControllerBase
 {
     private readonly IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> _moviesDirectorsRepository;
@@ -48,7 +48,7 @@ public class MoviesDirectorsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieDirector>> AddAsync(AddMovieDirectorModel addMovieDirectorModel)
     {
         if (ModelState.IsValid)
@@ -59,7 +59,7 @@ public class MoviesDirectorsController : ControllerBase
 
                 var insertedMovieDirector = await _moviesDirectorsRepository.GetAsync(insertedId);
 
-                return Created($"/api/moviesdirectors/{insertedId}", insertedMovieDirector);
+                return Created($"/api/movies/moviesdirectors/{insertedId}", insertedMovieDirector);
             }
             catch (Exception ex)
             {
@@ -71,7 +71,7 @@ public class MoviesDirectorsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieDirector>> UpdateAsync(long id, UpdateMovieDirectorModel updateMovieDirectorModel)
     {
         var movieDirectorToUpdate = await _moviesDirectorsRepository.GetAsync(id);
@@ -97,7 +97,7 @@ public class MoviesDirectorsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieDirector>> UpdateAsync(long id)
     {
         var movieDirectorToUpdate = await _moviesDirectorsRepository.GetAsync(id);

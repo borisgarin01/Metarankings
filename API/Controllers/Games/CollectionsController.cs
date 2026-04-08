@@ -1,0 +1,120 @@
+﻿using Data.Repositories.Interfaces;
+using Domain.Games.Collections;
+using Domain.RequestsModels.Games.Collections;
+
+namespace API.Controllers.Games;
+
+[ApiController]
+[Route("api/games/[controller]")]
+[Authorize(Policy = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+public sealed class CollectionsController : ControllerBase
+{
+    private readonly IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> _gamesCollectionsRepository;
+    private readonly IRepository<GameCollectionItem, AddGameCollectionItemModel, UpdateGameCollectionItemModel> _gamesCollectionsItemsRepository;
+
+    public CollectionsController(IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> gamesCollectionsRepository, IRepository<GameCollectionItem, AddGameCollectionItemModel, UpdateGameCollectionItemModel> gamesCollectionsItemsRepository)
+    {
+        _gamesCollectionsRepository = gamesCollectionsRepository;
+        _gamesCollectionsItemsRepository = gamesCollectionsItemsRepository;
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<GameCollection>>> GetAllAsync()
+    {
+        try
+        {
+            IEnumerable<GameCollection> gamesCollections = await _gamesCollectionsRepository.GetAllAsync();
+            return Ok(gamesCollections);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
+
+    [HttpGet("{offset:long}/{limit:long}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<GameCollection>>> GetAllAsync(long offset, long limit)
+    {
+        try
+        {
+            IEnumerable<GameCollection> gamesCollections = await _gamesCollectionsRepository.GetAsync(offset, limit);
+            return Ok(gamesCollections);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
+
+    [HttpGet("{gameCollectionId:long}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<GameCollection>> GetAsync(long gameCollectionId)
+    {
+        try
+        {
+            GameCollection gamesCollection = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
+            return Ok(gamesCollection);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<long>> AddAsync(AddGameCollectionModel addGameCollectionModel)
+    {
+        try
+        {
+            long insertedGameCollectionId = await _gamesCollectionsRepository.AddAsync(addGameCollectionModel);
+
+            foreach (long seletedGameId in addGameCollectionModel.SelectedGamesIds)
+            {
+                _ = await _gamesCollectionsItemsRepository.AddAsync(new AddGameCollectionItemModel(seletedGameId, insertedGameCollectionId));
+            }
+
+            return Ok(insertedGameCollectionId);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
+
+    [HttpDelete("{gameCollectionId:long}")]
+    public async Task<ActionResult<long>> DeleteAsync(long gameCollectionId)
+    {
+        GameCollection collection = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
+        if (collection is null)
+            return NotFound();
+        try
+        {
+            await _gamesCollectionsRepository.RemoveAsync(gameCollectionId);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
+
+
+    [HttpPut("{gameCollectionId:long}")]
+    public async Task<ActionResult<GameCollection>> UpdateAsync(long gameCollectionId, UpdateGameCollectionModel updateGameCollectionModel)
+    {
+        GameCollection gameCollectionToUpdate = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
+        if (gameCollectionToUpdate is null)
+            return NotFound();
+        try
+        {
+            GameCollection updatedGamesCollection = await _gamesCollectionsRepository.UpdateAsync(updateGameCollectionModel, gameCollectionId);
+            return Ok(updateGameCollectionModel);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
+}

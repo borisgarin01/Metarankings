@@ -1,0 +1,26 @@
+﻿@page "/chat/{GameId:long}"
+
+<PageTitle>Chat</PageTitle>
+
+@if (!IsConnected)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="form-group" style="@sendMessageStyle">
+        <label>
+            Message:
+            <input @bind="messageInput" size="50" />
+        </label>
+        <button @onclick="SendMessage" disabled="@(!IsConnected)">Send</button>
+    </div>
+}
+<hr>
+
+<ul id="messagesList">
+    @foreach (var message in messages)
+    {
+        <li>@message</li>
+    }
+</ul>

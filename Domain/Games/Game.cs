@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Domain.Games.Collections;
 using Domain.Reviews;
 
 namespace Domain.Games;
@@ -15,10 +16,8 @@ public sealed record Game
     [JsonPropertyName("image")]
     public required string Image { get; set; }
 
-    [JsonPropertyName("publisherId")]
-    public required long PublisherId { get; set; }
-    [JsonPropertyName("publisher")]
-    public required Publisher Publisher { get; set; }
+    [JsonPropertyName("publishers")]
+    public required List<Publisher> Publishers { get; set; } = new();
 
     [JsonPropertyName("releaseDate")]
     public required DateTime? ReleaseDate { get; set; }
@@ -51,7 +50,6 @@ public sealed record Game
     public long LocalizationId { get; set; }
 
     [JsonPropertyName("links")]
-    public IEnumerable<Link> Links { get; set; } = new Link[] { new Link("Лучшие игры для PS4","/best-ps4-games/"),
-        new Link("Лучшие приключенческие игры", "/top-igry-priklyucheniya/") };
+    public List<GameCollection> GameCollections { get; set; } = new();
 
 }

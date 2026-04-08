@@ -11,7 +11,7 @@ public sealed class CreateMoviesMoviesGenresTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE MoviesMoviesGenres
-(Id bigint not null primary key identity(1,1),
+(Id bigserial not null primary key,
 MovieId bigint not null,
 MovieGenreId bigint not null,
 FOREIGN KEY (MovieId) 

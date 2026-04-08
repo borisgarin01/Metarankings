@@ -6,7 +6,7 @@ using IdentityLibrary.Telegram;
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public sealed class LocalizationsController : ControllerBase
 {
     private readonly ILocalizationsRepository _localizationsRepository;
@@ -22,13 +22,13 @@ public sealed class LocalizationsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Localization>>> GetAllAsync()
     {
-        var developers = await _localizationsRepository.GetAllAsync();
+        IEnumerable<Localization> developers = await _localizationsRepository.GetAllAsync();
 
         return Ok(developers);
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Localization>> AddAsync(AddLocalizationModel addLocalizationModel)
     {
         if (!ModelState.IsValid)
@@ -40,16 +40,15 @@ public sealed class LocalizationsController : ControllerBase
 
         Localization insertedLocalization = await _localizationsRepository.GetAsync(insertedLocalizationId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New localization {addLocalizationModel.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/localizations/{insertedLocalizationId}");
-        return Created($"api/localizations/{insertedLocalizationId}", insertedLocalization);
+        await _telegramAuthenticator.SendMessageAsync($"New localization {addLocalizationModel.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/games/localizations/{insertedLocalizationId}");
+        return Created($"api/games/localizations/{insertedLocalizationId}", insertedLocalization);
     }
 
     [HttpGet("{id:long}")]
     [HttpGet("{id:long}/{platformId:long}")]
     public async Task<ActionResult<Localization>> GetAsync(long id, long? platformId)
     {
-        Localization localization = null;
-
+        Localization localization;
         if (!platformId.HasValue)
             localization = await _localizationsRepository.GetAsync(id);
         else
@@ -61,10 +60,10 @@ public sealed class LocalizationsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
-        var localization = await _localizationsRepository.GetAsync(id);
+        Localization? localization = await _localizationsRepository.GetAsync(id);
         if (localization is null)
             return NotFound();
         else
@@ -82,7 +81,7 @@ public sealed class LocalizationsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Localization>> UpdateAsync(long id, UpdateLocalizationModel updateLocalizationModel)
     {
         if (!ModelState.IsValid)
@@ -90,12 +89,12 @@ public sealed class LocalizationsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var localizationToUpdate = await _localizationsRepository.GetAsync(id);
+        Localization? localizationToUpdate = await _localizationsRepository.GetAsync(id);
         if (localizationToUpdate is null)
             return NotFound();
 
         // Update and return the updated entity
-        var updatedLocalization = await _localizationsRepository.UpdateAsync(updateLocalizationModel, id);
+        Localization updatedLocalization = await _localizationsRepository.UpdateAsync(updateLocalizationModel, id);
 
         return Ok(updatedLocalization);
     }

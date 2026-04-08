@@ -14,6 +14,6 @@ public partial class GenreGamesListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Genre = await HttpClient.GetFromJsonAsync<Genre>($"/api/Genres/{GenreId}");
+        Genre = await HttpClient.GetFromJsonAsync<Genre>($"/api/Games/Genres/{GenreId}");
     }
 }

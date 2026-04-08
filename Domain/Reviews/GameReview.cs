@@ -1,4 +1,5 @@
-﻿using IdentityLibrary.DTOs;
+﻿using Domain.Games;
+using IdentityLibrary.DTOs;
 
 namespace Domain.Reviews;
 
@@ -9,6 +10,9 @@ public sealed record GameReview
 
     [JsonPropertyName("gameId")]
     public long GameId { get; init; }
+
+    [JsonPropertyName("game")]
+    public Game Game { get; init; }
 
     [JsonPropertyName("applicationUser")]
     public ApplicationUser ApplicationUser { get; init; }

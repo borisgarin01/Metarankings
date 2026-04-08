@@ -7,7 +7,7 @@ using IdentityLibrary.Telegram;
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public sealed class DevelopersController : ControllerBase
 {
 
@@ -32,7 +32,7 @@ public sealed class DevelopersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Developer>>> GetAllAsync()
     {
-        var developers = await _developersRepository.GetAllAsync();
+        IEnumerable<Developer> developers = await _developersRepository.GetAllAsync();
 
         return Ok(developers);
     }
@@ -40,13 +40,13 @@ public sealed class DevelopersController : ControllerBase
     [HttpGet("{offset:long}/{limit:long}")]
     public async Task<ActionResult<IEnumerable<Developer>>> GetAsync(long offset, long limit)
     {
-        var developers = await _developersRepository.GetAsync(offset, limit);
+        IEnumerable<Developer> developers = await _developersRepository.GetAsync(offset, limit);
 
         return Ok(developers);
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Developer>> AddAsync(AddDeveloperModel addDeveloperModel)
     {
         if (!ModelState.IsValid)
@@ -58,15 +58,15 @@ public sealed class DevelopersController : ControllerBase
 
         Developer insertedDeveloper = await _developersRepository.GetAsync(insertedDeveloperId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New developer {insertedDeveloper.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/developers/{insertedDeveloper.Id}");
+        await _telegramAuthenticator.SendMessageAsync($"New developer {insertedDeveloper.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/games/developers/{insertedDeveloper.Id}");
 
-        return Created($"api/developers/{insertedDeveloper.Id}", insertedDeveloper);
+        return Created($"api/games/developers/{insertedDeveloper.Id}", insertedDeveloper);
     }
 
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Developer>> GetAsync(long id)
     {
-        var developer = await _developersRepository.GetAsync(id);
+        Developer? developer = await _developersRepository.GetAsync(id);
         if (developer is null)
             return NotFound();
         else
@@ -74,10 +74,10 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)
     {
-        var developer = await _developersRepository.GetAsync(id);
+        Developer? developer = await _developersRepository.GetAsync(id);
         if (developer is null)
             return NotFound();
         else
@@ -95,7 +95,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<Developer>> UpdateAsync(long id, UpdateDeveloperModel updateDeveloperModel)
     {
         if (!ModelState.IsValid)
@@ -103,7 +103,7 @@ public sealed class DevelopersController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var developerToUpdate = await _developersRepository.GetAsync(id);
+        Developer? developerToUpdate = await _developersRepository.GetAsync(id);
         if (developerToUpdate is null)
             return NotFound();
 
@@ -114,7 +114,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpPost("upload-developers-from-json")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> AddFromJsonAsync(IEnumerable<AddDeveloperModel> developers)
     {
         if (developers is null)
@@ -144,7 +144,7 @@ public sealed class DevelopersController : ControllerBase
     }
 
     [HttpPost("developers-excel-upload")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<IEnumerable<Developer>>> AddFromExcelAsync(IFormFile excelFileWithPublishers)
     {
         if (excelFileWithPublishers is null)
@@ -158,11 +158,11 @@ public sealed class DevelopersController : ControllerBase
             string uploadsFolderPath = $"{Directory.GetCurrentDirectory()}\\Uploads";
 
             if (!Directory.Exists(uploadsFolderPath))
-                Directory.CreateDirectory(uploadsFolderPath);
+                _ = Directory.CreateDirectory(uploadsFolderPath);
 
             string filePath = Path.Combine(uploadsFolderPath, excelFileWithPublishers.FileName);
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            using (FileStream fileStream = new(filePath, FileMode.Create))
             {
                 await excelFileWithPublishers.CopyToAsync(fileStream);
             }

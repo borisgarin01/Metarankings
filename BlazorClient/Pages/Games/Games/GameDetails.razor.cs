@@ -44,7 +44,7 @@ public partial class GameDetails : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Game = await HttpClient.GetFromJsonAsync<Game>($"/api/Games/{Id}");
+        Game = await HttpClient.GetFromJsonAsync<Game>($"/api/Games/Games/{Id}");
 
         if (authenticationState is not null)
         {

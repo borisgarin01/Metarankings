@@ -1,9 +1,10 @@
 ﻿@using BlazorClient.Components.PagesComponents.GamesList
+@using BlazorClient.Components.PagesComponents.Common
 @using System.Globalization
 
 <div class="featured-game">
     <GameDevelopers Developers="@Developers" />
-    <GamePublisher Publisher="@Publisher" />
+    <GamePublishersComponent Publishers="@Publishers" />
     <GamePlatforms Platforms="@Platforms" />
     <GenresComponent Genres="@Genres" />
 

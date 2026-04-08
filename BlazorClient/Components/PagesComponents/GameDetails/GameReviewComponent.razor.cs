@@ -26,11 +26,11 @@ public partial class GameReviewComponent : ComponentBase
     public bool IsAbleToEdit { get; private set; }
 
     [Inject]
-    public AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        AuthenticationState authState = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
         if (authState is not null
             && authState.User is not null)

@@ -1,34 +1,32 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /source
 
-# Depending on the operating system of the host machines(s) that will build or run the containers, the image specified in the FROM statement may need to be changed.
-# For more information, please see https://aka.ms/containercompat
+COPY *.sln .
 
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-nanoserver-1809 AS base
+COPY API/*.csproj ./API/
+COPY BlazorClient/*.csproj ./BlazorClient/
+COPY Data/*.csproj ./Data/
+COPY Domain/*.csproj ./Domain/
+COPY ExcelProcessors/*.csproj ./ExcelProcessors/
+COPY IdentityLibrary/*.csproj ./IdentityLibrary/
+COPY Shared/*.csproj ./Shared/
+COPY WebClientServices/*.csproj ./WebClientServices/
+
+RUN dotnet restore
+
+COPY API/. ./API/
+COPY BlazorClient/. ./BlazorClient/
+COPY Data/. ./Data/
+COPY Domain/. ./Domain/
+COPY ExcelProcessors/. ./ExcelProcessors/
+COPY IdentityLibrary/. ./IdentityLibrary/
+COPY Shared/. ./Shared/
+COPY WebClientServices/. ./WebClientServices/
+
+WORKDIR /source/API
+RUN dotnet publish -c release -o /app --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-
-# This stage is used to build the service project
-FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["api/API.csproj", "api/"]
-COPY ["domain/Domain.csproj", "domain/"]
-COPY ["data/Data.csproj", "data/"]
-RUN dotnet restore "./api/API.csproj"
-COPY . .
-WORKDIR "/src/api"
-RUN dotnet build "./API.csproj" -c %BUILD_CONFIGURATION% -o /app/build
-
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./API.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
-
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app .
 ENTRYPOINT ["dotnet", "API.dll"]

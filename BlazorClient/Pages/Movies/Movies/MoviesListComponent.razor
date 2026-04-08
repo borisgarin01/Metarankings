@@ -1,0 +1,9 @@
+@using BlazorClient.Components.PagesComponents.GamesList
+@using Domain.Games
+@using Domain.Movies
+@using Domain.Reviews
+
+@foreach (Movie movie in Movies)
+{
+    <BlazorClient.Pages.Movies.Movies.MovieListItemComponent Movie="@movie" />
+}

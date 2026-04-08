@@ -1,0 +1,8 @@
+﻿@page "/admin/movies/movies-directors/add-movie-director"
+
+<a href="/admin">К странице админа</a>
+<form method="post" @onsubmit="@AddMovieDirectorAsync">
+    <a href="/admin/movies/movies-directors/movies-directors-list" class="list-group-item link-dark">Режиссеры</a>
+    <input type="text" @bind-value="@Name" />
+    <button type="submit">Add</button>
+</form>

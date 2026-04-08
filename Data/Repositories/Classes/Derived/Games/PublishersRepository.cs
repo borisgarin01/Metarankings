@@ -12,12 +12,12 @@ public sealed class PublishersRepository : Repository, IRepository<Publisher, Ad
 
     public async Task<long> AddAsync(AddPublisherModel publisher)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Publishers
 (Name)
-output inserted.id
-VALUES (@Name);"
+VALUES (@Name)
+RETURNING Id;"
  , new
  {
      publisher.Name
@@ -36,17 +36,18 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Publisher>> GetAllAsync()
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var publisherDictionary = new Dictionary<long, Publisher>();
 
             await connection.QueryAsync<Publisher, Game, Publisher>(
                 @"SELECT 
                 p.Id, p.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer
               FROM Publishers p
-              LEFT JOIN Games g ON g.PublisherId = p.Id",
+              LEFT JOIN GamesPublishers gp on gp.PublisherId = p.Id
+              LEFT JOIN Games g ON g.Id = gp.GameId",
                 (publisher, game) =>
                 {
                     if (!publisherDictionary.TryGetValue(publisher.Id, out var publisherEntry))
@@ -72,17 +73,18 @@ VALUES (@Name);"
 
     public async Task<Publisher> GetAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var publisherDictionary = new Dictionary<long, Publisher>();
 
             await connection.QueryAsync<Publisher, Game, Publisher>(
                 @"SELECT 
                 p.Id, p.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer
               FROM Publishers p
-              LEFT JOIN Games g ON g.PublisherId = p.Id
+              LEFT JOIN GamesPublishers gp on gp.PublisherId = p.Id
+              LEFT JOIN Games g ON g.Id = gp.GameId
               WHERE p.Id = @id",
                 (publisher, game) =>
                 {
@@ -110,14 +112,14 @@ VALUES (@Name);"
 
     public async Task<IEnumerable<Publisher>> GetAsync(long offset, long limit)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var publisherDictionary = new Dictionary<long, Publisher>();
 
             await connection.QueryAsync<Publisher, Game, Publisher>(@"
             SELECT 
                 p.Id, p.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer
             FROM (
                 SELECT Id, Name 
@@ -125,7 +127,8 @@ VALUES (@Name);"
                 ORDER BY Id
                 OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY
             ) p
-            LEFT JOIN Games g ON g.PublisherId = p.Id",
+            LEFT JOIN GamesPublishers gp on gp.PublisherId = p.Id
+            LEFT JOIN Games g ON g.Id = gp.GameId",
                 (publisher, game) =>
                 {
                     if (!publisherDictionary.TryGetValue(publisher.Id, out var publisherEntry))
@@ -152,7 +155,7 @@ VALUES (@Name);"
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Publishers WHERE Id=@id", new { id });
@@ -169,11 +172,11 @@ Publishers WHERE Id=@id", new { id });
 
     public async Task<Publisher> UpdateAsync(UpdatePublisherModel publisher, long id)
     {
-        using (var connection = new SqlConnection(ConnectionString))
+        using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var updatedPublisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"UPDATE Publishers set Name=@Name 
-output inserted.name, inserted.id
-where Id=@id", new
+RETURNING Name, Id
+WHERE Id=@Id;", new
             {
                 publisher.Name,
                 id

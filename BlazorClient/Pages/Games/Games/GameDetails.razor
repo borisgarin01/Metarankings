@@ -1,12 +1,14 @@
 ﻿@page "/games/Details/{Id:long}"
 @using BlazorClient.Components.PagesComponents.GameDetails
 @using BlazorClient.Components.PagesComponents.Common
+@using BlazorClient.Pages.Games.Games.Chat
+@using BlazorClient.Pages.Games.Games.Reviews
 @using Domain.Reviews
 
 <Headerer />
-<GameMenu />
+<GameMenu Year="@Game.ReleaseDate.Value.Year" />
 
-@if (Game == null)
+@if (Game is null)
 {
     <LoadingIndicator />
 }
@@ -19,27 +21,28 @@ else
                     ReleaseYear="@Game.ReleaseDate!.Value.Year" />
 
         <div class="post-content">
-            <GameThumbnail Name="@Game.Name"
-                           ReleaseYear="@Game.ReleaseDate.Value.Year"
-                           ReleaseMonth="@Game.ReleaseDate.Value.Month"
-                           ImageSource="@Game.Image" />
+            <Thumbnail Name="@Game.Name"
+                       ReleaseYear="@Game.ReleaseDate.Value.Year"
+                       ReleaseMonth="@Game.ReleaseDate.Value.Month"
+                       ImageSource="@Game.Image"
+                       Prefix="Games" />
 
 
             <RatingComponent Score="@(Game.GamesPlayersReviews.Any() ? Game.GamesPlayersReviews.Average(g => g.Score) : 0)"
                              ScoresCount="@Game.GamesPlayersReviews.Count" />
 
             <GameMetadata Developers="@Game.Developers"
-                          Publisher="@Game.Publisher"
+                          Publishers="@Game.Publishers"
                           Platforms="@Game.Platforms"
                           Genres="@Game.Genres"
                           Localization="@Game.Localization"
                           ReleaseDate="@Game.ReleaseDate.Value" />
 
-            <GameDescription Description="@Game.Description" />
+            <Description TextContent="@Game.Description" />
 
             <SystemRequirements />
 
-            <GameTags Links="@Game.Links" />
+            <GameCollectionsComponent GameCollections="@Game.GameCollections" />
 
 
             <AdHorizontal AdId="R-A-201169-7" />
@@ -72,8 +75,9 @@ else
                         <Authorized>
                             @if (IsAbleToWriteComments)
                             {
-                                <YourScoreComponent YourScore="10" AverageGameGamersScore="10" Text="@string.Empty" GameId="@Game.Id" ScoresCount="0" />
+                                <YourScoreComponent GameId="@Game.Id" />
                             }
+                            <GoToChatComponent GameId="@Game.Id" />
                         </Authorized>
                     </AuthorizeView>
                 </div>

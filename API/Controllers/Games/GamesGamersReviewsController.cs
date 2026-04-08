@@ -7,7 +7,7 @@ using IdentityLibrary.Telegram;
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public sealed class GamesGamersReviewsController : ControllerBase
 {
     private readonly GamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
@@ -29,7 +29,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult> AddGameReviewAsync(AddGamePlayerReviewModel addGameReviewModel)
     {
         long userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -43,13 +43,20 @@ public sealed class GamesGamersReviewsController : ControllerBase
         if (game is null)
             return NotFound("Game not found");
 
-        var addGameReviewWithUserIdAndDateModel = new AddGamePlayerReviewWithUserIdAndDateModel(addGameReviewModel.GameId, addGameReviewModel.TextContent, addGameReviewModel.Score, long.Parse(User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value), DateTime.Now);
+        AddGamePlayerReviewWithUserIdAndDateModel addGameReviewWithUserIdAndDateModel = new(addGameReviewModel.GameId, addGameReviewModel.TextContent, addGameReviewModel.Score, long.Parse(User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value), DateTime.Now);
 
-        var gameReviewId = await _gamesPlayersReviewsRepository.AddAsync(addGameReviewWithUserIdAndDateModel);
-        var createdGameReview = await _gamesPlayersReviewsRepository.GetAsync(gameReviewId);
-        await _telegramAuthenticator.SendMessageAsync($"New game review for game {game.Name} at {this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/games/details/{createdGameReview.GameId}");
+        long gameReviewId = await _gamesPlayersReviewsRepository.AddAsync(addGameReviewWithUserIdAndDateModel);
+        GameReview createdGameReview = await _gamesPlayersReviewsRepository.GetAsync(gameReviewId);
+        await _telegramAuthenticator.SendMessageAsync($"New game review for game {game.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/games/details/{createdGameReview.GameId}");
         return Created($"api/GamesReviews/{createdGameReview.Id}", createdGameReview);
 
+    }
+
+    [HttpGet("{offset:long}/{limit:long}")]
+    public async Task<ActionResult<IEnumerable<GameReview>>> GetReviewsAsync(long offset, long limit)
+    {
+        IEnumerable<GameReview> gamesReviews = await _gamesPlayersReviewsRepository.GetAsync(offset, limit);
+        return Ok(gamesReviews);
     }
 
     [HttpGet("{id:long}")]
@@ -62,7 +69,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<GameReview>> UpdateReview(long id, UpdateGamePlayerReviewModel updateGamePlayerReviewModel)
     {
         GameReview gameReview = await _gamesPlayersReviewsRepository.GetAsync(id);
@@ -86,7 +93,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<GameReview>> RemoveReview(long id)
     {
         GameReview gameReview = await _gamesPlayersReviewsRepository.GetAsync(id);

@@ -1,0 +1,10 @@
+@using BlazorClient.Components.PagesComponents.GamesList
+@using BlazorClient.Pages.Movies.Movies
+@using Domain.Games
+@using Domain.Movies
+@using Domain.Reviews
+
+@foreach (var game in Games)
+{
+    <GameListItemComponent Game="@game" />
+}

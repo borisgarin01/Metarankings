@@ -1,0 +1,96 @@
+﻿version: '3.8'
+
+networks:
+  myAppNetwork:
+    driver: bridge
+    
+volumes:
+  postgres_data:
+  etc-letsencrypt:
+
+services:
+  Db:
+    container_name: Db
+    image: postgres:17.7
+    ports:
+      - 5432:5432
+    networks:
+      - myAppNetwork
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U borisgarin || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "borisgarin"
+      POSTGRES_PASSWORD: "borisgarin"
+      POSTGRES_DB: "Metarankings"
+
+  WebApi:
+    container_name: APIContainer
+    image: ${DOCKER_REGISTRY-}api
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    networks:
+      - myAppNetwork
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    depends_on:
+      Db:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_URLS=https://+:8081
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=UmbracoFuse8_2023!
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - ConnectionStrings__DefaultConnection=Host=Db;Database=Metarankings;Username=borisgarin;Password=borisgarin
+    volumes:
+      - ~/.aspnet/https:/https:ro
+      - ./API/Games/Images:/app/Games:rw
+      - ./API/Movies/Images:/app/Movies:rw
+      - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
+    healthcheck:
+      test: ["CMD", "dotnet", "--info"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  nginx:
+    depends_on:
+        WebApi:
+          condition: service_healthy
+    image: nginx:latest
+    ports:
+      - 8180:80 # HTTP (для валидации Certbot)
+      - 8443:443 # HTTPS
+    networks:
+      - myAppNetwork
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d          # Nginx конфиг
+      - ./static-files:/usr/share/nginx/html      # Добавляем статические файлы в nginx в Docker'е
+      - ./certbot/www:/var/www/certbot            # Certbot HTTP challenge
+      - ./certbot/conf:/etc/letsencrypt           # SSL certificates    # Исправляем healthcheck
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f https://localhost:443 || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  certbot:
+    image: certbot/certbot:latest
+    depends_on:
+     - nginx
+    container_name: certbot
+    volumes:
+     - ./certbot/conf:/etc/letsencrypt
+     - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email boris.garin01job@mail.ru --agree-tos -d localhost
+    restart: unless-stopped

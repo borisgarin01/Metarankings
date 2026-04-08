@@ -3,79 +3,152 @@
 namespace API.Controllers.Games;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/games/[controller]")]
 public class ImagesController : ControllerBase
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
-
     private readonly TelegramAuthenticator _telegramAuthenticator;
+    private readonly string _baseImagesPath;
 
     public ImagesController(IWebHostEnvironment webHostEnvironment, TelegramAuthenticator telegramAuthenticator)
     {
         _webHostEnvironment = webHostEnvironment;
         _telegramAuthenticator = telegramAuthenticator;
+
+        // Use a consistent base path for images
+        _baseImagesPath = Path.Combine(_webHostEnvironment.ContentRootPath, "Games");
     }
 
-    [HttpPost("{year:int}/{month:int}/{imagePath}")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
-    public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int? year, int? month, string imagePath)
+    [HttpPost("{year:int}/{month:int}/{name}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
+    public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int year, int month, string name)
     {
-        //JPEG, PNG, GIF, TIFF, WebP, SVG, BMP, and HEIF
+        // Validate file type
+        string[] allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".svg", ".gif", ".tiff", ".webp", ".bmp", ".heif" };
+        string fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
 
-        if (!formFile.FileName.EndsWith(".jpg")
-            && !formFile.FileName.EndsWith(".png")
-            && !formFile.FileName.EndsWith(".svg")
-            && !formFile.FileName.EndsWith(".jpeg")
-            && !formFile.FileName.EndsWith(".gif")
-            && !formFile.FileName.EndsWith(".tiff")
-            && !formFile.FileName.EndsWith(".webp")
-            && !formFile.FileName.EndsWith(".bmp")
-            && !formFile.FileName.EndsWith(".heif"))
-
-            return Problem(title: "Wrong image format",
-            detail: $"Image {formFile.FileName} has wrong format.{Environment.NewLine}Available formats: .jpg, .png, .svg, .jpeg, .gif, .tiff, .webp, .bmp, .heif",
-            statusCode: StatusCodes.Status400BadRequest);
-
-        if (string.IsNullOrWhiteSpace(imagePath))
-            return Problem(
-                title: "Image path is null or white space",
-                detail: "Image path is null or white space",
-                statusCode: StatusCodes.Status422UnprocessableEntity
-                );
-
-        if (formFile.Length > 0)
+        if (!allowedExtensions.Contains(fileExtension))
         {
-            string pathToImage;
-            if (year is not null && month is not null)
-                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Images/Uploads/{year}/{month}/{formFile.FileName}";
-            else
-                pathToImage = $"{_webHostEnvironment.ContentRootPath}/Images/Uploads/{formFile.FileName}";
+            return Problem(
+                title: "Wrong image format",
+                detail: $"Image {formFile.FileName} has wrong format.{Environment.NewLine}Available formats: {string.Join(", ", allowedExtensions)}",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
 
-            string imageFolder = Path.GetDirectoryName(pathToImage);
+        if (formFile.Length == 0)
+        {
+            return Problem(
+                title: "Empty file",
+                detail: "Form file length is 0",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
 
-            if (!Directory.Exists(imageFolder))
-                Directory.CreateDirectory(imageFolder);
+        try
+        {
+            // Create directory structure
+            string yearMonthPath = Path.Combine(_baseImagesPath, year.ToString(), month.ToString());
+            if (!Directory.Exists(yearMonthPath))
+            {
+                _ = Directory.CreateDirectory(yearMonthPath);
+            }
 
-            using (var fileStream = new FileStream($"{imageFolder}/{formFile.FileName}", FileMode.Create))
+            // Use the provided imageName but keep the original extension
+            string fileName = $"{Path.GetFileNameWithoutExtension(name)}{fileExtension}";
+            string fullPath = Path.Combine(yearMonthPath, fileName);
+
+            // Save the file
+            using (FileStream fileStream = new(fullPath, FileMode.Create))
             {
                 await formFile.CopyToAsync(fileStream);
             }
 
-            return Created($"api/images/{formFile.FileName}", formFile);
+            // Return the URL to access the image
+            string imageUrl = $"/api/movies/Images/{year}/{month}/{fileName}";
+            return Created(imageUrl, new { fileName, size = formFile.Length, url = imageUrl });
         }
-
-        return Problem(title: "Form file length == 0", detail: "Form file length == 0", statusCode: StatusCodes.Status400BadRequest);
+        catch (Exception ex)
+        {
+            return Problem(
+                title: "Error saving image",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
     }
 
-    [HttpGet("imagePath")]
-    public IActionResult GetImage(string imagePath)
+    [HttpGet("{year:int}/{month:int}/{imagePath}")]
+    public IActionResult GetImage(int year, int month, string imagePath)
     {
-        if (!System.IO.File.Exists($"{_webHostEnvironment.ContentRootPath}/Images/{imagePath}"))
-            return Problem(
-                title: "Image doesn't exist",
-                detail: $"Image {_webHostEnvironment.ContentRootPath}/Images/{imagePath} doesn't exist",
-                statusCode: StatusCodes.Status500InternalServerError);
+        try
+        {
+            string fullPath = Path.Combine(_baseImagesPath, year.ToString(), month.ToString(), imagePath);
 
-        return File($"{_webHostEnvironment.ContentRootPath}/Images/{imagePath}", imagePath.Substring(imagePath.IndexOf("."), imagePath.Length - imagePath.IndexOf(".")));
+            if (!System.IO.File.Exists(fullPath))
+            {
+                return NotFound($"Image {imagePath} not found");
+            }
+
+            // Get content type based on file extension
+            string contentType = GetContentType(fullPath);
+            if (contentType == null)
+            {
+                return BadRequest("Unsupported image format");
+            }
+
+            // Use FileStreamResult for better performance with large files
+            FileStream fileStream = new(fullPath, FileMode.Open, FileAccess.Read);
+            return File(fileStream, contentType, enableRangeProcessing: true);
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                title: "Error retrieving image",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    private string GetContentType(string filePath)
+    {
+        string extension = Path.GetExtension(filePath).ToLowerInvariant();
+        return extension switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".svg" => "image/svg+xml",
+            ".gif" => "image/gif",
+            ".tiff" => "image/tiff",
+            ".webp" => "image/webp",
+            ".bmp" => "image/bmp",
+            ".heif" => "image/heif",
+            _ => null
+        };
+    }
+
+    // Optional: Add method to list images
+    [HttpGet("{year:int}/{month:int}")]
+    public ActionResult<List<string>> GetImages(int year, int month)
+    {
+        try
+        {
+            string directoryPath = Path.Combine(_baseImagesPath, year.ToString(), month.ToString());
+
+            if (!Directory.Exists(directoryPath))
+            {
+                return new List<string>();
+            }
+
+            List<string?> images = Directory.GetFiles(directoryPath)
+                .Select(Path.GetFileName)
+                .ToList();
+
+            return Ok(images);
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                title: "Error listing images",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
     }
 }

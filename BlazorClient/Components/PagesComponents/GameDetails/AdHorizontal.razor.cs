@@ -8,11 +8,8 @@ public partial class AdHorizontal : ComponentBase
     [Inject]
     protected IJSRuntime JSRuntime { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            await JSRuntime.InvokeVoidAsync("renderYandexAd", AdId, $"yandex_rtb_{AdId}-1");
-        }
+        await JSRuntime.InvokeVoidAsync("renderYandexAd", AdId, $"yandex_rtb_{AdId}-1");
     }
 }

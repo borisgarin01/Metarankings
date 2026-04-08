@@ -1,0 +1,67 @@
+﻿using Domain.Games;
+using Domain.RequestsModels.Games.Platforms;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+
+namespace WebManagers.Derived.Games;
+
+public sealed class PlatformsWebManager : WebManager, IWebManager<Platform, AddPlatformModel, UpdatePlatformModel>
+{
+    public PlatformsWebManager(HttpClient httpClient) : base(httpClient)
+    {
+    }
+
+    public async Task<HttpResponseMessage> AddAsync(AddPlatformModel addPlatformModel)
+    {
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Platforms", addPlatformModel);
+        return httpResponseMessage;
+    }
+
+    public async Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile)
+    {
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Platforms/platforms-excel-upload", formFile);
+        return httpResponseMessage;
+    }
+
+    public Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddPlatformModel> adds)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<HttpResponseMessage> DeleteAsync(long id)
+    {
+        HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"/api/Games/Platforms/{id}");
+        return httpResponseMessage;
+    }
+
+    public Task<IEnumerable<Platform>> GetAllAsync()
+    {
+        var platforms = HttpClient.GetFromJsonAsync<IEnumerable<Platform>>("/api/Games/Platforms");
+        return platforms;
+    }
+
+    public Task<IEnumerable<Platform>> GetFirstAsync(long offset, long limit)
+    {
+        var platforms = HttpClient.GetFromJsonAsync<IEnumerable<Platform>>($"/api/Games/Platforms/{offset}/{limit}");
+        return platforms;
+    }
+
+    public Task<Platform> GetAsync(long id)
+    {
+        var platform = HttpClient.GetFromJsonAsync<Platform>($"/api/Games/Platforms/{id}");
+        return platform;
+    }
+
+    public async Task<Platform> UpdateAsync(long id, UpdatePlatformModel tUpdate)
+    {
+        HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync($"/api/Games/Platforms/{id}", tUpdate);
+        var platform = await JsonSerializer.DeserializeAsync<Platform>(await httpResponseMessage.Content.ReadAsStreamAsync());
+        return platform;
+    }
+
+    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    {
+        throw new NotImplementedException();
+    }
+}

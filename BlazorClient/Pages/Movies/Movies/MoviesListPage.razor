@@ -1,0 +1,53 @@
+﻿@page "/movies/movies/movies-list"
+@using Domain.Movies
+
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        <!-- Admin Navigation -->
+        <div class="admin-nav">
+            <a href="/admin">Админ панель</a>
+            <a href="/admin/movies/movies/add-movie">Добавить фильм</a>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+<div class="moviesList">
+    @if (Movies is null)
+    {
+        <p>Загружается...</p>
+    }
+    else
+    {
+        foreach (Movie movie in Movies)
+        {
+            <div class="movie">
+                <h4>@movie.Name</h4>
+
+                <!-- Public link (visible to all) -->
+                <a href="/movies/Details/@movie.Id">Подробнее</a>
+
+                <!-- Admin-only actions -->
+                <AuthorizeView Policy="Admin">
+                    <Authorized>
+                        <div class="admin-actions">
+                            <a href="/admin/movies/edit-movie/@movie.Id" class="btn-edit">Редактировать</a>
+                            <a href="/admin/movies/remove-movie/@movie.Id" class="btn-remove">Удалить</a>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
+        }
+    }
+</div>
+
+<AuthorizeView Policy="Admin">
+    <NotAuthorized>
+        <div class="auth-prompt">
+            <p>
+                <a href="/auth/login">Авторизируйся</a> или
+                <a href="/auth/register">Зарегистрируйся</a>,
+                чтобы получить доступ к админ-функциям
+            </p>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>

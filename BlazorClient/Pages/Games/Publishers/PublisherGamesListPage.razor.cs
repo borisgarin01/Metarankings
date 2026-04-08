@@ -14,6 +14,6 @@ public partial class PublisherGamesListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Publisher = await HttpClient.GetFromJsonAsync<Publisher>($"/api/Publishers/{PublisherId}");
+        Publisher = await HttpClient.GetFromJsonAsync<Publisher>($"/api/Games/Publishers/{PublisherId}");
     }
 }

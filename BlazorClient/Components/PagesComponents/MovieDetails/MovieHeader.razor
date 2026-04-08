@@ -1,0 +1,12 @@
+﻿<div class="post-meta">
+    <h1><span itemprop="name">@Name</span></h1>
+
+    <meta itemprop="headline" content="@Name">
+    <meta itemprop="description" content="@Description">
+    <link itemprop="url" href="/games/Details/@Id">
+
+    @if (ReleaseYear.HasValue)
+    {
+        <meta itemprop="dateCreated" content="@ReleaseYear">
+    }
+</div>

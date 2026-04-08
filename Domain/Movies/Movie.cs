@@ -1,4 +1,6 @@
-﻿namespace Domain.Movies;
+﻿using Domain.Reviews;
+
+namespace Domain.Movies;
 
 [Table("Movies")]
 public sealed record Movie
@@ -12,8 +14,8 @@ public sealed record Movie
     [JsonPropertyName("originalName")]
     public required string OriginalName { get; set; }
 
-    [JsonPropertyName("image")]
-    public required string Image { get; set; }
+    [JsonPropertyName("imageSource")]
+    public required string ImageSource { get; set; }
 
     [JsonPropertyName("score")]
     public float? Score { get; set; }
@@ -35,4 +37,7 @@ public sealed record Movie
 
     [JsonPropertyName("moviesDirectors")]
     public List<MovieDirector> MoviesDirectors { get; set; } = new List<MovieDirector>();
+
+    [JsonPropertyName("movieReviews")]
+    public List<MovieReview> MovieReviews { get; set; } = new List<MovieReview>();
 }

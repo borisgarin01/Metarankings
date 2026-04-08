@@ -11,11 +11,11 @@ public sealed class CreateMoviesTableMigration : Migration
     public override void Up()
     {
         Execute.Sql(@"CREATE TABLE Movies 
-(Id bigint not null primary key identity(1,1),
-Name nvarchar(255) not null unique,
-ImageSource nvarchar(1023) null unique,
-OriginalName nvarchar(255) not null unique,
+(Id bigserial not null primary key,
+Name varchar(255) not null unique,
+ImageSource text null unique,
+OriginalName varchar(255) not null unique,
 PremierDate date not null,
-Description nvarchar(1023) null);");
+Description varchar(1023) null);");
     }
 }

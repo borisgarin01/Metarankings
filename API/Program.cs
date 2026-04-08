@@ -1,160 +1,187 @@
+﻿using API.Auth;
+using API.Hubs;
 using API.IServiceCollectionExtensions;
 using Data.Migrations;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 using IdentityLibrary.Telegram;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.ResponseCompression;
+using Scalar.AspNetCore;
+using Settings;
+
+namespace API;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
-        var tokenValidationParameters = new TokenValidationParameters
+        TokenValidationParameters tokenValidationParameters = new()
         {
-            RequireExpirationTime = false,
-            RequireSignedTokens = false,
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Auth:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Auth:Audience"],
-            ValidateLifetime = false,
-            ClockSkew = TimeSpan.Zero,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth:Secret"]))
+            RequireExpirationTime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:RequireExpirationTime"]),
+            RequireSignedTokens = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:RequireSignedTokens"]),
+            ValidateIssuerSigningKey = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateIssuerSigningKey"]),
+            ValidateIssuer = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateIssuer"]),
+            ValidIssuer = builder.Configuration["TokenValidationParameters:ValidIssuer"],
+            ValidateAudience = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateAudience"]),
+            ValidAudience = builder.Configuration["TokenValidationParameters:Audience"],
+            ValidateLifetime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateLifetime"]),
+            ClockSkew = TimeSpan.FromSeconds(Convert.ToInt64(builder.Configuration["TokenValidationParameters:ClockSkew"])),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenValidationParameters:IssuerSigningKey"]))
         };
 
-        builder.Services.AddLogging();
-        builder.Logging.ClearProviders();
-        builder.Logging.AddConsole();
+        _ = builder.Services.Configure<TokenValidationParameters>(builder.Configuration.GetSection(nameof(TokenValidationParameters)));
 
-        builder.Services.AddAuthentication(options =>
+        _ = builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection(nameof(AuthSettings)));
+
+        _ = builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
+
+        _ = builder.Services.AddLogging();
+        _ = builder.Logging.ClearProviders();
+        _ = builder.Logging.AddConsole();
+
+        _ = builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            // Known networks for Docker
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
+
+        _ = builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
+            options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
+            options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
-            options.Authority = builder.Configuration["Auth:Authority"];
-            options.Audience = builder.Configuration["Auth:Audience"];
-            options.ClaimsIssuer = builder.Configuration["Auth:Issuer"];
+            options.Authority = builder.Configuration["AuthSettings:Authority"];
+            options.Audience = builder.Configuration["AuthSettings:Audience"];
+            options.ClaimsIssuer = builder.Configuration["AuthSettings:Issuer"];
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = tokenValidationParameters;
             options.SaveToken = true;
-        });
+        }).AddGoogle(googleOptions =>
+        {
+            googleOptions.ClientId = builder.Configuration["AuthSettings:Google:ClientId"];
+            googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
+        }).AddCookie();
 
-        builder.Services.AddAuthorization(options =>
+        _ = builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy("Admin", options =>
             {
-                options.RequireRole("Admin");
+                _ = options.RequireRole("Admin");
             });
             options.AddPolicy("AuthorizedWithEmailConfirmed", options =>
             {
-                options.RequireAuthenticatedUser();
-                options.RequireClaim("EmailConfirmed", true.ToString());
+                _ = options.RequireAuthenticatedUser();
+                _ = options.RequireClaim("EmailConfirmed", true.ToString());
             });
         });
 
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "MyAPI",
-                Version = "v1"
-            });
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Description = "Please enter token",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                BearerFormat = "JWT",
-                Scheme = "bearer"
-            });
+        _ = builder.Services.AddScoped<AuthTokenGenerator>();
 
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference=new OpenApiReference
-                        {
-                            Type=ReferenceType.SecurityScheme,
-                            Id="Bearer"
-                        }
-                    },
-                    new string[]{}
-                }
-            });
-        });
-
-
-        builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
+        _ = builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
             .AddJsonOptions(options =>
-         {
-             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-         });
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
 
-        builder.Services.AddCors(options =>
+        _ = builder.Services.AddEndpointsApiExplorer();
+
+        _ = builder.Services.AddOpenApi("v1", options =>
+        {
+            _ = options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+        });
+
+        _ = builder.Services.AddSignalR();
+
+        _ = builder.Services.AddResponseCompression(opts =>
+        {
+            opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                ["application/octet-stream"]);
+        });
+
+        _ = builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowBlazorFrontend", builder =>
             {
-                builder.AllowAnyOrigin()
+                _ = builder.AllowAnyOrigin()
                        .AllowAnyMethod()
                        .AllowAnyHeader();
             });
         });
 
-        builder.Services.RegisterRepositories(builder.Configuration);
-        builder.Services.RegisterFilesDataReaders();
+        _ = builder.Services.RegisterRepositories(builder.Configuration);
+        _ = builder.Services.RegisterFilesDataReaders();
 
-        builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
-            .AddUserStore<UsersStore>()
-            .AddRoleStore<RolesStore>()
-            .AddDefaultTokenProviders();
+        _ = builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+        {
+            options.Tokens.EmailConfirmationTokenProvider = "Email";
+            options.Tokens.PasswordResetTokenProvider = "Email";
+        }).AddUserStore<UsersStore>()
+          .AddRoleStore<RolesStore>()
+          .AddTokenProvider<EmailTokenProvider<ApplicationUser>>("Email")
+          .AddDefaultTokenProviders();
 
-        builder.Services.AddSingleton<TelegramAuthenticator>();
+        _ = builder.Services.AddSingleton<TelegramAuthenticator>();
 
-        builder.Services.AddHostedService<NotificationsBackgroundService>();
+        WebApplication app = builder.Build();
 
-        var app = builder.Build();
+        _ = app.UseForwardedHeaders();
 
         if (app.Environment.IsDevelopment())
         {
             app.UseWebAssemblyDebugging();
-            app.UseDeveloperExceptionPage();
+            _ = app.UseDeveloperExceptionPage();
         }
 
-        app.UseBlazorFrameworkFiles();
+        _ = app.UseBlazorFrameworkFiles();
 
-        app.UseStaticFiles();
+        _ = app.UseStaticFiles();
 
-        app.UseRouting();
+        _ = app.UseRouting();
 
-        app.UseAuthentication();
-        app.UseAuthorization();
+        _ = app.UseAuthentication();
+        _ = app.UseAuthorization();
 
-        app.MapControllers();
+        _ = app.MapOpenApi();
+        _ = app.MapScalarApiReference(options =>
+        {
+            _ = options.AddPreferredSecuritySchemes(["Bearer"]);
+            _ = options.AddHttpAuthentication("Bearer", bearer =>
+            {
+                bearer.Token = "Token";
+            });
+        });
 
-        app.MapFallbackToFile("index.html");
+        _ = app.MapControllers();
 
-        using (var serviceProvider = CreateServices(builder.Configuration))
-        using (var scope = serviceProvider.CreateScope())
+        _ = app.UseResponseCompression();
+
+        _ = app.MapHub<ChatHub>("/chathub");
+
+        _ = app.MapFallbackToFile("index.html");
+
+        using (ServiceProvider serviceProvider = CreateServices(builder.Configuration))
+        using (IServiceScope scope = serviceProvider.CreateScope())
         {
             // Put the database update into a scope to ensure
             // that all resources will be disposed.
             UpdateDatabase(scope.ServiceProvider);
         }
 
-        app.UseSwagger();
-        app.UseSwaggerUI();
-
         // Use CORS middleware
-        app.UseCors("AllowBlazorFrontend");
+        _ = app.UseCors("AllowBlazorFrontend");
 
         app.Run();
     }
@@ -166,9 +193,9 @@ internal class Program
             .AddFluentMigratorCore()
             .ConfigureRunner(rb => rb
                 // Add SQLite support to FluentMigrator
-                .AddSqlServer()
+                .AddPostgres()
                 // Set the connection string
-                .WithGlobalConnectionString(configurationManager.GetConnectionString("MetarankingsConnection"))
+                .WithGlobalConnectionString(configurationManager.GetConnectionString("PostgresConnection"))
                 // Define the assembly containing the migrations, maintenance migrations and other customizations
                 .ScanIn(typeof(CreateGamesTableMigration).Assembly, typeof(CreateApplicationRolesTableMigration).Assembly).For.Migrations())
             // Enable logging to console in the FluentMigrator way
@@ -183,7 +210,7 @@ internal class Program
     private static void UpdateDatabase(IServiceProvider serviceProvider)
     {
         // Instantiate the runner
-        var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+        IMigrationRunner runner = serviceProvider.GetRequiredService<IMigrationRunner>();
         runner.ListMigrations();
         // Execute the migrations
         runner.MigrateUp();

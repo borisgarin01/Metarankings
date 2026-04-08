@@ -8,7 +8,7 @@
         {
             Execute.Sql(@"CREATE TABLE DevelopersCreationTimestamps
 (DeveloperId bigint not null unique, 
-Timestamp DATETIME NOT NULL);");
+Timestamp timestamp NOT NULL);");
         }
         public override void Down()
         {

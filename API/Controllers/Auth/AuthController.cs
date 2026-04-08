@@ -1,9 +1,14 @@
-﻿using Domain.Auth;
+﻿using API.Auth;
+using Domain.Auth;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using IdentityLibrary.Telegram;
 using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.Extensions.Options;
 using MimeKit;
+using Settings;
 using System.Net;
 
 namespace API.Controllers.Auth;
@@ -14,30 +19,69 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _usersManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly TelegramAuthenticator _telegramAuthenticator;
+    private readonly AuthTokenGenerator _authTokenGenerator;
+
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger)
+    private readonly IOptionsMonitor<AuthSettings> _authSettingsOptionsMonitor;
+    private readonly IOptionsMonitor<TokenValidationParameters> _tokenValidationParameters;
+    private readonly IOptionsMonitor<EmailSettings> _emailSettings;
+
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters, SignInManager<ApplicationUser> signInManager, AuthTokenGenerator authTokenGenerator)
     {
         _configuration = configuration;
         _usersManager = usersManager;
         _telegramAuthenticator = telegramAuthenticator;
         _passwordHasher = passwordHasher;
         _logger = logger;
+        _authSettingsOptionsMonitor = authSettingsOptionsMonitor;
+        _emailSettings = emailSettings;
+        _tokenValidationParameters = tokenValidationParameters;
+        _signInManager = signInManager;
+        _authTokenGenerator = authTokenGenerator;
+    }
 
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost("addExternalLogin")]
+    public async Task<ActionResult> AddExternalLogin()
+    {
+        try
+        {
+            ApplicationUser? authUser = await _usersManager.FindByIdAsync(HttpContext.User.Claims.Single(b => b.Type == ClaimTypes.NameIdentifier).Value);
+            if (authUser is null)
+                return NotFound();
+
+            IdentityResult identityResult = await _usersManager.AddLoginAsync(authUser, new UserLoginInfo("Google", authUser.Email, "Google"));
+
+            if (identityResult.Succeeded)
+                return Ok(identityResult);
+            return BadRequest(identityResult);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpGet("external-providers")]
+    public async Task<ActionResult<IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme>>> GetExternalProviders()
+    {
+        IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalProviders = await _signInManager.GetExternalAuthenticationSchemesAsync();
+        return Ok(externalProviders.Select(ep => new Domain.Auth.AuthenticationScheme(ep.Name, ep.DisplayName)));
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<string>> Login(LoginModel loginModel)
+    public async Task<ActionResult> Login(LoginModel loginModel)
     {
         if (loginModel is null)
             return BadRequest("Неверный логин");
 
-
         if (string.IsNullOrWhiteSpace(loginModel.UserEmail) || string.IsNullOrWhiteSpace(loginModel.Password))
             return BadRequest("Email и пароль должны быть указаны");
 
-        var userToCheckExistance = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
+        ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
 
         if (userToCheckExistance is null)
             return NotFound("Пользователь не зарегистрирован");
@@ -47,36 +91,98 @@ public sealed class AuthController : ControllerBase
         if (passwordVerificationResult != PasswordVerificationResult.Success)
             return BadRequest("Неверный пароль");
 
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Secret"]));
-        var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha512);
+        // If 2FA is enabled, send email and return specific response
+        if (userToCheckExistance.TwoFactorEnabled is true)
+        {
+            string twoFactorAuthToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
 
-        var userClaims = new List<Claim>();
+            MimeMessage emailMessage = new();
 
-        if (await _usersManager.IsInRoleAsync(userToCheckExistance, "Admin"))
-            userClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
+            emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
+            emailMessage.To.Add(new MailboxAddress("", userToCheckExistance.Email));
+            emailMessage.Subject = "Confirm login";
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+            {
+                Text = $"Your 2FA verification code is: <strong>{twoFactorAuthToken}</strong><br><br>" +
+                       $"Enter this code to complete your login."
+            };
 
-        userClaims.Add(new Claim("EmailConfirmed", userToCheckExistance.EmailConfirmed.ToString()));
+            using (SmtpClient client = new())
+            {
+                await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
+                await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
+                _ = await client.SendAsync(emailMessage);
+                await client.DisconnectAsync(true);
+            }
 
-        userClaims.Add(new Claim(ClaimTypes.NameIdentifier, userToCheckExistance.Id.ToString()));
+            // Return specific response indicating 2FA is required
+            return Ok(new LoginResponse
+            {
+                RequiresTwoFactor = userToCheckExistance.TwoFactorEnabled,
+                UserId = userToCheckExistance.Id.ToString(),
+                Message = "2FA code sent to email"
+            });
+        }
 
-        var tokenOptions = new JwtSecurityToken(issuer: _configuration["Auth:Issuer"], audience: _configuration["Auth:Audience"], userClaims, expires: DateTime.Now.AddHours(1), signingCredentials: signingCredentials);
-
-        userToCheckExistance.SecurityStamp = DateTime.Now.ToString();
-
-        string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
-
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        string tokenString = await _authTokenGenerator.GenerateJwtToken(userToCheckExistance);
 
         IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
 
         if (identityResult.Succeeded)
-            return Ok(tokenString);
+            return Ok(new { Token = tokenString });
 
         return StatusCode(500, "Authentication token setting has been failed");
     }
 
+    [HttpPost("ConfirmLoginViaEmail")]
+    public async Task<ActionResult> ConfirmLoginViaEmail(ConfirmLoginModel model)
+    {
+        if (string.IsNullOrWhiteSpace(model.UserId) || string.IsNullOrWhiteSpace(model.TwoFactorToken))
+        {
+            _logger.LogError("User ID and token are required");
+
+            return BadRequest("User ID and token are required");
+        }
+        _logger.LogInformation("ConfirmLoginViaEmail called with UserId: {UserId} and TwoFactorToken: {TwoFactorToken}", model.UserId, model.TwoFactorToken);
+
+        ApplicationUser? userToCheckExistance = await _usersManager.FindByIdAsync(model.UserId);
+
+        if (userToCheckExistance is null)
+        {
+            _logger.LogError("User with ID {UserId} not found", model.UserId);
+            return NotFound();
+        }
+
+        _logger.LogInformation("User to check existance - {UserId}, {Email}", userToCheckExistance?.Id, userToCheckExistance?.Email);
+
+        bool isValidTwoFactorToken = await _usersManager.VerifyTwoFactorTokenAsync(userToCheckExistance, "Email", model.TwoFactorToken);
+
+        _logger.LogInformation("Is valid 2FA token for user {UserId}: {IsValidTwoFactorToken}", userToCheckExistance.Id, isValidTwoFactorToken);
+
+        if (isValidTwoFactorToken)
+        {
+            string tokenString = await _authTokenGenerator.GenerateJwtToken(userToCheckExistance);
+
+            _logger.LogInformation("Generated JWT token for user {UserId}: {TokenString}", userToCheckExistance.Id, tokenString);
+
+            IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
+
+            if (identityResult.Succeeded)
+            {
+                _logger.LogInformation("Authentication token set successfully for user {UserId} - {tokenString}", userToCheckExistance.Id, tokenString);
+                return Ok(new TokenResponse(tokenString, string.Empty));
+            }
+
+            _logger.LogError("Failed to set authentication token for user {UserId}. Errors: {Errors}", userToCheckExistance.Id, string.Join(", ", identityResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
+
+            return BadRequest("Failed to set authentication token");
+        }
+
+        return BadRequest("Invalid 2FA token");
+    }
+
     [HttpPost("logout")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult> Logout()
     {
         try
@@ -99,7 +205,7 @@ public sealed class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<string>> Register(RegisterModel registerModel)
     {
-        var userToCheckExistance = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
+        ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
         if (userToCheckExistance is not null)
             return BadRequest($"Пользователь с {registerModel.UserEmail} уже существует");
@@ -111,9 +217,9 @@ public sealed class AuthController : ControllerBase
         if (!string.Equals(registerModel.Password, registerModel.PasswordConfirmation))
             return BadRequest("Пароль не совпадает с подтверждением пароля");
 
-        var passwordHash = _passwordHasher.HashPassword(null, registerModel.Password);
+        string passwordHash = _passwordHasher.HashPassword(null, registerModel.Password);
 
-        var user = new ApplicationUser
+        ApplicationUser? user = new()
         {
             Email = registerModel.UserEmail,
             PasswordHash = passwordHash,
@@ -131,14 +237,24 @@ public sealed class AuthController : ControllerBase
 
         if (userCreationResult.Succeeded)
         {
+            if (string.Equals(registerModel.UserEmail, _authSettingsOptionsMonitor.CurrentValue.AdminEmail) && string.Equals(registerModel.Password, _authSettingsOptionsMonitor.CurrentValue.AdminPassword))
+            {
+                ApplicationUser? userToBindToAdminRole = await _usersManager.FindByEmailAsync(user.Email);
+                IdentityResult addingToAdminRoleIdentityResult = await _usersManager.AddToRoleAsync(userToBindToAdminRole, "Admin");
+                if (!addingToAdminRoleIdentityResult.Succeeded)
+                {
+                    _logger.LogError($"Ошибка добавления к роли администратора. {string.Join(", ", addingToAdminRoleIdentityResult.Errors.Select(b => $"{b.Code}, {b.Description}"))}");
+                }
+            }
+
             user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
             string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
-            var callbackUrl = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+            string? callbackUrl = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
-            var emailMessage = new MimeMessage();
+            MimeMessage emailMessage = new();
 
-            emailMessage.From.Add(new MailboxAddress(_configuration["EmailSettings:Sender:Name"], _configuration["EmailSettings:Sender:Email"]));
+            emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
             emailMessage.To.Add(new MailboxAddress("", user.Email));
             emailMessage.Subject = "Confirm email";
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -146,11 +262,11 @@ public sealed class AuthController : ControllerBase
                 Text = $"Confirm email: go to email confirmation <a href=\"{callbackUrl}\">link</a> to confirm your email"
             };
 
-            using (var client = new SmtpClient())
+            using (SmtpClient client = new())
             {
-                await client.ConnectAsync(_configuration["EmailSettings:Host"], int.Parse(_configuration["EmailSettings:Port"]), bool.Parse(_configuration["EmailSettings:UseSsl"]));
-                await client.AuthenticateAsync(_configuration["EmailSettings:UserName"], _configuration["EmailSettings:Password"]);
-                await client.SendAsync(emailMessage);
+                await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
+                await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
+                _ = await client.SendAsync(emailMessage);
 
                 await client.DisconnectAsync(true);
             }
@@ -161,6 +277,8 @@ public sealed class AuthController : ControllerBase
         return StatusCode(500, "User creation error");
     }
 
+
+
     [HttpGet("ConfirmEmail")]
     public async Task<IActionResult> ConfirmEmail(string userId, string code)
     {
@@ -170,11 +288,11 @@ public sealed class AuthController : ControllerBase
         // URL decode the code if needed
         code = WebUtility.UrlDecode(code);
 
-        var user = await _usersManager.FindByIdAsync(userId);
+        ApplicationUser? user = await _usersManager.FindByIdAsync(userId);
         if (user is null)
             return NotFound("User not found");
 
-        var emailConfirmationResult = await _usersManager.ConfirmEmailAsync(user, code);
+        IdentityResult emailConfirmationResult = await _usersManager.ConfirmEmailAsync(user, code);
 
         if (!emailConfirmationResult.Succeeded)
             return StatusCode(StatusCodes.Status400BadRequest, userId);
@@ -183,10 +301,10 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("assignToAdmin")]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> AssignToAdmin(string humanToAssignToAdminEmail)
     {
-        var humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
+        ApplicationUser? humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
 
         if (humanToAssignToAdmin is null)
             return NotFound("Human to assign to admin not found");
@@ -197,13 +315,13 @@ public sealed class AuthController : ControllerBase
             if (identityResult is null)
                 return NotFound();
             if (!identityResult.Succeeded)
-                return BadRequest(identityResult);
+                return StatusCode(StatusCodes.Status500InternalServerError, identityResult);
             return Ok(identityResult);
         }
     }
 
     [HttpPost("resetPassword")]
-    public async Task<ActionResult> ResetPassword(ResetPasswordModel resetPasswordModel)
+    public async Task<ActionResult> ResetPassword(Domain.Auth.ResetPasswordModel resetPasswordModel)
     {
         ApplicationUser user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
         if (user is null)
@@ -211,9 +329,9 @@ public sealed class AuthController : ControllerBase
 
         string resetPasswordToken = await _usersManager.GeneratePasswordResetTokenAsync(user);
 
-        var emailMessage = new MimeMessage();
+        MimeMessage emailMessage = new();
 
-        emailMessage.From.Add(new MailboxAddress(_configuration["EmailSettings:Sender:Name"], _configuration["EmailSettings:Sender:Email"]));
+        emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
         emailMessage.To.Add(new MailboxAddress("", user.Email));
         emailMessage.Subject = "Reset password";
         emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -221,11 +339,11 @@ public sealed class AuthController : ControllerBase
             Text = $"Reset password token - {resetPasswordToken}"
         };
 
-        using (var client = new SmtpClient())
+        using (SmtpClient client = new())
         {
-            await client.ConnectAsync(_configuration["EmailSettings:Host"], int.Parse(_configuration["EmailSettings:Port"]), bool.Parse(_configuration["EmailSettings:UseSsl"]));
-            await client.AuthenticateAsync(_configuration["EmailSettings:UserName"], _configuration["EmailSettings:Password"]);
-            await client.SendAsync(emailMessage);
+            await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
+            await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
+            _ = await client.SendAsync(emailMessage);
 
             await client.DisconnectAsync(true);
         }
@@ -234,7 +352,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("resetPasswordConfirm")]
-    public async Task<ActionResult> ResetPasswordConfirm(ResetPasswordConfirmModel resetPasswordModel)
+    public async Task<ActionResult> ResetPasswordConfirm(Domain.Auth.ResetPasswordConfirmModel resetPasswordModel)
     {
         ApplicationUser user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
         if (user is null)
@@ -242,6 +360,302 @@ public sealed class AuthController : ControllerBase
         IdentityResult passwordResettingResult = await _usersManager.ResetPasswordAsync(user, resetPasswordModel.ResetPasswordToken, resetPasswordModel.NewPassword);
         if (passwordResettingResult.Succeeded)
             return Ok("Password has been changed successfully");
-        return BadRequest();
+        return StatusCode(StatusCodes.Status500InternalServerError);
+    }
+
+    [HttpPost("setTwoFactorEnabled")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult> SetTwoFactorEnabled(Domain.Auth.SetTwoFactorEnabledModel setTwoFactorEnabledModel)
+    {
+        Claim? userId = User.FindFirst(ClaimTypes.NameIdentifier);
+        ApplicationUser applicationUser = await _usersManager.FindByIdAsync(userId.Value);
+        if (applicationUser is null)
+            return NotFound();
+        IdentityResult settingTwoFactorEnabledResult = await _usersManager.SetTwoFactorEnabledAsync(applicationUser, setTwoFactorEnabledModel.TwoFactorEnabled);
+        if (settingTwoFactorEnabledResult.Succeeded)
+            return Ok("Two factor enabled fact has been changed successfully");
+        return StatusCode(StatusCodes.Status500InternalServerError);
+    }
+
+    [HttpPost("addPassword/{password}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult> AddPasswordAsync(string password)
+    {
+        _logger.LogInformation("addPassword");
+
+        try
+        {
+            string emailClaimValue = User.Claims.SingleOrDefault(b => b.Type == ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrWhiteSpace(emailClaimValue))
+            {
+                _logger.LogWarning("Email claim not found in user claims");
+                return BadRequest("Email claim not found");
+            }
+
+            ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(emailClaimValue);
+
+            if (userToCheckExistance is null)
+            {
+                _logger.LogWarning("userToCheckExistance is null");
+                return NotFound();
+            }
+            if (string.IsNullOrWhiteSpace(userToCheckExistance.PasswordHash))
+            {
+                await _usersManager.AddPasswordAsync(userToCheckExistance, password);
+
+                return Ok();
+            }
+
+            return BadRequest("Password is already set for this user");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при добавлении пароля: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"Ошибка при добавлении пароля: {ex.Message}");
+        }
+
+    }
+
+    [HttpGet("login-google")]
+    public async Task<ActionResult> LoginViaGoogle()
+    {
+        try
+        {
+            string redirectUrl = Url.Action(nameof(GoogleCallback), "Auth", null, Request.Scheme);
+            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            _logger.LogInformation("AllowRefresh: {AllowRefresh}", properties.AllowRefresh);
+            _logger.LogInformation("ExpiresUtc: {ExpiresUtc}", properties.ExpiresUtc);
+            _logger.LogInformation("IsPersistent: {IsPersistent}", properties.IsPersistent);
+            _logger.LogInformation("IssuedUtc: {IssuedUtc}", properties.IssuedUtc);
+            _logger.LogInformation("RedirectUri: {RedirectUri}", properties.RedirectUri);
+            _logger.LogInformation("Items: {Items}", string.Join(", ", properties.Items.Select(kvp => $"{kvp.Key}: {kvp.Value}")));
+            return Challenge(properties, "Google");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при попытке входа через Google: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"Ошибка при попытке входа через Google: {ex.Message}");
+        }
+    }
+
+    [HttpGet("google-callback")]
+    public async Task<ActionResult> GoogleCallback()
+    {
+        try
+        {
+            _logger.LogInformation("google-callback");
+
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            _logger.LogInformation("Google callback authentication result succeeded: {Succeeded}", result.Succeeded);
+
+            if (!result.Succeeded || result.Principal is null)
+            {
+                HttpContext.Response.Redirect("/");
+                return Unauthorized();
+            }
+
+            string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            string? googleUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string? phoneNumber = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
+            string? name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
+
+            _logger.LogInformation("Google user email - {Email}, GoogleUserId - {UserId}, {PhoneNumber}, {Name}", email, googleUserId, phoneNumber, name);
+
+            ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(email);
+
+            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync("Google", email, isPersistent: true);
+
+            _logger.LogInformation("External login sign-in result for Google user {Email}: {Result}", email, signInResult.ToString());
+
+            if (userToCheckExistance is not null)
+            {
+                _logger.LogInformation("userToCheckExistance is not null");
+
+                if (signInResult is not null)
+                {
+                    if (signInResult.Succeeded)
+                    {
+                        _logger.LogInformation("signInResult is not null && signInResult.Succeeded");
+
+                        string tokenString = await _authTokenGenerator.GenerateJwtToken(userToCheckExistance);
+
+                        _logger.LogInformation("token - {token}", tokenString);
+
+                        IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
+
+                        if (identityResult.Succeeded)
+                        {
+                            _logger.LogInformation("IdentityResult succeded - {Succeeded}", identityResult.Succeeded);
+                            // Redirect back to Blazor app with token in URL
+                            // The token will be captured by Blazor's callback page
+                            return Redirect($"{Request.Scheme}://{Request.Host}/auth/google-callback?Token={tokenString}");
+                        }
+
+                        return Redirect($"{Request.Scheme}://{Request.Host}/login?error=token_generation_failed");
+                    }
+                    else if (signInResult.RequiresTwoFactor)
+                    {
+                        _logger.LogInformation("Google user {Email} requires two-factor authentication", email);
+
+                        string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
+
+                        _logger.LogInformation("Generated 2FA token for Google user {Email}: {TwoFactorToken}", email, twoFactorToken);
+
+                        MimeMessage emailMessage = new();
+                        emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
+
+                        emailMessage.To.Add(new MailboxAddress("", userToCheckExistance.Email));
+
+                        emailMessage.Subject = "Confirm login";
+                        emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+                        {
+                            Text = $"Your 2FA verification code is: <strong>{twoFactorToken}</strong><br><br>" +
+                                   $"Enter this code to complete your login."
+                        };
+
+                        using SmtpClient client = new();
+                        await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
+                        await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
+                        _ = await client.SendAsync(emailMessage);
+                        await client.DisconnectAsync(true);
+
+                        return Redirect($"/auth/validate-two-factor-code/{userToCheckExistance.Id}");
+                    }
+                    return Unauthorized();
+                }
+                return Unauthorized();
+
+            }
+            else
+            {
+                _logger.LogInformation("userToCheckExistance is null");
+
+                var userToRegister = new ApplicationUser
+                {
+                    Email = email,
+                    UserName = email,
+                    NormalizedEmail = email.ToUpperInvariant(),
+                    NormalizedUserName = email.ToUpperInvariant(),
+                    EmailConfirmed = true, // Since we get the email from Google, we can consider it confirmed
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                    AccessFailedCount = 0,
+                    PhoneNumber = phoneNumber,
+                    SecurityStamp = Guid.NewGuid().ToString()
+                };
+
+                IdentityResult userCreationResult = await _usersManager.CreateAsync(userToRegister);
+
+                if (userCreationResult.Succeeded)
+                {
+                    _logger.LogInformation("User creation succeeded for email {Email}", email);
+                }
+                else
+                {
+                    _logger.LogError("User creation failed for email {Email}. Errors: {Errors}", email, string.Join(", ", userCreationResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
+                    return StatusCode(500, new { Message = "User creation failed", UserToRegister = userToRegister });
+                }
+
+                _logger.LogInformation("user created in database with email {Email}", email);
+
+                ApplicationUser? userToAddExternalLogin = await _usersManager.FindByEmailAsync(email);
+
+                if (userToAddExternalLogin is null)
+                {
+                    _logger.LogError("User to add external login not found after creation for email {Email}", email);
+                    return StatusCode(500, new { Message = "User to add external login not found after creation", Email = email });
+                }
+
+                _logger.LogInformation("User to add external login - {Id}, {Email}, {PhoneNumber}", userToAddExternalLogin.Id, userToAddExternalLogin.Email, userToAddExternalLogin.PhoneNumber);
+
+                await _usersManager.AddLoginAsync(userToAddExternalLogin, new UserLoginInfo("Google", email, "Google"));
+
+                Microsoft.AspNetCore.Identity.SignInResult freshRegisteredUserSignInResult = await _signInManager.ExternalLoginSignInAsync("Google", email, isPersistent: true);
+
+                ApplicationUser? createdUser = await _usersManager.FindByEmailAsync(email);
+
+                _logger.LogInformation("New user created with email {Email}", email);
+
+                if (createdUser is not null && freshRegisteredUserSignInResult is not null && freshRegisteredUserSignInResult.Succeeded)
+                {
+                    _logger.LogInformation("createdUser is not null && freshRegisteredUserSignInResult is not null && freshRegisteredUserSignInResult.Succeeded");
+
+                    string tokenString = await _authTokenGenerator.GenerateJwtToken(createdUser);
+                    IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(createdUser, "SQLServer", "AuthToken", tokenString);
+                    if (identityResult.Succeeded)
+                    {
+                        return Redirect($"{Request.Scheme}://{Request.Host}/auth/google-callback?Token={tokenString}");
+                    }
+                    return Redirect($"{Request.Scheme}://{Request.Host}/login?error=token_generation_failed");
+                }
+
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=token_generation_failed");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при обработке Google callback: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
+        }
+    }
+
+    [HttpGet("current-user")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult<ApplicationUser>> GetCurrentUserAsync()
+    {
+        string? emailClaimValue = User.Claims.SingleOrDefault(b => b.Type == ClaimTypes.Email)?.Value;
+        if (string.IsNullOrWhiteSpace(emailClaimValue))
+        {
+            _logger.LogWarning("Email claim not found in user claims");
+            return null;
+        }
+        ApplicationUser? user = await _usersManager.FindByEmailAsync(emailClaimValue);
+        if (user is null)
+        {
+            _logger.LogWarning("User with email {Email} not found", emailClaimValue);
+            return NotFound();
+        }
+        return Ok(user);
+    }
+
+    [HttpPost("set-password")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult> ChangePassword(ChangePasswordModel changePasswordModel)
+    {
+        string? emailClaimValue = User.Claims.SingleOrDefault(b => b.Type == ClaimTypes.Email)?.Value;
+        if (string.IsNullOrWhiteSpace(emailClaimValue))
+        {
+            _logger.LogWarning("Email claim not found in user claims");
+            return BadRequest("Email claim not found");
+        }
+        ApplicationUser? user = await _usersManager.FindByEmailAsync(emailClaimValue);
+        if (user is null)
+        {
+            _logger.LogWarning("User with email {Email} not found", emailClaimValue);
+            return NotFound();
+        }
+
+        if (!string.IsNullOrWhiteSpace(user.PasswordHash))
+        {
+            bool isValidPassword = await _usersManager.CheckPasswordAsync(user, changePasswordModel.CurrentPassword);
+
+            if (!isValidPassword)
+                return BadRequest("Current password is incorrect");
+
+            IdentityResult changePasswordResult = await _usersManager.ChangePasswordAsync(user, changePasswordModel.CurrentPassword, changePasswordModel.NewPassword);
+            if (changePasswordResult.Succeeded)
+                return Ok("Password has been changed successfully");
+
+            return StatusCode(StatusCodes.Status500InternalServerError, changePasswordResult);
+        }
+        else
+        {
+            IdentityResult addPasswordResult = await _usersManager.AddPasswordAsync(user, changePasswordModel.NewPassword);
+            if (addPasswordResult.Succeeded)
+                return Ok("Password has been added successfully");
+
+            return StatusCode(StatusCodes.Status500InternalServerError, addPasswordResult);
+        }
     }
 }

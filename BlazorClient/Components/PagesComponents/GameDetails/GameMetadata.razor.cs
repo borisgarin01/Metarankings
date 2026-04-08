@@ -8,7 +8,7 @@ public partial class GameMetadata : ComponentBase
     public IEnumerable<Developer> Developers { get; set; } = Enumerable.Empty<Developer>();
 
     [Parameter, EditorRequired]
-    public Publisher Publisher { get; set; }
+    public IEnumerable<Publisher> Publishers { get; set; } = Enumerable.Empty<Publisher>();
 
     [Parameter, EditorRequired]
     public IEnumerable<Platform> Platforms { get; set; } = Enumerable.Empty<Platform>();

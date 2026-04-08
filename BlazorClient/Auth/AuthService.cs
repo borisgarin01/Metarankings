@@ -1,6 +1,9 @@
-﻿using Domain.Auth;
+﻿using API.Controllers.Auth;
+using Domain.Auth;
+using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using System.Net;
+using System.Text;
 
 namespace BlazorClient.Auth;
 
@@ -19,29 +22,56 @@ public class AuthService : IAuthService
         _authenticationStateProvider = authenticationStateProvider;
     }
 
-    public async Task<string> LoginAsync(LoginModel loginModel)
-    {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/login", loginModel);
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
 
-        if (!response.IsSuccessStatusCode)
+    public async Task<LoginResponse> LoginAsync(LoginModel loginModel)
+    {
+        HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/login", loginModel);
+
+        if (response.IsSuccessStatusCode)
         {
-            if (response.StatusCode == HttpStatusCode.BadRequest
-                ^ response.StatusCode == HttpStatusCode.NotFound)
-                throw new Exception(await response.Content.ReadAsStringAsync());
+            return await response.Content.ReadFromJsonAsync<LoginResponse>();
         }
 
-        var token = await response.Content.ReadAsStringAsync();
-        await _localStorage.SetItemAsync("authToken", token);
+        return new LoginResponse();
+    }
 
-        ((JwtAuthenticationStateProvider)_authenticationStateProvider)
-            .MarkUserAsAuthenticated(token); // Pass the token instead of email
+    public async Task<TokenResponse> VerifyTwoFactorAsync(string userId, string token)
+    {
+        var request = new ConfirmLoginModel(userId, token);
+        HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/ConfirmLoginViaEmail", request);
 
-        return token;
+        if (response.IsSuccessStatusCode)
+        {
+            return await JsonSerializer.DeserializeAsync<TokenResponse>(await response.Content.ReadAsStreamAsync());
+        }
+
+        return new TokenResponse(string.Empty, "Ошибка верификации");
+    }
+
+    public async Task StoreTokenAsync(string token)
+    {
+        // Store token in localStorage
+        await _localStorage.SetItemAsync<string>("authToken", token);
+
+        // Also set in HTTP client headers
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
     }
 
     public async Task LogoutAsync()
     {
-        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsync("api/auth/logout", null);
+        string? token = await _localStorage.GetItemAsync<string>("authToken");
+
+        if (token is null)
+            return;
+
+        HttpRequestMessage httpRequest = new(HttpMethod.Post, "api/auth/logout");
+        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
+
         if (httpResponseMessage.IsSuccessStatusCode)
         {
             await _localStorage.RemoveItemAsync("authToken");
@@ -60,13 +90,87 @@ public class AuthService : IAuthService
 
     public async Task<HttpResponseMessage> SendResetPasswordConfirmMessage(ResetPasswordConfirmModel resetPasswordConfirmModel)
     {
-        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/resetPasswordConfirm", resetPasswordConfirmModel);
-        return httpResponseMessage;
+        string? token = await _localStorage.GetItemAsync<string>("authToken");
+
+        if (token is not null)
+        {
+            HttpRequestMessage httpRequest = new(HttpMethod.Post, "api/auth/resetPasswordConfirm");
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                await _localStorage.RemoveItemAsync("authToken");
+                ((JwtAuthenticationStateProvider)_authenticationStateProvider)
+                    .MarkUserAsLoggedOut();
+                return httpResponseMessage;
+            }
+        }
+        return null;
     }
 
     public async Task<HttpResponseMessage> SendResetPasswordMessage(ResetPasswordModel resetPasswordModel)
     {
-        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/resetPassword", resetPasswordModel);
-        return httpResponseMessage;
+        string? token = await _localStorage.GetItemAsync<string>("authToken");
+
+        if (token is not null)
+        {
+            HttpRequestMessage httpRequest = new(HttpMethod.Post, "api/auth/resetPassword");
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                await _localStorage.RemoveItemAsync("authToken");
+                ((JwtAuthenticationStateProvider)_authenticationStateProvider)
+                    .MarkUserAsLoggedOut();
+                return httpResponseMessage;
+            }
+        }
+        return null;
+    }
+
+    public async Task<HttpResponseMessage> SendTwoFactorEnabledMessage(SetTwoFactorEnabledModel setTwoFactorEnabledModel)
+    {
+        string? token = await _localStorage.GetItemAsync<string>("authToken");
+
+        if (token is not null)
+        {
+            HttpRequestMessage httpRequest = new(HttpMethod.Post, "api/auth/setTwoFactorEnabled");
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            string jsonBody = System.Text.Json.JsonSerializer.Serialize(setTwoFactorEnabledModel);
+
+            // 2. Create StringContent with the JSON string and set Content-Type header
+            StringContent content = new(jsonBody, Encoding.UTF8, "application/json");
+
+            httpRequest.Content = content;
+
+            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
+
+            return httpResponseMessage;
+        }
+
+        return null;
+    }
+
+    public async Task<IEnumerable<AuthenticationScheme>> GetAuthenticationSchemesAsync()
+    {
+        IEnumerable<AuthenticationScheme>? schemes = await _httpClient.GetFromJsonAsync<IEnumerable<AuthenticationScheme>>("api/auth/external-providers");
+        return schemes;
+    }
+
+    public Task<ApplicationUser> GetCurrentUserAsync()
+    {
+        var applicaitonUser = _httpClient.GetFromJsonAsync<ApplicationUser>("api/auth/current-user");
+
+        return applicaitonUser;
+    }
+
+    public async Task<HttpResponseMessage> SendChangePasswordMessageAsync(ChangePasswordModel changePasswordModel)
+    {
+        HttpResponseMessage changingPasswordHttpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/set-password", changePasswordModel);
+
+        return changingPasswordHttpResponseMessage;
     }
 }

@@ -13,7 +13,7 @@
             <div class="nav">
                 <ul>
                     <li>
-                        <span @*onclick="jQuery( document ).ready(function($){$('.movie-drop').slideToggle('slow')});" *@><a href="/best-movies/">Фильмы</a></span>
+                        <span><a href="/best-movies/">Фильмы</a></span>
                         <div class="movie-drop">
                             <a href="/new-movies/">Новинки</a>
                             <a href="/coming-soon/">Скоро</a>
@@ -37,7 +37,7 @@
                         <span@* onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"*@>
                             <a href="/games/best-games?Year=@DateTime.Now.Year">Игры</a></span>
                             <div class="game-drop">
-                                <a href="/games/games/new-games/">Новинки</a>
+                                <a href="/games/new-games/">Новинки</a>
                                 <a href="/games/release-date/">Дата выхода</a>
                                 <a href="/games/most-waiting-games/">Ожидаемые</a>
                                 <a href="/games/meta/games/">Обзоры</a>
@@ -62,13 +62,14 @@
                             </div>
                     </li>
                     <li>
-                        <a href="/meta/collections/">Подборки</a>
+                        <a href="/games/collections/">Подборки</a>
                     </li>
                     <li>
                         <a href="/user-reviews/">Отзывы</a>
                     </li>
                     <AuthorizeView>
                         <Authorized>
+                            <li class="single-line">Привет, <a href="/auth/account/@context.User.FindFirstValue("UserId")">@context.User.FindFirstValue("UserName")</a></li>
                             <li class="single-line"><a href="/auth/logout">Выйти</a></li>
                         </Authorized>
                         <NotAuthorized>

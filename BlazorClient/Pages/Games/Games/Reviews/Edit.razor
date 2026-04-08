@@ -1,11 +1,17 @@
 ﻿@page "/games/reviews/edit/{Id:long}"
 
-<form method="post" @onsubmit="UpdateAsync">
-    <h3>Edit</h3>
+<AuthorizeView>
+    <Authorized>
+        <EditForm Model="UpdateGamePlayerReviewModel" OnValidSubmit="UpdateAsync" Context="myContext" class="form-control">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-    <InputNumber class="form-control" @bind-Value="Score" />
-
-    <InputTextArea class="form-control" @bind-Value="TextContent" />
-
-    <button type="submit" class="btn btn-primary">Commit editing</button>
-</form>
+            <InputNumber class="form-control" @bind-Value="UpdateGamePlayerReviewModel.Score" />
+            <InputTextArea class="form-control" @bind-Value="UpdateGamePlayerReviewModel.TextContent" />
+            <button type="submit" class="btn btn-primary">Add</button>
+        </EditForm>
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы добавить разраба
+    </NotAuthorized>
+</AuthorizeView>

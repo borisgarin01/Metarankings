@@ -14,6 +14,6 @@ public partial class DeveloperGamesListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Developer = await HttpClient.GetFromJsonAsync<Developer>($"/api/Developers/{DeveloperId}");
+        Developer = await HttpClient.GetFromJsonAsync<Developer>($"/api/Games/Developers/{DeveloperId}");
     }
 }

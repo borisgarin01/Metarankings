@@ -1,0 +1,89 @@
+﻿@page "/admin/movies/movies/add-movie"
+@using Domain.Movies
+
+<h3>Add movie page</h3>
+
+<a href="/admin/movies/movies/list-movies" class="list-group-item link-dark">Фильмы</a>
+
+<AuthorizeView>
+    <Authorized>
+        <a href="/admin">К странице админа</a>
+        @if (MoviesDirectorsToSelectFrom is null || MoviesGenresToSelectFrom is null || MoviesStudiosToSelectFrom is null)
+        {
+            <p>Загружается...</p>
+        }
+        else
+        {
+            <p>
+                <label>
+                    Enter original name:
+                    <input @bind="@OriginalName" />
+                </label>
+            </p>
+            <p>
+                <label>
+                    Enter name:
+                    <input @bind="@Name" />
+                </label>
+            </p>
+            <p>
+                <label>
+                    Enter premier date:
+                    <input type="date" @bind="@PremierDate" />
+                </label>
+            </p>
+            <p>
+                <label>
+                    Enter description:
+                    <textarea @bind="@Description" />
+                </label>
+            </p>
+            <p>
+                <label>
+                    Select movie director:
+                    <select @onchange="SelectMovieDirector" multiple>
+                        <option value="-1" selected>None</option>
+                        @foreach (MovieDirector movieDirector in MoviesDirectorsToSelectFrom)
+                        {
+                            <option value="@movieDirector.Id.ToString()">@movieDirector.Name</option>
+                        }
+                    </select>
+                </label>
+            </p>
+            <p>
+                <label>
+                    Select movie genre:
+                    <select @onchange="SelectMovieGenre" multiple>
+                        <option value="-1" selected>None</option>
+                        @foreach (MovieGenre movieGenre in MoviesGenresToSelectFrom)
+                        {
+                            <option value="@movieGenre.Id.ToString()">@movieGenre.Name</option>
+                        }
+                    </select>
+                </label>
+            </p>
+            <p>
+                <label>
+                    Select movie studio:
+                    <select @onchange="SelectMovieStudio" multiple>
+                        <option value="-1" selected>None</option>
+                        @foreach (MovieStudio movieStudio in MoviesStudiosToSelectFrom)
+                        {
+                            <option value="@movieStudio.Id.ToString()">@movieStudio.Name</option>
+                        }
+                    </select>
+                </label>
+            </p>
+            <p>
+                <label>
+                    Enter image:
+                    <InputFile OnChange="FileUploaded" />
+                </label>
+                <div class="image-container">
+                    <img class="post-image" src="@ImageSource" alt="Изображение на странице игры для загрузки игры" title="Игра @Name" itemprop="image">
+                </div>
+            </p>
+        }
+        <input type="submit" value="Submit" @onclick="@AddMovieAsync" />
+    </Authorized>
+</AuthorizeView>

@@ -1,15 +1,24 @@
 using BlazorClient.Auth;
 using Domain.Games;
+using Domain.Games.Collections;
+using Domain.Movies;
 using Domain.RequestsModels.Games;
+using Domain.RequestsModels.Games.Collections;
 using Domain.RequestsModels.Games.Developers;
 using Domain.RequestsModels.Games.Genres;
 using Domain.RequestsModels.Games.Localizations;
 using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Games.Publishers;
+using Domain.RequestsModels.Movies.Movies;
+using Domain.RequestsModels.Movies.MoviesDirectors;
+using Domain.RequestsModels.Movies.MoviesGenres;
+using Domain.RequestsModels.Movies.MoviesStudios;
 using WebManagers;
-using WebManagers.Derived;
+using WebManagers.Derived.Games;
+using WebManagers.Derived.Movies;
 
 namespace BlazorClient;
+
 internal class Program
 {
     private static async Task Main(string[] args)
@@ -30,10 +39,16 @@ internal class Program
         builder.Services.AddScoped<IWebManager<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsWebManager>();
         builder.Services.AddScoped<IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersWebManager>();
         builder.Services.AddScoped<IWebManager<Game, AddGameModel, UpdateGameModel>, GamesWebManager>();
+        builder.Services.AddScoped<IWebManager<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel>, GamesCollectionsWebManager>();
+
+        builder.Services.AddScoped<IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsWebManager>();
+        builder.Services.AddScoped<IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>();
+        builder.Services.AddScoped<IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosWebManager>();
+        builder.Services.AddScoped<IWebManager<Movie, AddMovieModel, UpdateMovieModel>, MoviesWebManager>();
 
         builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://172.16.1.62:5001") });
+        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["HttpClientSettings:BaseUrl"]) });
         builder.Services.AddScoped<IAuthService, AuthService>();
 
         await builder.Build().RunAsync();

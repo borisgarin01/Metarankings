@@ -1,12 +1,11 @@
-﻿using Data.Repositories.Classes.Derived.Movies;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
 using Domain.Movies;
-using Domain.RequestsModels.Movies.MoviesDirectors;
+using Domain.RequestsModels.Movies.MoviesGenres;
 
 namespace API.Controllers.Movies;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/movies/[controller]")]
 public class MoviesGenresController : ControllerBase
 {
     private readonly IRepository<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> _moviesGenresRepository;
@@ -49,7 +48,7 @@ public class MoviesGenresController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<MovieGenre>> AddAsync(AddMovieGenreModel addMovieGenreModel)
     {
         if (ModelState.IsValid)
@@ -60,7 +59,7 @@ public class MoviesGenresController : ControllerBase
 
                 var insertedMovieGenre = await _moviesGenresRepository.GetAsync(insertedId);
 
-                return Created($"/api/moviesGenres/{insertedId}", insertedMovieGenre);
+                return Created($"/api/movies/moviesGenres/{insertedId}", insertedMovieGenre);
             }
             catch (Exception ex)
             {
@@ -69,6 +68,33 @@ public class MoviesGenresController : ControllerBase
         }
 
         return BadRequest();
+    }
+
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
+    public async Task<ActionResult<MovieGenre>> DeleteAsync(long id)
+    {
+        try
+        {
+            MovieGenre movieGenre = await _moviesGenresRepository.GetAsync(id);
+
+            if (movieGenre is null)
+                return NotFound();
+
+            try
+            {
+                await _moviesGenresRepository.RemoveAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
     }
 }
 

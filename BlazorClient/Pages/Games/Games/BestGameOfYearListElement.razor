@@ -2,7 +2,7 @@
 @using BlazorClient.Pages.Games.Developers
 
 <div class="post clear">
-    <a href="/games/details/@Game.Id" title="Игра «@Game.Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/uploads/{Game.ReleaseDate.Value.Year}/{Game.ReleaseDate.Value.Month}/{Game.Image}")" alt="@Game.Name"></a>
+    <a href="/games/details/@Game.Id" title="Игра «@Game.Name»" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/{Game.ReleaseDate.Value.Year}/{Game.ReleaseDate.Value.Month}/{Game.Image}")" alt="@Game.Name"></a>
     <div class="best-prod">
         <div class="counter">@(Order)</div>
         <span class="star">★</span>

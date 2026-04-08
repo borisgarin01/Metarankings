@@ -1,0 +1,7 @@
+﻿@page "/admin/movies/movies-studios/add-movie-studio"
+
+<a href="/admin">К странице админа</a>
+<form method="post" @onsubmit="@AddMovieStudioAsync">
+    <input type="text" @bind-value="@Name" />
+    <button type="submit">Add</button>
+</form>
