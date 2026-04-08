@@ -1,0 +1,24 @@
+﻿@page "/auth/account"
+
+<AuthorizeView>
+    <Authorized>
+        <h3>Входить по двухфакторке?</h3>
+
+        <h3>@(TwoFactorEnabled ? "2FA включена" : "2FA отключена")</h3>
+        <InputCheckbox @bind-Value="ApplicationUser.TwoFactorEnabled" />
+
+        <h3>Current password</h3>
+        <InputText type="password" @bind-Value="CurrentPassword" class="form-control" />
+
+        <h3>New password</h3>
+        <InputText type="password" @bind-Value="NewPassword" class="form-control" />
+
+        <h3>New password confirm</h3>
+        <InputText type="password" @bind-Value="NewPasswordConfirm" class="form-control" />
+
+        <button class="btn btn-primary" @onclick="ChangePassword">Сменить пароль</button>
+    </Authorized>
+    <NotAuthorized>
+        Вы не авторизованы для доступа к этой странице
+    </NotAuthorized>
+</AuthorizeView>

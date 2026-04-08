@@ -1,10 +1,10 @@
 ﻿using API.Auth;
+using Domain.Auth;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using IdentityLibrary.Telegram;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -66,7 +66,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpGet("external-providers")]
-    public async Task<ActionResult<IEnumerable<AuthenticationScheme>>> GetExternalProviders()
+    public async Task<ActionResult<IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme>>> GetExternalProviders()
     {
         IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalProviders = await _signInManager.GetExternalAuthenticationSchemesAsync();
         return Ok(externalProviders.Select(ep => new Domain.Auth.AuthenticationScheme(ep.Name, ep.DisplayName)));
@@ -597,6 +597,65 @@ public sealed class AuthController : ControllerBase
         {
             _logger.LogError(ex, $"Ошибка при обработке Google callback: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
             return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
+        }
+    }
+
+    [HttpGet("current-user")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult<ApplicationUser>> GetCurrentUserAsync()
+    {
+        string? emailClaimValue = User.Claims.SingleOrDefault(b => b.Type == ClaimTypes.Email)?.Value;
+        if (string.IsNullOrWhiteSpace(emailClaimValue))
+        {
+            _logger.LogWarning("Email claim not found in user claims");
+            return null;
+        }
+        ApplicationUser? user = await _usersManager.FindByEmailAsync(emailClaimValue);
+        if (user is null)
+        {
+            _logger.LogWarning("User with email {Email} not found", emailClaimValue);
+            return NotFound();
+        }
+        return Ok(user);
+    }
+
+    [HttpPost("set-password")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult> ChangePassword(ChangePasswordModel changePasswordModel)
+    {
+        string? emailClaimValue = User.Claims.SingleOrDefault(b => b.Type == ClaimTypes.Email)?.Value;
+        if (string.IsNullOrWhiteSpace(emailClaimValue))
+        {
+            _logger.LogWarning("Email claim not found in user claims");
+            return BadRequest("Email claim not found");
+        }
+        ApplicationUser? user = await _usersManager.FindByEmailAsync(emailClaimValue);
+        if (user is null)
+        {
+            _logger.LogWarning("User with email {Email} not found", emailClaimValue);
+            return NotFound();
+        }
+
+        if (!string.IsNullOrWhiteSpace(user.PasswordHash))
+        {
+            bool isValidPassword = await _usersManager.CheckPasswordAsync(user, changePasswordModel.CurrentPassword);
+
+            if (!isValidPassword)
+                return BadRequest("Current password is incorrect");
+
+            IdentityResult changePasswordResult = await _usersManager.ChangePasswordAsync(user, changePasswordModel.CurrentPassword, changePasswordModel.NewPassword);
+            if (changePasswordResult.Succeeded)
+                return Ok("Password has been changed successfully");
+
+            return StatusCode(StatusCodes.Status500InternalServerError, changePasswordResult);
+        }
+        else
+        {
+            IdentityResult addPasswordResult = await _usersManager.AddPasswordAsync(user, changePasswordModel.NewPassword);
+            if (addPasswordResult.Succeeded)
+                return Ok("Password has been added successfully");
+
+            return StatusCode(StatusCodes.Status500InternalServerError, addPasswordResult);
         }
     }
 }

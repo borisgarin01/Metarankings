@@ -1,5 +1,6 @@
 ﻿using API.Controllers.Auth;
 using Domain.Auth;
+using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using System.Net;
 using System.Text;
@@ -157,5 +158,19 @@ public class AuthService : IAuthService
     {
         IEnumerable<AuthenticationScheme>? schemes = await _httpClient.GetFromJsonAsync<IEnumerable<AuthenticationScheme>>("api/auth/external-providers");
         return schemes;
+    }
+
+    public Task<ApplicationUser> GetCurrentUserAsync()
+    {
+        var applicaitonUser = _httpClient.GetFromJsonAsync<ApplicationUser>("api/auth/current-user");
+
+        return applicaitonUser;
+    }
+
+    public async Task<HttpResponseMessage> SendChangePasswordMessageAsync(ChangePasswordModel changePasswordModel)
+    {
+        HttpResponseMessage changingPasswordHttpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/set-password", changePasswordModel);
+
+        return changingPasswordHttpResponseMessage;
     }
 }
