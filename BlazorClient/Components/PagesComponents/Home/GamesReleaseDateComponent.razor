@@ -1,0 +1,9 @@
+﻿<div class="index-games">
+    <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
+
+    @foreach (GamesReleaseDateItemComponent gamesReleaseDateItemComponent in GamesReleaseDateItemComponents)
+    {
+        <GamesReleaseDateItemComponent Genres="@gamesReleaseDateItemComponent.Genres" Href="@gamesReleaseDateItemComponent.Href" ImageAlt="@gamesReleaseDateItemComponent.ImageAlt" ImageSource="@gamesReleaseDateItemComponent.ImageSource" ItemName="@gamesReleaseDateItemComponent.ItemName" Platforms="@gamesReleaseDateItemComponent.Platforms" ReleaseDate="@gamesReleaseDateItemComponent.ReleaseDate" Title="@gamesReleaseDateItemComponent.Title" />
+    }
+    <a href="https://metarankings.ru/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
+</div>
