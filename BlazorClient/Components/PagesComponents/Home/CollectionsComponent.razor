@@ -1,0 +1,15 @@
+﻿@using BlazorClient.Components.PagesComponents.GamesList
+@using BlazorClient.Pages.Games.Games
+@using BlazorClient.Pages.Movies.Movies
+@using Domain.Games
+@using Domain.Movies
+@using Domain.Reviews
+
+<div class="specials-index">
+    <h3><a href="https://metarankings.ru/meta/collections/">Подборки</a></h3>
+
+    @foreach (CollectionsItemComponent collectionsItemComponent in CollectionsItemComponents)
+    {
+        <CollectionsItemComponent Href="@collectionsItemComponent.Href" ImageAlt="@collectionsItemComponent.ImageAlt" ImageSource="@collectionsItemComponent.ImageSource" Title="@collectionsItemComponent.Title" />
+    }
+</div>
