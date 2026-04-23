@@ -6,6 +6,7 @@
 @using Domain.Games
 @using Domain.Movies
 @using Domain.Reviews
+@using ViewModels
 
 <BlazorClient.Components.PagesComponents.Common.Headerer />
 <BlazorClient.Components.PagesComponents.Common.GameMenu Year="@DateTime.Today.Year" />
@@ -129,8 +130,8 @@ else
                           })
                         })</script>
                 </div>
-                <CollectionsComponent />
-                <SoonAtCinemasComponent />
+                <CollectionsComponent CollectionsItemComponents="CollectionsItemComponents" />
+                <SoonAtCinemasComponent SoonAtCinemasItemComponents="SoonAtCinemasItemComponents" />
                 <GamesReleaseDateComponent GamesReleaseDateItemComponents="GamesReleaseDateItemComponents" />
             </div>
         </div>
@@ -139,21 +140,21 @@ else
                 <h3>Последние отзывы</h3>
                 <div class="widget-body">
                     <ul>
-                        @foreach (MovieReview review in MoviesReviews)
+                        @foreach (MovieReviewListViewModel review in MoviesReviews)
                         {
                             <li class="recent-reviews">
                                 <div class="ureview-text">
-                                    <span class="title-reviews"><a href="/movies/Details/@review.MovieId">@review.Movie.Name</a></span>
+                                    <span class="title-reviews"><a href="/movies/Details/@review.MovieId">@review.MovieName</a></span>
                                 </div>
                             </li>
                         }
                     </ul>
                     <ul>
-                        @foreach (GameReview review in GamesReviews)
+                        @foreach (GameReviewListViewModel review in GamesReviews)
                         {
                             <li class="recent-reviews">
                                 <div class="ureview-text">
-                                    <span class="title-reviews"><a href="/games/Details/@review.GameId">@review.Game.Name</a></span>
+                                    <span class="title-reviews"><a href="/games/Details/@review.GameId">@review.GameName</a></span>
                                 </div>
                             </li>
                         }

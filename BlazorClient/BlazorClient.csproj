@@ -18,6 +18,7 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\IdentityLibrary\IdentityLibrary.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
     <ProjectReference Include="..\WebClientServices\WebManagers.csproj" />
   </ItemGroup>
 
