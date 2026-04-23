@@ -2,7 +2,7 @@
     <h3><a href="https://metarankings.ru/coming-soon/">Скоро в кино</a></h3>
     @foreach (SoonAtCinemasItemComponent soonAtCinemasItemComponent in SoonAtCinemasItemComponents)
     {
-        <SoonAtCinemasItemComponent Href="@soonAtCinemasItemComponent.Href" Title="@soonAtCinemasItemComponent.Title" ImageAlt="@soonAtCinemasItemComponent.ImageAlt" ImageSource="@soonAtCinemasItemComponent.ImageSource" OriginalName="@soonAtCinemasItemComponent.OriginalName" ReleaseDate="@soonAtCinemasItemComponent.ReleaseDate" />
+        <SoonAtCinemasItemComponent Href="@soonAtCinemasItemComponent.Href" Title="@soonAtCinemasItemComponent.Title" ImageAlt="@soonAtCinemasItemComponent.ImageAlt" ImageSource="@soonAtCinemasItemComponent.ImageSource" OriginalName="@soonAtCinemasItemComponent.OriginalName" ReleaseDate="@soonAtCinemasItemComponent.ReleaseDate" Genres="@soonAtCinemasItemComponent.Genres" />
     }
     <a href="https://metarankings.ru/most-waiting-films/" class="allreviews">Самые ожидаемые фильмы</a>
 </div>

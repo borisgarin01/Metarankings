@@ -19,4 +19,10 @@ public partial class SoonAtCinemasItemComponent : ComponentBase
 
     [Parameter, EditorRequired]
     public DateTime ReleaseDate { get; set; }
+
+    [Parameter, EditorRequired]
+    public Dictionary<string, string> Genres { get; set; } = new Dictionary<string, string>
+    {
+        {"https://metarankings.ru/meta/movies/boeviki/", "Боевики"}
+    };
 }
