@@ -29,76 +29,153 @@
 }
 else
 {
-    <div class="slideshow">
-        <div id="slideshow" class="cycle-slideshow" data-cycle-fx="scrollHorz" data-cycle-timeout="7000" data-cycle-slides="&gt; div" data-cycle-pager=".pager" style="overflow: visible;">
-            <div class="slide clear cycle-slide cycle-sentinel" data-cycle-pager-template="&lt;span&gt;Фильмы&lt;/span&gt;" style="top: 0px; left: 0px; opacity: 1; z-index: 100; position: static; visibility: visible; display: block;">
-                <div class="post" style="visibility: visible;">
-                    @foreach (Movie movie in Movies)
-                    {
-                        <a href="/movies/details/@movie.Id" title="@movie.Name" style="visibility: visible;">
-                            <div class="featured-image" style="visibility: visible;">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/movies/images/{movie.PremierDate.Value.Year}/{movie.PremierDate.Value.Month}/{movie.ImageSource}")" alt="@movie.Name" style="visibility: visible;">
-                                @if (movie.MovieReviews is not null && movie.MovieReviews.Any())
-                                {
-                                    <div class="small-score mark-@Math.Round(movie.MovieReviews.Average(b => b.Score))" style="visibility: visible;">@Math.Round(movie.MovieReviews.Average(b => b.Score), 1)</div>
-                                }
-                                else
-                                {
-                                    <div class="small-score mark-0" style="visibility: visible;">0</div>
-                                }
-                                <span style="visibility: visible;">@movie.Name</span>
+    <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="row justify-content-between">
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2025/12/monster-hunter-stories-3-twisted-reflection-boxart-cover.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
                             </div>
-                        </a>
-                    }
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2026/03/marathon-boxart-cover.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2026/03/crimson-desert-boxart-cover.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2026/03/starship-troopers-ultimate-bug-war-boxart-cover.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-
-            <div class="slide clear cycle-slide" data-cycle-pager-template="&lt;span&gt;Фильмы&lt;/span&gt;" style="position: absolute; top: 0px; opacity: 1; display: block; z-index: 97; left: 0px; visibility: visible;">
-                <div class="post">
-                    @foreach (Movie movie in Movies)
-                    {
-                        <a href="/movies/details/@movie.Id" title="@movie.Name" style="visibility: visible;">
-                            <div class="featured-image" style="visibility: visible;">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/movies/images/{movie.PremierDate.Value.Year}/{movie.PremierDate.Value.Month}/{movie.ImageSource}")" alt="@movie.Name" style="visibility: visible;">
-                                @if (movie.MovieReviews is not null && movie.MovieReviews.Any())
-                                {
-                                    <div class="small-score mark-@Math.Round(movie.MovieReviews.Average(b => b.Score))" style="visibility: visible;">@Math.Round(movie.MovieReviews.Average(b => b.Score), 1)</div>
-                                }
-                                else
-                                {
-                                    <div class="small-score mark-0" style="visibility: visible;">0</div>
-                                }
-                                <span style="visibility: visible;">@movie.Name</span>
+            <div class="carousel-item">
+                <div class="row justify-content-between">
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2026/03/super-meat-boy-3d-cover-art.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
                             </div>
-                        </a>
-                    }
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2026/03/proekt-konec-sveta-cover-art.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2026/03/sekretnyj-agent-2026-cover-art.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2026/03/otklonenie-2026-cover-art.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="slide clear cycle-slide cycle-slide-active" data-cycle-pager-template="&lt;span&gt;Игры&lt;/span&gt;" style="position: absolute; z-index: 99; top: 0px; opacity: 1; visibility: visible; display: block; left: 0px;">
-                <div class="post">
-                    @foreach (Game game in Games)
-                    {
-                        <a href="/games/details/@game.Id" title="@game.Name" style="visibility: visible;">
-                            <div class="featured-image" style="visibility: visible;">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/{game.ReleaseDate.Value.Year}/{game.ReleaseDate.Value.Month}/{game.Image}")" alt="@game.Name" style="visibility: visible;">
-                                @if (game.GamesPlayersReviews is not null && game.GamesPlayersReviews.Any())
-                                {
-                                    <div class="small-score mark-@Math.Round(game.GamesPlayersReviews.Average(b => b.Score))" style="visibility: visible;">@Math.Round(game.GamesPlayersReviews.Average(b => b.Score), 1)</div>
-                                }
-                                else
-                                {
-                                    <div class="small-score mark-0" style="visibility: visible;">0</div>
-                                }
-                                <span style="visibility: visible;">@game.Name</span>
+            <div class="carousel-item">
+                <div class="row justify-content-between">
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2026/03/na-cepi-2026-cover-art.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
                             </div>
-                        </a>
-                    }
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2026/03/ostrye-kozyrki-bessmertnyj-chelovek-cover-art.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card w-100">
+                            <img src="https://metarankings.ru/images/uploads/2026/03/oxota-za-tenyu-cover-art.jpg"
+                                 class="d-block w-100" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Some quick example text to build</p>
+                                <a href="#" class="btn btn-primary">Read more</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
+                data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying"
+                data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
-
     <div id="container" class="clear">
         <div class="sidebar">
         </div>
