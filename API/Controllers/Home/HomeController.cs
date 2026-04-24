@@ -1,6 +1,5 @@
 ﻿using BlazorClient.Components.PagesComponents.Home;
-using Domain.Games;
-using Domain.Games.Collections;
+using Data.Repositories.Classes.Derived.Games;
 using Domain.Movies;
 using Domain.Reviews;
 using ViewModels;
@@ -11,6 +10,16 @@ namespace API.Controllers.Home;
 [Route("api/[controller]")]
 public sealed class HomeController : ControllerBase
 {
+    private readonly ILogger<HomeController> _logger;
+
+    private readonly GamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
+
+    public HomeController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, ILogger<HomeController> logger)
+    {
+        _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
+        _logger = logger;
+    }
+
     [HttpGet("collection-items")]
     public async Task<ActionResult<IEnumerable<CollectionsItemComponent>>> GetCollectionItemsComponents()
     {
@@ -256,128 +265,19 @@ public sealed class HomeController : ControllerBase
         });
     }
 
-    [HttpGet("games-reviews")]
-    public async Task<ActionResult<IEnumerable<GameReviewListViewModel>>> GetGamesReviews()
+    [HttpGet("games-reviews/{pageNumber:long}/{pageSize:long}")]
+    public async Task<ActionResult<IEnumerable<GameReviewListViewModel>>> GetGamesReviews(long pageNumber, long pageSize)
     {
-        var gamesReviews = new GameReview[]
+        try
         {
-            new GameReview
-            {
-                Id=1,
-                GameId=1,
-                Game=new Game
-                {
-                    Name="The Last of Us",
-                    Description="Тест",
-                    Developers=new List<Developer>(),
-                    GamesPlayersReviews=new List<GameReview>(),
-                    Genres=new List<Genre>(),
-                    Id=1,
-                    Image="Image",
-                    Localization=new Localization(),
-                    LocalizationId=1,
-                    Platforms=new List<Platform>(),
-                    Publishers=new List<Publisher>(),
-                    ReleaseDate=default,
-                    Screenshots=new List<GameScreenshot>(),
-                    GameCollections=new List<GameCollection>(),
-                    Trailer=""
-                }
-            },
-            new GameReview
-            {
-                Id=1,
-                GameId=1,
-                Game=new Game
-                {
-                    Name="Uncharted 4: A Thief's End",
-                    Description="Тест",
-                    Developers=new List<Developer>(),
-                    GamesPlayersReviews=new List<GameReview>(),
-                    Genres=new List<Genre>(),
-                    Id=1,
-                    Image="Image",
-                    Localization=new Localization(),
-                    LocalizationId=1,
-                    Platforms=new List<Platform>(),
-                    Publishers=new List<Publisher>(),
-                    ReleaseDate=default,
-                    Screenshots=new List<GameScreenshot>(),
-                    GameCollections=new List<GameCollection>(),
-                    Trailer=""
-                }
-            },
-            new GameReview
-            {
-                Id=1,
-                GameId=1,
-                Game=new Game
-                {
-                    Name="God of War",
-                    Description="Тест",
-                    Developers=new List<Developer>(),
-                    GamesPlayersReviews=new List<GameReview>(),
-                    Genres=new List<Genre>(),
-                    Id=1,
-                    Image="Image",
-                    Localization=new Localization(),
-                    LocalizationId=1,
-                    Platforms=new List<Platform>(),
-                    Publishers=new List<Publisher>(),
-                    ReleaseDate=default,
-                    Screenshots=new List<GameScreenshot>(),
-                    GameCollections=new List<GameCollection>(),
-                    Trailer=""
-                }
-            },
-            new GameReview
-            {
-                Id=1,
-                GameId=1,
-                Game=new Game
-                {
-                    Name="Detroit: Become Human",
-                    Description="Тест",
-                    Developers=new List<Developer>(),
-                    GamesPlayersReviews=new List<GameReview>(),
-                    Genres=new List<Genre>(),
-                    Id=1,
-                    Image="Image",
-                    Localization=new Localization(),
-                    LocalizationId=1,
-                    Platforms=new List<Platform>(),
-                    Publishers=new List<Publisher>(),
-                    ReleaseDate=default,
-                    Screenshots=new List<GameScreenshot>(),
-                    GameCollections=new List<GameCollection>(),
-                    Trailer=""
-                }
-            },
-            new GameReview
-            {
-                Id=1,
-                GameId=1,
-                Game=new Game
-                {
-                    Name="Valiant Hearts",
-                    Description="Тест",
-                    Developers=new List<Developer>(),
-                    GamesPlayersReviews=new List<GameReview>(),
-                    Genres=new List<Genre>(),
-                    Id=1,
-                    Image="Image",
-                    Localization=new Localization(),
-                    LocalizationId=1,
-                    Platforms=new List<Platform>(),
-                    Publishers=new List<Publisher>(),
-                    ReleaseDate=default,
-                    Screenshots=new List<GameScreenshot>(),
-                    GameCollections=new List<GameCollection>(),
-                    Trailer=""
-                }
-            }
-        };
+            IEnumerable<GameReview> gamesReviews = await _gamesPlayersReviewsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
 
-        return Ok(gamesReviews.Select(b => new GameReviewListViewModel(b.Id, b.Game.Name)));
+            return Ok(gamesReviews.Select(b => new GameReviewListViewModel(b.Id, b.Game.Name)));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message, ex.StackTrace);
+            return StatusCode(500, new { ex.Message, ex.StackTrace });
+        }
     }
 }

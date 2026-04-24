@@ -83,7 +83,7 @@ public partial class Home : ComponentBase
         // Fetch data based on the current PageSize and PageNumber
 
         var gamesGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/First/{PageNumber}/{PageSize}");
-        var gamesGamersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<GameReviewListViewModel>>($"/api/Home/games-reviews");
+        var gamesGamersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<GameReviewListViewModel>>($"/api/Home/games-reviews/{PageNumber}/{PageSize}");
         var moviesGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/{PageNumber}/{PageSize}");
         var moviesViewersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<MovieReviewListViewModel>>($"/api/Home/movies-reviews");
         var collectionsItemsComponentGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>("api/home/collection-items");
