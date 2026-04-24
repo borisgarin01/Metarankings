@@ -45,7 +45,7 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IRepository<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosRepository>(instance => new MoviesStudiosRepository(metarankingsConnectionString));
 
-        services.AddScoped(instance => new GamesPlayersReviewsRepository(metarankingsConnectionString));
+        services.AddScoped<IGamesPlayersReviewsRepository, GamesPlayersReviewsRepository>(instance => new GamesPlayersReviewsRepository(metarankingsConnectionString));
 
         services.AddScoped<IMoviesViewersReviewsRepository, MoviesViewersReviewsRepository>(instance => new MoviesViewersReviewsRepository(metarankingsConnectionString));
 

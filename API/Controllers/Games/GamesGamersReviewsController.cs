@@ -11,7 +11,7 @@ namespace API.Controllers.Games;
 [Route("api/games/[controller]")]
 public sealed class GamesGamersReviewsController : ControllerBase
 {
-    private readonly GamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
+    private readonly IGamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
     private readonly IGamesRepository _gamesRepository;
 
     private readonly UserManager<ApplicationUser> _usersManager;
@@ -20,7 +20,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
     private readonly ILogger<GamesGamersReviewsController> _logger;
 
-    public GamesGamersReviewsController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, GamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, ILogger<GamesGamersReviewsController> logger)
+    public GamesGamersReviewsController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, GamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, ILogger<GamesGamersReviewsController> logger)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _telegramAuthenticator = telegramAuthenticator;

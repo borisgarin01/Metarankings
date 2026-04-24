@@ -1,5 +1,4 @@
 ﻿using BlazorClient.Components.PagesComponents.Home;
-using Data.Repositories.Classes.Derived.Games;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Common;
 using Domain.Games;
@@ -15,10 +14,10 @@ public sealed class HomeController : ControllerBase
 {
     private readonly ILogger<HomeController> _logger;
 
-    private readonly GamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
+    private readonly IGamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
     private readonly IGamesRepository _gamesRepository;
 
-    public HomeController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, ILogger<HomeController> logger, IGamesRepository gamesRepository)
+    public HomeController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, ILogger<HomeController> logger, IGamesRepository gamesRepository)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _logger = logger;
