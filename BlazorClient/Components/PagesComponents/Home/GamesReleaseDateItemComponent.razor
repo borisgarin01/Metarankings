@@ -1,16 +1,17 @@
-﻿<div class="item">
+﻿@using Domain.Common
+<div class="item">
     <a href="@Href" title="@Title"><img class="post-image" src="@ImageSource" alt="@ImageAlt"></a>
     <span class="item-name"><a href="@Href">@ItemName</a></span>
     <span class="item-meta">
-        @foreach (KeyValuePair<string, string> platform in Platforms)
+        @foreach (Link platform in Platforms)
         {
-            <a href="@platform.Key">@platform.Value</a>
+            <a href="@platform.Url">@platform.Title</a>
         }
     </span>
     <span class="item-meta">
-        @foreach (KeyValuePair<string, string> genre in Genres)
+        @foreach (Link genre in Genres)
         {
-            <a href="@genre.Key">@genre.Value</a>
+            <a href="@genre.Url">@genre.Title</a>
         }
     </span>
     <span class="item-meta">@ReleaseDate.ToString("dd MMMM yyyy")</span>

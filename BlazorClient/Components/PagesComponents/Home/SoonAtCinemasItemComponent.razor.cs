@@ -1,4 +1,7 @@
-﻿namespace BlazorClient.Components.PagesComponents.Home;
+﻿using Domain.Common;
+using ViewModels;
+
+namespace BlazorClient.Components.PagesComponents.Home;
 
 public partial class SoonAtCinemasItemComponent : ComponentBase
 {
@@ -21,8 +24,8 @@ public partial class SoonAtCinemasItemComponent : ComponentBase
     public DateTime ReleaseDate { get; set; }
 
     [Parameter, EditorRequired]
-    public Dictionary<string, string> Genres { get; set; } = new Dictionary<string, string>
+    public Link[] Genres { get; set; } = new Link[]
     {
-        {"https://metarankings.ru/meta/movies/boeviki/", "Боевики"}
+        new Link("https://metarankings.ru/meta/movies/boeviki/", "Боевики")
     };
 }

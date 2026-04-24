@@ -1,4 +1,5 @@
 ﻿using BlazorClient.Components.PagesComponents.Home;
+using Domain.Common;
 using Domain.Games;
 using Domain.Movies;
 using Domain.Reviews;
@@ -107,17 +108,17 @@ public partial class Home : ComponentBase
                     ImageSource="https://metarankings.ru/images/uploads/2025/07/dying-light-the-beast-boxart-cover-50x70.jpg",
                     ItemName="Dying Light: The Beast",
                     ReleaseDate=new DateTime(2025,6,1),
-                    Genres=new Dictionary<string, string>
+                    Genres=new Link[]
                     {
-                        {"https://metarankings.ru/genre/rpg/", "РПГ" },
-                        {"https://metarankings.ru/genre/xorror/", "Хоррор" },
-                        {"https://metarankings.ru/genre/ekshen/", "Экшен" }
+                        new Link("https://metarankings.ru/genre/rpg/", "РПГ" ),
+                        new Link("https://metarankings.ru/genre/xorror/", "Хоррор"),
+                        new Link("https://metarankings.ru/genre/ekshen/", "Экшен")
                     },
-                    Platforms=new Dictionary<string, string>
+                    Platforms=new Link[]
                     {
-                        {"https://metarankings.ru/meta/games/pc/", "PC"},
-                        {"https://metarankings.ru/meta/games/ps5/", "PS5" },
-                        {"https://metarankings.ru/meta/games/xbox-series-x/", "Xbox Series X" }
+                        new Link("https://metarankings.ru/meta/games/pc/", "PC"),
+                        new Link("https://metarankings.ru/meta/games/ps5/", "PS5"),
+                        new Link("https://metarankings.ru/meta/games/xbox-series-x/", "Xbox Series X")
                     }
                 },
                 new GamesReleaseDateItemComponent
@@ -128,14 +129,14 @@ public partial class Home : ComponentBase
                     ImageSource="https://metarankings.ru/images/uploads/2025/07/donkey-kong-bananza-boxart-cover-50x70.jpg",
                     ItemName="Donkey Kong Bananza",
                     ReleaseDate=new DateTime(2025,7,17),
-                    Genres=new Dictionary<string, string>
+                    Genres=new Link[]
                     {
-                        {"https://metarankings.ru/genre/arkada/", "Аркада" },
-                        {"https://metarankings.ru/genre/priklyuchenie/", "Приключение" }
+                        new Link("https://metarankings.ru/genre/arkada/", "Аркада"),
+                        new Link("https://metarankings.ru/genre/priklyuchenie/", "Приключение")
                     },
-                    Platforms=new Dictionary<string, string>
+                    Platforms=new Link[]
                     {
-                        {"https://metarankings.ru/meta/games/switch-2/", "Switch 2"}
+                        new Link("https://metarankings.ru/meta/games/switch-2/", "Switch 2")
                     }
                 },
                 new GamesReleaseDateItemComponent
@@ -146,17 +147,17 @@ public partial class Home : ComponentBase
                     ImageSource="https://metarankings.ru/images/uploads/2025/08/mindseye-boxart-cover-50x70.jpg",
                     ItemName="MindsEye",
                     ReleaseDate=new DateTime(2025,6,1),
-                    Genres=new Dictionary<string, string>
+                    Genres=new Link[]
                     {
-                        {"https://metarankings.ru/genre/rpg/", "РПГ" },
-                        {"https://metarankings.ru/genre/shuter/", "Шутер" },
-                        {"https://metarankings.ru/genre/ekshen/", "Экшен" }
+                        new Link("https://metarankings.ru/genre/rpg/", "РПГ"),
+                        new Link("https://metarankings.ru/genre/shuter/", "Шутер"),
+                        new Link("https://metarankings.ru/genre/ekshen/", "Экшен")
                     },
-                    Platforms=new Dictionary<string, string>
+                    Platforms = new Link[]
                     {
-                        {"https://metarankings.ru/meta/games/pc/", "PC"},
-                        {"https://metarankings.ru/meta/games/ps5/", "PS5" },
-                        {"https://metarankings.ru/meta/games/xbox-series-x/", "Xbox Series X" }
+                        new Link("https://metarankings.ru/meta/games/pc/", "PC"),
+                        new Link("https://metarankings.ru/meta/games/ps5/", "PS5"),
+                        new Link("https://metarankings.ru/meta/games/xbox-series-x/", "Xbox Series X")
                     }
                 },
                 new GamesReleaseDateItemComponent
@@ -167,18 +168,18 @@ public partial class Home : ComponentBase
                     ImageSource="https://metarankings.ru/images/uploads/2025/08/shinobi-art-of-vengeance-boxart-cover-50x70.jpg",
                     ItemName="SHINOBI: Art of Vengeance",
                     ReleaseDate=new DateTime(2025,8,25),
-                    Genres=new Dictionary<string, string>
+                    Genres = new Link[]
                     {
-                        {"https://metarankings.ru/genre/arkada/", "Аркада" },
-                        {"https://metarankings.ru/genre/platformer/", "Платформер" },
-                        {"https://metarankings.ru/genre/ekshen/", "Экшен" }
+                        new Link("https://metarankings.ru/genre/arkada/", "Аркада"),
+                        new Link("https://metarankings.ru/genre/platformer/", "Платформер"),
+                        new Link("https://metarankings.ru/genre/ekshen/", "Экшен")
                     },
-                    Platforms=new Dictionary<string, string>
+                    Platforms = new Link[]
                     {
-                        {"https://metarankings.ru/meta/games/pc/", "PC"},
-                        {"https://metarankings.ru/meta/games/ps5/", "PS5" },
-                        {"https://metarankings.ru/meta/games/xbox-series-x/", "Xbox Series X" },
-                        {"https://metarankings.ru/meta/games/switch/", "Switch"}
+                        new Link("https://metarankings.ru/meta/games/pc/", "PC"),
+                        new Link("https://metarankings.ru/meta/games/ps5/", "PS5"),
+                        new Link("https://metarankings.ru/meta/games/xbox-series-x/", "Xbox Series X"),
+                        new Link("https://metarankings.ru/meta/games/switch/", "Switch")
                     }
                 },
                 new GamesReleaseDateItemComponent
@@ -189,15 +190,15 @@ public partial class Home : ComponentBase
                     ImageSource="https://metarankings.ru/images/uploads/2023/05/metal-gear-solid-delta-snake-eater-boxart-cover-50x70.jpg",
                     ItemName="Metal Gear Solid Delta: Snake Eater",
                     ReleaseDate=new DateTime(2025,8,28),
-                    Genres=new Dictionary<string, string>
+                    Genres = new Link[]
                     {
-                        {"https://metarankings.ru/genre/ekshen/", "Экшен" }
+                        new Link("https://metarankings.ru/genre/ekshen/", "Экшен")
                     },
-                    Platforms=new Dictionary<string, string>
+                    Platforms = new Link[]
                     {
-                        {"https://metarankings.ru/meta/games/pc/", "PC"},
-                        {"https://metarankings.ru/meta/games/ps5/", "PS5" },
-                        {"https://metarankings.ru/meta/games/xbox-series-x/", "Xbox Series X" }
+                        new Link("https://metarankings.ru/meta/games/pc/", "PC"),
+                        new Link("https://metarankings.ru/meta/games/ps5/", "PS5" ),
+                        new Link("https://metarankings.ru/meta/games/xbox-series-x/", "Xbox Series X")
                     }
                 }
             };

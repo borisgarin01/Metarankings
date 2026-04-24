@@ -1,4 +1,6 @@
-﻿namespace BlazorClient.Components.PagesComponents.Home;
+﻿using Domain.Common;
+
+namespace BlazorClient.Components.PagesComponents.Home;
 
 public partial class GamesReleaseDateItemComponent : ComponentBase
 {
@@ -18,10 +20,10 @@ public partial class GamesReleaseDateItemComponent : ComponentBase
     public string ItemName { get; set; }
 
     [Parameter, EditorRequired]
-    public Dictionary<string, string> Platforms { get; set; }
+    public Link[] Platforms { get; set; }
 
     [Parameter, EditorRequired]
-    public Dictionary<string, string> Genres { get; set; }
+    public Link[] Genres { get; set; }
 
     [Parameter, EditorRequired]
     public DateTime ReleaseDate { get; set; }

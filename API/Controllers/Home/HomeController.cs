@@ -1,4 +1,8 @@
 ﻿using BlazorClient.Components.PagesComponents.Home;
+using Domain.Games;
+using Domain.Games.Collections;
+using Domain.Movies;
+using Domain.Reviews;
 using ViewModels;
 
 namespace API.Controllers.Home;
@@ -113,6 +117,135 @@ public sealed class HomeController : ControllerBase
     [HttpGet("movies-reviews")]
     public async Task<ActionResult<IEnumerable<MovieReviewListViewModel>>> GetMoviesReviews()
     {
+        var moviesReviews = new MovieReview[]
+        {
+            new MovieReview
+            {
+                Id=1,
+                ApplicationUser=null,
+                Date=default,
+                Movie=new Movie
+                {
+                    Name="Фильм 1",
+                    Description=string.Empty,
+                    ImageSource=string.Empty,
+                    OriginalName=string.Empty,
+                    Id=1,
+                    MovieGenres=new List<MovieGenre>(),
+                    MovieReviews=new List<MovieReview>(),
+                    MoviesDirectors=new List<MovieDirector>(),
+                    MoviesStudios=new List<MovieStudio>(),
+                    PremierDate=default,
+                    Score=default,
+                    ScoresCount=default
+                },
+                MovieId=1,
+                Score=0,
+                TextContent="Тест",
+                ViewerId=1
+            },
+            new MovieReview
+            {
+                Id=2,
+                ApplicationUser=null,
+                Date=default,
+                Movie=new Movie
+                {
+                    Name="Фильм 2",
+                    Description=string.Empty,
+                    ImageSource=string.Empty,
+                    OriginalName=string.Empty,
+                    Id=1,
+                    MovieGenres=new List<MovieGenre>(),
+                    MovieReviews=new List<MovieReview>(),
+                    MoviesDirectors=new List<MovieDirector>(),
+                    MoviesStudios=new List<MovieStudio>(),
+                    PremierDate=default,
+                    Score=default,
+                    ScoresCount=default
+                },
+                MovieId=1,
+                Score=0,
+                TextContent="Тест",
+                ViewerId=1
+            },
+            new MovieReview
+            {
+                Id=2,
+                ApplicationUser=null,
+                Date=default,
+                Movie=new Movie
+                {
+                    Name="Фильм 3",
+                    Description=string.Empty,
+                    ImageSource=string.Empty,
+                    OriginalName=string.Empty,
+                    Id=1,
+                    MovieGenres=new List<MovieGenre>(),
+                    MovieReviews=new List<MovieReview>(),
+                    MoviesDirectors=new List<MovieDirector>(),
+                    MoviesStudios=new List<MovieStudio>(),
+                    PremierDate=default,
+                    Score=default,
+                    ScoresCount=default
+                },
+                MovieId=3,
+                Score=0,
+                TextContent="Тест",
+                ViewerId=1
+            },
+            new MovieReview
+            {
+                Id=2,
+                ApplicationUser=null,
+                Date=default,
+                Movie=new Movie
+                {
+                    Name="Фильм 4",
+                    Description=string.Empty,
+                    ImageSource=string.Empty,
+                    OriginalName=string.Empty,
+                    Id=1,
+                    MovieGenres=new List<MovieGenre>(),
+                    MovieReviews=new List<MovieReview>(),
+                    MoviesDirectors=new List<MovieDirector>(),
+                    MoviesStudios=new List<MovieStudio>(),
+                    PremierDate=default,
+                    Score=default,
+                    ScoresCount=default
+                },
+                MovieId=4,
+                Score=0,
+                TextContent="Тест",
+                ViewerId=1
+            },
+            new MovieReview
+            {
+                Id=2,
+                ApplicationUser=null,
+                Date=default,
+                Movie=new Movie
+                {
+                    Name="Фильм 5",
+                    Description=string.Empty,
+                    ImageSource=string.Empty,
+                    OriginalName=string.Empty,
+                    Id=1,
+                    MovieGenres=new List<MovieGenre>(),
+                    MovieReviews=new List<MovieReview>(),
+                    MoviesDirectors=new List<MovieDirector>(),
+                    MoviesStudios=new List<MovieStudio>(),
+                    PremierDate=default,
+                    Score=default,
+                    ScoresCount=default
+                },
+                MovieId=5,
+                Score=0,
+                TextContent="Тест",
+                ViewerId=1
+            }
+        };
+
         return Ok(new MovieReviewListViewModel[]
         {
             new MovieReviewListViewModel(1,"Фильм 1"),
@@ -126,13 +259,125 @@ public sealed class HomeController : ControllerBase
     [HttpGet("games-reviews")]
     public async Task<ActionResult<IEnumerable<GameReviewListViewModel>>> GetGamesReviews()
     {
-        return Ok(new GameReviewListViewModel[]
+        var gamesReviews = new GameReview[]
         {
-            new GameReviewListViewModel(1,"Игра 1"),
-            new GameReviewListViewModel(2,"Игра 2"),
-            new GameReviewListViewModel(3,"Игра 3"),
-            new GameReviewListViewModel(4,"Игра 4"),
-            new GameReviewListViewModel(5,"Игра 5"),
-        });
+            new GameReview
+            {
+                Id=1,
+                GameId=1,
+                Game=new Game
+                {
+                    Name="The Last of Us",
+                    Description="Тест",
+                    Developers=new List<Developer>(),
+                    GamesPlayersReviews=new List<GameReview>(),
+                    Genres=new List<Genre>(),
+                    Id=1,
+                    Image="Image",
+                    Localization=new Localization(),
+                    LocalizationId=1,
+                    Platforms=new List<Platform>(),
+                    Publishers=new List<Publisher>(),
+                    ReleaseDate=default,
+                    Screenshots=new List<GameScreenshot>(),
+                    GameCollections=new List<GameCollection>(),
+                    Trailer=""
+                }
+            },
+            new GameReview
+            {
+                Id=1,
+                GameId=1,
+                Game=new Game
+                {
+                    Name="Uncharted 4: A Thief's End",
+                    Description="Тест",
+                    Developers=new List<Developer>(),
+                    GamesPlayersReviews=new List<GameReview>(),
+                    Genres=new List<Genre>(),
+                    Id=1,
+                    Image="Image",
+                    Localization=new Localization(),
+                    LocalizationId=1,
+                    Platforms=new List<Platform>(),
+                    Publishers=new List<Publisher>(),
+                    ReleaseDate=default,
+                    Screenshots=new List<GameScreenshot>(),
+                    GameCollections=new List<GameCollection>(),
+                    Trailer=""
+                }
+            },
+            new GameReview
+            {
+                Id=1,
+                GameId=1,
+                Game=new Game
+                {
+                    Name="God of War",
+                    Description="Тест",
+                    Developers=new List<Developer>(),
+                    GamesPlayersReviews=new List<GameReview>(),
+                    Genres=new List<Genre>(),
+                    Id=1,
+                    Image="Image",
+                    Localization=new Localization(),
+                    LocalizationId=1,
+                    Platforms=new List<Platform>(),
+                    Publishers=new List<Publisher>(),
+                    ReleaseDate=default,
+                    Screenshots=new List<GameScreenshot>(),
+                    GameCollections=new List<GameCollection>(),
+                    Trailer=""
+                }
+            },
+            new GameReview
+            {
+                Id=1,
+                GameId=1,
+                Game=new Game
+                {
+                    Name="Detroit: Become Human",
+                    Description="Тест",
+                    Developers=new List<Developer>(),
+                    GamesPlayersReviews=new List<GameReview>(),
+                    Genres=new List<Genre>(),
+                    Id=1,
+                    Image="Image",
+                    Localization=new Localization(),
+                    LocalizationId=1,
+                    Platforms=new List<Platform>(),
+                    Publishers=new List<Publisher>(),
+                    ReleaseDate=default,
+                    Screenshots=new List<GameScreenshot>(),
+                    GameCollections=new List<GameCollection>(),
+                    Trailer=""
+                }
+            },
+            new GameReview
+            {
+                Id=1,
+                GameId=1,
+                Game=new Game
+                {
+                    Name="Valiant Hearts",
+                    Description="Тест",
+                    Developers=new List<Developer>(),
+                    GamesPlayersReviews=new List<GameReview>(),
+                    Genres=new List<Genre>(),
+                    Id=1,
+                    Image="Image",
+                    Localization=new Localization(),
+                    LocalizationId=1,
+                    Platforms=new List<Platform>(),
+                    Publishers=new List<Publisher>(),
+                    ReleaseDate=default,
+                    Screenshots=new List<GameScreenshot>(),
+                    GameCollections=new List<GameCollection>(),
+                    Trailer=""
+                }
+            }
+        };
+
+        return Ok(gamesReviews.Select(b => new GameReviewListViewModel(b.Id, b.Game.Name)));
     }
 }
