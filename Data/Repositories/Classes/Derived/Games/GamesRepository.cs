@@ -232,6 +232,32 @@ gc.Id, gc.Name, gc.Description
         }
     }
 
+    public async Task<IEnumerable<Game>> GetNearestAsync(short limit)
+    {
+        using var connection = new NpgsqlConnection(ConnectionString);
+
+        var games = await connection.QueryAsync<Game>(@"WITH future_games AS (
+    SELECT Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer
+    FROM Games
+    WHERE ReleaseDate >= CURRENT_DATE
+    ORDER BY ReleaseDate ASC
+    LIMIT @Limit
+),
+past_games AS (
+    SELECT Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer
+    FROM Games
+    WHERE ReleaseDate < CURRENT_DATE
+    ORDER BY ReleaseDate DESC
+    LIMIT @Limit
+)
+SELECT * FROM future_games
+UNION ALL
+SELECT * FROM past_games
+WHERE NOT EXISTS (SELECT 1 FROM future_games);", new { Limit = limit });
+
+        return games;
+    }
+
 
     public async Task<IEnumerable<Game>> GetAllAsync()
     {

@@ -1,4 +1,5 @@
 ﻿using Data.Repositories.Classes.Derived.Games;
+using Data.Repositories.Interfaces.Derived;
 using Domain.RequestsModels.Games.GamesGamersReviews;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
@@ -11,7 +12,7 @@ namespace API.Controllers.Games;
 public sealed class GamesGamersReviewsController : ControllerBase
 {
     private readonly GamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
-    private readonly GamesRepository _gamesRepository;
+    private readonly IGamesRepository _gamesRepository;
 
     private readonly UserManager<ApplicationUser> _usersManager;
 

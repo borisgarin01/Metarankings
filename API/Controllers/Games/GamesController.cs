@@ -1,9 +1,12 @@
 ﻿using API.Json;
 using Data.Repositories.Classes.Derived.Games;
+using Data.Repositories.Interfaces.Derived;
+using Domain.Common;
 using Domain.Games;
 using Domain.RequestsModels;
 using Domain.RequestsModels.Games;
 using IdentityLibrary.Telegram;
+using ViewModels;
 
 namespace API.Controllers.Games;
 
@@ -12,11 +15,11 @@ namespace API.Controllers.Games;
 public sealed class GamesController : ControllerBase
 {
     private JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
-    private readonly GamesRepository _gamesRepository;
+    private readonly IGamesRepository _gamesRepository;
     private readonly ILogger<GamesController> _logger;
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public GamesController(GamesRepository gamesRepository, TelegramAuthenticator telegramAuthenticator, ILogger<GamesController> logger)
+    public GamesController(IGamesRepository gamesRepository, TelegramAuthenticator telegramAuthenticator, ILogger<GamesController> logger)
     {
         jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
         _gamesRepository = gamesRepository;
@@ -79,12 +82,20 @@ public sealed class GamesController : ControllerBase
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Game>> GetAsync(long id)
     {
-        Game? game = await _gamesRepository.GetAsync(id);
+        try
+        {
+            Game? game = await _gamesRepository.GetAsync(id);
 
-        if (game is null)
-            return NotFound();
+            if (game is null)
+                return NotFound();
 
-        return Ok(game);
+            return Ok(game);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message, ex.StackTrace);
+            return StatusCode(500, new { ex.Message, ex.StackTrace });
+        }
     }
 
     [HttpPost("byParameters")]

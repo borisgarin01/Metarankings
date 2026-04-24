@@ -33,7 +33,7 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IRepository<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersRepository>(instance => new PublishersRepository(metarankingsConnectionString));
 
-        services.AddScoped(instance => new GamesRepository(metarankingsConnectionString));
+        services.AddScoped<IGamesRepository, GamesRepository>(instance => new GamesRepository(metarankingsConnectionString));
 
         services.AddScoped<ILocalizationsRepository>(instance => new LocalizationsRepository(metarankingsConnectionString));
 

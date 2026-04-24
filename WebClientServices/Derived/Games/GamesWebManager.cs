@@ -66,4 +66,10 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
             return await JsonSerializer.DeserializeAsync<Game>(await publisherUpdateHttpResponseMessage.Content.ReadAsStreamAsync());
         return null;
     }
+
+    public async Task<IEnumerable<Game>> GetNearestAsync(short offset)
+    {
+        IEnumerable<Game> nearestGames = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/nearest/{offset}");
+        return nearestGames;
+    }
 }

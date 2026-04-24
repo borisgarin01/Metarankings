@@ -1,7 +1,9 @@
-﻿namespace BlazorClient.Components.PagesComponents.Home;
+﻿using ViewModels;
+
+namespace BlazorClient.Components.PagesComponents.Home;
 
 public partial class GamesReleaseDateComponent : ComponentBase
 {
     [Parameter, EditorRequired]
-    public IEnumerable<GamesReleaseDateItemComponent> GamesReleaseDateItemComponents { get; set; }
+    public IEnumerable<GamesReleaseDateItemViewModel> GamesReleaseDateItemComponents { get; set; }
 }

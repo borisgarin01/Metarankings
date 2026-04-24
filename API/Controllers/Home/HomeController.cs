@@ -1,5 +1,8 @@
 ﻿using BlazorClient.Components.PagesComponents.Home;
 using Data.Repositories.Classes.Derived.Games;
+using Data.Repositories.Interfaces.Derived;
+using Domain.Common;
+using Domain.Games;
 using Domain.Movies;
 using Domain.Reviews;
 using ViewModels;
@@ -13,11 +16,13 @@ public sealed class HomeController : ControllerBase
     private readonly ILogger<HomeController> _logger;
 
     private readonly GamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
+    private readonly IGamesRepository _gamesRepository;
 
-    public HomeController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, ILogger<HomeController> logger)
+    public HomeController(GamesPlayersReviewsRepository gamesPlayersReviewsRepository, ILogger<HomeController> logger, IGamesRepository gamesRepository)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _logger = logger;
+        _gamesRepository = gamesRepository;
     }
 
     [HttpGet("collection-items")]
@@ -272,12 +277,21 @@ public sealed class HomeController : ControllerBase
         {
             IEnumerable<GameReview> gamesReviews = await _gamesPlayersReviewsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
 
-            return Ok(gamesReviews.Select(b => new GameReviewListViewModel(b.Id, b.Game.Name)));
+            return Ok(gamesReviews.Select(b => new GameReviewListViewModel(b.GameId, b.Game.Name)));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message, ex.StackTrace);
             return StatusCode(500, new { ex.Message, ex.StackTrace });
         }
+    }
+    [HttpGet("nearest/{offset}")]
+    public async Task<ActionResult<IEnumerable<GamesReleaseDateItemViewModel>>> GetNearestAsync(short limit)
+    {
+        IEnumerable<Game> games = await _gamesRepository.GetNearestAsync(limit);
+
+        var gamesReleaseDatetItemViewModels = games.Select(b => new GamesReleaseDateItemViewModel($"/games/Details/{b.Id}", b.Name, b.Image, b.Name, b.Name, b.Platforms.Select(c => new Link(c.Name, $"/platforms/{c.Id}")).ToArray(), b.Genres.Select(c => new Link(c.Name, $"/genres/{c.Id}")).ToArray(), b.ReleaseDate.HasValue ? b.ReleaseDate.Value : DateTime.Today.AddYears(5)));
+
+        return Ok(gamesReleaseDatetItemViewModels);
     }
 }
