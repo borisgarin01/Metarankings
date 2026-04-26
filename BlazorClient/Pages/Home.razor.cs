@@ -75,10 +75,10 @@ public partial class Home : ComponentBase
             PageSize = 5;
         // Fetch data based on the current PageSize and PageNumber
 
-        var gamesGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/First/{PageNumber}/{PageSize}");
-        var gamesGamersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<GameReview>>($"/api/Games/GamesGamersReviews/{GamesGamersReviewsOffset}/{GamesGamersReviewsLimit}");
-        var moviesGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/{PageNumber}/{PageSize}");
-        var moviesViewersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<MovieReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}");
+        Task<IEnumerable<Game>?> gamesGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/First/{PageNumber}/{PageSize}");
+        Task<IEnumerable<GameReview>?> gamesGamersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<GameReview>>($"/api/Games/GamesGamersReviews/{GamesGamersReviewsOffset}/{GamesGamersReviewsLimit}");
+        Task<IEnumerable<Movie>?> moviesGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/{PageNumber}/{PageSize}");
+        Task<IEnumerable<MovieReview>?> moviesViewersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<MovieReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}");
 
         await Task.WhenAll(gamesGettingTask, gamesGamersReviewsGettingTask, moviesGettingTask, moviesViewersReviewsGettingTask)
             .ContinueWith(b =>

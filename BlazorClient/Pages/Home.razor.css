@@ -1,0 +1,31 @@
+﻿.col {
+    display: flex;
+}
+
+.card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+    .card img {
+        height: 200px; /* Единая высота для всех картинок */
+        width: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+.card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-text {
+    flex-grow: 1; /* Текст тоже будет занимать доступное место */
+}
+
+.btn {
+    margin-top: auto; /* Кнопка прижмётся к низу */
+    align-self: flex-start;
+}
