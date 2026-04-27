@@ -1,0 +1,21 @@
+﻿@using ViewModels
+
+<div class="sidebar rcol" style="height: 2500px;">
+    <div class="widget last-reviews">
+        <h3>Последние отзывы</h3>
+        <div class="widget-body">
+            <ul>
+                @foreach (MovieReviewListViewModel movieReviewListViewModel in MoviesReviewsListViewModels)
+                {
+                    <LatestReviewItemComponent Href="@($"/novies/Details/{movieReviewListViewModel.MovieId}")" Title="@movieReviewListViewModel.MovieName" />
+                }
+            </ul>
+            <ul>
+                @foreach (GameReviewListViewModel gameReviewListViewModel in GamesReviewsListViewModels)
+                {
+                    <LatestReviewItemComponent Href="@($"/games/Details/{gameReviewListViewModel.GameId}")" Title="@gameReviewListViewModel.GameName" />
+                }
+            </ul>
+        </div>
+    </div>
+</div>

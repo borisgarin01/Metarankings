@@ -270,7 +270,7 @@ public sealed class HomeController : ControllerBase
     }
 
     [HttpGet("games-reviews/{pageNumber:long}/{pageSize:long}")]
-    public async Task<ActionResult<IEnumerable<GameReviewListViewModel>>> GetGamesReviews(long pageNumber, long pageSize)
+    public async Task<ActionResult<IEnumerable<GameReviewListViewModel>>> GetGamesReviewsAsync(long pageNumber, long pageSize)
     {
         try
         {
@@ -284,6 +284,7 @@ public sealed class HomeController : ControllerBase
             return StatusCode(500, new { ex.Message, ex.StackTrace });
         }
     }
+
     [HttpGet("nearest/{offset}")]
     public async Task<ActionResult<IEnumerable<GamesReleaseDateItemViewModel>>> GetNearestAsync(short limit)
     {
@@ -292,5 +293,59 @@ public sealed class HomeController : ControllerBase
         var gamesReleaseDatetItemViewModels = games.Select(b => new GamesReleaseDateItemViewModel($"/games/Details/{b.Id}", b.Name, b.Image, b.Name, b.Name, b.Platforms.Select(c => new Link(c.Name, $"/platforms/{c.Id}")).ToArray(), b.Genres.Select(c => new Link(c.Name, $"/genres/{c.Id}")).ToArray(), b.ReleaseDate.HasValue ? b.ReleaseDate.Value : DateTime.Today.AddYears(5)));
 
         return Ok(gamesReleaseDatetItemViewModels);
+    }
+
+    [HttpGet("games-release-dates")]
+    public async Task<ActionResult<IEnumerable<GamesReleaseDateItemComponent>>> GetGamesReleasesDatesAsync(long pageNumber, long pageSize)
+    {
+        IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemsComponents = new GamesReleaseDateItemViewModel[]
+        {
+            new GamesReleaseDateItemViewModel("https://metarankings.ru/dying-light-the-beast/","Игра Dying Light: The Beast", "https://metarankings.ru/images/uploads/2025/07/dying-light-the-beast-boxart-cover-50x70.jpg", "Dying Light: The Beast", "Dying Light: The Beast", new Link[]{new Link("PC", "https://metarankings.ru/meta/games/pc/"),
+                    new Link("PS5", "https://metarankings.ru/meta/games/ps5/"),
+                    new Link("Xbox Series X", "https://metarankings.ru/meta/games/xbox-series-x/")}, new Link[]
+                {
+                    new Link("РПГ", "https://metarankings.ru/genre/rpg/"),
+                    new Link("Хоррор", "https://metarankings.ru/genre/xorror/"),
+                    new Link("Экшен", "https://metarankings.ru/genre/ekshen/")
+                }, new DateTime(2025,6,1)),
+            new GamesReleaseDateItemViewModel("https://metarankings.ru/donkey-kong-bananza/","Игра Donkey Kong Bananza", "https://metarankings.ru/images/uploads/2025/07/donkey-kong-bananza-boxart-cover-50x70.jpg", "Donkey Kong Bananza", "Donkey Kong Bananza", new Link[]{new Link("Switch 2", "https://metarankings.ru/meta/games/switch-2/") }, new Link[]
+                {
+                    new Link("РПГ", "https://metarankings.ru/genre/rpg/"),
+                    new Link("Хоррор", "https://metarankings.ru/genre/xorror/"),
+                    new Link("Экшен", "https://metarankings.ru/genre/ekshen/")
+                },new DateTime(2025,7,17)),
+            new GamesReleaseDateItemViewModel("https://metarankings.ru/mindseye/","Игра MindsEye", "https://metarankings.ru/images/uploads/2025/08/mindseye-boxart-cover-50x70.jpg", "MindsEye", "MindsEye",
+            new Link[]
+            {new Link("PC", "https://metarankings.ru/meta/games/pc/"),
+                    new Link("PS5", "https://metarankings.ru/meta/games/ps5/"),
+                    new Link("Xbox Series X", "https://metarankings.ru/meta/games/xbox-series-x/")}, new Link[]
+                {
+                    new Link("Шутер", "https://metarankings.ru/genre/shuter/"),
+                    new Link("Приключение", "https://metarankings.ru/genre/priklyuchenie/"),
+                    new Link("Экшен", "https://metarankings.ru/genre/ekshen/")
+                },new DateTime(2025, 6, 1)),
+            new GamesReleaseDateItemViewModel("https://metarankings.ru/shinobi-art-of-vengeance/","Игра SHINOBI: Art of Vengeance","https://metarankings.ru/images/uploads/2025/08/shinobi-art-of-vengeance-boxart-cover-50x70.jpg", "SHINOBI: Art of Vengeance","SHINOBI: Art of Vengeance",new Link[]
+                {
+                    new Link("Аркада", "https://metarankings.ru/genre/arkada/"),
+                    new Link("Платформер", "https://metarankings.ru/genre/platformer/"),
+                    new Link("Экшен", "https://metarankings.ru/genre/ekshen/")
+                }, new Link[]
+                {
+                    new Link("PC", "https://metarankings.ru/meta/games/pc/"),
+                    new Link("PS5", "https://metarankings.ru/meta/games/ps5/"),
+                    new Link("Xbox Series X", "https://metarankings.ru/meta/games/xbox-series-x/")
+                }, new DateTime(2025, 8, 26)),
+            new GamesReleaseDateItemViewModel("https://metarankings.ru/game-metal-gear-solid-delta-snake-eater/", "Игра Metal Gear Solid Delta: Snake Eater", "https://metarankings.ru/images/uploads/2023/05/metal-gear-solid-delta-snake-eater-boxart-cover-50x70.jpg", "Metal Gear Solid Delta: Snake Eater","Metal Gear Solid Delta: Snake Eater", new Link[]
+                {
+                    new Link("Экшен", "https://metarankings.ru/genre/ekshen/")
+                }, new Link[]
+                {
+                    new Link("PC", "https://metarankings.ru/meta/games/pc/"),
+                    new Link("PS5", "https://metarankings.ru/meta/games/ps5/"),
+                    new Link("Xbox Series X", "https://metarankings.ru/meta/games/xbox-series-x/")
+                }, new DateTime(2025, 8, 28))
+        };
+
+        return Ok(gamesReleaseDateItemsComponents);
     }
 }

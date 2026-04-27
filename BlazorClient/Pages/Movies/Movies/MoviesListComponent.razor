@@ -1,9 +1,17 @@
-@using BlazorClient.Components.PagesComponents.GamesList
+﻿@using BlazorClient.Components.PagesComponents.GamesList
 @using Domain.Games
 @using Domain.Movies
+@using Domain.RequestsModels.Movies.MoviesGenres
 @using Domain.Reviews
 
 @foreach (Movie movie in Movies)
 {
-    <BlazorClient.Pages.Movies.Movies.MovieListItemComponent Movie="@movie" />
+    <BlazorClient.Pages.Movies.Movies.MovieListItemComponent Href="@($"/movies/details/{movie.Id}")"
+                                                             Description="@movie.Description"
+                                                             ImageAlt="@movie.Name"
+                                                             ImageSource="@movie.ImageSource"
+                                                             Title="@($"Фильм {movie.Name}")"
+                                                             ReleaseDate="@(movie.PremierDate.HasValue ? movie.PremierDate.Value:DateTime.Today)"
+                                                             ListMovieGenreModels="@movie.MovieGenres.Select(mg=>new ListMovieGenreModel(mg.Name,$"/movies/genres/{mg.Id}"))"
+                                                             ReviewsHref="@($"/movies/details/{movie.Id}/#reviews")" />
 }

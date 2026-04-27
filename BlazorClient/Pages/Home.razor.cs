@@ -2,6 +2,7 @@
 using Domain.Games;
 using Domain.Movies;
 using Domain.Reviews;
+using ViewModels;
 
 namespace BlazorClient.Pages;
 
@@ -13,6 +14,7 @@ public partial class Home : ComponentBase
     private IEnumerable<MovieReview> moviesReviews;
     private IEnumerable<CollectionsItemComponent> collectionsItemsComponents;
     private IEnumerable<SoonAtCinemasItemComponent> soonAtCinemasItemComponents;
+    private IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemComponents;
 
     [Inject]
     public HttpClient HttpClient { get; set; }
@@ -77,6 +79,16 @@ public partial class Home : ComponentBase
         }
     }
 
+    public IEnumerable<GamesReleaseDateItemViewModel> GamesReleaseDateItemComponents
+    {
+        get => gamesReleaseDateItemComponents;
+        set
+        {
+            gamesReleaseDateItemComponents = value;
+            StateHasChanged();
+        }
+    }
+
     [Parameter]
     public int PageSize { get; set; } = 5; // Default value
 
@@ -103,6 +115,7 @@ public partial class Home : ComponentBase
         Task<IEnumerable<MovieReview>?> moviesViewersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<MovieReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}");
         Task<IEnumerable<CollectionsItemComponent>> collectionsItemsComponents = HttpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>($"/api/home/collection-items/{PageNumber}/{PageSize}");
         Task<IEnumerable<SoonAtCinemasItemComponent>> soonAtCinemasItemComponents = HttpClient.GetFromJsonAsync<IEnumerable<SoonAtCinemasItemComponent>>($"/api/home/soon-at-cinemas");
+        Task<IEnumerable<GamesReleaseDateItemViewModel>> gamesReleaseDateItemComponents = HttpClient.GetFromJsonAsync<IEnumerable<GamesReleaseDateItemViewModel>>($"/api/home/games-release-dates");
 
         await Task.WhenAll(gamesGettingTask, gamesGamersReviewsGettingTask, moviesGettingTask, moviesViewersReviewsGettingTask, collectionsItemsComponents)
             .ContinueWith(b =>
@@ -113,6 +126,7 @@ public partial class Home : ComponentBase
             MoviesReviews = moviesViewersReviewsGettingTask.Result;
             CollectionsItemComponents = collectionsItemsComponents.Result;
             SoonAtCinemasItemComponents = soonAtCinemasItemComponents.Result;
+            GamesReleaseDateItemComponents = gamesReleaseDateItemComponents.Result;
         });
     }
 }
