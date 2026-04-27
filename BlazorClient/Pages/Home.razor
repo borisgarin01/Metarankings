@@ -1,4 +1,7 @@
 ﻿@page "/"
+@using BlazorClient.Components.PagesComponents.Home
+@using BlazorClient.Pages.Games.Games
+@using BlazorClient.Pages.Movies.Movies
 @using Domain.Reviews
 
 <BlazorClient.Components.PagesComponents.Common.Headerer />
@@ -83,78 +86,8 @@ else
                           })
                         })</script>
                 </div>
-                <div class="specials-index">
-                    <h3><a href="https://metarankings.ru/meta/collections/">Подборки</a></h3>
-                    <div class="news-item">
-                        <a href="https://metarankings.ru/samye-slozhnye-igry/" title="Самые сложные игры"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" alt="Самые сложные игры"></a>
-                        <span class="news-title"><a href="https://metarankings.ru/samye-slozhnye-igry/">Самые сложные игры</a></span>
-                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
-                    </div>
-                    <div class="news-item">
-                        <a href="https://metarankings.ru/best-films-pro-zhenshhin/" title="Лучшие фильмы про женщин"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/films-pro-zhenshhin-445x250.jpg" alt="Лучшие фильмы про женщин"></a>
-                        <span class="news-title"><a href="https://metarankings.ru/best-films-pro-zhenshhin/">Лучшие фильмы про женщин</a></span>
-                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
-                    </div>
-                    <div class="news-item">
-                        <a href="https://metarankings.ru/filmy-pro-realnye-sobytiya/" title="Фильмы про реальные события"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/pro-realnye-sobytiya-445x250.jpg" alt="Фильмы про реальные события"></a>
-                        <span class="news-title"><a href="https://metarankings.ru/filmy-pro-realnye-sobytiya/">Фильмы про реальные события</a></span>
-                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
-                    </div>
-                    <div class="news-item">
-                        <a href="https://metarankings.ru/luchshie-filmy-pro-monstrov/" title="Лучшие фильмы про монстров"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/filmy-pro-monstrov-445x250.jpg" alt="Лучшие фильмы про монстров"></a>
-                        <span class="news-title"><a href="https://metarankings.ru/luchshie-filmy-pro-monstrov/">Лучшие фильмы про монстров</a></span>
-                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
-                    </div>
-                    <div class="news-item">
-                        <a href="https://metarankings.ru/samye-strashnye-igry/" title="Самые страшные игры"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/strashnye-igry-445x250.jpg" alt="Самые страшные игры"></a>
-                        <span class="news-title"><a href="https://metarankings.ru/samye-strashnye-igry/">Самые страшные игры</a></span>
-                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
-                    </div>
-                    <div class="news-item">
-                        <a href="https://metarankings.ru/best-games-open-world/" title="Лучшие игры с открытым миром"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/best-igry-s-otkrytym-mirom-445x250.jpg" alt="Лучшие игры с открытым миром"></a>
-                        <span class="news-title"><a href="https://metarankings.ru/best-games-open-world/">Лучшие игры с открытым миром</a></span>
-                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
-                    </div>
-                </div>
-                <div class="index-movies">
-                    <h3><a href="https://metarankings.ru/coming-soon/">Скоро в кино</a></h3>
-                    <div class="item">
-                        <a href="https://metarankings.ru/balerina-2025/" title="Фильм Балерина"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/06/balerina-2025-cover-art-50x70.jpg" alt="Балерина"></a>
-                        <span class="item-name"><a href="https://metarankings.ru/balerina-2025/">Балерина</a></span>
-                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/boeviki/">Боевики</a></span>
-                        <span class="item-meta">Ballerina</span>
-                        <span class="item-meta">5 июня 2025</span>
-                    </div>
-                    <div class="item">
-                        <a href="https://metarankings.ru/kloun-na-kukuruznom-pole-2025/" title="Фильм Клоун на кукурузном поле"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/06/kloun-na-kukuruznom-pole-cover-art-50x70.jpg" alt="Клоун на кукурузном поле"></a>
-                        <span class="item-name"><a href="https://metarankings.ru/kloun-na-kukuruznom-pole-2025/">Клоун на кукурузном поле</a></span>
-                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
-                        <span class="item-meta">Clown in a Cornfield</span>
-                        <span class="item-meta">5 июня 2025</span>
-                    </div>
-                    <div class="item">
-                        <a href="https://metarankings.ru/zombi-kenguru-2025/" title="Фильм Зомби-кенгуру"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/02/zombi-kenguru-cover-art-50x70.jpg" alt="Зомби-кенгуру"></a>
-                        <span class="item-name"><a href="https://metarankings.ru/zombi-kenguru-2025/">Зомби-кенгуру</a></span>
-                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
-                        <span class="item-meta">Rippy</span>
-                        <span class="item-meta">12 июня 2025</span>
-                    </div>
-                    <div class="item">
-                        <a href="https://metarankings.ru/sinister-iz-tmy-2025/" title="Фильм Синистер. Из тьмы"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/06/sinister-iz-tmy-cover-art-50x70.jpg" alt="Синистер. Из тьмы"></a>
-                        <span class="item-name"><a href="https://metarankings.ru/sinister-iz-tmy-2025/">Синистер. Из тьмы</a></span>
-                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
-                        <span class="item-meta">Ur mörkret</span>
-                        <span class="item-meta">12 июня 2025</span>
-                    </div>
-                    <div class="item">
-                        <a href="https://metarankings.ru/igra-v-kalmara-perezagruzka-2025/" title="Фильм Игра в кальмара: Перезагрузка"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/igra-v-kalmara-perezagruzka-cover-art-50x70.jpg" alt="Игра в кальмара: Перезагрузка"></a>
-                        <span class="item-name"><a href="https://metarankings.ru/igra-v-kalmara-perezagruzka-2025/">Игра в кальмара: Перезагрузка</a></span>
-                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/thrillers/">Триллеры</a></span>
-                        <span class="item-meta">Exit</span>
-                        <span class="item-meta">19 июня 2025</span>
-                    </div>
-                    <a href="https://metarankings.ru/most-waiting-films/" class="allreviews">Самые ожидаемые фильмы</a>
-                </div>
+                <CollectionsComponent CollectionsItemComponents="CollectionsItemComponents" />
+                <SoonAtCinemasComponent SoonAtCinemasItemComponents="SoonAtCinemasItemComponents" />
                 <div class="index-games">
                     <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
                     <div class="item">

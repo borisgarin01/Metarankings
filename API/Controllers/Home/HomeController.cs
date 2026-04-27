@@ -24,8 +24,8 @@ public sealed class HomeController : ControllerBase
         _gamesRepository = gamesRepository;
     }
 
-    [HttpGet("collection-items")]
-    public async Task<ActionResult<IEnumerable<CollectionsItemComponent>>> GetCollectionItemsComponents()
+    [HttpGet("collection-items/{pageNumber:int}/{pageSize:int}")]
+    public async Task<ActionResult<IEnumerable<CollectionsItemComponent>>> GetCollectionItemsComponents(int pageNumber, int pageSize)
     {
         return Ok(new CollectionsItemComponent[]
         {

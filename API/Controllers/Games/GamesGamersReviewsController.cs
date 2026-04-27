@@ -20,7 +20,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
     private readonly ILogger<GamesGamersReviewsController> _logger;
 
-    public GamesGamersReviewsController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, GamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, ILogger<GamesGamersReviewsController> logger)
+    public GamesGamersReviewsController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, IGamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, ILogger<GamesGamersReviewsController> logger)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _telegramAuthenticator = telegramAuthenticator;

@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using BlazorClient.Components.PagesComponents.Home;
+using Domain.Games;
 using Domain.Movies;
 using Domain.Reviews;
 
@@ -8,9 +9,10 @@ public partial class Home : ComponentBase
 {
     private IEnumerable<Game> games;
     private IEnumerable<GameReview> gamesReviews;
-
     private IEnumerable<Movie> movies;
     private IEnumerable<MovieReview> moviesReviews;
+    private IEnumerable<CollectionsItemComponent> collectionsItemsComponents;
+    private IEnumerable<SoonAtCinemasItemComponent> soonAtCinemasItemComponents;
 
     [Inject]
     public HttpClient HttpClient { get; set; }
@@ -55,6 +57,26 @@ public partial class Home : ComponentBase
         }
     }
 
+    public IEnumerable<CollectionsItemComponent> CollectionsItemComponents
+    {
+        get => collectionsItemsComponents;
+        private set
+        {
+            collectionsItemsComponents = value;
+            StateHasChanged();
+        }
+    }
+
+    public IEnumerable<SoonAtCinemasItemComponent> SoonAtCinemasItemComponents
+    {
+        get => soonAtCinemasItemComponents;
+        set
+        {
+            soonAtCinemasItemComponents = value;
+            StateHasChanged();
+        }
+    }
+
     [Parameter]
     public int PageSize { get; set; } = 5; // Default value
 
@@ -79,14 +101,18 @@ public partial class Home : ComponentBase
         Task<IEnumerable<GameReview>?> gamesGamersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<GameReview>>($"/api/Games/GamesGamersReviews/{GamesGamersReviewsOffset}/{GamesGamersReviewsLimit}");
         Task<IEnumerable<Movie>?> moviesGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/{PageNumber}/{PageSize}");
         Task<IEnumerable<MovieReview>?> moviesViewersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<MovieReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}");
+        Task<IEnumerable<CollectionsItemComponent>> collectionsItemsComponents = HttpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>($"/api/home/collection-items/{PageNumber}/{PageSize}");
+        Task<IEnumerable<SoonAtCinemasItemComponent>> soonAtCinemasItemComponents = HttpClient.GetFromJsonAsync<IEnumerable<SoonAtCinemasItemComponent>>($"/api/home/soon-at-cinemas");
 
-        await Task.WhenAll(gamesGettingTask, gamesGamersReviewsGettingTask, moviesGettingTask, moviesViewersReviewsGettingTask)
+        await Task.WhenAll(gamesGettingTask, gamesGamersReviewsGettingTask, moviesGettingTask, moviesViewersReviewsGettingTask, collectionsItemsComponents)
             .ContinueWith(b =>
         {
             Games = gamesGettingTask.Result;
             GamesReviews = gamesGamersReviewsGettingTask.Result;
             Movies = moviesGettingTask.Result;
             MoviesReviews = moviesViewersReviewsGettingTask.Result;
+            CollectionsItemComponents = collectionsItemsComponents.Result;
+            SoonAtCinemasItemComponents = soonAtCinemasItemComponents.Result;
         });
     }
 }
