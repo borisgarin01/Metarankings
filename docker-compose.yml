@@ -69,7 +69,7 @@ services:
     image: nginx:latest
     ports:
       - 8180:80 # HTTP (для валидации Certbot)
-      - 8443:443 # HTTPS
+      - 8543:443 # HTTPS
     networks:
       - myAppNetwork
     volumes:

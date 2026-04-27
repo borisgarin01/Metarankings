@@ -1,0 +1,35 @@
+﻿/* CSS */
+.col {
+    display: flex;
+}
+
+.h-100 {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-img-wrapper {
+    height: 150px; /* Фиксированная высота для всех картинок */
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+    .card-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Не растягивает, а обрезает */
+        object-position: center;
+    }
+
+.card-body {
+    flex: 1;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+.mt-auto {
+    margin-top: auto;
+}

@@ -1,12 +1,5 @@
 ﻿@page "/"
-@using BlazorClient.Components.PagesComponents.GamesList
-@using BlazorClient.Components.PagesComponents.Home
-@using BlazorClient.Pages.Games.Games
-@using BlazorClient.Pages.Movies.Movies
-@using Domain.Games
-@using Domain.Movies
 @using Domain.Reviews
-@using ViewModels
 
 <BlazorClient.Components.PagesComponents.Common.Headerer />
 <BlazorClient.Components.PagesComponents.Common.GameMenu Year="@DateTime.Today.Year" />
@@ -19,7 +12,7 @@
 
 <AuthorizeView>
     <Authorized>
-        <a href="/account">Управление аккаунтом</a>
+        <a href="/two-factor-enabled">Установить вход по 2FA?</a>
     </Authorized>
 </AuthorizeView>
 
@@ -31,76 +24,22 @@
 }
 else
 {
-    <div class="slideshow">
-        <div id="slideshow" class="cycle-slideshow" data-cycle-fx="scrollHorz" data-cycle-timeout="7000" data-cycle-slides="&gt; div" data-cycle-pager=".pager" style="overflow: visible;">
-            <div class="slide clear cycle-slide cycle-sentinel" data-cycle-pager-template="&lt;span&gt;Фильмы&lt;/span&gt;" style="top: 0px; left: 0px; opacity: 1; z-index: 100; position: static; visibility: visible; display: block;">
-                <div class="post" style="visibility: visible;">
-                    @foreach (Movie movie in Movies)
-                    {
-                        <a href="/movies/details/@movie.Id" title="@movie.Name" style="visibility: visible;">
-                            <div class="featured-image" style="visibility: visible;">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/movies/images/{movie.PremierDate.Value.Year}/{movie.PremierDate.Value.Month}/{movie.ImageSource}")" alt="@movie.Name" style="visibility: visible;">
-                                @if (movie.MovieReviews is not null && movie.MovieReviews.Any())
-                                {
-                                    <div class="small-score mark-@Math.Round(movie.MovieReviews.Average(b => b.Score))" style="visibility: visible;">@Math.Round(movie.MovieReviews.Average(b => b.Score), 1)</div>
-                                }
-                                else
-                                {
-                                    <div class="small-score mark-0" style="visibility: visible;">0</div>
-                                }
-                                <span style="visibility: visible;">@movie.Name</span>
-                            </div>
-                        </a>
-                    }
-                </div>
-            </div>
-
-
-            <div class="slide clear cycle-slide" data-cycle-pager-template="&lt;span&gt;Фильмы&lt;/span&gt;" style="position: absolute; top: 0px; opacity: 1; display: block; z-index: 97; left: 0px; visibility: visible;">
-                <div class="post">
-                    @foreach (Movie movie in Movies)
-                    {
-                        <a href="/movies/details/@movie.Id" title="@movie.Name" style="visibility: visible;">
-                            <div class="featured-image" style="visibility: visible;">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/movies/images/{movie.PremierDate.Value.Year}/{movie.PremierDate.Value.Month}/{movie.ImageSource}")" alt="@movie.Name" style="visibility: visible;">
-                                @if (movie.MovieReviews is not null && movie.MovieReviews.Any())
-                                {
-                                    <div class="small-score mark-@Math.Round(movie.MovieReviews.Average(b => b.Score))" style="visibility: visible;">@Math.Round(movie.MovieReviews.Average(b => b.Score), 1)</div>
-                                }
-                                else
-                                {
-                                    <div class="small-score mark-0" style="visibility: visible;">0</div>
-                                }
-                                <span style="visibility: visible;">@movie.Name</span>
-                            </div>
-                        </a>
-                    }
-                </div>
-            </div>
-            <div class="slide clear cycle-slide cycle-slide-active" data-cycle-pager-template="&lt;span&gt;Игры&lt;/span&gt;" style="position: absolute; z-index: 99; top: 0px; opacity: 1; visibility: visible; display: block; left: 0px;">
-                <div class="post">
-                    @foreach (Game game in Games)
-                    {
-                        <a href="/games/details/@game.Id" title="@game.Name" style="visibility: visible;">
-                            <div class="featured-image" style="visibility: visible;">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/{game.ReleaseDate.Value.Year}/{game.ReleaseDate.Value.Month}/{game.Image}")" alt="@game.Name" style="visibility: visible;">
-                                @if (game.GamesPlayersReviews is not null && game.GamesPlayersReviews.Any())
-                                {
-                                    <div class="small-score mark-@Math.Round(game.GamesPlayersReviews.Average(b => b.Score))" style="visibility: visible;">@Math.Round(game.GamesPlayersReviews.Average(b => b.Score), 1)</div>
-                                }
-                                else
-                                {
-                                    <div class="small-score mark-0" style="visibility: visible;">0</div>
-                                }
-                                <span style="visibility: visible;">@game.Name</span>
-                            </div>
-                        </a>
-                    }
-                </div>
-            </div>
+    <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <CarouselItemActiveComponent />
+            <CarouselItemComponent />
         </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
+                data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying"
+                data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
-
     <div id="container" class="clear">
         <div class="sidebar">
         </div>
@@ -116,7 +55,21 @@ else
                 <div class="index-games">
                     <h3><a href="https://metarankings.ru/new-games/">Новые игры</a></h3>
                     <GamesListComponent Games="@Games" />
-                    <GamesDropdownComponent />
+                    <div class="title-index">
+                        <div class="dropdown-menu genre">
+                            <span class="title">Год</span>
+                            <ul>
+                                <li><a href="/best-games-2025/">Игры 2025</a></li>
+                                <li><a href="/best-games-2024/">Игры 2024</a></li>
+                                <li><a href="/best-games-2023/">Игры 2023</a></li>
+                                <li><a href="/best-games-2022/">Игры 2022</a></li>
+                                <li><a href="/best-games-2021/">Игры 2021</a></li>
+                                <li><a href="/best-games-2020/">Игры 2020</a></li>
+                                <li><a href="/best-games-2019/">Игры 2019</a></li>
+                                <li><a href="/best-games-2018/">Игры 2018</a></li>
+                            </ul>
+                        </div>
+                    </div>
                     <a class="allreviews" href="https://metarankings.ru/meta/games/">Обзоры на игры</a>
                 </div>
                 <div class="ads-horizont hor-1">
@@ -130,9 +83,117 @@ else
                           })
                         })</script>
                 </div>
-                <CollectionsComponent CollectionsItemComponents="CollectionsItemComponents" />
-                <SoonAtCinemasComponent SoonAtCinemasItemComponents="SoonAtCinemasItemComponents" />
-                <GamesReleaseDateComponent GamesReleaseDateItemComponents="GamesReleaseDateItemComponents" />
+                <div class="specials-index">
+                    <h3><a href="https://metarankings.ru/meta/collections/">Подборки</a></h3>
+                    <div class="news-item">
+                        <a href="https://metarankings.ru/samye-slozhnye-igry/" title="Самые сложные игры"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg" alt="Самые сложные игры"></a>
+                        <span class="news-title"><a href="https://metarankings.ru/samye-slozhnye-igry/">Самые сложные игры</a></span>
+                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                    </div>
+                    <div class="news-item">
+                        <a href="https://metarankings.ru/best-films-pro-zhenshhin/" title="Лучшие фильмы про женщин"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/films-pro-zhenshhin-445x250.jpg" alt="Лучшие фильмы про женщин"></a>
+                        <span class="news-title"><a href="https://metarankings.ru/best-films-pro-zhenshhin/">Лучшие фильмы про женщин</a></span>
+                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                    </div>
+                    <div class="news-item">
+                        <a href="https://metarankings.ru/filmy-pro-realnye-sobytiya/" title="Фильмы про реальные события"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/pro-realnye-sobytiya-445x250.jpg" alt="Фильмы про реальные события"></a>
+                        <span class="news-title"><a href="https://metarankings.ru/filmy-pro-realnye-sobytiya/">Фильмы про реальные события</a></span>
+                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                    </div>
+                    <div class="news-item">
+                        <a href="https://metarankings.ru/luchshie-filmy-pro-monstrov/" title="Лучшие фильмы про монстров"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/filmy-pro-monstrov-445x250.jpg" alt="Лучшие фильмы про монстров"></a>
+                        <span class="news-title"><a href="https://metarankings.ru/luchshie-filmy-pro-monstrov/">Лучшие фильмы про монстров</a></span>
+                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                    </div>
+                    <div class="news-item">
+                        <a href="https://metarankings.ru/samye-strashnye-igry/" title="Самые страшные игры"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/strashnye-igry-445x250.jpg" alt="Самые страшные игры"></a>
+                        <span class="news-title"><a href="https://metarankings.ru/samye-strashnye-igry/">Самые страшные игры</a></span>
+                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                    </div>
+                    <div class="news-item">
+                        <a href="https://metarankings.ru/best-games-open-world/" title="Лучшие игры с открытым миром"><img class="news-thumb" src="https://metarankings.ru/images/uploads/2023/06/best-igry-s-otkrytym-mirom-445x250.jpg" alt="Лучшие игры с открытым миром"></a>
+                        <span class="news-title"><a href="https://metarankings.ru/best-games-open-world/">Лучшие игры с открытым миром</a></span>
+                        <div class="rubrika"><a href="https://metarankings.ru/meta/collections/films-games/">Контент</a></div>
+                    </div>
+                </div>
+                <div class="index-movies">
+                    <h3><a href="https://metarankings.ru/coming-soon/">Скоро в кино</a></h3>
+                    <div class="item">
+                        <a href="https://metarankings.ru/balerina-2025/" title="Фильм Балерина"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/06/balerina-2025-cover-art-50x70.jpg" alt="Балерина"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/balerina-2025/">Балерина</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/boeviki/">Боевики</a></span>
+                        <span class="item-meta">Ballerina</span>
+                        <span class="item-meta">5 июня 2025</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/kloun-na-kukuruznom-pole-2025/" title="Фильм Клоун на кукурузном поле"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/06/kloun-na-kukuruznom-pole-cover-art-50x70.jpg" alt="Клоун на кукурузном поле"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/kloun-na-kukuruznom-pole-2025/">Клоун на кукурузном поле</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
+                        <span class="item-meta">Clown in a Cornfield</span>
+                        <span class="item-meta">5 июня 2025</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/zombi-kenguru-2025/" title="Фильм Зомби-кенгуру"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/02/zombi-kenguru-cover-art-50x70.jpg" alt="Зомби-кенгуру"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/zombi-kenguru-2025/">Зомби-кенгуру</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
+                        <span class="item-meta">Rippy</span>
+                        <span class="item-meta">12 июня 2025</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/sinister-iz-tmy-2025/" title="Фильм Синистер. Из тьмы"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/06/sinister-iz-tmy-cover-art-50x70.jpg" alt="Синистер. Из тьмы"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/sinister-iz-tmy-2025/">Синистер. Из тьмы</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/horror/">Ужасы</a></span>
+                        <span class="item-meta">Ur mörkret</span>
+                        <span class="item-meta">12 июня 2025</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/igra-v-kalmara-perezagruzka-2025/" title="Фильм Игра в кальмара: Перезагрузка"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/05/igra-v-kalmara-perezagruzka-cover-art-50x70.jpg" alt="Игра в кальмара: Перезагрузка"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/igra-v-kalmara-perezagruzka-2025/">Игра в кальмара: Перезагрузка</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/movies/thrillers/">Триллеры</a></span>
+                        <span class="item-meta">Exit</span>
+                        <span class="item-meta">19 июня 2025</span>
+                    </div>
+                    <a href="https://metarankings.ru/most-waiting-films/" class="allreviews">Самые ожидаемые фильмы</a>
+                </div>
+                <div class="index-games">
+                    <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
+                    <div class="item">
+                        <a href="https://metarankings.ru/dying-light-the-beast/" title="Игра Dying Light: The Beast"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/07/dying-light-the-beast-boxart-cover-50x70.jpg" alt="Dying Light: The Beast"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/dying-light-the-beast/">Dying Light: The Beast</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/genre/rpg/">РПГ</a> / <a href="https://metarankings.ru/genre/xorror/">Хоррор</a> / <a href="https://metarankings.ru/genre/ekshen/">Экшен</a></span>
+                        <span class="item-meta">Лето 2025</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/donkey-kong-bananza/" title="Игра Donkey Kong Bananza"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/07/donkey-kong-bananza-boxart-cover-50x70.jpg" alt="Donkey Kong Bananza"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/donkey-kong-bananza/">Donkey Kong Bananza</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/games/switch-2/">Switch 2</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/genre/arkada/">Аркада</a> / <a href="https://metarankings.ru/genre/priklyuchenie/">Приключение</a></span>
+                        <span class="item-meta">17 июля 2025 </span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/mindseye/" title="Игра MindsEye"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/08/mindseye-boxart-cover-50x70.jpg" alt="MindsEye"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/mindseye/">MindsEye</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/genre/priklyuchenie/">Приключение</a> / <a href="https://metarankings.ru/genre/shuter/">Шутер</a> / <a href="https://metarankings.ru/genre/ekshen/">Экшен</a></span>
+                        <span class="item-meta">Лето 2025</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/shinobi-art-of-vengeance/" title="Игра SHINOBI: Art of Vengeance"><img class="post-image" src="https://metarankings.ru/images/uploads/2025/08/shinobi-art-of-vengeance-boxart-cover-50x70.jpg" alt="SHINOBI: Art of Vengeance"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/shinobi-art-of-vengeance/">SHINOBI: Art of Vengeance</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/switch/">Switch</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/genre/arkada/">Аркада</a> / <a href="https://metarankings.ru/genre/platformer/">Платформер</a> / <a href="https://metarankings.ru/genre/ekshen/">Экшен</a></span>
+                        <span class="item-meta">26 августа 2025</span>
+                    </div>
+                    <div class="item">
+                        <a href="https://metarankings.ru/game-metal-gear-solid-delta-snake-eater/" title="Игра Metal Gear Solid Delta: Snake Eater"><img class="post-image" src="https://metarankings.ru/images/uploads/2023/05/metal-gear-solid-delta-snake-eater-boxart-cover-50x70.jpg" alt="Metal Gear Solid Delta: Snake Eater"></a>
+                        <span class="item-name"><a href="https://metarankings.ru/game-metal-gear-solid-delta-snake-eater/">Metal Gear Solid Delta: Snake Eater</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/meta/games/pc/">PC</a> / <a href="https://metarankings.ru/meta/games/ps5/">PS5</a> / <a href="https://metarankings.ru/meta/games/xbox-series-x/">Xbox Series X</a></span>
+                        <span class="item-meta"><a href="https://metarankings.ru/genre/ekshen/">Экшен</a></span>
+                        <span class="item-meta">28 августа 2025</span>
+                    </div>
+                    <a href="https://metarankings.ru/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
+                </div>
             </div>
         </div>
         <div class="sidebar rcol" style="height: 2500px;">
@@ -140,21 +201,21 @@ else
                 <h3>Последние отзывы</h3>
                 <div class="widget-body">
                     <ul>
-                        @foreach (MovieReviewListViewModel review in MoviesReviews)
+                        @foreach (MovieReview review in MoviesReviews)
                         {
                             <li class="recent-reviews">
                                 <div class="ureview-text">
-                                    <span class="title-reviews"><a href="/movies/Details/@review.MovieId">@review.MovieName</a></span>
+                                    <span class="title-reviews"><a href="/movies/Details/@review.MovieId">@review.Movie.Name</a></span>
                                 </div>
                             </li>
                         }
                     </ul>
                     <ul>
-                        @foreach (GameReviewListViewModel review in GamesReviews)
+                        @foreach (GameReview review in GamesReviews)
                         {
                             <li class="recent-reviews">
                                 <div class="ureview-text">
-                                    <span class="title-reviews"><a href="/games/Details/@review.GameId">@review.GameName</a></span>
+                                    <span class="title-reviews"><a href="/games/Details/@review.GameId">@review.Game.Name</a></span>
                                 </div>
                             </li>
                         }
