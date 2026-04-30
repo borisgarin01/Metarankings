@@ -40,7 +40,7 @@ RETURNING Id;",
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieReview, Movie, ApplicationUser, MovieReview>(@"
 SELECT 
     vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
-    m.Id, m.Name, m.OriginalName, m.Image, m.Score, m.ScoresCount, m.PremierDate, m.Description,
+    m.Id, m.Name, m.OriginalName, m.Image, m.PremierDate, m.Description,
     au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
         au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
 FROM ViewersMoviesReviews vmr

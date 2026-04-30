@@ -5,26 +5,26 @@ using Domain.RequestsModels.Games.Collections;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesCollectionsRepository : Repository, IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel>
+public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>
 {
     public GamesCollectionsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddGameCollectionModel entity)
+    public async Task<long> AddAsync(AddGamesCollectionModel entity)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedGameCollectionId = await connection.QuerySingleAsync<long>(@"
-INSERT INTO GamesCollections(Name,Description) 
-VALUES(@Name, @Description)
-RETURNING Id;", new { entity.Name, entity.Description });
+INSERT INTO GamesCollections(Name,Description,ImageSource) 
+VALUES(@Name, @Description, @ImageSource)
+RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
 
             return insertedGameCollectionId;
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddGameCollectionModel> entities)
+    public async Task AddRangeAsync(IEnumerable<AddGamesCollectionModel> entities)
     {
         foreach (var entity in entities)
         {
@@ -32,13 +32,13 @@ RETURNING Id;", new { entity.Name, entity.Description });
         }
     }
 
-    public async Task<IEnumerable<GameCollection>> GetAllAsync()
+    public async Task<IEnumerable<GamesCollection>> GetAllAsync()
     {
         using var connection = new NpgsqlConnection(ConnectionString);
 
-        var gamesCollectionsDictionary = new Dictionary<long, GameCollection>();
+        var gamesCollectionsDictionary = new Dictionary<long, GamesCollection>();
 
-        await connection.QueryAsync<GameCollection, Game, GameCollection>(
+        await connection.QueryAsync<GamesCollection, Game, GamesCollection>(
             @"SELECT gc.Id, gc.Name, gc.Description,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
@@ -67,11 +67,11 @@ RETURNING Id;", new { entity.Name, entity.Description });
         return gamesCollectionsDictionary.Values;
     }
 
-    public async Task<GameCollection?> GetAsync(long id)
+    public async Task<GamesCollection?> GetAsync(long id)
     {
         using var connection = new NpgsqlConnection(ConnectionString);
 
-        var gamesCollection = await connection.QueryAsync<GameCollection, Game, GameCollection>(
+        var gamesCollection = await connection.QueryAsync<GamesCollection, Game, GamesCollection>(
             @"SELECT gc.Id, gc.Name, gc.Description,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
@@ -87,10 +87,10 @@ RETURNING Id;", new { entity.Name, entity.Description });
             new { Id = id },
             splitOn: "Id");
 
-        IEnumerable<GameCollection> gamesCollectionGrouped = gamesCollection.GroupBy(b => new { b.Id })
+        IEnumerable<GamesCollection> gamesCollectionGrouped = gamesCollection.GroupBy(b => new { b.Id })
                 .Select(g =>
                 {
-                    GameCollection gameCollection = g.First();
+                    GamesCollection gameCollection = g.First();
                     gameCollection.Games = g.SelectMany(b => b.Games).ToList();
                     return gameCollection;
                 });
@@ -98,13 +98,13 @@ RETURNING Id;", new { entity.Name, entity.Description });
         return gamesCollectionGrouped.SingleOrDefault();
     }
 
-    public async Task<IEnumerable<GameCollection>> GetAsync(long offset, long limit)
+    public async Task<IEnumerable<GamesCollection>> GetAsync(long offset, long limit)
     {
         using var connection = new NpgsqlConnection(ConnectionString);
 
-        var gamesCollectionsDictionary = new Dictionary<long, GameCollection>();
+        var gamesCollectionsDictionary = new Dictionary<long, GamesCollection>();
 
-        await connection.QueryAsync<GameCollection, Game, GameCollection>(
+        await connection.QueryAsync<GamesCollection, Game, GamesCollection>(
             @"SELECT gc.Id, gc.Name, gc.Description,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
@@ -156,14 +156,19 @@ RETURNING Id;", new { entity.Name, entity.Description });
         }
     }
 
-    public async Task<GameCollection> UpdateAsync(UpdateGameCollectionModel entity, long id)
+    public async Task<GamesCollection> UpdateAsync(UpdateGamesCollectionModel entity, long id)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedGameCollection = await connection.QuerySingleOrDefaultAsync<GameCollection>(@"UPDATE GamesCollections 
-SET Name=@Name 
+            var updatedGameCollection = await connection.QuerySingleOrDefaultAsync<GamesCollection>(@"UPDATE GamesCollections 
+SET Name=@Name, ImageSource=@ImageSource 
 WHERE Id=@Id
-RETURNING Name, Id;", new { Id = id });
+RETURNING Name, Id;", new
+            {
+                Name = entity.CollectionName,
+                ImageSource = entity.ImageSource,
+                Id = id
+            });
 
             return updatedGameCollection;
         }

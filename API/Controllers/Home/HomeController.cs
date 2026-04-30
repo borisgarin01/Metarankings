@@ -1,8 +1,15 @@
 ﻿using BlazorClient.Components.PagesComponents.Home;
+using Data.Repositories.Classes.Derived.Games;
+using Data.Repositories.Classes.Derived.Movies;
+using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Common;
 using Domain.Games;
+using Domain.Games.Collections;
 using Domain.Movies;
+using Domain.Movies.MoviesCollections;
+using Domain.RequestsModels.Games.Collections;
+using Domain.RequestsModels.Movies.Collections;
 using Domain.Reviews;
 using ViewModels;
 
@@ -16,62 +23,43 @@ public sealed class HomeController : ControllerBase
 
     private readonly IGamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
     private readonly IGamesRepository _gamesRepository;
+    private readonly IRepository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> _gamesCollectionsRepository;
+    private readonly IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> _moviesCollectionsRepository;
 
-    public HomeController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, ILogger<HomeController> logger, IGamesRepository gamesRepository)
+    public HomeController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, ILogger<HomeController> logger, IGamesRepository gamesRepository, IRepository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> gamesCollectionsRepository, IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> moviesCollectionsRepository)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _logger = logger;
         _gamesRepository = gamesRepository;
+        _gamesCollectionsRepository = gamesCollectionsRepository;
+        _moviesCollectionsRepository = moviesCollectionsRepository;
     }
 
-    [HttpGet("collection-items/{pageNumber:int}/{pageSize:int}")]
-    public async Task<ActionResult<IEnumerable<CollectionsItemComponent>>> GetCollectionItemsComponents(int pageNumber, int pageSize)
+    [HttpGet("collections/{pageNumber:int}/{pageSize:int}")]
+    public async Task<ActionResult<IEnumerable<CollectionsItemComponent>>> GetCollectionsComponents(int pageNumber, int pageSize)
     {
-        return Ok(new CollectionsItemComponent[]
-        {
-            new CollectionsItemComponent
+        IEnumerable
+            <GamesCollection> gamesCollections = await _gamesCollectionsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
+        IEnumerable<MoviesCollection> moviesCollections = await _moviesCollectionsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
+
+        var collectionsItemComponent = gamesCollections
+            .Select(x => new CollectionsItemComponent
             {
-                Href="https://metarankings.ru/samye-slozhnye-igry/",
-                Title="Самые сложные игры",
-                ImageAlt="Самые сложные игры",
-                ImageSource="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry-445x250.jpg"
-            },
-            new CollectionsItemComponent
+                Href = $"/games/collections/{x.Id}",
+                ImageAlt = x.Name,
+                ImageSource = x.ImageSource,
+                Title = x.Name
+            })
+            .Union(moviesCollections
+            .Select(x => new CollectionsItemComponent
             {
-                Href="https://metarankings.ru/best-films-pro-zhenshhin/",
-                Title="Лучшие фильмы про женщин",
-                ImageAlt="Лучшие фильмы про женщин",
-                ImageSource="https://metarankings.ru/images/uploads/2023/06/films-pro-zhenshhin-445x250.jpg"
-            },
-            new CollectionsItemComponent
-            {
-                Href="https://metarankings.ru/filmy-pro-realnye-sobytiya/",
-                Title="Фильмы про реальные события",
-                ImageAlt="Фильмы про реальные события",
-                ImageSource="https://metarankings.ru/images/uploads/2023/06/pro-realnye-sobytiya-445x250.jpg"
-            },
-            new CollectionsItemComponent
-            {
-                Href="https://metarankings.ru/luchshie-filmy-pro-monstrov/",
-                Title="Лучшие фильмы про монстров",
-                ImageAlt="Лучшие фильмы про монстров",
-                ImageSource="https://metarankings.ru/images/uploads/2023/06/filmy-pro-monstrov-445x250.jpg"
-            },
-            new CollectionsItemComponent
-            {
-                Href="https://metarankings.ru/samye-strashnye-igry/",
-                Title="Самые страшные игры",
-                ImageAlt="Самые страшные игры",
-                ImageSource="https://metarankings.ru/images/uploads/2023/06/strashnye-igry-445x250.jpg"
-            },
-            new CollectionsItemComponent
-            {
-                Href="https://metarankings.ru/best-games-open-world/",
-                Title="Лучшие игры с открытым миром",
-                ImageAlt="Лучшие игры с открытым миром",
-                ImageSource="https://metarankings.ru/images/uploads/2023/06/best-igry-s-otkrytym-mirom-445x250.jpg"
-            }
-        });
+                Href = $"/movies/collections/{x.Id}",
+                ImageAlt = x.Name,
+                ImageSource = x.ImageSource,
+                Title = x.Name
+            }));
+
+        return Ok(collectionsItemComponent);
     }
 
     [HttpGet("soon-at-cinemas")]

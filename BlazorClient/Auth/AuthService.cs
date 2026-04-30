@@ -90,44 +90,14 @@ public class AuthService : IAuthService
 
     public async Task<HttpResponseMessage> SendResetPasswordConfirmMessage(ResetPasswordConfirmModel resetPasswordConfirmModel)
     {
-        string? token = await _localStorage.GetItemAsync<string>("authToken");
-
-        if (token is not null)
-        {
-            HttpRequestMessage httpRequest = new(HttpMethod.Post, "api/auth/resetPasswordConfirm");
-            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                await _localStorage.RemoveItemAsync("authToken");
-                ((JwtAuthenticationStateProvider)_authenticationStateProvider)
-                    .MarkUserAsLoggedOut();
-                return httpResponseMessage;
-            }
-        }
-        return null;
+        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/resetPasswordConfirm", resetPasswordConfirmModel);
+        return httpResponseMessage;
     }
 
     public async Task<HttpResponseMessage> SendResetPasswordMessage(ResetPasswordModel resetPasswordModel)
     {
-        string? token = await _localStorage.GetItemAsync<string>("authToken");
-
-        if (token is not null)
-        {
-            HttpRequestMessage httpRequest = new(HttpMethod.Post, "api/auth/resetPassword");
-            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                await _localStorage.RemoveItemAsync("authToken");
-                ((JwtAuthenticationStateProvider)_authenticationStateProvider)
-                    .MarkUserAsLoggedOut();
-                return httpResponseMessage;
-            }
-        }
-        return null;
+        HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync<ResetPasswordModel>("api/auth/resetPassword", resetPasswordModel);
+        return httpResponseMessage;
     }
 
     public async Task<HttpResponseMessage> SendTwoFactorEnabledMessage(SetTwoFactorEnabledModel setTwoFactorEnabledModel)

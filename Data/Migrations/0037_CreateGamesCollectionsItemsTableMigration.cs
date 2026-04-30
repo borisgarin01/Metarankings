@@ -15,6 +15,7 @@ public sealed class CreateGameCollectionItemsTableMigration : Migration
 Id BIGSERIAL not null primary key,
 GameCollectionId BIGINT NOT NULL, 
 GameId BIGINT NOT NULL, 
+UNIQUE(GameCollectionId, GameId),
 FOREIGN KEY(GameCollectionId) 
 REFERENCES GamesCollections(Id) 
 ON DELETE CASCADE,

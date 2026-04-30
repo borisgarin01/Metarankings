@@ -1,7 +1,7 @@
 ﻿@using Domain.Games.Collections
 
 <div class="podborki">
-    @foreach (GameCollection gameCollection in GameCollections)
+    @foreach (GamesCollection gameCollection in GameCollections)
     {
         <p>
             <a class="mark-link" href="/games/collections/@gameCollection.Id">@gameCollection.Name</a>

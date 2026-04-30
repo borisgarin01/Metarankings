@@ -110,7 +110,7 @@ gc.Id, gc.Name, gc.Description
 
             var gameDictionary = new Dictionary<long, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
@@ -186,7 +186,7 @@ gc.Id, gc.Name, gc.Description
 
             var gameDictionary = new Dictionary<long, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
@@ -288,7 +288,7 @@ gc.Id, gc.Name, gc.Description
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
@@ -300,7 +300,7 @@ gc.Id, gc.Name, gc.Description
                         gameEntry.Platforms = new List<Platform>();
                         gameEntry.Screenshots = new List<GameScreenshot>();
                         gameEntry.Publishers = new List<Publisher>();
-                        gameEntry.GameCollections = new List<GameCollection>();
+                        gameEntry.GameCollections = new List<GamesCollection>();
                         gameDictionary.Add(gameEntry.Name, gameEntry);
                     }
 
@@ -370,7 +370,7 @@ WHERE g.Id=@id";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, GameReview, ApplicationUser, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview, ApplicationUser, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot, gameCollection, gamePlayerReview, applicationUser) =>
                 {
@@ -462,7 +462,7 @@ ORDER BY g.id, gen.id;";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
@@ -544,7 +544,7 @@ ORDER BY g.id, gen.id;";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
@@ -627,7 +627,7 @@ ORDER BY g.id, gen.id;";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
@@ -710,7 +710,7 @@ ORDER BY g.id, gen.id;";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
@@ -809,7 +809,7 @@ WHERE EXTRACT(YEAR FROM g.ReleaseDate) = @Year;";
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
                 sql,
                 (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
@@ -821,7 +821,7 @@ WHERE EXTRACT(YEAR FROM g.ReleaseDate) = @Year;";
                         gameEntry.Platforms = new List<Platform>();
                         gameEntry.Screenshots = new List<GameScreenshot>();
                         gameEntry.Publishers = new List<Publisher>();
-                        gameEntry.GameCollections = new List<GameCollection>();
+                        gameEntry.GameCollections = new List<GamesCollection>();
                         gameDictionary.Add(gameEntry.Name, gameEntry);
                     }
 
@@ -939,7 +939,7 @@ WHERE 1=1");
 
             var gameDictionary = new Dictionary<string, Game>();
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GameCollection, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
                 sqlBuilder.ToString(),
                 (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
                 {
@@ -951,7 +951,7 @@ WHERE 1=1");
                         gameEntry.Platforms = new List<Platform>();
                         gameEntry.Screenshots = new List<GameScreenshot>();
                         gameEntry.Publishers = new List<Publisher>();
-                        gameEntry.GameCollections = new List<GameCollection>();
+                        gameEntry.GameCollections = new List<GamesCollection>();
                         gameDictionary.Add(gameEntry.Name, gameEntry);
                     }
 

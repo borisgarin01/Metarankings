@@ -7,20 +7,20 @@ namespace BlazorClient.Pages.Admin.Games.Collections;
 public partial class ManageCollectionPage : ComponentBase
 {
     [Inject]
-    public IWebManager<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> GamesCollectionsWebManager { get; set; }
+    public IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> GamesCollectionsWebManager { get; set; }
 
     [Inject]
-    public IWebManager<GameCollectionItem, AddGameCollectionItemModel, UpdateGameCollectionItemModel> GamesCollectionsItemsWebManager { get; set; }
+    public IWebManager<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel> GamesCollectionsItemsWebManager { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    private GameCollection gameCollection;
+    private GamesCollection gameCollection;
 
     [Parameter, EditorRequired]
     public long Id { get; set; }
 
-    public GameCollection GameCollection
+    public GamesCollection GameCollection
     {
         get => gameCollection;
         private set

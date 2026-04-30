@@ -2,10 +2,10 @@
 using Domain.Games.Collections;
 using Domain.RequestsModels.Games.Collections;
 
-namespace API.Controllers.Games;
+namespace API.Controllers.Movies;
 
 [ApiController]
-[Route("api/games/[controller]")]
+[Route("api/movies/[controller]")]
 [Authorize(Policy = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class CollectionsItemsController : ControllerBase
 {

@@ -12,6 +12,7 @@ public sealed class CreateGamesCollectionsTableMigration : Migration
     {
         Execute.Sql(@"CREATE TABLE GamesCollections(Id BIGSERIAL NOT NULL PRIMARY KEY, 
 Name VARCHAR(255) NOT NULL UNIQUE,
-Description VARCHAR(4095) NOT NULL);");
+Description TEXT NOT NULL,
+ImageSource TEXT NOT NULL);");
     }
 }

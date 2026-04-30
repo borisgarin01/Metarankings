@@ -5,14 +5,17 @@ using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.Games.Collections;
 using Domain.Movies;
+using Domain.Movies.MoviesCollections;
 using Domain.RequestsModels.Games.Collections;
 using Domain.RequestsModels.Games.Developers;
 using Domain.RequestsModels.Games.Genres;
 using Domain.RequestsModels.Games.Localizations;
 using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Games.Publishers;
+using Domain.RequestsModels.Movies.Collections;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Domain.RequestsModels.Movies.MoviesGenres;
+using Domain.RequestsModels.Movies.MoviesStudios;
 using Domain.Reviews;
 
 namespace API.IServiceCollectionExtensions;
@@ -49,9 +52,13 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IMoviesViewersReviewsRepository, MoviesViewersReviewsRepository>(instance => new MoviesViewersReviewsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel>, GamesCollectionsRepository>(instance => new GamesCollectionsRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>, GamesCollectionsRepository>(instance => new GamesCollectionsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<GameCollectionItem, AddGameCollectionItemModel, UpdateGameCollectionItemModel>, GamesCollectionsItemsRepository>(instance => new GamesCollectionsItemsRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>, GamesCollectionsItemsRepository>(instance => new GamesCollectionsItemsRepository(metarankingsConnectionString));
+
+        services.AddScoped<IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>, MoviesCollectionsRepository>(instance => new MoviesCollectionsRepository(metarankingsConnectionString));
+
+        services.AddScoped<IRepository<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsRepository>(instance => new MoviesCollectionsItemsRepository(metarankingsConnectionString));
 
         return services;
     }

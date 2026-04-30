@@ -113,7 +113,7 @@ public partial class Home : ComponentBase
         Task<IEnumerable<GameReview>?> gamesGamersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<GameReview>>($"/api/Games/GamesGamersReviews/{GamesGamersReviewsOffset}/{GamesGamersReviewsLimit}");
         Task<IEnumerable<Movie>?> moviesGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/{PageNumber}/{PageSize}");
         Task<IEnumerable<MovieReview>?> moviesViewersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<MovieReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}");
-        Task<IEnumerable<CollectionsItemComponent>> collectionsItemsComponents = HttpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>($"/api/home/collection-items/{PageNumber}/{PageSize}");
+        Task<IEnumerable<CollectionsItemComponent>> collectionsItemsComponents = HttpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>($"/api/home/collections/{PageNumber}/{PageSize}");
         Task<IEnumerable<SoonAtCinemasItemComponent>> soonAtCinemasItemComponents = HttpClient.GetFromJsonAsync<IEnumerable<SoonAtCinemasItemComponent>>($"/api/home/soon-at-cinemas");
         Task<IEnumerable<GamesReleaseDateItemViewModel>> gamesReleaseDateItemComponents = HttpClient.GetFromJsonAsync<IEnumerable<GamesReleaseDateItemViewModel>>($"/api/home/games-release-dates");
 

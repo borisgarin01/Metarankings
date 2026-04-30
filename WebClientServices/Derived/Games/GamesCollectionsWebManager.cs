@@ -7,13 +7,13 @@ using System.Text.Json;
 
 namespace WebManagers.Derived.Games;
 
-public sealed class GamesCollectionsWebManager : WebManager, IWebManager<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel>
+public sealed class GamesCollectionsWebManager : WebManager, IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>
 {
     public GamesCollectionsWebManager(HttpClient httpClient) : base(httpClient)
     {
     }
 
-    public async Task<HttpResponseMessage> AddAsync(AddGameCollectionModel addGameCollectionModel)
+    public async Task<HttpResponseMessage> AddAsync(AddGamesCollectionModel addGameCollectionModel)
     {
         HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Collections", addGameCollectionModel);
         return httpResponseMessage;
@@ -24,7 +24,7 @@ public sealed class GamesCollectionsWebManager : WebManager, IWebManager<GameCol
         throw new NotImplementedException();
     }
 
-    public async Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddGameCollectionModel> adds)
+    public async Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddGamesCollectionModel> adds)
     {
         throw new NotImplementedException();
     }
@@ -35,31 +35,31 @@ public sealed class GamesCollectionsWebManager : WebManager, IWebManager<GameCol
         return httpResponseMessage;
     }
 
-    public async Task<IEnumerable<GameCollection>> GetAllAsync()
+    public async Task<IEnumerable<GamesCollection>> GetAllAsync()
     {
-        var gamesCollections = await HttpClient.GetFromJsonAsync<IEnumerable<GameCollection>>($"/api/Games/Collections");
+        var gamesCollections = await HttpClient.GetFromJsonAsync<IEnumerable<GamesCollection>>($"/api/Games/Collections");
         return gamesCollections;
     }
 
-    public async Task<IEnumerable<GameCollection>> GetFirstAsync(long offset, long limit)
+    public async Task<IEnumerable<GamesCollection>> GetFirstAsync(long offset, long limit)
     {
-        var gameCollections = await HttpClient.GetFromJsonAsync<IEnumerable<GameCollection>>($"/api/Games/Collections/{offset}/{limit}");
+        var gameCollections = await HttpClient.GetFromJsonAsync<IEnumerable<GamesCollection>>($"/api/Games/Collections/{offset}/{limit}");
         return gameCollections;
     }
 
-    public async Task<GameCollection> GetAsync(long id)
+    public async Task<GamesCollection> GetAsync(long id)
     {
-        var gameCollection = await HttpClient.GetFromJsonAsync<GameCollection>($"/api/Games/Collections/{id}");
+        var gameCollection = await HttpClient.GetFromJsonAsync<GamesCollection>($"/api/Games/Collections/{id}");
         return gameCollection;
     }
 
-    public async Task<GameCollection> UpdateAsync(long id, UpdateGameCollectionModel updateGameCollectionModel)
+    public async Task<GamesCollection> UpdateAsync(long id, UpdateGamesCollectionModel updateGameCollectionModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateGameCollectionModel>($"/api/Games/Collections/{id}", updateGameCollectionModel);
+        HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateGamesCollectionModel>($"/api/Games/Collections/{id}", updateGameCollectionModel);
 
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
         {
-            var updatedGameCollection = await JsonSerializer.DeserializeAsync<GameCollection>(await httpResponseMessage.Content.ReadAsStreamAsync());
+            var updatedGameCollection = await JsonSerializer.DeserializeAsync<GamesCollection>(await httpResponseMessage.Content.ReadAsStreamAsync());
             return updatedGameCollection;
         }
 

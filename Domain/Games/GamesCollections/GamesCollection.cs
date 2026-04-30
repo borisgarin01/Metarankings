@@ -1,6 +1,6 @@
 ﻿namespace Domain.Games.Collections;
 
-public sealed record GameCollection
+public sealed record GamesCollection
 {
     public long Id { get; set; }
 
@@ -10,6 +10,9 @@ public sealed record GameCollection
     public string Name { get; set; }
 
     public string Description { get; set; }
+
+    [Required]
+    public string ImageSource { get; set; }
 
     public List<Game> Games { get; set; } = new();
 }

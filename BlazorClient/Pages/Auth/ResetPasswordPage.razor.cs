@@ -1,10 +1,8 @@
 ﻿using BlazorClient.Auth;
 using BlazorClient.PagesModels;
-using Microsoft.AspNetCore.Authorization;
 
 namespace BlazorClient.Pages.Auth;
 
-[Authorize]
 public partial class ResetPasswordPage : ComponentBase
 {
     [Inject]

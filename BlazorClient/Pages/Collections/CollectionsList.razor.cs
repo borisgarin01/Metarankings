@@ -1,19 +1,17 @@
-﻿
-using Domain.Games.Collections;
+﻿using Domain.Games.Collections;
 using Domain.RequestsModels.Games.Collections;
 using WebManagers;
-using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Collections;
 
 public partial class CollectionsList : ComponentBase
 {
-    private IEnumerable<GameCollection> gamesCollections;
+    private IEnumerable<GamesCollection> gamesCollections;
 
     [Inject]
-    public IWebManager<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> GamesCollectionsWebManager { get; set; }
+    public IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> GamesCollectionsWebManager { get; set; }
 
-    public IEnumerable<GameCollection> GamesCollections
+    public IEnumerable<GamesCollection> GamesCollections
     {
         get => gamesCollections;
         set

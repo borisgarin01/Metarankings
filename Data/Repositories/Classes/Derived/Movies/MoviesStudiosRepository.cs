@@ -1,5 +1,6 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Movies;
+using Domain.RequestsModels.Movies.MoviesStudios;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 public sealed class MoviesStudiosRepository : Repository, IRepository<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>

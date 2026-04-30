@@ -5,13 +5,13 @@ using Domain.RequestsModels.Games.Collections;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesCollectionsItemsRepository : Repository, IRepository<GameCollectionItem, AddGameCollectionItemModel, UpdateGameCollectionItemModel>
+public sealed class GamesCollectionsItemsRepository : Repository, IRepository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>
 {
     public GamesCollectionsItemsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddGameCollectionItemModel entity)
+    public async Task<long> AddAsync(AddGamesCollectionItemModel entity)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -25,7 +25,7 @@ new { entity.GameId, entity.GameCollectionId });
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddGameCollectionItemModel> entities)
+    public async Task AddRangeAsync(IEnumerable<AddGamesCollectionItemModel> entities)
     {
         foreach (var entity in entities)
         {
@@ -33,11 +33,11 @@ new { entity.GameId, entity.GameCollectionId });
         }
     }
 
-    public async Task<IEnumerable<GameCollectionItem>> GetAllAsync()
+    public async Task<IEnumerable<GamesCollectionItem>> GetAllAsync()
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var gamesCollectionsItems = await connection.QueryAsync<GameCollectionItem, Game, GameCollection, GameCollectionItem>(@"
+            var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollection, GamesCollectionItem>(@"
 SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId,
 gc.Id, gc.Name
@@ -55,8 +55,8 @@ ON gc.Id=gci.GameCollectionId;", (gameCollectionItem, game, gameCollection) =>
                         {
                             gameCollectionItem.Game = game;
                             gameCollectionItem.GameId = game.Id;
-                            gameCollectionItem.GameCollection = gameCollection;
-                            gameCollectionItem.GameCollectionId = gameCollection.Id;
+                            gameCollectionItem.GamesCollection = gameCollection;
+                            gameCollectionItem.GamesCollectionId = gameCollection.Id;
                             gameCollection.Games.Add(game);
                         }
                     }
@@ -69,11 +69,11 @@ ON gc.Id=gci.GameCollectionId;", (gameCollectionItem, game, gameCollection) =>
         }
     }
 
-    public async Task<GameCollectionItem> GetAsync(long id)
+    public async Task<GamesCollectionItem> GetAsync(long id)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var gamesCollectionsItems = await connection.QueryAsync<GameCollectionItem, Game, GameCollectionItem>(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
+            var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollectionItem>(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId
 FROM GamesCollectionsItems gci
 LEFT JOIN Games g
@@ -86,10 +86,10 @@ WHERE gci.Id=@Id;", (gameCollectionItem, game) =>
             }, new { Id = id });
 
             var gamesCollectionsItemsResult = gamesCollectionsItems
-                .GroupBy(b => new { b.GameId, b.GameCollectionId })
+                .GroupBy(b => new { b.GameId, b.GamesCollectionId })
                 .Select(g =>
                 {
-                    GameCollectionItem gameCollection = gamesCollectionsItems.First();
+                    GamesCollectionItem gameCollection = gamesCollectionsItems.First();
                     return gameCollection;
                 });
 
@@ -97,11 +97,11 @@ WHERE gci.Id=@Id;", (gameCollectionItem, game) =>
         }
     }
 
-    public async Task<IEnumerable<GameCollectionItem>> GetAsync(long offset, long limit)
+    public async Task<IEnumerable<GamesCollectionItem>> GetAsync(long offset, long limit)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var gamesCollectionsItems = await connection.QueryAsync<GameCollectionItem, Game, GameCollectionItem>(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
+            var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollectionItem>(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId
 FROM GamesCollectionsItems gci
 ON gc.Id=gci.GameCollectionId
@@ -116,7 +116,7 @@ OFFSET @Offset LIMIT @Limit;", (gameCollectionItem, game) =>
             }, new { Offset = offset, Limit = limit });
 
             var gamesCollectionsItemsResult = gamesCollectionsItems
-                .GroupBy(b => new { b.GameId, b.GameCollectionId })
+                .GroupBy(b => new { b.GameId, b.GamesCollectionId })
                 .Select(g =>
                 {
                     return g.First();
@@ -143,7 +143,7 @@ WHERE Id=@Id;", new { Id = id });
         }
     }
 
-    public async Task<GameCollectionItem> UpdateAsync(UpdateGameCollectionItemModel entity, long id)
+    public async Task<GamesCollectionItem> UpdateAsync(UpdateGamesCollectionItemModel entity, long id)
     {
         throw new NotImplementedException();
     }

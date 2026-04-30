@@ -9,22 +9,24 @@ namespace API.Controllers.Games;
 [Authorize(Policy = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class CollectionsController : ControllerBase
 {
-    private readonly IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> _gamesCollectionsRepository;
-    private readonly IRepository<GameCollectionItem, AddGameCollectionItemModel, UpdateGameCollectionItemModel> _gamesCollectionsItemsRepository;
+    private readonly ILogger<CollectionsController> _logger;
+    private readonly IRepository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> _gamesCollectionsRepository;
+    private readonly IRepository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel> _gamesCollectionsItemsRepository;
 
-    public CollectionsController(IRepository<GameCollection, AddGameCollectionModel, UpdateGameCollectionModel> gamesCollectionsRepository, IRepository<GameCollectionItem, AddGameCollectionItemModel, UpdateGameCollectionItemModel> gamesCollectionsItemsRepository)
+    public CollectionsController(IRepository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> gamesCollectionsRepository, IRepository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel> gamesCollectionsItemsRepository, ILogger<CollectionsController> logger)
     {
         _gamesCollectionsRepository = gamesCollectionsRepository;
         _gamesCollectionsItemsRepository = gamesCollectionsItemsRepository;
+        _logger = logger;
     }
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<GameCollection>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<GamesCollection>>> GetAllAsync()
     {
         try
         {
-            IEnumerable<GameCollection> gamesCollections = await _gamesCollectionsRepository.GetAllAsync();
+            IEnumerable<GamesCollection> gamesCollections = await _gamesCollectionsRepository.GetAllAsync();
             return Ok(gamesCollections);
         }
         catch (Exception ex)
@@ -35,11 +37,11 @@ public sealed class CollectionsController : ControllerBase
 
     [HttpGet("{offset:long}/{limit:long}")]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<GameCollection>>> GetAllAsync(long offset, long limit)
+    public async Task<ActionResult<IEnumerable<GamesCollection>>> GetAllAsync(long offset, long limit)
     {
         try
         {
-            IEnumerable<GameCollection> gamesCollections = await _gamesCollectionsRepository.GetAsync(offset, limit);
+            IEnumerable<GamesCollection> gamesCollections = await _gamesCollectionsRepository.GetAsync(offset, limit);
             return Ok(gamesCollections);
         }
         catch (Exception ex)
@@ -50,11 +52,11 @@ public sealed class CollectionsController : ControllerBase
 
     [HttpGet("{gameCollectionId:long}")]
     [AllowAnonymous]
-    public async Task<ActionResult<GameCollection>> GetAsync(long gameCollectionId)
+    public async Task<ActionResult<GamesCollection>> GetAsync(long gameCollectionId)
     {
         try
         {
-            GameCollection gamesCollection = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
+            GamesCollection gamesCollection = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
             return Ok(gamesCollection);
         }
         catch (Exception ex)
@@ -64,7 +66,7 @@ public sealed class CollectionsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<long>> AddAsync(AddGameCollectionModel addGameCollectionModel)
+    public async Task<ActionResult<long>> AddAsync(AddGamesCollectionModel addGameCollectionModel)
     {
         try
         {
@@ -72,13 +74,14 @@ public sealed class CollectionsController : ControllerBase
 
             foreach (long seletedGameId in addGameCollectionModel.SelectedGamesIds)
             {
-                _ = await _gamesCollectionsItemsRepository.AddAsync(new AddGameCollectionItemModel(seletedGameId, insertedGameCollectionId));
+                _ = await _gamesCollectionsItemsRepository.AddAsync(new AddGamesCollectionItemModel(seletedGameId, insertedGameCollectionId));
             }
 
             return Ok(insertedGameCollectionId);
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, ex.Message, ex.StackTrace);
             return StatusCode(500, ex);
         }
     }
@@ -86,7 +89,7 @@ public sealed class CollectionsController : ControllerBase
     [HttpDelete("{gameCollectionId:long}")]
     public async Task<ActionResult<long>> DeleteAsync(long gameCollectionId)
     {
-        GameCollection collection = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
+        GamesCollection collection = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
         if (collection is null)
             return NotFound();
         try
@@ -102,14 +105,14 @@ public sealed class CollectionsController : ControllerBase
 
 
     [HttpPut("{gameCollectionId:long}")]
-    public async Task<ActionResult<GameCollection>> UpdateAsync(long gameCollectionId, UpdateGameCollectionModel updateGameCollectionModel)
+    public async Task<ActionResult<GamesCollection>> UpdateAsync(long gameCollectionId, UpdateGamesCollectionModel updateGameCollectionModel)
     {
-        GameCollection gameCollectionToUpdate = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
+        GamesCollection gameCollectionToUpdate = await _gamesCollectionsRepository.GetAsync(gameCollectionId);
         if (gameCollectionToUpdate is null)
             return NotFound();
         try
         {
-            GameCollection updatedGamesCollection = await _gamesCollectionsRepository.UpdateAsync(updateGameCollectionModel, gameCollectionId);
+            GamesCollection updatedGamesCollection = await _gamesCollectionsRepository.UpdateAsync(updateGameCollectionModel, gameCollectionId);
             return Ok(updateGameCollectionModel);
         }
         catch (Exception ex)

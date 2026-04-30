@@ -50,6 +50,6 @@ public sealed record Game
     public long LocalizationId { get; set; }
 
     [JsonPropertyName("links")]
-    public List<GameCollection> GameCollections { get; set; } = new();
+    public List<GamesCollection> GameCollections { get; set; } = new();
 
 }

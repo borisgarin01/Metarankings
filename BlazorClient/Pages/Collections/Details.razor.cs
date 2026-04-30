@@ -5,11 +5,11 @@ namespace BlazorClient.Pages.Collections;
 
 public partial class Details : ComponentBase
 {
-    private GameCollection gameCollection;
+    private GamesCollection gameCollection;
 
     [Parameter, EditorRequired]
     public long GameCollectionId { get; set; }
-    public GameCollection GameCollection
+    public GamesCollection GameCollection
     {
         get => gameCollection;
         set
@@ -24,6 +24,6 @@ public partial class Details : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        GameCollection = await HttpClient.GetFromJsonAsync<GameCollection>($"/api/games/collections/{GameCollectionId}");
+        GameCollection = await HttpClient.GetFromJsonAsync<GamesCollection>($"/api/games/collections/{GameCollectionId}");
     }
 }
