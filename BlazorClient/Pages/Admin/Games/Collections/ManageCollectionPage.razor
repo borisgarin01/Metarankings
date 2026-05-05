@@ -1,5 +1,6 @@
-﻿@page "/admin/games/collections/manage-collection/{Id:long}"
+﻿@page "/admin/games/collections/{Id:long}/manage-collection"
 @using Domain.Games
+@using Domain.Games.Collections
 
 @if (GameCollection is null)
 {
@@ -9,41 +10,31 @@ else
 {
     <p>@GameCollection.Name</p>
 
-    <AuthorizeView Policy="Admin">
-        <Authorized>
-            <button type="submit" @onclick="@(() => DeleteGameFromCollectionAsync(GameCollection.Id))">
-                Delete
-            </button>
-        </Authorized>
-    </AuthorizeView>
-
-    @foreach (Game game in GameCollection.Games)
+    @foreach (GamesCollectionItem gamesCollectionItem in GameCollection.GamesCollectionItems)
     {
-        <h3>@game.Name</h3>
+        <h3>@gamesCollectionItem.Game.Name</h3>
+
         <p>
-            <img class="alignnone size-full wp-image-15473" src="https://metarankings.ru/images/uploads/2021/10/the-witcher-3-wild-hunt.jpg" alt="@game.Name" width="1000" height="488">
-        </p>
-        <p>
-            @game.Description
+            @gamesCollectionItem.Game.Description
         </p>
         <div class="list postid">
             <div class="post">
                 <div class="spec-img">
-                    <a href="@game.Image" title="@game.Name" class="thumb"><img class="post-image" src="@game.Image" alt="@game.Name"></a>
+                    <a href="@gamesCollectionItem.Game.Image" title="@gamesCollectionItem.Game.Name" class="thumb"><img class="post-image" src="@gamesCollectionItem.Game.Image" alt="@gamesCollectionItem.Game.Name"></a>
                     <div class="small-score mark-10">9.6</div>
                 </div>
-                <a class="name" href="/games/Details/@game.Id">@game.Name</a>
+                <a class="name" href="/games/Details/@gamesCollectionItem.Game.Id">@gamesCollectionItem.Game.Name</a>
 
-                <div class="p-meta">Разработчик: @string.Join(", ", game.Developers.Select(d => d.Name))</div>
-                <div class="p-meta">Издатель:  @string.Join(", ", game.Publishers.Select(d => d.Name))</div>
+                <div class="p-meta">Разработчик: @string.Join(", ", gamesCollectionItem.Game.Developers.Select(d => d.Name))</div>
+                <div class="p-meta">Издатель:  @string.Join(", ", gamesCollectionItem.Game.Publishers.Select(d => d.Name))</div>
                 <div class="p-meta">
-                    Дата выхода:  @game.ReleaseDate.Value.ToString("dd MMMM yyyy")
+                    Дата выхода:  @gamesCollectionItem.Game.ReleaseDate.Value.ToString("dd MMMM yyyy")
                 </div>
             </div>
         </div>
         <AuthorizeView Policy="Admin">
             <Authorized>
-                <button type="submit" @onclick="@(() => DeleteGameFromCollectionAsync(game.Id))">
+                <button type="submit" @onclick="@(() => DeleteGameFromCollectionAsync(gamesCollectionItem.Id))">
                     Delete
                 </button>
             </Authorized>
