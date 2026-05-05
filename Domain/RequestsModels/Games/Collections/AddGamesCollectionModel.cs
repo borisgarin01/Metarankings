@@ -6,6 +6,4 @@ public sealed record AddGamesCollectionModel(
     [property: JsonPropertyName("description")]
     string Description,
     [property:JsonPropertyName("imageSource")]
-    string ImageSource,
-    [property:JsonPropertyName("selectedGamesIds")]
-    IEnumerable<long> SelectedGamesIds);
+    string ImageSource);

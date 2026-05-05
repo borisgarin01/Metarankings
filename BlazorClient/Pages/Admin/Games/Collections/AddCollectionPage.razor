@@ -3,50 +3,29 @@
 
 <h3>Добавь подборку</h3>
 
-@if (GamesToSelectFrom is null)
-{
-    <p>Loading...</p>
-}
-
 <AuthorizeView Policy="Admin">
     <Authorized>
-        @if (GamesToSelectFrom is null)
-        {
-            <p>Loading...</p>
-        }
-        else
-        {
-            <EditForm OnValidSubmit="@AddGameCollectionAsync" Model="this" Context="myContext">
-                <DataAnnotationsValidator />
-                <div>
-                    <InputText @bind-Value="@CollectionName" />
+        <EditForm OnValidSubmit="@AddGameCollectionAsync" Model="this" Context="myContext">
+            <DataAnnotationsValidator />
+            <div>
+                <InputText @bind-Value="@CollectionName" />
+            </div>
+            <div>
+                <InputTextArea @bind-Value="@Description" />
+            </div>
+            <div>
+                <label>
+                    Enter image:
+                    <InputFile OnChange="FileUploaded" />
+                </label>
+                <div class="image-container">
+                    <img class="post-image" src="@ImageSource" alt="Изображение на странице подборки для загрузки подборки" title="Игра @CollectionName" itemprop="image">
                 </div>
-                <div>
-                    <InputTextArea @bind-Value="@Description" />
-                </div>
-                <div>
-                    <select @onchange="SelectGames" multiple>
-                        <option value="-1" selected>None</option>
-                        @foreach (Game game in GamesToSelectFrom)
-                        {
-                            <option value="@game.Id.ToString()">@game.Name</option>
-                        }
-                    </select>
-                </div>
-                <div>
-                    <label>
-                        Enter image:
-                        <InputFile OnChange="FileUploaded" />
-                    </label>
-                    <div class="image-container">
-                        <img class="post-image" src="@ImageSource" alt="Изображение на странице подборки для загрузки подборки" title="Игра @CollectionName" itemprop="image">
-                    </div>
-                </div>
-                <div>
-                    <input type="submit" value="Add" />
-                </div>
-            </EditForm>
-        }
+            </div>
+            <div>
+                <input type="submit" value="Add" />
+            </div>
+        </EditForm>
     </Authorized>
     <NotAuthorized>
         <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы добавить подборку

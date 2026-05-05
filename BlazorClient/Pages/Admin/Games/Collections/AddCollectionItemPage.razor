@@ -1,0 +1,16 @@
+﻿@page "/admin/games/collections/{Id:long}/add-games"
+@using Domain.Games
+<h3>AddCollectionItemPage</h3>
+
+<EditForm OnValidSubmit="@AddGameCollectionItemAsync" Model="this" Context="myContext">
+    <div>
+        <select @onchange="SelectGame">
+            <option value="-1" selected>None</option>
+            @foreach (Game game in GamesToSelectFrom)
+            {
+                <option value="@game.Id.ToString()">@game.Name</option>
+            }
+        </select>
+        <input type="submit" value="Add" />
+    </div>
+</EditForm>

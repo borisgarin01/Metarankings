@@ -10,6 +10,8 @@ else
 {
     <p>@GameCollection.Name</p>
 
+    <a href="/admin/games/collections/@Id/add-games">Добавить игру в подборку</a>
+
     @foreach (GamesCollectionItem gamesCollectionItem in GameCollection.GamesCollectionItems)
     {
         <h3>@gamesCollectionItem.Game.Name</h3>

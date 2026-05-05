@@ -31,31 +31,14 @@ public partial class AddCollectionPage : ComponentBase
     [MaxLength(4000)]
     [MinLength(1)]
     public string Description { get; set; }
-
-    public IEnumerable<Game> GamesToSelectFrom { get; set; }
-
-    public IEnumerable<long> SelectedGamesIds { get; private set; }
     public IBrowserFile ImageToUpload { get; private set; }
     public string ImageSource { get; set; }
 
     const int MAX_FILESIZE = 5000 * 1024;
 
-    protected override async Task OnInitializedAsync()
-    {
-        GamesToSelectFrom = await GamesWebManager.GetAllAsync();
-    }
-
-    public Task SelectGames(ChangeEventArgs e)
-    {
-        SelectedGamesIds = ((string[])e.Value)
-            .Select(idString => long.Parse(idString))
-            .ToList();
-        return Task.CompletedTask;
-    }
-
     public async Task AddGameCollectionAsync()
     {
-        var addGameCollectionModel = new AddGamesCollectionModel(CollectionName, Description, ImageSource, SelectedGamesIds);
+        var addGameCollectionModel = new AddGamesCollectionModel(CollectionName, Description, ImageSource);
 
         HttpResponseMessage gameCreationHttpResponseMessage = await GamesCollectionsWebManager.AddAsync(addGameCollectionModel);
 
