@@ -13,5 +13,5 @@ public interface IWebManager<T, TAdd, TUpdate> where T : class
     Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<TAdd> adds);
     Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile);
     Task<HttpResponseMessage> AddAsync(TAdd tAdd);
-    Task<IEnumerable<Game>> GetLastAsync(long offset, long limit);
+    Task<IEnumerable<T>> GetLastAsync(long offset, long limit);
 }

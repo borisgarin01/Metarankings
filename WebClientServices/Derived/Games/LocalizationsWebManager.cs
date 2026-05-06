@@ -68,7 +68,7 @@ public sealed class LocalizationsWebManager : WebManager, IWebManager<Localizati
         }
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<Localization>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

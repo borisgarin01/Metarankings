@@ -66,7 +66,7 @@ public sealed class GamesCollectionsWebManager : WebManager, IWebManager<GamesCo
         return null;
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<GamesCollection>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

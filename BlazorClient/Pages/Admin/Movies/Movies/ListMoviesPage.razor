@@ -1,24 +1,24 @@
-﻿@page "/movies/movies-genres/list-genres"
+﻿@page "/admin/movies/movies/list-movies"
 @using Domain.Games
 @using Domain.Movies
 
 <AuthorizeView Policy="Admin">
     <Authorized>
         <a href="/admin">К странице админа</a>
-        <a href="/admin/movies/movies-genres/add-movie-genre">Добавить жанр</a>
-        <div class="gamesList">
-            @if (Genres is null)
+        <a href="/admin/movies/movies/add-movie">Добавить фильм</a>
+        <div class="moviesList">
+            @if (Movies is null)
             {
                 <p>Загружается...</p>
             }
             else
             {
-                foreach (Genre genre in Genres)
+                foreach (Movie movie in Movies)
                 {
                     <div class="movie">
-                        <h4>@genre.Name</h4>
-                        <a href="/admin/genres/remove-genre/@genre.Id">Remove movie</a>
-                        <a href="/movies/Details/@genre.Id">Details</a>
+                        <h4>@movie.Name</h4>
+                        <a href="/admin/movies/remove-movie/@movie.Id">Remove movie</a>
+                        <a href="/movies/Details/@movie.Id">Details</a>
                     </div>
                 }
             }

@@ -1,13 +1,11 @@
 ﻿using BlazorClient.Components.PagesComponents.Home;
-using Data.Repositories.Classes.Derived.Games;
-using Data.Repositories.Classes.Derived.Movies;
 using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Common;
 using Domain.Games;
 using Domain.Games.Collections;
 using Domain.Movies;
-using Domain.Movies.MoviesCollections;
+using Domain.Movies.Collections;
 using Domain.RequestsModels.Games.Collections;
 using Domain.RequestsModels.Movies.Collections;
 using Domain.Reviews;

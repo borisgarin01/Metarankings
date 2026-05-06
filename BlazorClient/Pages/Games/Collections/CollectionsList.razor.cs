@@ -2,7 +2,7 @@
 using Domain.RequestsModels.Games.Collections;
 using WebManagers;
 
-namespace BlazorClient.Pages.Collections;
+namespace BlazorClient.Pages.Games.Collections;
 
 public partial class CollectionsList : ComponentBase
 {

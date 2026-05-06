@@ -61,7 +61,7 @@ public sealed class PublishersWebManager : WebManager, IWebManager<Publisher, Ad
         return null;
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<Publisher>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

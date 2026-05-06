@@ -37,7 +37,7 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
         using var connection = new NpgsqlConnection(ConnectionString);
 
         var gamesCollections = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GamesCollection>(
-            @"SELECT gc.Id, gc.Name, gc.Description,
+            @"SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
                 gci.Id, gci.GameId, gci.GameCollectionId,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
@@ -67,7 +67,7 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
         using var connection = new NpgsqlConnection(ConnectionString);
 
         var gamesCollection = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GamesCollection>(
-            @"SELECT gc.Id, gc.Name, gc.Description,
+            @"SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
                 gci.Id, gci.GameId, gci.GameCollectionId,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
@@ -109,7 +109,7 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
         var gamesCollectionsDictionary = new Dictionary<long, GamesCollection>();
 
         await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GamesCollection>(
-            @"SELECT gc.Id, gc.Name, gc.Description,
+            @"SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
                  gci.Id, gci.GameId, gci.GameCollectionId,
                  g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
           FROM GamesCollections gc
@@ -126,8 +126,6 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
             {
                 if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out var existingCollection))
                 {
-                    // Initialize Games list
-                    gameCollection.GamesCollectionItems = new List<GamesCollectionItem>();
                     gamesCollectionsDictionary.Add(gameCollection.Id, gameCollection);
                     existingCollection = gameCollection;
                 }

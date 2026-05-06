@@ -5,7 +5,7 @@ using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.Games.Collections;
 using Domain.Movies;
-using Domain.Movies.MoviesCollections;
+using Domain.Movies.Collections;
 using Domain.RequestsModels.Games.Collections;
 using Domain.RequestsModels.Games.Developers;
 using Domain.RequestsModels.Games.Genres;

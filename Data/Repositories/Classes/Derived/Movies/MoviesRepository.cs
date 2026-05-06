@@ -349,9 +349,10 @@ md.id, md.name
         }
     }
 
-    public Task RemoveAsync(long id)
+    public async Task RemoveAsync(long id)
     {
-        throw new NotImplementedException();
+        using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.ExecuteAsync("DELETE FROM Movies WHERE Id=@Id", new { Id = id });
     }
 
     public Task RemoveRangeAsync(IEnumerable<long> ids)

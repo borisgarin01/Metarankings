@@ -61,7 +61,7 @@ public sealed class MoviesDirectorsWebManager : WebManager, IWebManager<MovieDir
         return null;
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<MovieDirector>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

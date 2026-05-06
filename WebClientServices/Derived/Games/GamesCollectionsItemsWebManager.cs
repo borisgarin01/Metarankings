@@ -53,7 +53,7 @@ public sealed class GamesCollectionsItemsWebManager : WebManager, IWebManager<Ga
         return gamesCollectionsItems;
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<GamesCollectionItem>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

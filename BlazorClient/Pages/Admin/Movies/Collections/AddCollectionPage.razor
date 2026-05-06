@@ -1,10 +1,10 @@
-﻿@page "/admin/games/collections/add-collection"
+﻿@page "/admin/movies/collections/add-collection"
 
 <h3>Добавь подборку</h3>
 
 <AuthorizeView Policy="Admin">
     <Authorized>
-        <EditForm OnValidSubmit="@AddGameCollectionAsync" Model="this" Context="myContext">
+        <EditForm OnValidSubmit="@AddMovieCollectionAsync" Model="this" Context="myContext">
             <DataAnnotationsValidator />
             <div>
                 <InputText @bind-Value="@CollectionName" />

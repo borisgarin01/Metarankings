@@ -20,7 +20,7 @@ else
                 </div>
                 <div class="post-content">
                     <div class="news-img">
-                        <img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry.jpg" alt="@GameCollection.Name">
+                        <img class="news-image" src="@GameCollection.ImageSource" alt="@GameCollection.Name">
                     </div>
                     <p>@GameCollection.Description</p>
                 </div>
@@ -29,7 +29,7 @@ else
                     {
                         <article class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
                             <a href="/games/details/@gamesCollectionItem.Game.Id" class="thumb">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/{gamesCollectionItem.Game.ReleaseDate.Value.Year}/{gamesCollectionItem.Game.ReleaseDate.Value.Month}/{gamesCollectionItem.Game.Image}")" alt="@gamesCollectionItem.Game.Name">
+                                <img class="post-image" src="@($"{HttpClient.BaseAddress}{gamesCollectionItem.Game.Image}")" alt="@gamesCollectionItem.Game.Name">
                             </a>
                             <div itemprop="item" itemscope="" itemtype="https://schema.org/VideoGame">
                                 <link itemprop="url" href="/games/details/@gamesCollectionItem.Game.Id">

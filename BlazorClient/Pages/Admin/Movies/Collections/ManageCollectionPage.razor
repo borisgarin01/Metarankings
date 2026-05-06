@@ -1,0 +1,50 @@
+﻿@page "/admin/movies/collections/{Id:long}/manage-collection"
+
+@using Domain.Movies.Collections
+
+@if (MoviesCollection is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <p>@MoviesCollection.Name</p>
+
+    <AuthorizeView Policy="Admin">
+        <Authorized>
+            <a href="/admin/movies/collections/@Id/add-movie">Добавить фильм в подборку</a>
+        </Authorized>
+    </AuthorizeView>
+
+    @foreach (MoviesCollectionItem moviesCollectionItem in MoviesCollection.MoviesCollectionItems)
+    {
+        <h3>@moviesCollectionItem.Movie.Name</h3>
+
+        <p>
+            @moviesCollectionItem.Movie.Description
+        </p>
+        <div class="list postid">
+            <div class="post">
+                <div class="spec-img">
+                    <a href="@moviesCollectionItem.Movie.ImageSource" title="@moviesCollectionItem.Movie.Name" class="thumb"><img class="post-image" src="@moviesCollectionItem.Movie.ImageSource" alt="@moviesCollectionItem.Movie.Name"></a>
+                    <div class="small-score mark-10">9.6</div>
+                </div>
+                <a class="name" href="/movies/Details/@moviesCollectionItem.Movie.Id">@moviesCollectionItem.Movie.Name</a>
+
+                <div class="p-meta">Жанры: @string.Join(", ", moviesCollectionItem.Movie.MovieGenres.Select(d => d.Name))</div>
+                <div class="p-meta">Студии:  @string.Join(", ", moviesCollectionItem.Movie.MoviesStudios.Select(d => d.Name))</div>
+                <div class="p-meta">Режиссеры:  @string.Join(", ", moviesCollectionItem.Movie.MoviesDirectors.Select(d => d.Name))</div>
+                <div class="p-meta">
+                    Дата премьеры:  @moviesCollectionItem.Movie.PremierDate.Value.ToString("dd MMMM yyyy")
+                </div>
+            </div>
+        </div>
+        <AuthorizeView Policy="Admin">
+            <Authorized>
+                <button type="submit" class="btn btn-danger" @onclick="@(() => DeleteMovieFromCollectionAsync(moviesCollectionItem.Id))">
+                    Delete
+                </button>
+            </Authorized>
+        </AuthorizeView>
+    }
+}

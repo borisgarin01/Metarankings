@@ -1,4 +1,4 @@
-﻿namespace Domain.Movies.MoviesCollections;
+﻿namespace Domain.Movies.Collections;
 
 public sealed record MoviesCollectionItem
 {

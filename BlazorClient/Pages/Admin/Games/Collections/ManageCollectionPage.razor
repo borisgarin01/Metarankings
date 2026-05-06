@@ -10,7 +10,11 @@ else
 {
     <p>@GameCollection.Name</p>
 
-    <a href="/admin/games/collections/@Id/add-games">Добавить игру в подборку</a>
+    <AuthorizeView Policy="Admin">
+        <Authorized>
+            <a href="/admin/games/collections/@Id/add-games">Добавить игру в подборку</a>
+        </Authorized>
+    </AuthorizeView>
 
     @foreach (GamesCollectionItem gamesCollectionItem in GameCollection.GamesCollectionItems)
     {
@@ -22,7 +26,7 @@ else
         <div class="list postid">
             <div class="post">
                 <div class="spec-img">
-                    <a href="@gamesCollectionItem.Game.Image" title="@gamesCollectionItem.Game.Name" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/{gamesCollectionItem.Game.ReleaseDate.Value.Year}/{gamesCollectionItem.Game.ReleaseDate.Value.Month}/{gamesCollectionItem.Game.Image}")" alt="@gamesCollectionItem.Game.Name"></a>
+                    <a href="@gamesCollectionItem.Game.Image" title="@gamesCollectionItem.Game.Name" class="thumb"><img class="post-image" src="@gamesCollectionItem.Game.Image" alt="@gamesCollectionItem.Game.Name"></a>
                     <div class="small-score mark-10">9.6</div>
                 </div>
                 <a class="name" href="/games/Details/@gamesCollectionItem.Game.Id">@gamesCollectionItem.Game.Name</a>

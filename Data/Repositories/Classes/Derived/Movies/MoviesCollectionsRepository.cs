@@ -1,10 +1,10 @@
 ﻿using Data.Repositories.Interfaces;
-using Domain.Games.Collections;
 using Domain.Movies;
-using Domain.Movies.MoviesCollections;
+using Domain.Movies.Collections;
 using Domain.RequestsModels.Movies.Collections;
 
 namespace Data.Repositories.Classes.Derived.Movies;
+
 public sealed class MoviesCollectionsRepository : Repository, IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>
 {
     public MoviesCollectionsRepository(string connectionString) : base(connectionString)
@@ -16,7 +16,7 @@ public sealed class MoviesCollectionsRepository : Repository, IRepository<Movies
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var insertedMovieCollectionId = await connection.QuerySingleAsync<long>(@"
-INSERT INTO MoviesCollections(Name,Description, ImageSoruce) 
+INSERT INTO MoviesCollections(Name,Description, ImageSource) 
 VALUES(@Name, @Description, @ImageSource)
 RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
 
@@ -38,26 +38,30 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
 
         var moviesCollectionsDictionary = new Dictionary<long, MoviesCollection>();
 
-        await connection.QueryAsync<MoviesCollection, Movie, MoviesCollection>(
+        await connection.QueryAsync<MoviesCollection, MoviesCollectionItem, Movie, MoviesCollection>(
             @"SELECT mc.Id, mc.Name, mc.ImageSource, mc.Description, mc.ImageSource,
+                 mci.Id, mci.MovieCollectionId, mci.MovieId,
                  m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description
           FROM MoviesCollections mc
           LEFT JOIN MoviesCollectionsItems mci ON mc.Id = mci.MovieCollectionId
           LEFT JOIN Movies m ON m.Id = mci.MovieId
           ORDER BY mc.Id",
-            (moviesCollection, movie) =>
+            (moviesCollection, movieCollectionItem, movie) =>
             {
                 if (!moviesCollectionsDictionary.TryGetValue(moviesCollection.Id, out var existingCollection))
                 {
                     // Initialize Games list
-                    moviesCollection.Movies = new List<Movie>();
                     moviesCollectionsDictionary.Add(moviesCollection.Id, moviesCollection);
                     existingCollection = moviesCollection;
                 }
 
-                if (movie is not null)
+                if (movie is not null && movieCollectionItem is not null && !moviesCollection.MoviesCollectionItems.Any(mci => mci.Id == movieCollectionItem.Id))
                 {
-                    existingCollection.Movies.Add(movie);
+                    movieCollectionItem.Movie = movie;
+                    movieCollectionItem.MovieId = movie.Id;
+                    movieCollectionItem.MoviesCollection = moviesCollection;
+                    movieCollectionItem.MovieCollectionId = moviesCollection.Id;
+                    existingCollection.MoviesCollectionItems.Add(movieCollectionItem);
                 }
 
                 return existingCollection;
@@ -71,17 +75,25 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
     {
         using var connection = new NpgsqlConnection(ConnectionString);
 
-        var moviesCollection = await connection.QueryAsync<MoviesCollection, Movie, MoviesCollection>(
+        var moviesCollection = await connection.QueryAsync<MoviesCollection, MoviesCollectionItem, Movie, MoviesCollection>(
             @"SELECT mc.Id, mc.Name, mc.Description, mc.ImageSource,
+                 mci.Id, mci.MovieCollectionId, mci.MovieId,
                  m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description
           FROM MoviesCollections mc
           LEFT JOIN MoviesCollectionsItems mci ON mc.Id = mci.MovieCollectionId
           LEFT JOIN Movies m ON m.Id = mci.MovieId
-          WHERE gc.Id = @Id",
-            (moviesCollection, movie) =>
+          WHERE mc.Id = @Id",
+            (moviesCollection, movieCollectionItem, movie) =>
             {
-                if (!moviesCollection.Movies.Any(m => m.Id == movie.Id))
-                    moviesCollection.Movies.Add(movie);
+                if (movie is not null && movieCollectionItem is not null && !moviesCollection.MoviesCollectionItems.Any(m => m.MovieId == movie.Id))
+                {
+                    movieCollectionItem.Movie = movie;
+                    movieCollectionItem.MovieId = movie.Id;
+                    movieCollectionItem.MoviesCollection = moviesCollection;
+                    movieCollectionItem.MovieCollectionId = moviesCollection.Id;
+                    moviesCollection.MoviesCollectionItems.Add(movieCollectionItem);
+                }
+
                 return moviesCollection;
             },
             new { Id = id },
@@ -91,7 +103,7 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
                 .Select(g =>
                 {
                     MoviesCollection movieCollection = g.First();
-                    movieCollection.Movies = g.SelectMany(b => b.Movies).ToList();
+                    movieCollection.MoviesCollectionItems = g.SelectMany(b => b.MoviesCollectionItems).ToList();
                     return movieCollection;
                 });
 
@@ -104,8 +116,9 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
 
         var moviesCollectionsDictionary = new Dictionary<long, MoviesCollection>();
 
-        await connection.QueryAsync<MoviesCollection, Movie, MoviesCollection>(
+        await connection.QueryAsync<MoviesCollection, MoviesCollectionItem, Movie, MoviesCollection>(
             @"SELECT mc.Id, mc.Name, mc.Description, mc.ImageSource,
+                 mci.Id, mci.MovieCollectionId, mci.MovieId,
                  m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description
           FROM MoviesCollections mc
           LEFT JOIN MoviesCollectionsItems mci ON mc.Id = mci.MovieCollectionId
@@ -117,19 +130,22 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
               OFFSET @offset LIMIT @limit
           )
           ORDER BY mc.Id",
-            (moviesCollection, movie) =>
+            (moviesCollection, movieCollectionItem, movie) =>
             {
                 if (!moviesCollectionsDictionary.TryGetValue(moviesCollection.Id, out var existingCollection))
                 {
                     // Initialize Movies list
-                    moviesCollection.Movies = new List<Movie>();
                     moviesCollectionsDictionary.Add(moviesCollection.Id, moviesCollection);
                     existingCollection = moviesCollection;
                 }
 
-                if (movie is not null)
+                if (movieCollectionItem is not null && movie is not null && !moviesCollection.MoviesCollectionItems.Any(m => m.MovieId == movie.Id))
                 {
-                    existingCollection.Movies.Add(movie);
+                    movieCollectionItem.Movie = movie;
+                    movieCollectionItem.MovieId = movie.Id;
+                    movieCollectionItem.MoviesCollection = moviesCollection;
+                    movieCollectionItem.MovieCollectionId = moviesCollection.Id;
+                    existingCollection.MoviesCollectionItems.Add(movieCollectionItem);
                 }
 
                 return existingCollection;
