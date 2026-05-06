@@ -150,7 +150,7 @@ public sealed partial class AddMoviePage : ComponentBase
                         Name: Name,
                         OriginalName: OriginalName,
                         Description: Description,
-                        ImageSource: uploadingFileNameWithCorrectExtention,
+                        ImageSource: url,
                         PremierDate: PremierDate.Value,
                         MoviesDirectorsNames: MoviesDirectorsToSelectFrom
                             .Where(d => SelectedMoviesDirectorsIds.Contains(d.Id)).Select(b => b.Name)

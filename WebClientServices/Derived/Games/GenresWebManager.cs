@@ -67,7 +67,7 @@ public sealed class GenresWebManager : WebManager, IWebManager<Genre, AddGenreMo
         }
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<Genre>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

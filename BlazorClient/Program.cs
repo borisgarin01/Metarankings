@@ -2,6 +2,7 @@ using BlazorClient.Auth;
 using Domain.Games;
 using Domain.Games.Collections;
 using Domain.Movies;
+using Domain.Movies.Collections;
 using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Games.Collections;
 using Domain.RequestsModels.Games.Developers;
@@ -9,6 +10,7 @@ using Domain.RequestsModels.Games.Genres;
 using Domain.RequestsModels.Games.Localizations;
 using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Games.Publishers;
+using Domain.RequestsModels.Movies.Collections;
 using Domain.RequestsModels.Movies.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Domain.RequestsModels.Movies.MoviesGenres;
@@ -40,11 +42,14 @@ internal class Program
         builder.Services.AddScoped<IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersWebManager>();
         builder.Services.AddScoped<IWebManager<Game, AddGameModel, UpdateGameModel>, GamesWebManager>();
         builder.Services.AddScoped<IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>, GamesCollectionsWebManager>();
+        builder.Services.AddScoped<IWebManager<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>, GamesCollectionsItemsWebManager>();
 
         builder.Services.AddScoped<IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsWebManager>();
         builder.Services.AddScoped<IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>();
         builder.Services.AddScoped<IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosWebManager>();
         builder.Services.AddScoped<IWebManager<Movie, AddMovieModel, UpdateMovieModel>, MoviesWebManager>();
+        builder.Services.AddScoped<IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>, MoviesCollectionsWebManager>();
+        builder.Services.AddScoped<IWebManager<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsWebManager>();
 
         builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 

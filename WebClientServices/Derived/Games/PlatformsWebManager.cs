@@ -60,7 +60,7 @@ public sealed class PlatformsWebManager : WebManager, IWebManager<Platform, AddP
         return platform;
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<Platform>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

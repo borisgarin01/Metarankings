@@ -68,7 +68,7 @@ public sealed class MoviesStudiosWebManager : WebManager, IWebManager<MovieStudi
         return null;
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<MovieStudio>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

@@ -1,15 +1,15 @@
-﻿using Domain.Games.Collections;
-using Domain.RequestsModels.Games.Collections;
+﻿using Domain.Movies.Collections;
+using Domain.RequestsModels.Movies.Collections;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO;
 using WebManagers;
 
-namespace BlazorClient.Pages.Admin.Games.Collections;
+namespace BlazorClient.Pages.Admin.Movies.Collections;
 
 public partial class AddCollectionPage : ComponentBase
 {
     [Inject]
-    public IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> GamesCollectionsWebManager { get; set; }
+    public IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> MoviesCollectionsWebManager { get; set; }
 
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
@@ -31,17 +31,17 @@ public partial class AddCollectionPage : ComponentBase
 
     const int MAX_FILESIZE = 5000 * 1024;
 
-    public async Task AddGameCollectionAsync()
+    public async Task AddMovieCollectionAsync()
     {
-        var addGameCollectionModel = new AddGamesCollectionModel(CollectionName, Description, ImageSource);
+        var addGameCollectionModel = new AddMoviesCollectionModel(CollectionName, Description, ImageSource);
 
-        HttpResponseMessage gameCreationHttpResponseMessage = await GamesCollectionsWebManager.AddAsync(addGameCollectionModel);
+        HttpResponseMessage gameCreationHttpResponseMessage = await MoviesCollectionsWebManager.AddAsync(addGameCollectionModel);
 
         if (!gameCreationHttpResponseMessage.IsSuccessStatusCode)
             await JSRuntime.InvokeVoidAsync("alert", await gameCreationHttpResponseMessage.Content.ReadAsStringAsync());
 
         else
-            NavigationManager.NavigateTo("/games/collections");
+            NavigationManager.NavigateTo("/movies/collections");
     }
 
     private async Task FileUploaded(InputFileChangeEventArgs e)

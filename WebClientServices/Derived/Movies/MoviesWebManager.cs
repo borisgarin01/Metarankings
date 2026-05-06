@@ -30,9 +30,10 @@ public sealed class MoviesWebManager : WebManager, IWebManager<Movie, AddMovieMo
         throw new NotImplementedException();
     }
 
-    public Task<HttpResponseMessage> DeleteAsync(long id)
+    public async Task<HttpResponseMessage> DeleteAsync(long id)
     {
-        throw new NotImplementedException();
+        HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"/api/movies/movies/{id}");
+        return httpResponseMessage;
     }
 
     public async Task<IEnumerable<Movie>> GetAllAsync()
@@ -61,7 +62,7 @@ public sealed class MoviesWebManager : WebManager, IWebManager<Movie, AddMovieMo
         return null;
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<Movie>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

@@ -47,19 +47,13 @@ on g.Id=gci.GameId
 LEFT JOIN GamesCollections gc 
 ON gc.Id=gci.GameCollectionId;", (gameCollectionItem, game, gameCollection) =>
             {
-                if (game is not null)
+                if (game is not null && gameCollection is not null && gameCollectionItem is not null && !gameCollection.GamesCollectionItems.Any(g => g.GameId == game.Id))
                 {
-                    if (gameCollection is not null)
-                    {
-                        if (!gameCollection.Games.Any(g => g.Id == game.Id))
-                        {
-                            gameCollectionItem.Game = game;
-                            gameCollectionItem.GameId = game.Id;
-                            gameCollectionItem.GamesCollection = gameCollection;
-                            gameCollectionItem.GamesCollectionId = gameCollection.Id;
-                            gameCollection.Games.Add(game);
-                        }
-                    }
+                    gameCollectionItem.Game = game;
+                    gameCollectionItem.GameId = game.Id;
+                    gameCollectionItem.GamesCollection = gameCollection;
+                    gameCollectionItem.GamesCollectionId = gameCollection.Id;
+                    gameCollection.GamesCollectionItems.Add(gameCollectionItem);
                 }
 
                 return gameCollectionItem;

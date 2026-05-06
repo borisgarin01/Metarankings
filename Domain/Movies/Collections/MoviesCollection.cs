@@ -1,4 +1,4 @@
-﻿namespace Domain.Movies.MoviesCollections;
+﻿namespace Domain.Movies.Collections;
 
 public sealed record MoviesCollection
 {
@@ -14,5 +14,5 @@ public sealed record MoviesCollection
     [Required]
     public string ImageSource { get; set; }
 
-    public List<Movie> Movies { get; set; } = new();
+    public List<MoviesCollectionItem> MoviesCollectionItems { get; set; } = new();
 }

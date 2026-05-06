@@ -84,7 +84,7 @@ public partial class AddGamePage : ComponentBase
                     // Extract the URL from the response
                     var responseContent = await response.Content.ReadAsStringAsync();
 
-                    var addGameModel = new AddGameModel(Name, uploadingFileNameWithCorrectExtention, SelectedDevelopersIds, SelectedPublishersIds, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
+                    var addGameModel = new AddGameModel(Name, url, SelectedDevelopersIds, SelectedPublishersIds, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
 
                     HttpResponseMessage addingGameResponseMessage = await GetWebManager.AddAsync(addGameModel);
 

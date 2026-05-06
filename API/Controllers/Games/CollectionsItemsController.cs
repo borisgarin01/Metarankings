@@ -54,7 +54,7 @@ public sealed class CollectionsItemsController : ControllerBase
         try
         {
             await _gamesCollectionsItemsRepository.RemoveAsync(gameCollectionItemId);
-            return NotFound();
+            return NoContent();
         }
         catch (Exception ex)
         {

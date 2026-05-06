@@ -67,7 +67,7 @@ public sealed class DevelopersWebManager : WebManager, IWebManager<Developer, Ad
         }
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<Developer>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

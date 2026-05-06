@@ -1,6 +1,6 @@
 ﻿using Data.Repositories.Interfaces;
-using Domain.Games.Collections;
-using Domain.RequestsModels.Games.Collections;
+using Domain.Movies.Collections;
+using Domain.RequestsModels.Movies.Collections;
 
 namespace API.Controllers.Movies;
 
@@ -9,21 +9,21 @@ namespace API.Controllers.Movies;
 [Authorize(Policy = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class CollectionsItemsController : ControllerBase
 {
-    private IRepository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel> _gamesCollectionsItemsRepository;
+    private IRepository<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel> _moviesCollectionsItemsRepository;
 
-    public CollectionsItemsController(IRepository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel> gamesCollectionsItemsRepository)
+    public CollectionsItemsController(IRepository<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel> moviesCollectionsItemsRepository)
     {
-        _gamesCollectionsItemsRepository = gamesCollectionsItemsRepository;
+        _moviesCollectionsItemsRepository = moviesCollectionsItemsRepository;
     }
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<GamesCollectionItem>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<MoviesCollectionItem>>> GetAllAsync()
     {
         try
         {
-            IEnumerable<GamesCollectionItem> gameCollectionItems = await _gamesCollectionsItemsRepository.GetAllAsync();
-            return Ok(gameCollectionItems);
+            IEnumerable<MoviesCollectionItem> moviesCollectionItems = await _moviesCollectionsItemsRepository.GetAllAsync();
+            return Ok(moviesCollectionItems);
         }
         catch (Exception ex)
         {
@@ -32,12 +32,12 @@ public sealed class CollectionsItemsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<long>> AddAsync(AddGamesCollectionItemModel addGameCollectionItemModel)
+    public async Task<ActionResult<long>> AddAsync(AddMoviesCollectionItemModel addMoviesCollectionItemModel)
     {
         try
         {
-            long insertedGameCollectionItemId = await _gamesCollectionsItemsRepository.AddAsync(addGameCollectionItemModel);
-            return Ok(insertedGameCollectionItemId);
+            long insertedMovieCollectionItemId = await _moviesCollectionsItemsRepository.AddAsync(addMoviesCollectionItemModel);
+            return Ok(insertedMovieCollectionItemId);
         }
         catch (Exception ex)
         {
@@ -45,16 +45,16 @@ public sealed class CollectionsItemsController : ControllerBase
         }
     }
 
-    [HttpDelete("{gameCollectionItemId:long}")]
-    public async Task<ActionResult<long>> DeleteAsync(long gameCollectionItemId)
+    [HttpDelete("{movieCollectionItemId:long}")]
+    public async Task<ActionResult<long>> DeleteAsync(long movieCollectionItemId)
     {
-        GamesCollectionItem gameCollectionItem = await _gamesCollectionsItemsRepository.GetAsync(gameCollectionItemId);
-        if (gameCollectionItem is null)
+        MoviesCollectionItem moviesCollectionItem = await _moviesCollectionsItemsRepository.GetAsync(movieCollectionItemId);
+        if (moviesCollectionItem is null)
             return NotFound();
         try
         {
-            await _gamesCollectionsItemsRepository.RemoveAsync(gameCollectionItemId);
-            return NotFound();
+            await _moviesCollectionsItemsRepository.RemoveAsync(movieCollectionItemId);
+            return NoContent();
         }
         catch (Exception ex)
         {
@@ -62,16 +62,16 @@ public sealed class CollectionsItemsController : ControllerBase
         }
     }
 
-    [HttpPut("{gameCollectionItemId:long}")]
-    public async Task<ActionResult<GamesCollectionItem>> UpdateAsync(long gameCollectionItemId, UpdateGamesCollectionItemModel updateGameCollectionItemModel)
+    [HttpPut("{movieCollectionItemId:long}")]
+    public async Task<ActionResult<MoviesCollectionItem>> UpdateAsync(long movieCollectionItemId, UpdateMoviesCollectionItemModel updateMoviesCollectionItemModel)
     {
-        GamesCollectionItem gameCollectionItemToUpdate = await _gamesCollectionsItemsRepository.GetAsync(gameCollectionItemId);
-        if (gameCollectionItemToUpdate is null)
+        MoviesCollectionItem movieCollectionItemToUpdate = await _moviesCollectionsItemsRepository.GetAsync(movieCollectionItemId);
+        if (movieCollectionItemToUpdate is null)
             return NotFound();
         try
         {
-            GamesCollectionItem updatedGameCollectionItem = await _gamesCollectionsItemsRepository.UpdateAsync(updateGameCollectionItemModel, gameCollectionItemId);
-            return Ok(updatedGameCollectionItem);
+            MoviesCollectionItem updatedMovieCollectionItem = await _moviesCollectionsItemsRepository.UpdateAsync(updateMoviesCollectionItemModel, movieCollectionItemId);
+            return Ok(updatedMovieCollectionItem);
         }
         catch (Exception ex)
         {

@@ -62,7 +62,7 @@ public sealed class MoviesGenresWebManager : WebManager, IWebManager<MovieGenre,
         return null;
     }
 
-    public Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
+    public Task<IEnumerable<MovieGenre>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }

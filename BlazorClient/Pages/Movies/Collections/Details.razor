@@ -1,0 +1,74 @@
+﻿@page "/movies/collections/{MovieCollectionId:long}"
+@using Domain.Movies
+@using Domain.Movies.Collections
+
+@if (MoviesCollection is null)
+{
+    <p>Loading...</p>
+}
+
+else
+{
+    <div id="content" class="lcol">
+        <div class="news-text entry">
+            <div class="specials post single clear">
+                <div class="post-meta">
+                    <div class="breadcrumbs news-meta">
+                        <a href="https://metarankings.ru/meta/collections/">Подборки</a> → <a href="https://metarankings.ru/meta/collections/films-games/">Контент</a>
+                    </div>
+                    <h1><span>@MoviesCollection.Name</span></h1>
+                </div>
+                <div class="post-content">
+                    <div class="news-img">
+                        <img class="news-image" src="@MoviesCollection.ImageSource" alt="@MoviesCollection.Name">
+                    </div>
+                    <p>@MoviesCollection.Description</p>
+                </div>
+                <section id="loop" class="list clear best" itemscope="" itemtype="https://schema.org/ItemList">
+                    @foreach (MoviesCollectionItem moviesCollectionItem in MoviesCollection.MoviesCollectionItems)
+                    {
+                        <article class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+                            <a href="/movies/details/@moviesCollectionItem.Movie.Id" class="thumb">
+                                <img class="post-image" src="@($"{HttpClient.BaseAddress}{moviesCollectionItem.Movie.ImageSource}")" alt="@moviesCollectionItem.Movie.Name">
+                            </a>
+                            <div itemprop="item" itemscope="" itemtype="https://schema.org/Movie">
+                                <link itemprop="url" href="/movies/details/@moviesCollectionItem.Movie.Id">
+                                <link itemprop="image" href="@($"{HttpClient.BaseAddress}api/movies/images/{moviesCollectionItem.Movie.PremierDate.Value.Year}/{moviesCollectionItem.Movie.PremierDate.Value.Month}/{moviesCollectionItem.Movie.ImageSource}")">
+                                <meta itemprop="dateCreated" content="@moviesCollectionItem.Movie.PremierDate.Value.Year">
+                                <div itemprop="name"><a class="name" href="/games/details/@moviesCollectionItem.Movie.Id">@moviesCollectionItem.Movie.Name</a></div>
+                                <div class="post-meta">@moviesCollectionItem.Movie.PremierDate.Value.ToString("dd MMMM yyyy")</div>
+                            </div>
+                            <div class="ratings-graph">
+                                <div class="graph">
+                                    @if (!moviesCollectionItem.Movie.MovieReviews.Any())
+                                    {
+                                        <div class="small-score mark-0">0.0</div>
+                                        <div class="graph-body"><div style="width:0%" class="rating-graph mark-0"></div></div>
+                                    }
+                                    else
+                                    {
+                                        <div class="small-score mark-@Math.Round(moviesCollectionItem.Movie.MovieReviews.Average(mr => mr.Score))">@Math.Round(moviesCollectionItem.Movie.MovieReviews.Average(mr => mr.Score), 1)</div>
+                                        <div class="graph-body">
+                                            <div style="width:@(Math.Round(moviesCollectionItem.Movie.MovieReviews.Average(mr => mr.Score), 1) * 10)%" class="rating-graph mark-@Math.Round(moviesCollectionItem.Movie.MovieReviews.Average(mr => mr.Score))"></div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </article>
+                    }
+                </section>
+                <div class="ads-horizont hor-1">
+                    <!-- Yandex.RTB R-A-201169-7 -->
+                    <div id="yandex_rtb_R-A-201169-7"></div>
+                    <script>
+                        window.yaContextCb.push(()=>{
+                          Ya.Context.AdvManager.render({
+                            renderTo: 'yandex_rtb_R-A-201169-7',
+                            blockId: 'R-A-201169-7'
+                          })
+                        })</script>
+                </div>
+            </div>
+        </div>
+    </div>
+}

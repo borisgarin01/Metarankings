@@ -2,7 +2,7 @@
 using Domain.Games;
 using Domain.Games.Collections;
 using Domain.Movies;
-using Domain.Movies.MoviesCollections;
+using Domain.Movies.Collections;
 using Domain.RequestsModels.Movies.Collections;
 
 namespace Data.Repositories.Classes.Derived.Games;
@@ -49,19 +49,13 @@ on m.Id=mci.MovieId
 LEFT JOIN MoviesCollections mc 
 ON mc.Id=mci.MovieCollectionId;", (moviesCollectionItem, movie, moviesCollection) =>
             {
-                if (movie is not null)
+                if (movie is not null && moviesCollection is not null && !moviesCollection.MoviesCollectionItems.Any(m => m.Id == moviesCollectionItem.Id))
                 {
-                    if (moviesCollection is not null)
-                    {
-                        if (!moviesCollection.Movies.Any(m => m.Id == movie.Id))
-                        {
-                            moviesCollectionItem.Movie = movie;
-                            moviesCollectionItem.MovieId = movie.Id;
-                            moviesCollectionItem.MoviesCollection = moviesCollection;
-                            moviesCollectionItem.MovieCollectionId = moviesCollection.Id;
-                            moviesCollection.Movies.Add(movie);
-                        }
-                    }
+                    moviesCollectionItem.Movie = movie;
+                    moviesCollectionItem.MovieId = movie.Id;
+                    moviesCollectionItem.MoviesCollection = moviesCollection;
+                    moviesCollectionItem.MovieCollectionId = moviesCollection.Id;
+                    moviesCollection.MoviesCollectionItems.Add(moviesCollectionItem);
                 }
 
                 return moviesCollectionItem;

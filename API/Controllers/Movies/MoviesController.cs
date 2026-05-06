@@ -1,4 +1,6 @@
-﻿using Data.Repositories.Classes.Derived.Movies;
+﻿using API.Controllers.Games;
+using Data.Repositories.Classes.Derived.Games;
+using Data.Repositories.Classes.Derived.Movies;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
 using Domain.RequestsModels.Movies.Movies;
@@ -11,13 +13,15 @@ public sealed class MoviesController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly IMoviesRepository _moviesModelsRepository;
+    private readonly ILogger<MoviesController> _logger;
 
     private JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
-    public MoviesController(IConfiguration configuration, IMoviesRepository moviesModelsRepository)
+    public MoviesController(IConfiguration configuration, IMoviesRepository moviesModelsRepository, ILogger<MoviesController> logger)
     {
         _configuration = configuration;
         _moviesModelsRepository = moviesModelsRepository;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -67,5 +71,24 @@ public sealed class MoviesController : ControllerBase
         if (file is null)
             return NotFound();
         return File(file, "image/jpeg");
+    }
+    
+    [HttpDelete("{id:long}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
+    public async Task<ActionResult<long>> RemoveAsync(long id)
+    {
+        Movie movie = await _moviesModelsRepository.GetAsync(id);
+        if (movie is null)
+            return NotFound();
+        try
+        {
+            await _moviesModelsRepository.RemoveAsync(id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{ex.Message}\t{ex.StackTrace}");
+            return StatusCode(500, ex);
+        }
     }
 }

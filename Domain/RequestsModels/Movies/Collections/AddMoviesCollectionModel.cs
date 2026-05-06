@@ -6,6 +6,4 @@ public sealed record AddMoviesCollectionModel(
     [property: JsonPropertyName("description")]
     string Description,
     [property:JsonPropertyName("imageSource")]
-    string ImageSource,
-    [property:JsonPropertyName("selectedMoviesIds")]
-    IEnumerable<long> SelectedMoviesIds);
+    string ImageSource);

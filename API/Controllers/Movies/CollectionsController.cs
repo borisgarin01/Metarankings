@@ -1,5 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
-using Domain.Movies.MoviesCollections;
+using Domain.Movies.Collections;
 using Domain.RequestsModels.Movies.Collections;
 
 namespace API.Controllers.Movies;
@@ -9,13 +9,16 @@ namespace API.Controllers.Movies;
 [Authorize(Policy = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class CollectionsController : ControllerBase
 {
+    private readonly ILogger<CollectionsController> _logger;
+
     private readonly IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> _moviesCollectionsRepository;
     private readonly IRepository<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel> _moviesCollectionsItemsRepository;
 
-    public CollectionsController(IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> moviesCollectionsRepository, IRepository<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel> moviesCollectionsItemsRepository)
+    public CollectionsController(IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> moviesCollectionsRepository, IRepository<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel> moviesCollectionsItemsRepository, ILogger<CollectionsController> logger)
     {
         _moviesCollectionsRepository = moviesCollectionsRepository;
         _moviesCollectionsItemsRepository = moviesCollectionsItemsRepository;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -29,6 +32,7 @@ public sealed class CollectionsController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, ex.Message, ex.StackTrace);
             return StatusCode(500, ex);
         }
     }
@@ -44,6 +48,7 @@ public sealed class CollectionsController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, ex.Message, ex.StackTrace);
             return StatusCode(500, ex);
         }
     }
@@ -61,6 +66,7 @@ public sealed class CollectionsController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, ex.Message, ex.StackTrace);
             return StatusCode(500, ex);
         }
     }
@@ -72,15 +78,11 @@ public sealed class CollectionsController : ControllerBase
         {
             long insertedMovieCollectionId = await _moviesCollectionsRepository.AddAsync(addMoviesCollectionModel);
 
-            foreach (long selectedMovieId in addMoviesCollectionModel.SelectedMoviesIds)
-            {
-                _ = await _moviesCollectionsItemsRepository.AddAsync(new AddMoviesCollectionItemModel(selectedMovieId, insertedMovieCollectionId));
-            }
-
             return Ok(insertedMovieCollectionId);
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, ex.Message, ex.StackTrace);
             return StatusCode(500, ex);
         }
     }
@@ -98,6 +100,7 @@ public sealed class CollectionsController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, ex.Message, ex.StackTrace);
             return StatusCode(500, ex);
         }
     }
@@ -116,6 +119,7 @@ public sealed class CollectionsController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, ex.Message, ex.StackTrace);
             return StatusCode(500, ex);
         }
     }

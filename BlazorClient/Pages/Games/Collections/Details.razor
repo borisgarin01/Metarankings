@@ -1,5 +1,6 @@
 ﻿@page "/games/collections/{GameCollectionId:long}"
 @using Domain.Games
+@using Domain.Games.Collections
 
 @if (GameCollection is null)
 {
@@ -19,23 +20,23 @@ else
                 </div>
                 <div class="post-content">
                     <div class="news-img">
-                        <img class="news-image" src="https://metarankings.ru/images/uploads/2023/06/slozhnye-igry.jpg" alt="@GameCollection.Name">
+                        <img class="news-image" src="@GameCollection.ImageSource" alt="@GameCollection.Name">
                     </div>
                     <p>@GameCollection.Description</p>
                 </div>
                 <section id="loop" class="list clear best" itemscope="" itemtype="https://schema.org/ItemList">
-                    @foreach (Game game in GameCollection.Games)
+                    @foreach (GamesCollectionItem gamesCollectionItem in GameCollection.GamesCollectionItems)
                     {
                         <article class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
-                            <a href="/games/details/@game.Id" class="thumb">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/{game.ReleaseDate.Value.Year}/{game.ReleaseDate.Value.Month}/{game.Image}")" alt="@game.Name">
+                            <a href="/games/details/@gamesCollectionItem.Game.Id" class="thumb">
+                                <img class="post-image" src="@($"{HttpClient.BaseAddress}{gamesCollectionItem.Game.Image}")" alt="@gamesCollectionItem.Game.Name">
                             </a>
                             <div itemprop="item" itemscope="" itemtype="https://schema.org/VideoGame">
-                                <link itemprop="url" href="/games/details/@game.Id">
-                                <link itemprop="image" href="@($"{HttpClient.BaseAddress}api/games/images/{game.ReleaseDate.Value.Year}/{game.ReleaseDate.Value.Month}/{game.Image}")">
-                                <meta itemprop="dateCreated" content="@game.ReleaseDate.Value.Year">
-                                <div itemprop="name"><a class="name" href="/games/details/@game.Id">@game.Name</a></div>
-                                <div class="post-meta">@game.ReleaseDate.Value.ToString("dd MMMM yyyy")</div>
+                                <link itemprop="url" href="/games/details/@gamesCollectionItem.Game.Id">
+                                <link itemprop="image" href="@($"{HttpClient.BaseAddress}api/games/images/{gamesCollectionItem.Game.ReleaseDate.Value.Year}/{gamesCollectionItem.Game.ReleaseDate.Value.Month}/{gamesCollectionItem.Game.Image}")">
+                                <meta itemprop="dateCreated" content="@gamesCollectionItem.Game.ReleaseDate.Value.Year">
+                                <div itemprop="name"><a class="name" href="/games/details/@gamesCollectionItem.Game.Id">@gamesCollectionItem.Game.Name</a></div>
+                                <div class="post-meta">@gamesCollectionItem.Game.ReleaseDate.Value.ToString("dd MMMM yyyy")</div>
                             </div>
                             <div class="ratings-graph">
                                 <div class="graph">

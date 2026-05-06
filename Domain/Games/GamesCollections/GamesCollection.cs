@@ -14,5 +14,5 @@ public sealed record GamesCollection
     [Required]
     public string ImageSource { get; set; }
 
-    public List<Game> Games { get; set; } = new();
+    public List<GamesCollectionItem> GamesCollectionItems { get; set; } = new();
 }

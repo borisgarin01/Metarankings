@@ -1,7 +1,6 @@
-﻿
-using Domain.Games.Collections;
+﻿using Domain.Games.Collections;
 
-namespace BlazorClient.Pages.Collections;
+namespace BlazorClient.Pages.Games.Collections;
 
 public partial class Details : ComponentBase
 {
