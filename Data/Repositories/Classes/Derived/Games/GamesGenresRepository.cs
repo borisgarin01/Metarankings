@@ -3,13 +3,13 @@ using Domain.Games;
 using Domain.RequestsModels.Games.Genres;
 
 namespace Data.Repositories.Classes.Derived.Games;
-public sealed class GamesGenresRepository : Repository, IRepository<Genre, AddGenreModel, UpdateGenreModel>
+public sealed class GamesGenresRepository : Repository, IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel>
 {
     public GamesGenresRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddGenreModel genre)
+    public async Task<long> AddAsync(AddGameGenreModel genre)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -26,7 +26,7 @@ RETURNING Id;"
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddGenreModel> genres)
+    public async Task AddRangeAsync(IEnumerable<AddGameGenreModel> genres)
     {
         foreach (var genre in genres)
         {
@@ -139,7 +139,7 @@ Genres WHERE Id=@id", new { id });
         }
     }
 
-    public async Task<Genre> UpdateAsync(UpdateGenreModel genre, long id)
+    public async Task<Genre> UpdateAsync(UpdateGameGenreModel genre, long id)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {

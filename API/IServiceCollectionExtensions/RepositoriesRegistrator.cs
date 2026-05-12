@@ -28,7 +28,7 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel>, DevelopersRepository>(instance => new DevelopersRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Genre, AddGenreModel, UpdateGenreModel>, GamesGenresRepository>(instance => new GamesGenresRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel>, GamesGenresRepository>(instance => new GamesGenresRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsRepository>(instance => new PlatformsRepository(metarankingsConnectionString));
 

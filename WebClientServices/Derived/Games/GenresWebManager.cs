@@ -6,13 +6,13 @@ using System.Text.Json;
 
 namespace WebManagers.Derived.Games;
 
-public sealed class GenresWebManager : WebManager, IWebManager<Genre, AddGenreModel, UpdateGenreModel>
+public sealed class GenresWebManager : WebManager, IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel>
 {
     public GenresWebManager(HttpClient httpClient) : base(httpClient)
     {
     }
 
-    public async Task<HttpResponseMessage> AddAsync(AddGenreModel addGenreModel)
+    public async Task<HttpResponseMessage> AddAsync(AddGameGenreModel addGenreModel)
     {
         HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Genres", addGenreModel);
         return httpResponseMessage;
@@ -24,7 +24,7 @@ public sealed class GenresWebManager : WebManager, IWebManager<Genre, AddGenreMo
         return httpResponseMessage;
     }
 
-    public async Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddGenreModel> addGenresModels)
+    public async Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddGameGenreModel> addGenresModels)
     {
         HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Genres/upload-genres-from-json", addGenresModels);
         return httpResponseMessage;
@@ -54,7 +54,7 @@ public sealed class GenresWebManager : WebManager, IWebManager<Genre, AddGenreMo
         return genre;
     }
 
-    public async Task<Genre> UpdateAsync(long id, UpdateGenreModel tUpdate)
+    public async Task<Genre> UpdateAsync(long id, UpdateGameGenreModel tUpdate)
     {
         HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync($"/api/Games/Genres/{id}", tUpdate);
         if (httpResponseMessage.IsSuccessStatusCode)

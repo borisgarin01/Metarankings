@@ -9,11 +9,11 @@ namespace API.Controllers.Games;
 [Route("api/games/[controller]")]
 public sealed class GenresController : ControllerBase
 {
-    private readonly IRepository<Genre, AddGenreModel, UpdateGenreModel> _genresRepository;
+    private readonly IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel> _genresRepository;
 
     private readonly TelegramAuthenticator _telegramAuthenticator;
 
-    public GenresController(IRepository<Genre, AddGenreModel, UpdateGenreModel> genresRepository, TelegramAuthenticator telegramAuthenticator)
+    public GenresController(IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel> genresRepository, TelegramAuthenticator telegramAuthenticator)
     {
         _genresRepository = genresRepository;
         _telegramAuthenticator = telegramAuthenticator;
@@ -29,7 +29,7 @@ public sealed class GenresController : ControllerBase
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<Genre>> AddAsync(AddGenreModel addGenreModel)
+    public async Task<ActionResult<Genre>> AddAsync(AddGameGenreModel addGenreModel)
     {
         if (!ModelState.IsValid)
         {
@@ -78,7 +78,7 @@ public sealed class GenresController : ControllerBase
 
     [HttpPut("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<Genre>> UpdateAsync(long id, UpdateGenreModel updateGenreModel)
+    public async Task<ActionResult<Genre>> UpdateAsync(long id, UpdateGameGenreModel updateGenreModel)
     {
         if (!ModelState.IsValid)
         {

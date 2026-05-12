@@ -10,12 +10,12 @@ public partial class AddGenrePage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IWebManager<Genre, AddGenreModel, UpdateGenreModel> GenresWebManager { get; set; }
+    public IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel> GenresWebManager { get; set; }
 
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
 
-    public AddGenreModel AddGenreModel { get; } = new AddGenreModel();
+    public AddGameGenreModel AddGenreModel { get; } = new AddGameGenreModel();
 
     public async Task AddGenreAsync()
     {

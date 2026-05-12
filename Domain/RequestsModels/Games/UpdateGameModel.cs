@@ -31,7 +31,7 @@ AddPublisherModel Publisher,
 [property: JsonPropertyName("genres")]
 [Required(ErrorMessage = "Genres should be set")]
 [MinLength(1, ErrorMessage = "Genres should be not empty")]
-IEnumerable<AddGenreModel> Genres,
+IEnumerable<AddGameGenreModel> Genres,
 
 [property: JsonPropertyName("localization")]
 [Required(ErrorMessage = "Localization should be set")]
