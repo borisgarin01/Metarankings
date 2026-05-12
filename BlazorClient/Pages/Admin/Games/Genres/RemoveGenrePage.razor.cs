@@ -12,7 +12,7 @@ public partial class RemoveGenrePage : ComponentBase
     public Genre Genre { get; private set; }
 
     [Inject]
-    public IWebManager<Genre, AddGenreModel, UpdateGenreModel> GenresWebManager { get; set; }
+    public IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel> GenresWebManager { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }

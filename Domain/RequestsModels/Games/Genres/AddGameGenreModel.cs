@@ -1,6 +1,6 @@
 ﻿namespace Domain.RequestsModels.Games.Genres;
 
-public sealed record AddGenreModel
+public sealed record AddGameGenreModel
 {
     [Required(ErrorMessage = "Name is required")]
     [MaxLength(255, ErrorMessage = "Max length is 255")]

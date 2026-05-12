@@ -1,4 +1,6 @@
-﻿<div class="headerer">
+﻿@using Domain.Games
+@using Domain.Movies
+<div class="headerer">
     <div class="header-bottom">
         <div class="header clear nav-menu">
             <div class="menu-icon">
@@ -13,24 +15,18 @@
             <div class="nav">
                 <ul>
                     <li>
-                        <span><a href="/best-movies/">Фильмы</a></span>
+                        <span><a href="/movies/movies-list/">Фильмы</a></span>
                         <div class="movie-drop">
-                            <a href="/new-movies/">Новинки</a>
-                            <a href="/coming-soon/">Скоро</a>
-                            <a href="/most-waiting-films/">Ожидаемые</a>
-                            <a href="/meta/movies/">Обзоры</a>
-                            <a href="/best-movies/">Топ фильмов</a>
-                            <a href="/best-movies-2024/">Фильмы 2024</a>
-                            <a href="/best-boeviki/">Боевики</a>
-                            <a href="/best-horror/">Ужасы</a>
-                            <a href="/best-comedy/">Комедии</a>
-                            <a href="/best-thrillers/">Триллеры</a>
-                            <a href="/best-fantasy/">Фантастика</a>
-                            <a href="/best-fentezi/">Фэнтези</a>
-                            <a href="/best-dramy/">Драмы</a>
-                            <a href="/best-melodramas/">Мелодрамы</a>
-                            <a href="/best-cartoons/">Мультфильмы</a>
-                            <a href="/best-serials/">Сериалы</a>
+                            <a href="/movies/new-movies/">Новинки</a>
+                            <a href="/movies/coming-soon/">Скоро</a>
+                            <a href="/movies/most-waiting-films/">Ожидаемые</a>
+                            <a href="/movies/meta/movies/">Обзоры</a>
+                            <a href="/movies/best-movies/">Топ фильмов</a>
+                            <a href="/movies/best-movies/@DateTime.Today.Year">Фильмы @DateTime.Today.Year</a>
+                            @foreach (MovieGenre genre in MoviesGenres)
+                            {
+                                <a href="/movies/genres/@genre.Id">@genre.Name</a>
+                            }
                         </div>
                     </li>
                     <li class="active">
@@ -42,23 +38,15 @@
                                 <a href="/games/most-waiting-games/">Ожидаемые</a>
                                 <a href="/games/meta/games/">Обзоры</a>
                                 <a href="/games/best-games?Year=@DateTime.Now.Year">Топ игр</a>
-                                <a href="/games/best-games?Year=@(DateTime.Now.Year - 1)">Игры 2024</a>
-                                <a href="/games/best-games?PlatformId=3">ПК</a>
-                                <a href="/games/best-games?PlatformId=6">PS5</a>
-                                <a href="/games/best-games?PlatformId=1">PS4</a>
-                                <a href="/games/best-games?PlatformId=7">Xbox Series X</a>
-                                <a href="/games/best-games?PlatformId=5">Xbox One</a>
-                                <a href="/games/best-games?PlatformId=4">Switch</a>
-                                <a href="/games/best-games?GenreId=3">Лучшие экшены</a>
-                                <a href="/games/best-games?GenreId=9">Лучшие шутеры</a>
-                                <a href="/games/best-games?GenreId=2">Лучшие хорроры</a>
-                                <a href="/games/best-games?GenreId=1">Лучшие приключения</a>
-                                <a href="/games/best-games?GenreId=4">Лучшие РПГ</a>
-                                <a href="/games/best-games?GenreId=10">Лучшие стратегии</a>
-                                <a href="/games/best-games?GenreId=11">Лучшие гонки</a>
-                                <a href="/games/best-games?GenreId=6">Лучшие аркады</a>
-                                <a href="/games/best-games?GenreId=15">Лучшие файтинги</a>
-                                <a href="/games/best-games?GenreId=13">Лучшие MMO</a>
+                                <a href="/games/best-games?Year=@(DateTime.Now.Year - 1)">Игры @(DateTime.Now.Year - 1)</a>
+                                @foreach (Platform platform in Platforms)
+                                {
+                                    <a href="/games/best-games?PlatformId=@platform.Id">@platform.Name</a>
+                                }
+                                @foreach (Genre genre in GamesGenres)
+                                {
+                                    <a href="/games/best-games?GenreId=@genre.Id">Лучшие игры жанра @genre.Name</a>
+                                }
                             </div>
                     </li>
                     <li>

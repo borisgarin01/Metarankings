@@ -36,7 +36,7 @@ internal class Program
         });
 
         builder.Services.AddScoped<IWebManager<Developer, AddDeveloperModel, UpdateDeveloperModel>, DevelopersWebManager>();
-        builder.Services.AddScoped<IWebManager<Genre, AddGenreModel, UpdateGenreModel>, GenresWebManager>();
+        builder.Services.AddScoped<IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel>, GenresWebManager>();
         builder.Services.AddScoped<IWebManager<Localization, AddLocalizationModel, UpdateLocalizationModel>, LocalizationsWebManager>();
         builder.Services.AddScoped<IWebManager<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsWebManager>();
         builder.Services.AddScoped<IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersWebManager>();
