@@ -6,7 +6,9 @@ using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 using IdentityLibrary.Telegram;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
 using Scalar.AspNetCore;
@@ -74,8 +76,10 @@ internal class Program
             googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
         }).AddVkontakte(vkontakteOptions =>
         {
+            vkontakteOptions.CallbackPath = new PathString(builder.Configuration["AuthSettings:Vkontakte:CallbackPath"]);
             vkontakteOptions.ClientId = builder.Configuration["AuthSettings:Vkontakte:ClientId"];
             vkontakteOptions.ClientSecret = builder.Configuration["AuthSettings:Vkontakte:ClientSecret"];
+            vkontakteOptions.ClaimsIssuer = builder.Configuration["AuthSettings:Vkontakte:ClaimsIssuer"];
             vkontakteOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:Vkontakte:AuthUri"];
             vkontakteOptions.TokenEndpoint = builder.Configuration["AuthSettings:Vkontakte:TokenUri"];
             vkontakteOptions.UserInformationEndpoint = builder.Configuration["AuthSettings:Vkontakte:UserInfoUri"];
@@ -83,6 +87,17 @@ internal class Program
             var scopes = builder.Configuration.GetSection("AuthSettings:Vkontakte:Scopes").Get<string[]>();
             foreach (var scope in scopes ?? Array.Empty<string>())
                 vkontakteOptions.Scope.Add(scope);
+            vkontakteOptions.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "user_id");
+            vkontakteOptions.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+            vkontakteOptions.SaveTokens = true;
+            vkontakteOptions.Events = new OAuthEvents
+            {
+                OnCreatingTicket = context =>
+                {
+                    context.RunClaimActions(context.TokenResponse.Response.RootElement);
+                    return Task.CompletedTask;
+                }
+            };
         })
         .AddCookie();
 

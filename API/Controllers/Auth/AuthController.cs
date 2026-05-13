@@ -1,4 +1,5 @@
 ﻿using API.Auth;
+using AspNet.Security.OAuth.Vkontakte;
 using Domain.Auth;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
@@ -606,19 +607,19 @@ public sealed class AuthController : ControllerBase
         try
         {
             string redirectUrl = Url.Action(nameof(VkCallback), "Auth", null, Request.Scheme);
-            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("Vk", redirectUrl);
+            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("Vkontakte", redirectUrl);
             _logger.LogInformation("AllowRefresh: {AllowRefresh}", properties.AllowRefresh);
             _logger.LogInformation("ExpiresUtc: {ExpiresUtc}", properties.ExpiresUtc);
             _logger.LogInformation("IsPersistent: {IsPersistent}", properties.IsPersistent);
             _logger.LogInformation("IssuedUtc: {IssuedUtc}", properties.IssuedUtc);
             _logger.LogInformation("RedirectUri: {RedirectUri}", properties.RedirectUri);
             _logger.LogInformation("Items: {Items}", string.Join(", ", properties.Items.Select(kvp => $"{kvp.Key}: {kvp.Value}")));
-            return Challenge(properties, "Google");
+            return Challenge(properties, "Vkontakte");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Ошибка при попытке входа через Google: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            return StatusCode(500, $"Ошибка при попытке входа через Google: {ex.Message}");
+            _logger.LogError(ex, $"Ошибка при попытке входа через Vkontakte: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"Ошибка при попытке входа через Vkontakte: {ex.Message}");
         }
     }
 
@@ -629,7 +630,7 @@ public sealed class AuthController : ControllerBase
         {
             _logger.LogInformation("vk-callback");
 
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+            var result = await HttpContext.AuthenticateAsync(VkontakteAuthenticationDefaults.AuthenticationScheme);
 
             _logger.LogInformation("Vk callback authentication result succeeded: {Succeeded}", result.Succeeded);
 
@@ -648,7 +649,7 @@ public sealed class AuthController : ControllerBase
 
             ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(email);
 
-            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync("Vk", email, isPersistent: true);
+            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync("Vkontakte", email, isPersistent: true);
 
             _logger.LogInformation("External login sign-in result for Vk user {Email}: {Result}", email, signInResult.ToString());
 
@@ -752,9 +753,9 @@ public sealed class AuthController : ControllerBase
 
                 _logger.LogInformation("User to add external login - {Id}, {Email}, {PhoneNumber}", userToAddExternalLogin.Id, userToAddExternalLogin.Email, userToAddExternalLogin.PhoneNumber);
 
-                await _usersManager.AddLoginAsync(userToAddExternalLogin, new UserLoginInfo("Google", email, "Google"));
+                await _usersManager.AddLoginAsync(userToAddExternalLogin, new UserLoginInfo("Vkontakte", email, "Vkontakte"));
 
-                Microsoft.AspNetCore.Identity.SignInResult freshRegisteredUserSignInResult = await _signInManager.ExternalLoginSignInAsync("Google", email, isPersistent: true);
+                Microsoft.AspNetCore.Identity.SignInResult freshRegisteredUserSignInResult = await _signInManager.ExternalLoginSignInAsync("Vkontakte", email, isPersistent: true);
 
                 ApplicationUser? createdUser = await _usersManager.FindByEmailAsync(email);
 
