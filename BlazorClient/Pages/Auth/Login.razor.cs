@@ -172,4 +172,9 @@ public partial class Login : ComponentBase
     {
         NavigationManager.NavigateTo($"/api/auth/login-google", forceLoad: true);
     }
+
+    public async Task LoginVkontakte()
+    {
+        NavigationManager.NavigateTo($"/api/auth/login-vk", forceLoad: true);
+    }
 }

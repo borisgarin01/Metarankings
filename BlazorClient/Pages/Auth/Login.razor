@@ -50,7 +50,15 @@
             {
                 @foreach (AuthenticationScheme login in ExternalLogins)
                 {
-                    <button @onclick="LoginGoogle">@login.DisplayName</button>
+                    if (login.DisplayName == "Google")
+                    {
+                        <button @onclick="LoginGoogle">@login.DisplayName</button>
+                    }
+                    else if (login.DisplayName == "Vkontakte")
+                    {
+
+                        <button @onclick="LoginVkontakte">@login.DisplayName</button>
+                    }
                 }
             }
         </div>

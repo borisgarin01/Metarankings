@@ -600,6 +600,189 @@ public sealed class AuthController : ControllerBase
         }
     }
 
+    [HttpGet("login-vk")]
+    public async Task<ActionResult> LoginViaVk()
+    {
+        try
+        {
+            string redirectUrl = Url.Action(nameof(VkCallback), "Auth", null, Request.Scheme);
+            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("Vk", redirectUrl);
+            _logger.LogInformation("AllowRefresh: {AllowRefresh}", properties.AllowRefresh);
+            _logger.LogInformation("ExpiresUtc: {ExpiresUtc}", properties.ExpiresUtc);
+            _logger.LogInformation("IsPersistent: {IsPersistent}", properties.IsPersistent);
+            _logger.LogInformation("IssuedUtc: {IssuedUtc}", properties.IssuedUtc);
+            _logger.LogInformation("RedirectUri: {RedirectUri}", properties.RedirectUri);
+            _logger.LogInformation("Items: {Items}", string.Join(", ", properties.Items.Select(kvp => $"{kvp.Key}: {kvp.Value}")));
+            return Challenge(properties, "Google");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при попытке входа через Google: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"Ошибка при попытке входа через Google: {ex.Message}");
+        }
+    }
+
+    [HttpGet("vk-callback")]
+    public async Task<ActionResult> VkCallback()
+    {
+        try
+        {
+            _logger.LogInformation("vk-callback");
+
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            _logger.LogInformation("Vk callback authentication result succeeded: {Succeeded}", result.Succeeded);
+
+            if (!result.Succeeded || result.Principal is null)
+            {
+                HttpContext.Response.Redirect("/");
+                return Unauthorized();
+            }
+
+            string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            string? vkUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string? phoneNumber = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
+            string? name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
+
+            _logger.LogInformation("Vk user email - {Email}, VkUserId - {UserId}, {PhoneNumber}, {Name}", email, vkUserId, phoneNumber, name);
+
+            ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(email);
+
+            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync("Vk", email, isPersistent: true);
+
+            _logger.LogInformation("External login sign-in result for Vk user {Email}: {Result}", email, signInResult.ToString());
+
+            if (userToCheckExistance is not null)
+            {
+                _logger.LogInformation("userToCheckExistance is not null");
+
+                if (signInResult is not null)
+                {
+                    if (signInResult.Succeeded)
+                    {
+                        _logger.LogInformation("signInResult is not null && signInResult.Succeeded");
+
+                        string tokenString = await _authTokenGenerator.GenerateJwtToken(userToCheckExistance);
+
+                        _logger.LogInformation("token - {token}", tokenString);
+
+                        IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
+
+                        if (identityResult.Succeeded)
+                        {
+                            _logger.LogInformation("IdentityResult succeded - {Succeeded}", identityResult.Succeeded);
+                            // Redirect back to Blazor app with token in URL
+                            // The token will be captured by Blazor's callback page
+                            return Redirect($"{Request.Scheme}://{Request.Host}/auth/vk-callback?Token={tokenString}");
+                        }
+
+                        return Redirect($"{Request.Scheme}://{Request.Host}/login?error=token_generation_failed");
+                    }
+                    else if (signInResult.RequiresTwoFactor)
+                    {
+                        _logger.LogInformation("Vk user {Email} requires two-factor authentication", email);
+
+                        string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
+
+                        _logger.LogInformation("Generated 2FA token for Google user {Email}: {TwoFactorToken}", email, twoFactorToken);
+
+                        MimeMessage emailMessage = new();
+                        emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
+
+                        emailMessage.To.Add(new MailboxAddress("", userToCheckExistance.Email));
+
+                        emailMessage.Subject = "Confirm login";
+                        emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+                        {
+                            Text = $"Your 2FA verification code is: <strong>{twoFactorToken}</strong><br><br>" +
+                                   $"Enter this code to complete your login."
+                        };
+
+                        using SmtpClient client = new();
+                        await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
+                        await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
+                        _ = await client.SendAsync(emailMessage);
+                        await client.DisconnectAsync(true);
+
+                        return Redirect($"/auth/validate-two-factor-code/{userToCheckExistance.Id}");
+                    }
+                    return Unauthorized();
+                }
+                return Unauthorized();
+
+            }
+            else
+            {
+                _logger.LogInformation("userToCheckExistance is null");
+
+                var userToRegister = new ApplicationUser
+                {
+                    Email = email,
+                    UserName = email,
+                    NormalizedEmail = email.ToUpperInvariant(),
+                    NormalizedUserName = email.ToUpperInvariant(),
+                    EmailConfirmed = true, // Since we get the email from Google, we can consider it confirmed
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                    AccessFailedCount = 0,
+                    PhoneNumber = phoneNumber,
+                    SecurityStamp = Guid.NewGuid().ToString()
+                };
+
+                IdentityResult userCreationResult = await _usersManager.CreateAsync(userToRegister);
+
+                if (userCreationResult.Succeeded)
+                {
+                    _logger.LogInformation("User creation succeeded for email {Email}", email);
+                }
+                else
+                {
+                    _logger.LogError("User creation failed for email {Email}. Errors: {Errors}", email, string.Join(", ", userCreationResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
+                    return StatusCode(500, new { Message = "User creation failed", UserToRegister = userToRegister });
+                }
+
+                _logger.LogInformation("user created in database with email {Email}", email);
+
+                ApplicationUser? userToAddExternalLogin = await _usersManager.FindByEmailAsync(email);
+
+                if (userToAddExternalLogin is null)
+                {
+                    _logger.LogError("User to add external login not found after creation for email {Email}", email);
+                    return StatusCode(500, new { Message = "User to add external login not found after creation", Email = email });
+                }
+
+                _logger.LogInformation("User to add external login - {Id}, {Email}, {PhoneNumber}", userToAddExternalLogin.Id, userToAddExternalLogin.Email, userToAddExternalLogin.PhoneNumber);
+
+                await _usersManager.AddLoginAsync(userToAddExternalLogin, new UserLoginInfo("Google", email, "Google"));
+
+                Microsoft.AspNetCore.Identity.SignInResult freshRegisteredUserSignInResult = await _signInManager.ExternalLoginSignInAsync("Google", email, isPersistent: true);
+
+                ApplicationUser? createdUser = await _usersManager.FindByEmailAsync(email);
+
+                _logger.LogInformation("New user created with email {Email}", email);
+
+                if (createdUser is not null && freshRegisteredUserSignInResult is not null && freshRegisteredUserSignInResult.Succeeded)
+                {
+                    _logger.LogInformation("createdUser is not null && freshRegisteredUserSignInResult is not null && freshRegisteredUserSignInResult.Succeeded");
+
+                    string tokenString = await _authTokenGenerator.GenerateJwtToken(createdUser);
+                    IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(createdUser, "SQLServer", "AuthToken", tokenString);
+                    if (identityResult.Succeeded)
+                    {
+                        return Redirect($"{Request.Scheme}://{Request.Host}/auth/vk-callback?Token={tokenString}");
+                    }
+                    return Redirect($"{Request.Scheme}://{Request.Host}/login?error=token_generation_failed");
+                }
+
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=token_generation_failed");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при обработке Vk callback: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
+        }
+    }
+
     [HttpGet("current-user")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<ApplicationUser>> GetCurrentUserAsync()

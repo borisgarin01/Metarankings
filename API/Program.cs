@@ -6,7 +6,6 @@ using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
 using IdentityLibrary.Telegram;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -73,7 +72,19 @@ internal class Program
         {
             googleOptions.ClientId = builder.Configuration["AuthSettings:Google:ClientId"];
             googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
-        }).AddCookie();
+        }).AddVkontakte(vkontakteOptions =>
+        {
+            vkontakteOptions.ClientId = builder.Configuration["AuthSettings:Vkontakte:ClientId"];
+            vkontakteOptions.ClientSecret = builder.Configuration["AuthSettings:Vkontakte:ClientSecret"];
+            vkontakteOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:Vkontakte:AuthUri"];
+            vkontakteOptions.TokenEndpoint = builder.Configuration["AuthSettings:Vkontakte:TokenUri"];
+            vkontakteOptions.UserInformationEndpoint = builder.Configuration["AuthSettings:Vkontakte:UserInfoUri"];
+            // Код
+            var scopes = builder.Configuration.GetSection("AuthSettings:Vkontakte:Scopes").Get<string[]>();
+            foreach (var scope in scopes ?? Array.Empty<string>())
+                vkontakteOptions.Scope.Add(scope);
+        })
+        .AddCookie();
 
         _ = builder.Services.AddAuthorization(options =>
         {
