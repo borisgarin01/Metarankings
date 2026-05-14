@@ -16,18 +16,20 @@
                 <ul>
                     <li>
                         <span><a href="/movies/movies-list/">Фильмы</a></span>
-                        <div class="movie-drop">
-                            <a href="/movies/new-movies/">Новинки</a>
-                            <a href="/movies/coming-soon/">Скоро</a>
-                            <a href="/movies/most-waiting-films/">Ожидаемые</a>
-                            <a href="/movies/meta/movies/">Обзоры</a>
-                            <a href="/movies/best-movies/">Топ фильмов</a>
-                            <a href="/movies/best-movies/@DateTime.Today.Year">Фильмы @DateTime.Today.Year</a>
+                        <ul class="dropdown-list">
+                            <li><a href="/movies/new-movies/">Новинки</a></li>
+                            <li><a href="/movies/coming-soon/">Скоро</a></li>
+                            <li><a href="/movies/most-waiting-films/">Ожидаемые</a></li>
+                            <li><a href="/movies/meta/movies/">Обзоры</a></li>
+                            <li><a href="/movies/best-movies/">Топ фильмов</a></li>
+                            <li><a href="/movies/best-movies/@DateTime.Today.Year">Фильмы @DateTime.Today.Year</a></li>
                             @foreach (MovieGenre genre in MoviesGenres)
                             {
-                                <a href="/movies/genres/@genre.Id">@genre.Name</a>
+                                <li>
+                                    <a href="/movies/genres/@genre.Id">@genre.Name</a>
+                                </li>
                             }
-                        </div>
+                        </ul>
                     </li>
                     <li class="active">
                         <span@* onclick="jQuery( document ).ready(function($){$('.game-drop').slideToggle('slow')});"*@>
@@ -70,11 +72,12 @@
                 <ul>
                     <li><span class="user-login popauthor" title="Войти на сайт"></span></li>
                 </ul>
-            </div><div class="search_form">
+            </div>
+            <div class="search_form">
                 <form method="get" id="searchform" action="/search/">
                     <fieldset>
                         <input name="text" type="search" id="search" placeholder="Название игры или фильма..." autocomplete="off">
-                        <button type="submit"></button>
+                        <button type="submit">Искать</button>
                     </fieldset>
                 </form>
                 <div id="search_form-result"></div>

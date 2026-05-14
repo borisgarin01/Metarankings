@@ -3,6 +3,7 @@ using Domain.Movies;
 using Domain.RequestsModels.Movies.Movies;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 public sealed class MoviesRepository : Repository, IMoviesRepository
@@ -346,6 +347,59 @@ md.id, md.name
             var result = moviesDictionary.Values.ToList();
 
             return result;
+        }
+    }
+
+    public async Task<IEnumerable<Movie>> GetByNameAsync(string name)
+    {
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            var sql = @"SELECT         
+            m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
+            mg.id, mg.name,
+            ms.id, ms.name,
+            md.id, md.name
+        FROM movies m
+        LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
+        LEFT JOIN moviesGenres mg ON mg.id = mmg.moviegenreid
+        LEFT JOIN moviesMoviesStudios mms ON mms.movieId = m.Id
+        LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
+        LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
+        LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
+        WHERE m.name ILIKE '%' || @name || '%'
+        ORDER BY m.Id DESC;";
+
+            var moviesDictionary = new Dictionary<long, Movie>();
+
+            var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
+                sql,
+                (movie, movieGenre, movieStudio, movieDirector) =>
+                {
+                    if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                    {
+                        movieEntry = movie;
+                        movieEntry.MovieGenres = new List<MovieGenre>();
+                        movieEntry.MoviesStudios = new List<MovieStudio>();
+                        movieEntry.MoviesDirectors = new List<MovieDirector>();
+                        moviesDictionary.Add(movieEntry.Id, movieEntry);
+                    }
+
+                    if (movieGenre is not null && !movieEntry.MovieGenres.Any(d => d.Id == movieGenre.Id))
+                        movieEntry.MovieGenres.Add(movieGenre);
+
+                    if (movieStudio is not null && !movieEntry.MoviesStudios.Any(g => g.Id == movieStudio.Id))
+                        movieEntry.MoviesStudios.Add(movieStudio);
+
+                    if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(p => p.Id == movieDirector.Id))
+                        movieEntry.MoviesDirectors.Add(movieDirector);
+
+                    return movieEntry;
+                },
+                new { name }, // Pass parameter as anonymous object
+                splitOn: "Id,Id,Id,Id" // You had one too many "Id"
+            );
+
+            return moviesDictionary.Values;
         }
     }
 

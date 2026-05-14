@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace WebManagers.Derived.Movies;
 
-public sealed class MoviesWebManager : WebManager, IWebManager<Movie, AddMovieModel, UpdateMovieModel>
+public sealed class MoviesWebManager : WebManager, IWebManager<Movie, AddMovieModel, UpdateMovieModel>, IByNameSearchingManager<Movie>
 {
     public MoviesWebManager(HttpClient httpClient) : base(httpClient)
     {
@@ -65,5 +65,11 @@ public sealed class MoviesWebManager : WebManager, IWebManager<Movie, AddMovieMo
     public Task<IEnumerable<Movie>> GetLastAsync(long offset, long limit)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<Movie>> SearchByName(string name)
+    {
+        var movies = await HttpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/Search?name={name}");
+        return movies;
     }
 }

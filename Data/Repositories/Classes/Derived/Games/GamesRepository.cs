@@ -986,4 +986,93 @@ WHERE 1=1");
             return result;
         }
     }
+
+    public async Task<IEnumerable<Game>> GetByNameAsync(string name)
+    {
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            var sql = @"SELECT         
+g.Id, g.name, g.image, g.releasedate, g.description,
+d.id, d.name, 
+p.id, p.name, 
+gen.id, gen.name, 
+l.id, l.name,
+platf.id, platf.name, 
+gs.id, gs.gameid, gs.imageUrl,
+gc.Id, gc.Name, gc.Description,
+gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
+au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
+    FROM games g
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+    LEFT JOIN publishers p on p.id = gpub.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms platf ON platf.id = gplatf.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
+    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId
+    LEFT JOIN GamesPlayersReviews gpr on gpr.gameid=g.Id
+    LEFT JOIN ApplicationUsers au on au.Id=gpr.UserId
+WHERE g.name ILIKE '%' || @name || '%'
+        ORDER BY g.Id DESC;";
+
+            var gameDictionary = new Dictionary<string, Game>();
+
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview, ApplicationUser, Game>(
+                sql,
+                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection, gamePlayerReview, applicationUser) =>
+                {
+                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    {
+                        gameEntry = game;
+                        gameEntry.Developers = new List<Developer>();
+                        gameEntry.Genres = new List<Genre>();
+                        gameEntry.Platforms = new List<Platform>();
+                        gameEntry.Screenshots = new List<GameScreenshot>();
+                        gameEntry.GamesPlayersReviews = new List<GameReview>();
+                        gameEntry.Publishers = new List<Publisher>();
+                        gameDictionary.Add(gameEntry.Name, gameEntry);
+                    }
+
+                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
+                        gameEntry.Developers.Add(developer);
+
+                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                        gameEntry.Publishers.Add(publisher);
+
+                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
+                        gameEntry.Genres.Add(genre);
+
+                    if (localization is not null && gameEntry.Localization == null)
+                        gameEntry.Localization = localization;
+
+                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                        gameEntry.Platforms.Add(platform);
+
+                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
+                        gameEntry.Screenshots.Add(screenshot);
+
+                    if (gamePlayerReview is not null && applicationUser is not null)
+                    {
+                        gamePlayerReview = gamePlayerReview with { ApplicationUser = applicationUser };
+
+                        if (!gameEntry.GamesPlayersReviews.Any(s => s.Id == gamePlayerReview.Id))
+                            gameEntry.GamesPlayersReviews.Add(gamePlayerReview);
+                    }
+
+                    if (gameCollection is not null && !gameEntry.GameCollections.Any(b => b.Id == gameCollection.Id))
+                        gameEntry.GameCollections.Add(gameCollection);
+
+                    return gameEntry;
+                },
+                new { name } // Parameter passed here
+            );
+
+            return gameDictionary.Values;
+        }
+    }
 }

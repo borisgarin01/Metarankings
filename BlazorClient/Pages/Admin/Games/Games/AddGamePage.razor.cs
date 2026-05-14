@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO;
 using WebManagers;
+using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Games;
 
@@ -36,7 +37,7 @@ public partial class AddGamePage : ComponentBase
     public IJSRuntime JSRuntime { get; private set; }
 
     [Inject]
-    public IWebManager<Game, AddGameModel, UpdateGameModel> GetWebManager { get; private set; }
+    public GamesWebManager GetWebManager { get; private set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; private set; }

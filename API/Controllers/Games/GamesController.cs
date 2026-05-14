@@ -113,4 +113,10 @@ public sealed class GamesController : ControllerBase
 
         return Ok(games);
     }
+
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<Game>>> Search([FromQuery] string name)
+    {
+        return Ok(await _gamesRepository.GetByNameAsync(name));
+    }
 }

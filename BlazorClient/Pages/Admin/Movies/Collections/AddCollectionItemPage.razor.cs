@@ -3,6 +3,7 @@ using Domain.Movies.Collections;
 using Domain.RequestsModels.Movies.Collections;
 using Domain.RequestsModels.Movies.Movies;
 using WebManagers;
+using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Pages.Admin.Movies.Collections;
 
@@ -16,7 +17,7 @@ public partial class AddCollectionItemPage : ComponentBase
     public long Id { get; set; }
 
     [Inject]
-    public IWebManager<Movie, AddMovieModel, UpdateMovieModel> MoviesWebManager { get; set; }
+    public MoviesWebManager MoviesWebManager { get; set; }
 
     [Inject]
     public IWebManager<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel> MoviesCollectionsItemsWebManager { get; set; }

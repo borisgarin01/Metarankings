@@ -1,6 +1,7 @@
 ﻿using Domain.Games;
 using Domain.RequestsModels.Games;
 using WebManagers;
+using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Games;
 
@@ -18,7 +19,7 @@ public partial class RemoveGamePage : ComponentBase
     public IJSRuntime JSRuntime { get; set; }
 
     [Inject]
-    public IWebManager<Game, AddGameModel, UpdateGameModel> GamesWebManager { get; set; }
+    public GamesWebManager GamesWebManager { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

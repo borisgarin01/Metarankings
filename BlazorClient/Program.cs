@@ -40,14 +40,14 @@ internal class Program
         builder.Services.AddScoped<IWebManager<Localization, AddLocalizationModel, UpdateLocalizationModel>, LocalizationsWebManager>();
         builder.Services.AddScoped<IWebManager<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsWebManager>();
         builder.Services.AddScoped<IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersWebManager>();
-        builder.Services.AddScoped<IWebManager<Game, AddGameModel, UpdateGameModel>, GamesWebManager>();
+        builder.Services.AddScoped<GamesWebManager>();
         builder.Services.AddScoped<IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>, GamesCollectionsWebManager>();
         builder.Services.AddScoped<IWebManager<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>, GamesCollectionsItemsWebManager>();
 
         builder.Services.AddScoped<IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsWebManager>();
         builder.Services.AddScoped<IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>();
         builder.Services.AddScoped<IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosWebManager>();
-        builder.Services.AddScoped<IWebManager<Movie, AddMovieModel, UpdateMovieModel>, MoviesWebManager>();
+        builder.Services.AddScoped<MoviesWebManager>();
         builder.Services.AddScoped<IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>, MoviesCollectionsWebManager>();
         builder.Services.AddScoped<IWebManager<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsWebManager>();
 

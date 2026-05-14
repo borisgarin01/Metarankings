@@ -72,7 +72,7 @@ public sealed class MoviesController : ControllerBase
             return NotFound();
         return File(file, "image/jpeg");
     }
-    
+
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<long>> RemoveAsync(long id)
@@ -90,5 +90,11 @@ public sealed class MoviesController : ControllerBase
             _logger.LogError(ex, $"{ex.Message}\t{ex.StackTrace}");
             return StatusCode(500, ex);
         }
+    }
+
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<Movie>>> Search([FromQuery] string name)
+    {
+        return Ok(await _moviesModelsRepository.GetByNameAsync(name));
     }
 }

@@ -9,4 +9,5 @@ public interface IGamesRepository : IRepository<Game, AddGameModel, UpdateGameMo
     Task<IEnumerable<Game>> GetFirstAsync(int offset, int limit);
     Task<IEnumerable<Game>> GetLastAsync(int offset, int limit);
     Task<IEnumerable<Game>> GetNearestAsync(short limit);
+    Task<IEnumerable<Game>> GetByNameAsync(string name);
 }

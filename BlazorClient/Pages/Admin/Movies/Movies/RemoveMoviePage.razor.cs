@@ -2,6 +2,7 @@
 using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Movies.Movies;
 using WebManagers;
+using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Pages.Admin.Movies.Movies;
 
@@ -20,7 +21,7 @@ public partial class RemoveMoviePage : ComponentBase
     public IJSRuntime JSRuntime { get; set; }
 
     [Inject]
-    public IWebManager<Movie, AddMovieModel, UpdateMovieModel> MoviesWebManager { get; set; }
+    public MoviesWebManager MoviesWebManager { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

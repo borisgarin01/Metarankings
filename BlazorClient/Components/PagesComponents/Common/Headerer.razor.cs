@@ -35,4 +35,16 @@ public partial class Headerer : ComponentBase
             GamesGenres = gamesGenresGettingTask.Result;
         });
     }
+
+    private bool isActive = false;
+
+    private void Show()
+    {
+        isActive = true;
+    }
+
+    private void Hide()
+    {
+        isActive = false;
+    }
 }

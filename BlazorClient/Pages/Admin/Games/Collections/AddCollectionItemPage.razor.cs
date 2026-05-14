@@ -1,8 +1,8 @@
 ﻿using Domain.Games;
 using Domain.Games.Collections;
-using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Games.Collections;
 using WebManagers;
+using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Collections;
 
@@ -16,7 +16,7 @@ public partial class AddCollectionItemPage : ComponentBase
     public long Id { get; set; }
 
     [Inject]
-    public IWebManager<Game, AddGameModel, UpdateGameModel> GamesWebManager { get; set; }
+    public GamesWebManager GamesWebManager { get; set; }
 
     [Inject]
     public IWebManager<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel> GamesCollectionsItemsWebManager { get; set; }

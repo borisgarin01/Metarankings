@@ -7,6 +7,7 @@ using Domain.RequestsModels.Movies.MoviesStudios;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO;
 using WebManagers;
+using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Pages.Admin.Movies.Movies;
 
@@ -41,7 +42,7 @@ public sealed partial class AddMoviePage : ComponentBase
     public IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel> MoviesStudiosWebManager { get; set; }
 
     [Inject]
-    public IWebManager<Movie, AddMovieModel, UpdateMovieModel> MoviesWebManager { get; set; }
+    public MoviesWebManager MoviesWebManager { get; set; }
 
     [Inject]
     public IJSRuntime JSRuntime { get; set; }

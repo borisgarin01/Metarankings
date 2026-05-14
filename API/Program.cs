@@ -76,7 +76,7 @@ internal class Program
             googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
         }).AddVkontakte(vkontakteOptions =>
         {
-            vkontakteOptions.CallbackPath = new PathString(builder.Configuration["AuthSettings:Vkontakte:CallbackPath"]);
+            vkontakteOptions.CallbackPath = new PathString (builder.Configuration["AuthSettings:Vkontakte:CallbackPath"]);
             vkontakteOptions.ClientId = builder.Configuration["AuthSettings:Vkontakte:ClientId"];
             vkontakteOptions.ClientSecret = builder.Configuration["AuthSettings:Vkontakte:ClientSecret"];
             vkontakteOptions.ClaimsIssuer = builder.Configuration["AuthSettings:Vkontakte:ClaimsIssuer"];

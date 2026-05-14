@@ -1,13 +1,14 @@
 ﻿using Domain.Games;
 using Domain.RequestsModels.Games;
 using WebManagers;
+using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Games.Games;
 
 public partial class GamesListPage : ComponentBase
 {
     [Inject]
-    public IWebManager<Game, AddGameModel, UpdateGameModel> GamesWebManager { get; set; }
+    public GamesWebManager GamesWebManager { get; set; }
 
     public IEnumerable<Game> Games { get; set; } = Enumerable.Empty<Game>();
 
