@@ -44,22 +44,29 @@ RETURNING Id;", new
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var gameReviewToCheckExistance = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
-SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
+            var gameReviewToCheckExistance = await connection.QueryAsync<GameReview, Game, GamePlayerReviewShift, ApplicationUser, GameReview>(@"
+SELECT gpr.Id, gpr.GameId, gpr.UserId, gpr.TextContent, gpr.Score, gpr.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
-ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
-FROM GamesPlayersReviews
+gprs.Id, gprs.GamePlayerReviewId, gprs.ShifterId, gprs.Direction,
+au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
+FROM GamesPlayersReviews gpr
 INNER JOIN Games
-on GamesPlayersReviews.GameId=Games.Id
-INNER JOIN ApplicationUsers
-on GamesPlayersReviews.UserId=ApplicationUsers.Id
-WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, applicationUser) =>
+on gpr.GameId=Games.Id
+INNER JOIN ApplicationUsers au
+on gpr.UserId=au.Id
+LEFT JOIN GamesPlayersReviewsShifts gprs on gprs.GamePlayerReviewId=gpr.Id
+WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, shift, applicationUser) =>
             {
                 gameReview = gameReview with
                 {
                     Game = game,
                     ApplicationUser = applicationUser
                 };
+
+                if (shift is not null && !gameReview.GamePlayerReviewShifts.Any(b => b.GamePlayerReviewId == shift.GamePlayerReviewId && b.ShifterId == shift.ShifterId))
+                {
+                    gameReview.GamePlayerReviewShifts.Add(shift);
+                }
 
                 return gameReview;
 
@@ -100,26 +107,30 @@ WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, applicationUser) =
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var gamesReviews = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+            var gamesReviews = await connection.QueryAsync<GameReview, GamePlayerReviewShift, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
+    gprs.Id, gprs.GamePlayerReviewId, gprs.ShifterId, gprs.Direction,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
 FROM GamesPlayersReviews
+LEFT JOIN GamesPlayersReviewsShifts gprs on gprs.GamePlayerReviewId=GamesPlayersReviews.Id
 INNER JOIN Games
 on GamesPlayersReviews.GameId=Games.Id
 INNER JOIN ApplicationUsers
 on GamesPlayersReviews.UserId=ApplicationUsers.Id
-WHERE GamesPlayersReviews.Id = @id;", (gameReview, game, applicationUser) =>
+WHERE GamesPlayersReviews.Id = @id;", (gameReview, gamePlayerReviewShift, game, applicationUser) =>
             {
                 gameReview = gameReview with
                 {
                     Game = game,
                     ApplicationUser = applicationUser
                 };
+                if (!gameReview.GamePlayerReviewShifts.Any(b => b.GamePlayerReviewId == gamePlayerReviewShift.GamePlayerReviewId && b.ShifterId == gamePlayerReviewShift.ShifterId))
+                    gameReview.GamePlayerReviewShifts.Add(gamePlayerReviewShift);
                 return gameReview;
             }, new { id });
 
-            return gamesReviews.FirstOrDefault();
+            return gamesReviews.SingleOrDefault();
         }
     }
 

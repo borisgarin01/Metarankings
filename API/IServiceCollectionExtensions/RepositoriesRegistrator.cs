@@ -60,6 +60,8 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IRepository<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsRepository>(instance => new MoviesCollectionsItemsRepository(metarankingsConnectionString));
 
+        services.AddScoped<GamesPlayersReviewsShiftsRepository>(instance => new GamesPlayersReviewsShiftsRepository(metarankingsConnectionString));
+
         return services;
     }
 }

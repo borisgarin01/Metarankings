@@ -10,7 +10,7 @@
                 </p>
                 <p class="comment-date">@PublishDate.ToString("dd.MM.yyyy")</p>
                 <div class="rating-com">
-                    <span class="ldc-ul_like" onclick="alter_ul_post_values(this,'53','c_like')">+ <span>60</span></span><span class="ldc-ul_dislike" onclick="alter_ul_post_values(this,'53','c_dislike')">- <span>6</span></span>
+                    <span class="ldc-ul_like" onclick="@Like">+ <span>@LikesCount</span></span><span class="ldc-ul_dislike" onclick="@Dislike">- <span>@DislikesCount</span></span>
                 </div>
             </div>
             <div class="review-text">

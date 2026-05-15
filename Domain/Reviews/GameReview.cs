@@ -30,4 +30,6 @@ public sealed record GameReview
 
     [JsonPropertyName("date")]
     public DateTime Date { get; set; }
+
+    public List<GamePlayerReviewShift> GamePlayerReviewShifts { get; set; } = new();
 }

@@ -1,5 +1,6 @@
 ﻿using Data.Repositories.Classes.Derived.Games;
 using Data.Repositories.Interfaces.Derived;
+using Domain.Games;
 using Domain.RequestsModels.Games.GamesGamersReviews;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
@@ -13,6 +14,7 @@ public sealed class GamesGamersReviewsController : ControllerBase
 {
     private readonly IGamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
     private readonly IGamesRepository _gamesRepository;
+    private readonly GamesPlayersReviewsShiftsRepository _gamePlayerReviewsShiftsRepository;
 
     private readonly UserManager<ApplicationUser> _usersManager;
 
@@ -20,13 +22,14 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
     private readonly ILogger<GamesGamersReviewsController> _logger;
 
-    public GamesGamersReviewsController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, IGamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, ILogger<GamesGamersReviewsController> logger)
+    public GamesGamersReviewsController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, IGamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, ILogger<GamesGamersReviewsController> logger, GamesPlayersReviewsShiftsRepository gamePlayerReviewsShiftsRepository)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _telegramAuthenticator = telegramAuthenticator;
         _gamesRepository = gamesRepository;
         _usersManager = usersManager;
         _logger = logger;
+        _gamePlayerReviewsShiftsRepository = gamePlayerReviewsShiftsRepository;
     }
 
     [HttpPost]
@@ -114,6 +117,54 @@ public sealed class GamesGamersReviewsController : ControllerBase
         {
             _logger.LogError($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             return StatusCode(500, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+        }
+    }
+
+    [HttpPost("shift")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult<long>> Shift(Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Frontend.AddGamePlayerReviewShiftModel addGamePlayerReviewShiftModel)
+    {
+
+        try
+        {
+            _logger.LogInformation("ShifterId - {ShifterId}", User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value);
+
+            long shifterId = long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value);
+
+            _logger.LogInformation("GamePlayerReviewId - {GamePlayerReviewId}, Direction - {Direction}, ShifterId - {ShifterId}", addGamePlayerReviewShiftModel.GamePlayerReviewId, addGamePlayerReviewShiftModel.Direction, shifterId);
+
+            GameReview gameReview = await _gamesPlayersReviewsRepository.GetAsync(addGamePlayerReviewShiftModel.GamePlayerReviewId);
+
+            _logger.LogInformation("Game review: Id - {Id}, GameId - {GameId}", gameReview.Id, gameReview.GameId);
+
+            if (gameReview is null)
+            {
+                _logger.LogWarning("gameReview is null");
+                return BadRequest("gameReview is null");
+            }
+            if (shifterId == gameReview.UserId)
+            {
+                _logger.LogWarning("shifterId == gameReview.UserId. Нельзя голосовать за свои обзоры");
+                return BadRequest("Нельзя голосовать за свои обзоры");
+            }
+            GamePlayerReviewShift shift = await _gamePlayerReviewsShiftsRepository.GetByShifterIdAsync(long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value), gameReview.Id);
+            if (shift is null)
+            {
+                long insertedShift = await _gamePlayerReviewsShiftsRepository.AddAsync(new Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Backend.AddGamePlayerReviewShiftModel(gameReview.Id, shifterId, addGamePlayerReviewShiftModel.Direction));
+                return Ok(insertedShift);
+            }
+            else if (shift.Direction != addGamePlayerReviewShiftModel.Direction)
+            {
+                GamePlayerReviewShift gamePlayerReviewShift = await _gamePlayerReviewsShiftsRepository.UpdateAsync(new Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Backend.UpdateGamePlayerReviewShiftModel(shift.GamePlayerReviewId, shift.ShifterId, addGamePlayerReviewShiftModel.Direction), shift.Id);
+                return Ok(gamePlayerReviewShift);
+            }
+            _logger.LogWarning("Пользователь уже голосовал за обзор");
+            return BadRequest("Пользователь уже голосовал за обзор");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message, ex.StackTrace);
+            return StatusCode(500, ex);
         }
     }
 }

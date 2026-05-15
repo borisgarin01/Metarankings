@@ -73,4 +73,11 @@ public partial class GameDetails : ComponentBase
         else
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
+
+    // В основном компоненте страницы
+    private async Task RefreshGameData()
+    {
+        Game = await HttpClient.GetFromJsonAsync<Game>($"/api/Games/Games/{Id}");
+        StateHasChanged();
+    }
 }

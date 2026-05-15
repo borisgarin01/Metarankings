@@ -6,7 +6,7 @@
 @using Domain.Reviews
 
 <Headerer />
-<GameMenu Year="@Game.ReleaseDate.Value.Year" />
+<GameMenu Year="@((Game.ReleaseDate ?? DateTime.Now).Year)" />
 
 @if (Game is null)
 {
@@ -18,12 +18,12 @@ else
         <GameHeader Name="@Game.Name"
                     Description="@Game.Description"
                     Id="@Id"
-                    ReleaseYear="@Game.ReleaseDate!.Value.Year" />
+                    ReleaseYear=@((Game.ReleaseDate ?? DateTime.Now).Year)" />
 
         <div class="post-content">
             <Thumbnail Name="@Game.Name"
-                       ReleaseYear="@Game.ReleaseDate.Value.Year"
-                       ReleaseMonth="@Game.ReleaseDate.Value.Month"
+                       ReleaseYear="@((Game.ReleaseDate ?? DateTime.Now).Year)"
+                       ReleaseMonth="@((Game.ReleaseDate ?? DateTime.Now).Month)"
                        ImageSource="@Game.Image"
                        Prefix="Games" />
 
@@ -36,7 +36,7 @@ else
                           Platforms="@Game.Platforms"
                           Genres="@Game.Genres"
                           Localization="@Game.Localization"
-                          ReleaseDate="@Game.ReleaseDate.Value" />
+                          ReleaseDate="@(Game.ReleaseDate ?? DateTime.Now)" />
 
             <Description TextContent="@Game.Description" />
 
@@ -51,7 +51,7 @@ else
                        Screenshots="@Game.Screenshots"
                        Name="@Game.Name"
                        Image="@Game.Image"
-                       ReleaseDate="@Game.ReleaseDate"
+                       ReleaseDate="@(Game.ReleaseDate ?? DateTime.Now)"
                        GameId="@Game.Id" />
 
             <div class="user-reviews comments">
@@ -67,7 +67,10 @@ else
                                                      UserName="@gameReview.ApplicationUser.UserName"
                                                      PublishDate="@gameReview.Date"
                                                      TextContent="@gameReview.TextContent"
-                                                     AuthorId="@gameReview.UserId" />
+                                                     AuthorId="@gameReview.UserId"
+                                                     LikesCount="@gameReview.GamePlayerReviewShifts.Count(s=>s.Direction is true)"
+                                                     DislikesCount="@gameReview.GamePlayerReviewShifts.Count(s=>s.Direction is false)"
+                                                     OnUpdate="@RefreshGameData" />
                             }
                         </ol>
                     </div>

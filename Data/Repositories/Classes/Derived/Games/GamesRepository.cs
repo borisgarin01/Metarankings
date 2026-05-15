@@ -350,79 +350,122 @@ platf.id, platf.name,
 gs.id, gs.gameid, gs.imageUrl,
 gc.Id, gc.Name, gc.Description,
 gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
-au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
-    FROM games g
-    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-    LEFT JOIN developers d ON d.id = gd.developerid
-    LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
-    LEFT JOIN publishers p on p.id = gpub.publisherid
-    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-    LEFT JOIN genres gen ON gen.id = gg.genreid
-    LEFT JOIN localizations l ON l.id = g.localizationid
-    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
-    LEFT JOIN platforms platf ON platf.id = gplatf.platformid
-    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-    LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
-    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId
-    LEFT JOIN GamesPlayersReviews gpr on gpr.gameid=g.Id
-    LEFT JOIN ApplicationUsers au on au.Id=gpr.UserId
+gprs.Id, gprs.GamePlayerReviewId, gprs.ShifterId, gprs.Direction,
+au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
+au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
+FROM games g
+LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+LEFT JOIN developers d ON d.id = gd.developerid
+LEFT JOIN gamespublishers gpub on gpub.gameid=g.id
+LEFT JOIN publishers p on p.id = gpub.publisherid
+LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+LEFT JOIN genres gen ON gen.id = gg.genreid
+LEFT JOIN localizations l ON l.id = g.localizationid
+LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+LEFT JOIN platforms platf ON platf.id = gplatf.platformid
+LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
+LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId
+LEFT JOIN GamesPlayersReviews gpr on gpr.gameid=g.Id
+LEFT JOIN GamesPlayersReviewsShifts gprs on gprs.GamePlayerReviewId=gpr.Id
+LEFT JOIN ApplicationUsers au on au.Id=gpr.UserId
 WHERE g.Id=@id";
 
-            var gameDictionary = new Dictionary<string, Game>();
+            var gameDictionary = new Dictionary<long, Game>(); // Лучше использовать Id как ключ
+            var reviewDictionary = new Dictionary<long, GameReview>(); // Для отслеживания отзывов
 
-            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview, ApplicationUser, Game>(
+            var query = await connection.QueryAsync<Game, Developer, Publisher, Genre,
+                Localization, Platform, GameScreenshot, GamesCollection, GameReview,
+                GamePlayerReviewShift, ApplicationUser, Game>(
                 sql,
-                (game, developer, publisher, genre, localization, platform, screenshot, gameCollection, gamePlayerReview, applicationUser) =>
+                (game, developer, publisher, genre, localization, platform, screenshot,
+                 gameCollection, gameReview, gamePlayerReviewShift, applicationUser) =>
                 {
-                    if (!gameDictionary.TryGetValue(game.Name, out var gameEntry))
+                    // Получаем или создаем Game
+                    if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
                     {
                         gameEntry = game;
                         gameEntry.Developers = new List<Developer>();
+                        gameEntry.Publishers = new List<Publisher>();
                         gameEntry.Genres = new List<Genre>();
                         gameEntry.Platforms = new List<Platform>();
                         gameEntry.Screenshots = new List<GameScreenshot>();
+                        gameEntry.GameCollections = new List<GamesCollection>();
                         gameEntry.GamesPlayersReviews = new List<GameReview>();
-                        gameEntry.Publishers = new List<Publisher>();
-                        gameDictionary.Add(gameEntry.Name, gameEntry);
+                        gameDictionary.Add(gameEntry.Id, gameEntry);
                     }
 
-                    if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
+                    // Добавляем Developer
+                    if (developer?.Id > 0 && !gameEntry.Developers.Any(d => d.Id == developer.Id))
                         gameEntry.Developers.Add(developer);
 
-                    if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                    // Добавляем Publisher
+                    if (publisher?.Id > 0 && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
                         gameEntry.Publishers.Add(publisher);
 
-                    if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
+                    // Добавляем Genre
+                    if (genre?.Id > 0 && !gameEntry.Genres.Any(g => g.Id == genre.Id))
                         gameEntry.Genres.Add(genre);
 
-                    if (localization is not null && gameEntry.Localization == null)
+                    // Добавляем Localization
+                    if (localization?.Id > 0 && gameEntry.Localization == null)
                         gameEntry.Localization = localization;
 
-                    if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                    // Добавляем Platform
+                    if (platform?.Id > 0 && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
                         gameEntry.Platforms.Add(platform);
 
-                    if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
+                    // Добавляем Screenshot
+                    if (screenshot?.Id > 0 && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                         gameEntry.Screenshots.Add(screenshot);
 
-                    if (gamePlayerReview is not null && applicationUser is not null)
-                    {
-                        gamePlayerReview = gamePlayerReview with { ApplicationUser = applicationUser };
-
-                        if (!gameEntry.GamesPlayersReviews.Any(s => s.Id == gamePlayerReview.Id))
-                            gameEntry.GamesPlayersReviews.Add(gamePlayerReview);
-                    }
-
-                    if (gameCollection is not null && !gameEntry.GameCollections.Any(b => b.Id == gameCollection.Id))
+                    // Добавляем GameCollection
+                    if (gameCollection?.Id > 0 && !gameEntry.GameCollections.Any(gc => gc.Id == gameCollection.Id))
                         gameEntry.GameCollections.Add(gameCollection);
+
+                    // ★★★ ИСПРАВЛЕННАЯ ЛОГИКА ДЛЯ REVIEW ★★★
+                    if (gameReview?.Id > 0 && applicationUser?.Id > 0)
+                    {
+                        // Проверяем, есть ли уже такой отзыв в коллекции
+                        var existingReview = gameEntry.GamesPlayersReviews
+                            .FirstOrDefault(r => r.Id == gameReview.Id);
+
+                        if (existingReview == null)
+                        {
+                            // Создаем новый отзыв с пользователем
+                            var newReview = gameReview with
+                            {
+                                ApplicationUser = applicationUser,
+                                GamePlayerReviewShifts = new List<GamePlayerReviewShift>()
+                            };
+
+                            // Добавляем сдвиг, если он есть
+                            if (gamePlayerReviewShift?.Id > 0)
+                            {
+                                newReview.GamePlayerReviewShifts.Add(gamePlayerReviewShift);
+                            }
+
+                            gameEntry.GamesPlayersReviews.Add(newReview);
+                            reviewDictionary[newReview.Id] = newReview;
+                        }
+                        else
+                        {
+                            // Добавляем сдвиг к существующему отзыву
+                            if (gamePlayerReviewShift?.Id > 0 &&
+                                !existingReview.GamePlayerReviewShifts.Any(s => s.Id == gamePlayerReviewShift.Id))
+                            {
+                                existingReview.GamePlayerReviewShifts.Add(gamePlayerReviewShift);
+                            }
+                        }
+                    }
 
                     return gameEntry;
                 },
-                new { id } // Parameter passed here
+                new { id },
+                splitOn: "Id,Id,Id,Id,Id,Id,Id,Id,Id,Id,Id" // Укажите все split точки
             );
 
-            var result = gameDictionary.Values.FirstOrDefault();
-
-            return result;
+            return gameDictionary.Values.FirstOrDefault();
         }
     }
 

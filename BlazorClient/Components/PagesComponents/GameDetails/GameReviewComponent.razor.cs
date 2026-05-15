@@ -1,4 +1,9 @@
 ﻿
+
+using Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Frontend;
+using System.Threading.Tasks;
+using WebManagers.Derived.Games;
+
 namespace BlazorClient.Components.PagesComponents.GameDetails;
 
 public partial class GameReviewComponent : ComponentBase
@@ -21,12 +26,23 @@ public partial class GameReviewComponent : ComponentBase
     [Parameter, EditorRequired]
     public string TextContent { get; set; }
 
+    [Parameter, EditorRequired]
+    public int LikesCount { get; set; }
+
+    [Parameter, EditorRequired]
+    public int DislikesCount { get; set; }
+
     public bool IsAbleToRemove { get; private set; }
 
     public bool IsAbleToEdit { get; private set; }
 
     [Inject]
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    [Inject]
+    public GamesPlayersReviewsShiftsWebManager GamesPlayersReviewsShiftsWebManager { get; set; }
+    [Parameter]
+    public EventCallback OnUpdate { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,5 +67,19 @@ public partial class GameReviewComponent : ComponentBase
                 IsAbleToEdit = true;
             }
         }
+    }
+
+    public async Task Like()
+    {
+        await GamesPlayersReviewsShiftsWebManager.AddAsync(new AddGamePlayerReviewShiftModel(Id, true));
+        await OnUpdate.InvokeAsync(); // Вызываем обновление родителя
+        StateHasChanged();
+    }
+
+    public async Task Dislike()
+    {
+        await GamesPlayersReviewsShiftsWebManager.AddAsync(new AddGamePlayerReviewShiftModel(Id, false));
+        await OnUpdate.InvokeAsync(); // Вызываем обновление родителя
+        StateHasChanged();
     }
 }
