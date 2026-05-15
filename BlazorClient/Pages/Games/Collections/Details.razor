@@ -40,8 +40,8 @@ else
                             </div>
                             <div class="ratings-graph">
                                 <div class="graph">
-                                    <div class="small-score mark-8">7.5</div>
-                                    <div class="graph-body"><div style="width:75%" class="rating-graph mark-8"></div></div>
+                                    <div class="small-score mark-@Math.Round(gamesCollectionItem.Game.GamesPlayersReviews.Any() ? gamesCollectionItem.Game.GamesPlayersReviews.Average(b => b.Score) : 0)">@(gamesCollectionItem.Game.GamesPlayersReviews.Any() ? Math.Round(gamesCollectionItem.Game.GamesPlayersReviews.Average(b => b.Score), 1) : 0)</div>
+                                    <div class="graph-body"><div style="width:@(gamesCollectionItem.Game.GamesPlayersReviews.Any() ? Math.Round(gamesCollectionItem.Game.GamesPlayersReviews.Average(b => b.Score), 1) * 10 : 0)%" class="rating-graph mark-@Math.Round(gamesCollectionItem.Game.GamesPlayersReviews.Any() ? gamesCollectionItem.Game.GamesPlayersReviews.Average(b => b.Score) : 0)"></div></div>
                                 </div>
                             </div>
                         </article>

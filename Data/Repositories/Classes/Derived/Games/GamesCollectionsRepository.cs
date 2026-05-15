@@ -2,6 +2,8 @@
 using Domain.Games;
 using Domain.Games.Collections;
 using Domain.RequestsModels.Games.Collections;
+using Domain.Reviews;
+using IdentityLibrary.DTOs;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -36,15 +38,19 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
     {
         using var connection = new NpgsqlConnection(ConnectionString);
 
-        var gamesCollections = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GamesCollection>(
+        var gamesCollections = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GameReview, ApplicationUser, GamesCollection>(
             @"SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
                 gci.Id, gci.GameId, gci.GameCollectionId,
-                 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
+                 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer,
+                gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
+                au.Id, au.UserName, au.NormalizedUserName, au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
           FROM GamesCollections gc
           LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
           LEFT JOIN Games g ON g.Id = gci.GameId
+          LEFT JOIN GamesPlayersReviews gpr on gpr.GameId=g.Id
+          LEFT JOIN ApplicationUsers au on au.Id = gpr.UserId
           ORDER BY gc.Id",
-            (gameCollection, gameCollectionItem, game) =>
+            (gameCollection, gameCollectionItem, game, gamePlayerReview, applicationUser) =>
             {
                 if (game is not null && gameCollectionItem is not null && !gameCollection.GamesCollectionItems.Any(g => g.GameId == game.Id))
                 {
@@ -53,6 +59,15 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
                     gameCollectionItem.GamesCollection = gameCollection;
                     gameCollectionItem.GamesCollectionId = gameCollection.Id;
                     gameCollection.GamesCollectionItems.Add(gameCollectionItem);
+
+                    if (gamePlayerReview is not null && applicationUser is not null && !game.GamesPlayersReviews.Any(b => b.UserId == gamePlayerReview.UserId))
+                    {
+                        gamePlayerReview.Game = game;
+                        gamePlayerReview.GameId = game.Id;
+                        gamePlayerReview.ApplicationUser = applicationUser;
+                        gamePlayerReview.UserId = applicationUser.Id;
+                        game.GamesPlayersReviews.Add(gamePlayerReview);
+                    }
                 }
 
                 return gameCollection;
@@ -66,15 +81,19 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
     {
         using var connection = new NpgsqlConnection(ConnectionString);
 
-        var gamesCollection = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GamesCollection>(
+        var gamesCollection = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GameReview, ApplicationUser, GamesCollection>(
             @"SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
                 gci.Id, gci.GameId, gci.GameCollectionId,
-                 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer
+                 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer,
+                gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
+                au.Id, au.UserName, au.NormalizedUserName, au.EmailConfirmed, au.PasswordHash, au.PhoneNumber
           FROM GamesCollections gc
           LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
           LEFT JOIN Games g ON g.Id = gci.GameId
+          LEFT JOIN GamesPlayersReviews gpr on gpr.GameId=g.Id
+          LEFT JOIN ApplicationUsers au on au.Id = gpr.UserId
           WHERE gc.Id = @Id",
-            (gameCollection, gameCollectionItem, game) =>
+            (gameCollection, gameCollectionItem, game, gamePlayerReview, applicationUser) =>
             {
                 if (game is not null && gameCollectionItem is not null && !gameCollection.GamesCollectionItems.Any(g => g.GameId == game.Id))
                 {
@@ -82,6 +101,15 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
                     gameCollectionItem.GameId = game.Id;
                     gameCollectionItem.GamesCollection = gameCollection;
                     gameCollectionItem.GamesCollectionId = gameCollection.Id;
+
+                    if (gamePlayerReview is not null && applicationUser is not null && !game.GamesPlayersReviews.Any(b => b.UserId == gamePlayerReview.UserId))
+                    {
+                        gamePlayerReview.Game = game;
+                        gamePlayerReview.GameId = game.Id;
+                        gamePlayerReview.ApplicationUser = applicationUser;
+                        gamePlayerReview.UserId = applicationUser.Id;
+                        game.GamesPlayersReviews.Add(gamePlayerReview);
+                    }
                     gameCollection.GamesCollectionItems.Add(gameCollectionItem);
                 }
 
