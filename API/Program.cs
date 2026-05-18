@@ -5,6 +5,7 @@ using Data.Migrations;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
+using IdentityLibrary.Services;
 using IdentityLibrary.Telegram;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -76,7 +77,7 @@ internal class Program
             googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
         }).AddVkontakte(vkontakteOptions =>
         {
-            vkontakteOptions.CallbackPath = new PathString (builder.Configuration["AuthSettings:Vkontakte:CallbackPath"]);
+            vkontakteOptions.CallbackPath = new PathString(builder.Configuration["AuthSettings:Vkontakte:CallbackPath"]);
             vkontakteOptions.ClientId = builder.Configuration["AuthSettings:Vkontakte:ClientId"];
             vkontakteOptions.ClientSecret = builder.Configuration["AuthSettings:Vkontakte:ClientSecret"];
             vkontakteOptions.ClaimsIssuer = builder.Configuration["AuthSettings:Vkontakte:ClaimsIssuer"];
@@ -115,6 +116,8 @@ internal class Program
         });
 
         _ = builder.Services.AddScoped<AuthTokenGenerator>();
+
+        _ = builder.Services.AddScoped<TwoFactorAuthEmailProcessor>();
 
         _ = builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
             .AddJsonOptions(options =>

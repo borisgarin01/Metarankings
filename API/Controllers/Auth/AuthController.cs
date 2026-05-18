@@ -3,6 +3,7 @@ using AspNet.Security.OAuth.Vkontakte;
 using Domain.Auth;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
+using IdentityLibrary.Services;
 using IdentityLibrary.Telegram;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication;
@@ -23,6 +24,7 @@ public sealed class AuthController : ControllerBase
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly TelegramAuthenticator _telegramAuthenticator;
     private readonly AuthTokenGenerator _authTokenGenerator;
+    private readonly TwoFactorAuthEmailProcessor _twoFactorAuthEmailProcessor;
 
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
@@ -30,7 +32,7 @@ public sealed class AuthController : ControllerBase
     private readonly IOptionsMonitor<TokenValidationParameters> _tokenValidationParameters;
     private readonly IOptionsMonitor<EmailSettings> _emailSettings;
 
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters, SignInManager<ApplicationUser> signInManager, AuthTokenGenerator authTokenGenerator)
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, TelegramAuthenticator telegramAuthenticator, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters, SignInManager<ApplicationUser> signInManager, AuthTokenGenerator authTokenGenerator, TwoFactorAuthEmailProcessor twoFactorAuthEmailProcessor)
     {
         _configuration = configuration;
         _usersManager = usersManager;
@@ -42,6 +44,7 @@ public sealed class AuthController : ControllerBase
         _tokenValidationParameters = tokenValidationParameters;
         _signInManager = signInManager;
         _authTokenGenerator = authTokenGenerator;
+        _twoFactorAuthEmailProcessor = twoFactorAuthEmailProcessor;
     }
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -449,154 +452,45 @@ public sealed class AuthController : ControllerBase
 
             var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
 
-            _logger.LogInformation("Google callback authentication result succeeded: {Succeeded}", result.Succeeded);
-
             if (!result.Succeeded || result.Principal is null)
             {
-                HttpContext.Response.Redirect("/");
-                return Unauthorized();
+                _logger.LogWarning("Google authentication failed");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=google_auth_failed");
             }
 
+            // Извлекаем данные
             string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
             string? googleUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             string? phoneNumber = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
             string? name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
 
-            _logger.LogInformation("Google user email - {Email}, GoogleUserId - {UserId}, {PhoneNumber}, {Name}", email, googleUserId, phoneNumber, name);
-
-            ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(email);
-
-            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync("Google", email, isPersistent: true);
-
-            _logger.LogInformation("External login sign-in result for Google user {Email}: {Result}", email, signInResult.ToString());
-
-            if (userToCheckExistance is not null)
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(googleUserId))
             {
-                _logger.LogInformation("userToCheckExistance is not null");
-
-                if (signInResult is not null)
-                {
-                    if (signInResult.Succeeded)
-                    {
-                        _logger.LogInformation("signInResult is not null && signInResult.Succeeded");
-
-                        string tokenString = await _authTokenGenerator.GenerateJwtToken(userToCheckExistance);
-
-                        _logger.LogInformation("token - {token}", tokenString);
-
-                        IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AuthToken", tokenString);
-
-                        if (identityResult.Succeeded)
-                        {
-                            _logger.LogInformation("IdentityResult succeded - {Succeeded}", identityResult.Succeeded);
-                            // Redirect back to Blazor app with token in URL
-                            // The token will be captured by Blazor's callback page
-                            return Redirect($"{Request.Scheme}://{Request.Host}/auth/google-callback?Token={tokenString}");
-                        }
-
-                        return Redirect($"{Request.Scheme}://{Request.Host}/login?error=token_generation_failed");
-                    }
-                    else if (signInResult.RequiresTwoFactor)
-                    {
-                        _logger.LogInformation("Google user {Email} requires two-factor authentication", email);
-
-                        string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
-
-                        _logger.LogInformation("Generated 2FA token for Google user {Email}: {TwoFactorToken}", email, twoFactorToken);
-
-                        MimeMessage emailMessage = new();
-                        emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
-
-                        emailMessage.To.Add(new MailboxAddress("", userToCheckExistance.Email));
-
-                        emailMessage.Subject = "Confirm login";
-                        emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
-                        {
-                            Text = $"Your 2FA verification code is: <strong>{twoFactorToken}</strong><br><br>" +
-                                   $"Enter this code to complete your login."
-                        };
-
-                        using SmtpClient client = new();
-                        await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
-                        await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
-                        _ = await client.SendAsync(emailMessage);
-                        await client.DisconnectAsync(true);
-
-                        return Redirect($"/auth/validate-two-factor-code/{userToCheckExistance.Id}");
-                    }
-                    return Unauthorized();
-                }
-                return Unauthorized();
-
+                _logger.LogError("Email or GoogleUserId is null");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_required_data");
             }
-            else
+
+            _logger.LogInformation("Processing Google login for email: {Email}, GoogleUserId: {GoogleUserId}", email, googleUserId);
+
+            // ✅ ВЫЗЫВАЕМ УНИВЕРСАЛЬНЫЙ МЕТОД
+            var (success, token, error) = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
+                provider: "Google",
+                providerKey: googleUserId,
+                email: email,
+                name: name,
+                phoneNumber: phoneNumber
+            );
+
+            if (success)
             {
-                _logger.LogInformation("userToCheckExistance is null");
-
-                var userToRegister = new ApplicationUser
-                {
-                    Email = email,
-                    UserName = email,
-                    NormalizedEmail = email.ToUpperInvariant(),
-                    NormalizedUserName = email.ToUpperInvariant(),
-                    EmailConfirmed = true, // Since we get the email from Google, we can consider it confirmed
-                    ConcurrencyStamp = Guid.NewGuid().ToString(),
-                    AccessFailedCount = 0,
-                    PhoneNumber = phoneNumber,
-                    SecurityStamp = Guid.NewGuid().ToString()
-                };
-
-                IdentityResult userCreationResult = await _usersManager.CreateAsync(userToRegister);
-
-                if (userCreationResult.Succeeded)
-                {
-                    _logger.LogInformation("User creation succeeded for email {Email}", email);
-                }
-                else
-                {
-                    _logger.LogError("User creation failed for email {Email}. Errors: {Errors}", email, string.Join(", ", userCreationResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
-                    return StatusCode(500, new { Message = "User creation failed", UserToRegister = userToRegister });
-                }
-
-                _logger.LogInformation("user created in database with email {Email}", email);
-
-                ApplicationUser? userToAddExternalLogin = await _usersManager.FindByEmailAsync(email);
-
-                if (userToAddExternalLogin is null)
-                {
-                    _logger.LogError("User to add external login not found after creation for email {Email}", email);
-                    return StatusCode(500, new { Message = "User to add external login not found after creation", Email = email });
-                }
-
-                _logger.LogInformation("User to add external login - {Id}, {Email}, {PhoneNumber}", userToAddExternalLogin.Id, userToAddExternalLogin.Email, userToAddExternalLogin.PhoneNumber);
-
-                await _usersManager.AddLoginAsync(userToAddExternalLogin, new UserLoginInfo("Google", email, "Google"));
-
-                Microsoft.AspNetCore.Identity.SignInResult freshRegisteredUserSignInResult = await _signInManager.ExternalLoginSignInAsync("Google", email, isPersistent: true);
-
-                ApplicationUser? createdUser = await _usersManager.FindByEmailAsync(email);
-
-                _logger.LogInformation("New user created with email {Email}", email);
-
-                if (createdUser is not null && freshRegisteredUserSignInResult is not null && freshRegisteredUserSignInResult.Succeeded)
-                {
-                    _logger.LogInformation("createdUser is not null && freshRegisteredUserSignInResult is not null && freshRegisteredUserSignInResult.Succeeded");
-
-                    string tokenString = await _authTokenGenerator.GenerateJwtToken(createdUser);
-                    IdentityResult identityResult = await _usersManager.SetAuthenticationTokenAsync(createdUser, "SQLServer", "AuthToken", tokenString);
-                    if (identityResult.Succeeded)
-                    {
-                        return Redirect($"{Request.Scheme}://{Request.Host}/auth/google-callback?Token={tokenString}");
-                    }
-                    return Redirect($"{Request.Scheme}://{Request.Host}/login?error=token_generation_failed");
-                }
-
-                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=token_generation_failed");
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/google-callback?Token={token}");
             }
+
+            return Redirect($"{Request.Scheme}://{Request.Host}/login?error={error}");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Ошибка при обработке Google callback: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            _logger.LogError(ex, $"Error in Google callback: {ex.Message}");
             return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
         }
     }
