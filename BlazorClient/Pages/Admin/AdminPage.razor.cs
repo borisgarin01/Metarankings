@@ -1,4 +1,5 @@
-﻿using Domain.Auth;
+﻿using Blazored.Toast.Services;
+using Domain.Auth;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
 
@@ -11,7 +12,7 @@ public partial class AdminPage : ComponentBase
     public HttpClient HttpClient { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     NavigationManager NavigationManager { get; set; }
@@ -26,23 +27,23 @@ public partial class AdminPage : ComponentBase
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Вы не авторизованы для выполнения этого действия");
+            ToastService.ShowWarning("Вы не авторизованы для выполнения этого действия");
             return;
         }
 
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Пользователь не найден");
+            ToastService.ShowWarning("Пользователь не найден");
             return;
         }
         // You might want to handle the response
         if (!response.IsSuccessStatusCode)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Ошибка назначения пользователя администратором");
+            ToastService.ShowWarning("Ошибка назначения пользователя администратором");
             return;
         }
 
-        await JSRuntime.InvokeVoidAsync("alert", "Пользователь успешно назначен администратором");
+        ToastService.ShowSuccess("Пользователь успешно назначен администратором");
 
         NavigationManager.NavigateTo("/");
     }

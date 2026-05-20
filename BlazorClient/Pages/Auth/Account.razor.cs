@@ -1,4 +1,5 @@
 ﻿using BlazorClient.Auth;
+using Blazored.Toast.Services;
 using Domain.Auth;
 using IdentityLibrary.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -67,7 +68,7 @@ public partial class Account : ComponentBase
     }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public IAuthService AuthService { get; set; }
@@ -124,21 +125,21 @@ public partial class Account : ComponentBase
 
             await AuthService.LogoutAsync();
 
-            await JSRuntime.InvokeVoidAsync("alert", "Настройки обновлены!");
+            ToastService.ShowError("Настройки обновлены!");
         }
         catch (Exception ex)
         {
             // Revert UI state if update fails
             TwoFactorEnabled = !newValue;
             StateHasChanged();
-            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {ex.Message}");
+            ToastService.ShowError($"Ошибка: {ex.Message}");
         }
     }
     private async Task ChangePassword()
     {
         if (NewPassword != NewPasswordConfirm)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Пароли не совпадают!");
+            ToastService.ShowWarning("Пароли не совпадают!");
             return;
         }
         try
@@ -147,16 +148,16 @@ public partial class Account : ComponentBase
             if (httpResponseMessage.IsSuccessStatusCode)
             {
                 await AuthService.LogoutAsync();
-                await JSRuntime.InvokeVoidAsync("alert", "Пароль успешно изменён!");
+                ToastService.ShowSuccess("Пароль успешно изменён!");
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {await httpResponseMessage.Content.ReadAsStringAsync()}");
+                ToastService.ShowError($"Ошибка: {await httpResponseMessage.Content.ReadAsStringAsync()}");
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {ex.Message}");
+            ToastService.ShowError($"Ошибка: {ex.Message}{ex.StackTrace}");
         }
     }
 }

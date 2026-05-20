@@ -1,7 +1,9 @@
-﻿using Domain.Movies.Collections;
+﻿using Blazored.Toast.Services;
+using Domain.Movies.Collections;
 using Domain.RequestsModels.Movies.Collections;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO;
+using System.Net.Http;
 using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.Collections;
@@ -12,7 +14,7 @@ public partial class AddCollectionPage : ComponentBase
     public IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> MoviesCollectionsWebManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -38,7 +40,7 @@ public partial class AddCollectionPage : ComponentBase
         HttpResponseMessage gameCreationHttpResponseMessage = await MoviesCollectionsWebManager.AddAsync(addGameCollectionModel);
 
         if (!gameCreationHttpResponseMessage.IsSuccessStatusCode)
-            await JSRuntime.InvokeVoidAsync("alert", await gameCreationHttpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await gameCreationHttpResponseMessage.Content.ReadAsStringAsync());
 
         else
             NavigationManager.NavigateTo("/movies/collections");

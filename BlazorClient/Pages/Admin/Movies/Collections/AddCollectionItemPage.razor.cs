@@ -1,4 +1,5 @@
-﻿using Domain.Movies;
+﻿using Blazored.Toast.Services;
+using Domain.Movies;
 using Domain.Movies.Collections;
 using Domain.RequestsModels.Movies.Collections;
 using Domain.RequestsModels.Movies.Movies;
@@ -26,7 +27,7 @@ public partial class AddCollectionItemPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,6 +47,6 @@ public partial class AddCollectionItemPage : ComponentBase
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo($"/admin/movies/collections/{Id}/manage-collection");
         else
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

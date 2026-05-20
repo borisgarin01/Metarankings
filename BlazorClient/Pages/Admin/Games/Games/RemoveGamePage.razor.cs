@@ -1,6 +1,5 @@
-﻿using Domain.Games;
-using Domain.RequestsModels.Games;
-using WebManagers;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Games;
@@ -16,7 +15,7 @@ public partial class RemoveGamePage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public GamesWebManager GamesWebManager { get; set; }
@@ -29,12 +28,8 @@ public partial class RemoveGamePage : ComponentBase
     {
         HttpResponseMessage httpResponseMessage = await GamesWebManager.DeleteAsync(Id);
         if (httpResponseMessage.IsSuccessStatusCode)
-        {
             NavigationManager.NavigateTo("/admin/games/games/list-games");
-        }
         else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
-        }
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

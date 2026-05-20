@@ -1,4 +1,5 @@
-﻿using Domain.Movies;
+﻿using Blazored.Toast.Services;
+using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using WebManagers;
 
@@ -13,7 +14,7 @@ public partial class AddMovieDirectorPage : ComponentBase
 
     [Inject]
     public NavigationManager NavigationManager { get; private set; }
-    public IJSRuntime JSRuntime { get; private set; }
+    public IToastService ToastService { get; private set; }
 
     public async Task AddMovieDirectorAsync()
     {
@@ -23,6 +24,6 @@ public partial class AddMovieDirectorPage : ComponentBase
             NavigationManager.NavigateTo("/movies/movies-directors/movies-directors-list");
         else
             if (httpResponseMessage is not null)
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

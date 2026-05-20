@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games.Developers;
 using WebManagers;
 
@@ -10,12 +11,12 @@ public partial class RemoveDeveloperPage : ComponentBase
     public long Id { get; set; }
 
     public Developer Developer { get; private set; }
-    
+
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public IWebManager<Developer, AddDeveloperModel, UpdateDeveloperModel> DevelopersWebManager { get; set; }
@@ -31,12 +32,8 @@ public partial class RemoveDeveloperPage : ComponentBase
     {
         HttpResponseMessage httpResponseMessage = await DevelopersWebManager.DeleteAsync(Id);
         if (httpResponseMessage.IsSuccessStatusCode)
-        {
             NavigationManager.NavigateTo("/admin/games/developers/list-developers");
-        }
         else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
-        }
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

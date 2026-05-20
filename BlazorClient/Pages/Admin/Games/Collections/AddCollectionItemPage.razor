@@ -6,13 +6,13 @@
     <Authorized>
         <EditForm OnValidSubmit="@AddGameCollectionItemAsync" Model="this" Context="myContext">
             <div>
-                <select @onchange="SelectGame">
+                <InputSelect @bind-Value="SelectedGameId">
                     <option value="-1" selected>None</option>
                     @foreach (Game game in GamesToSelectFrom)
                     {
                         <option value="@game.Id.ToString()">@game.Name</option>
                     }
-                </select>
+                </InputSelect>
                 <input type="submit" value="Add" />
             </div>
         </EditForm>

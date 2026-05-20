@@ -6,11 +6,14 @@
     <Authorized>
         <EditForm OnValidSubmit="@AddGameCollectionAsync" Model="this" Context="myContext">
             <DataAnnotationsValidator />
+            <ValidationSummary />
             <div>
                 <InputText @bind-Value="@CollectionName" />
+                <ValidationMessage For="() => CollectionName" />
             </div>
             <div>
                 <InputTextArea @bind-Value="@Description" />
+                <ValidationMessage For="() => Description" />
             </div>
             <div>
                 <label>

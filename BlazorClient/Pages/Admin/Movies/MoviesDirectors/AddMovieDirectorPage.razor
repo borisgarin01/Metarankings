@@ -1,8 +1,18 @@
 ﻿@page "/admin/movies/movies-directors/add-movie-director"
 
-<a href="/admin">К странице админа</a>
-<form method="post" @onsubmit="@AddMovieDirectorAsync">
-    <a href="/admin/movies/movies-directors/movies-directors-list" class="list-group-item link-dark">Режиссеры</a>
-    <input type="text" @bind-value="@Name" />
-    <button type="submit">Add</button>
-</form>
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <a href="/admin">К странице админа</a>
+        <EditForm method="post" OnValidSubmit="@AddMovieDirectorAsync" Context="myContext">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <a href="/admin/movies/movies-directors/movies-directors-list" class="list-group-item link-dark">Режиссеры</a>
+            <InputText @bind-value="@Name" />
+            <ValidationMessage For="() => Name" />
+            <button type="submit">Add</button>
+        </EditForm>
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы добавить режиссера
+    </NotAuthorized>
+</AuthorizeView>

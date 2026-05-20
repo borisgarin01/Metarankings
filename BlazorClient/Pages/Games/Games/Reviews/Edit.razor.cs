@@ -1,4 +1,5 @@
-﻿using Domain.RequestsModels.Games.GamesGamersReviews;
+﻿using Blazored.Toast.Services;
+using Domain.RequestsModels.Games.GamesGamersReviews;
 using Domain.Reviews;
 
 namespace BlazorClient.Pages.Games.Games.Reviews;
@@ -20,8 +21,9 @@ public partial class Edit : ComponentBase
     public HttpClient HttpClient { get; set; }
     [Inject]
     public NavigationManager NavigationManager { get; set; }
+
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,6 +48,6 @@ public partial class Edit : ComponentBase
             NavigationManager.NavigateTo($"/games/Details/{GameId}", true);
 
         else
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

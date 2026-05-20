@@ -1,4 +1,6 @@
-﻿namespace BlazorClient.Components.PagesComponents.Common;
+﻿using Blazored.Toast.Services;
+
+namespace BlazorClient.Components.PagesComponents.Common;
 
 public abstract partial class YourScoreComponent : ComponentBase
 {
@@ -45,7 +47,7 @@ public abstract partial class YourScoreComponent : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     public abstract Task AddReviewAsync();
 }

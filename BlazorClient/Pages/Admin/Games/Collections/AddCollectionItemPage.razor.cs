@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.Games.Collections;
 using Domain.RequestsModels.Games.Collections;
 using WebManagers;
@@ -25,7 +26,7 @@ public partial class AddCollectionItemPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -45,6 +46,6 @@ public partial class AddCollectionItemPage : ComponentBase
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo($"/admin/games/collections/{Id}/manage-collection");
         else
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowWarning(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

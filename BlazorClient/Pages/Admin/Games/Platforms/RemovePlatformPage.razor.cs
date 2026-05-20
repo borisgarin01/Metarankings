@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games.Platforms;
 using WebManagers;
 using WebManagers.Derived;
@@ -10,7 +11,7 @@ public partial class RemovePlatformPage : ComponentBase
     [Parameter]
     public long Id { get; set; }
     public Platform Platform { get; private set; }
-    
+
     [Inject]
     public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> PlatformsWebManager { get; set; }
 
@@ -18,7 +19,7 @@ public partial class RemovePlatformPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,12 +30,8 @@ public partial class RemovePlatformPage : ComponentBase
     {
         HttpResponseMessage httpResponseMessage = await PlatformsWebManager.DeleteAsync(Id);
         if (httpResponseMessage.IsSuccessStatusCode)
-        {
             NavigationManager.NavigateTo("/admin/games/platforms/list-platforms");
-        }
         else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
-        }
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

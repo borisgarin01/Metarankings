@@ -1,4 +1,5 @@
-﻿using Domain.Reviews;
+﻿using Blazored.Toast.Services;
+using Domain.Reviews;
 
 namespace BlazorClient.Pages.Games.Games.Reviews
 {
@@ -14,7 +15,7 @@ namespace BlazorClient.Pages.Games.Games.Reviews
         public NavigationManager NavigationManager { get; set; }
 
         [Inject]
-        public IJSRuntime JSRuntime { get; set; }
+        public IToastService ToastService { get; set; }
 
         public GameReview GameReview { get; private set; }
 
@@ -29,7 +30,7 @@ namespace BlazorClient.Pages.Games.Games.Reviews
             if (httpResponseMessage.IsSuccessStatusCode)
                 NavigationManager.NavigateTo($"/games/Details/{GameReview.GameId}", true);
             else
-                await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+                ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
         }
     }
 }

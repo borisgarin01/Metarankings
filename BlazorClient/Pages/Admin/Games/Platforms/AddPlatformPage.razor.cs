@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games.Platforms;
 using WebManagers;
 
@@ -13,7 +14,7 @@ public partial class AddPlatformPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     public AddPlatformModel AddPlatformModel { get; } = new AddPlatformModel();
 
@@ -24,6 +25,6 @@ public partial class AddPlatformPage : ComponentBase
             NavigationManager.NavigateTo("/admin/Games/platforms/list-platforms");
         else
             if (httpResponseMessage is not null)
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

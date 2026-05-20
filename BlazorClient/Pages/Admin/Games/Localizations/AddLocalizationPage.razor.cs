@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games.Localizations;
 using Microsoft.AspNetCore.Authorization;
 using WebManagers;
@@ -15,7 +16,7 @@ public partial class AddLocalizationPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     public AddLocalizationModel AddLocalizationModel { get; } = new AddLocalizationModel();
 
@@ -26,6 +27,6 @@ public partial class AddLocalizationPage : ComponentBase
             NavigationManager.NavigateTo("/admin/games/localizations/list-localizations");
         else
             if (httpResponseMessage is not null)
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

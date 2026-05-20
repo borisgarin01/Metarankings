@@ -1,4 +1,5 @@
-﻿using Domain.Movies;
+﻿using Blazored.Toast.Services;
+using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesGenres;
 using WebManagers;
 
@@ -18,7 +19,7 @@ public partial class RemoveMovieGenrePage : ComponentBase
     public IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresWebManager { get; private set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; private set; }
+    public IToastService ToastService { get; private set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -31,6 +32,6 @@ public partial class RemoveMovieGenrePage : ComponentBase
         if (httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/movies/movies-genres/movies-genres-list");
         else
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

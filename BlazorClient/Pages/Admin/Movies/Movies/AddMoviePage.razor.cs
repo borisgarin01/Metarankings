@@ -1,4 +1,5 @@
-﻿using Domain.Movies;
+﻿using Blazored.Toast.Services;
+using Domain.Movies;
 using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Movies.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
@@ -45,7 +46,7 @@ public sealed partial class AddMoviePage : ComponentBase
     public MoviesWebManager MoviesWebManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -175,18 +176,18 @@ public sealed partial class AddMoviePage : ComponentBase
                     else
                     {
                         var error = await addingMovieResponseMessage.Content.ReadAsStringAsync();
-                        await JSRuntime.InvokeVoidAsync("alert", $"Failed to add movie: {error}");
+                        ToastService.ShowError($"Failed to add movie: {error}");
                     }
                 }
                 else
                 {
                     var problemDetails = await response.Content.ReadAsStringAsync();
-                    await JSRuntime.InvokeVoidAsync("alert", problemDetails);
+                    ToastService.ShowError(problemDetails);
                 }
             }
             catch (Exception ex)
             {
-                await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+                ToastService.ShowError(ex.Message);
             }
         }
     }

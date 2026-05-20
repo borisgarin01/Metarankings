@@ -1,4 +1,5 @@
-﻿using Domain.Movies;
+﻿using Blazored.Toast.Services;
+using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesGenres;
 using WebManagers;
 
@@ -15,7 +16,7 @@ public partial class AddMovieGenrePage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     public async Task AddMovieGenreAsync()
     {
@@ -24,6 +25,6 @@ public partial class AddMovieGenrePage : ComponentBase
             NavigationManager.NavigateTo("/movies/movies-genres/list-genres");
         else
             if (httpResponseMessage is not null)
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

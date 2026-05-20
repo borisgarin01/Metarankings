@@ -1,4 +1,5 @@
 ﻿using BlazorClient.PagesModels.Games.Reviews;
+using Blazored.Toast.Services;
 using Domain.RequestsModels.Games.GamesGamersReviews;
 
 namespace BlazorClient.Pages.Games.Games.Reviews;
@@ -33,15 +34,18 @@ public partial class YourScoreComponent : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     public async Task AddReviewAsync()
     {
         var addGamePlayerReviewModel = new AddGamePlayerReviewModel(GameId, YourScoreComponentModel.Text, YourScoreComponentModel.YourScore);
         HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClient.PostAsJsonAsync<AddGamePlayerReviewModel>("api/Games/GamesGamersReviews", addGamePlayerReviewModel);
         if (addingGamePlayerReviewHttpResponseMessage.IsSuccessStatusCode)
+        {
+            ToastService.ShowSuccess("Обзор добавлен");
             NavigationManager.NavigateTo($"/games/Details/{GameId}", true);
+        }
         else
-            await JSRuntime.InvokeVoidAsync("alert", await addingGamePlayerReviewHttpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await addingGamePlayerReviewHttpResponseMessage.Content.ReadAsStringAsync());
     }
 }

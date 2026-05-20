@@ -1,4 +1,5 @@
 ﻿using BlazorClient.Auth;
+using Blazored.Toast.Services;
 using IdentityLibrary.Models;
 
 namespace BlazorClient.Pages.Auth;
@@ -9,7 +10,7 @@ public partial class ValidateTwoFactorCodePage : ComponentBase
     public string UserId { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public IAuthService AuthService { get; set; }
@@ -23,8 +24,6 @@ public partial class ValidateTwoFactorCodePage : ComponentBase
     {
         try
         {
-            await JSRuntime.InvokeVoidAsync("console.log", $"Validating 2FA code: {model.TwoFactorCode} for UserId: {UserId}");
-
             TokenResponse tokenResponse = await AuthService.VerifyTwoFactorAsync(UserId, model.TwoFactorCode);
 
             if (tokenResponse is not null && !string.IsNullOrWhiteSpace(tokenResponse.Token) && string.IsNullOrWhiteSpace(tokenResponse.Error))
@@ -34,12 +33,12 @@ public partial class ValidateTwoFactorCodePage : ComponentBase
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Неверный код подтверждения. Пожалуйста, попробуйте снова.");
+                ToastService.ShowWarning("Неверный код подтверждения. Пожалуйста, попробуйте снова.");
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {ex.Message}");
+            ToastService.ShowError($"Ошибка: {ex.Message}\t{ex.StackTrace}");
         }
     }
 }

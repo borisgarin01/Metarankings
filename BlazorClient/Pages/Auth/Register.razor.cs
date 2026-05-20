@@ -1,4 +1,5 @@
 ﻿using BlazorClient.Auth;
+using Blazored.Toast.Services;
 using IdentityLibrary.Models;
 
 namespace BlazorClient.Pages.Auth;
@@ -7,7 +8,7 @@ public partial class Register : ComponentBase
 {
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public IAuthService AuthService { get; set; }
@@ -22,12 +23,12 @@ public partial class Register : ComponentBase
         try
         {
             await AuthService.RegisterAsync(RegisterModel);
-            await JSRuntime.InvokeVoidAsync("alert", "На Ваш адрес электронной почты отправлено письмо для перехода по ссылке для подтверждения аккаунта");
+            ToastService.ShowInfo("На Ваш адрес электронной почты отправлено письмо для перехода по ссылке для подтверждения аккаунта");
             NavigationManager.NavigateTo("/");
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+            ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
         }
     }
 }

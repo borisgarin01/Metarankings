@@ -177,4 +177,9 @@ public partial class Login : ComponentBase
     {
         NavigationManager.NavigateTo($"/api/auth/login-vk", forceLoad: true);
     }
+
+    public async Task LoginGithub()
+    {
+        NavigationManager.NavigateTo($"/api/auth/login-github", forceLoad: true);
+    }
 }

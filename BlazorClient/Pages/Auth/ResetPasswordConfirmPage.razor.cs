@@ -1,5 +1,6 @@
 ﻿using BlazorClient.Auth;
 using BlazorClient.PagesModels;
+using Blazored.Toast.Services;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BlazorClient.Pages.Auth;
@@ -10,7 +11,7 @@ public partial class ResetPasswordConfirmPage : ComponentBase
     public IAuthService AuthService { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -28,17 +29,17 @@ public partial class ResetPasswordConfirmPage : ComponentBase
 
             if (resetPasswordHttpResponseMessage.IsSuccessStatusCode)
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Password has been reset successully");
+                ToastService.ShowWarning("Password has been reset successully");
                 NavigationManager.NavigateTo("/");
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", await resetPasswordHttpResponseMessage.Content.ReadAsStringAsync());
+                ToastService.ShowError(await resetPasswordHttpResponseMessage.Content.ReadAsStringAsync());
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"{ex.Message}\t{ex.StackTrace}");
+            ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
         }
     }
 }

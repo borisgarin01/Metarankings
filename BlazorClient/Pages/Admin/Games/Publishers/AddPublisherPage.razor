@@ -8,6 +8,7 @@
             <DataAnnotationsValidator />
             <ValidationSummary />
             <InputText @bind-Value="AddPublisherModel.Name" />
+            <ValidationMessage For="() => AddPublisherModel.Name" />
             <input type="submit" value="Добавить" />
         </EditForm>
     </Authorized>

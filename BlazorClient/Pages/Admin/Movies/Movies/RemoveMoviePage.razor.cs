@@ -1,4 +1,5 @@
-﻿using Domain.Movies;
+﻿using Blazored.Toast.Services;
+using Domain.Movies;
 using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Movies.Movies;
 using WebManagers;
@@ -18,7 +19,7 @@ public partial class RemoveMoviePage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public MoviesWebManager MoviesWebManager { get; set; }
@@ -37,7 +38,7 @@ public partial class RemoveMoviePage : ComponentBase
         }
         else
         {
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
         }
     }
 }

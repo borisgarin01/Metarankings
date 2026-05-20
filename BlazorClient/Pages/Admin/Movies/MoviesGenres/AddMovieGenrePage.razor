@@ -1,7 +1,10 @@
 ﻿@page "/admin/movies/movies-genres/add-movie-genre"
 
 <a href="/admin">К странице админа</a>
-<form method="post" @onsubmit="@AddMovieGenreAsync">
-    <input type="text" @bind-value="@Name" />
+<EditForm Model="this" OnValidSubmit="@AddMovieGenreAsync" Context="myContext">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <InputText @bind-value="@Name" />
+    <ValidationMessage For="() => Name" />
     <button type="submit">Add</button>
-</form>
+</EditForm>

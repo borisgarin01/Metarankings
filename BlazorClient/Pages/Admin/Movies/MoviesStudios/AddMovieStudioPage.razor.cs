@@ -1,4 +1,5 @@
-﻿using Domain.Movies;
+﻿using Blazored.Toast.Services;
+using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesStudios;
 using WebManagers;
 
@@ -15,7 +16,7 @@ public partial class AddMovieStudioPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     public async Task AddMovieStudioAsync()
     {

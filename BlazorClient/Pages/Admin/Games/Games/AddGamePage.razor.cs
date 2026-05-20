@@ -1,8 +1,10 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO;
+using System.Net.Http;
 using WebManagers;
 using WebManagers.Derived.Games;
 
@@ -34,7 +36,7 @@ public partial class AddGamePage : ComponentBase
     public HttpClient HttpClient { get; private set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; private set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public GamesWebManager GetWebManager { get; private set; }
@@ -93,14 +95,11 @@ public partial class AddGamePage : ComponentBase
                         NavigationManager.NavigateTo("/admin/games/games/list-games");
                 }
                 else
-                {
-                    var problemDetails = await response.Content.ReadAsStringAsync();
-                    await JSRuntime.InvokeVoidAsync("alert", problemDetails);
-                }
+                    ToastService.ShowError(await response.Content.ReadAsStringAsync());
             }
             catch (Exception ex)
             {
-                await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+                ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
             }
         }
     }
@@ -113,44 +112,6 @@ public partial class AddGamePage : ComponentBase
             && !SelectedPlatformsIds.Contains(-1)
             && !SelectedPublishersIds.Contains(-1)
             && ImageToUpload is not null;
-    }
-
-    private Task SelectDeveloper(ChangeEventArgs e)
-    {
-        SelectedDevelopersIds = ((string[])e.Value)
-            .Select(idString => long.Parse(idString))
-            .ToList();
-        return Task.CompletedTask;
-    }
-
-    private Task SelectGenre(ChangeEventArgs e)
-    {
-        SelectedGenresIds = ((string[])e.Value)
-        .Select(idString => long.Parse(idString))
-            .ToList();
-        return Task.CompletedTask;
-    }
-
-    private Task SelectPublisher(ChangeEventArgs e)
-    {
-        SelectedPublishersIds = ((string[])e.Value)
-        .Select(idString => long.Parse(idString))
-            .ToList();
-        return Task.CompletedTask;
-    }
-
-    private Task SelectLocalization(ChangeEventArgs e)
-    {
-        SelectedLocalizationId = long.Parse((string)e.Value);
-        return Task.CompletedTask;
-    }
-
-    private Task SelectPlatform(ChangeEventArgs e)
-    {
-        SelectedPlatformsIds = ((string[])e.Value)
-        .Select(idString => long.Parse(idString))
-            .ToList();
-        return Task.CompletedTask;
     }
 
     private async Task FileUploaded(InputFileChangeEventArgs e)

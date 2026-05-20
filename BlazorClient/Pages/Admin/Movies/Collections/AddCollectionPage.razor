@@ -6,6 +6,7 @@
     <Authorized>
         <EditForm OnValidSubmit="@AddMovieCollectionAsync" Model="this" Context="myContext">
             <DataAnnotationsValidator />
+            <ValidationSummary />
             <div>
                 <InputText @bind-Value="@CollectionName" />
             </div>

@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games.Publishers;
 using WebManagers;
 
@@ -13,12 +14,12 @@ public partial class RemovePublisherPage : ComponentBase
 
     [Inject]
     public IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel> PublishersWebManager { get; set; }
-    
+
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,12 +30,8 @@ public partial class RemovePublisherPage : ComponentBase
     {
         HttpResponseMessage httpResponseMessage = await PublishersWebManager.DeleteAsync(Id);
         if (httpResponseMessage.IsSuccessStatusCode)
-        {
             NavigationManager.NavigateTo("/admin/games/publishers/list-publishers");
-        }
         else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
-        }
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

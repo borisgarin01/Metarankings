@@ -1,12 +1,13 @@
 ﻿using BlazorClient.Auth;
 using BlazorClient.PagesModels;
+using Blazored.Toast.Services;
 
 namespace BlazorClient.Pages.Auth;
 
 public partial class ResetPasswordPage : ComponentBase
 {
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     [Inject]
     public IAuthService AuthService { get; set; }
@@ -28,12 +29,12 @@ public partial class ResetPasswordPage : ComponentBase
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", await resetPasswordHttpResponseMessage.Content.ReadAsStringAsync());
+                ToastService.ShowError(await resetPasswordHttpResponseMessage.Content.ReadAsStringAsync());
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"{ex.Message}\t{ex.StackTrace}");
+            ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
         }
     }
 }

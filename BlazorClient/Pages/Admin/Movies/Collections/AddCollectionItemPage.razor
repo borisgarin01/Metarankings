@@ -7,13 +7,13 @@
     <Authorized>
         <EditForm OnValidSubmit="@AddMovieCollectionItemAsync" Model="this" Context="myContext">
             <div>
-                <select @onchange="SelectMovie">
+                <InputSelect @bind-Value="@SelectedMovieId">
                     <option value="-1" selected>None</option>
                     @foreach (Movie movie in MoviesToSelectFrom)
                     {
                         <option value="@movie.Id.ToString()">@movie.Name</option>
                     }
-                </select>
+                </InputSelect>
                 <input type="submit" value="Add" />
             </div>
         </EditForm>

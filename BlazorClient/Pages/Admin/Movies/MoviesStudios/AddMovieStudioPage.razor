@@ -1,7 +1,11 @@
 ﻿@page "/admin/movies/movies-studios/add-movie-studio"
 
 <a href="/admin">К странице админа</a>
-<form method="post" @onsubmit="@AddMovieStudioAsync">
-    <input type="text" @bind-value="@Name" />
+
+<EditForm Model="this" OnValidSubmit="@AddMovieStudioAsync" Context="myContext">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <InputText @bind-Value="@Name" />
+    <ValidationMessage For="() => Name" />
     <button type="submit">Add</button>
-</form>
+</EditForm>

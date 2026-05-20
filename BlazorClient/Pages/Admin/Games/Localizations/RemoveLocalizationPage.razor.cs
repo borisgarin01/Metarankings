@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games.Localizations;
 using WebManagers;
 
@@ -18,7 +19,7 @@ public partial class RemoveLocalizationPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,12 +30,8 @@ public partial class RemoveLocalizationPage : ComponentBase
     {
         HttpResponseMessage httpResponseMessage = await LocalizationsWebManager.DeleteAsync(Id);
         if (httpResponseMessage.IsSuccessStatusCode)
-        {
             NavigationManager.NavigateTo("/admin/Games/localizations/list-localizations");
-        }
         else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
-        }
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

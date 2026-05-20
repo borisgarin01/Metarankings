@@ -56,8 +56,11 @@
                     }
                     else if (login.DisplayName == "Vkontakte")
                     {
-
                         <button @onclick="LoginVkontakte">@login.DisplayName</button>
+                    }
+                    else if (login.DisplayName == "GitHub")
+                    {
+                        <button @onclick="LoginGithub">@login.DisplayName</button>
                     }
                 }
             }

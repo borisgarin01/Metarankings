@@ -14,9 +14,6 @@ public partial class MoviesStudiosListPage : ComponentBase
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    [Inject]
-    public IJSRuntime JSRuntime { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
         MoviesStudios = await MoviesStudiosManager.GetAllAsync();

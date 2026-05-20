@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games.Developers;
 using Microsoft.AspNetCore.Authorization;
 using WebManagers;
@@ -15,7 +16,7 @@ public partial class AddDeveloperPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     public AddDeveloperModel AddDeveloperModel { get; } = new AddDeveloperModel();
     protected override Task OnInitializedAsync()
@@ -30,6 +31,6 @@ public partial class AddDeveloperPage : ComponentBase
             NavigationManager.NavigateTo("/admin/games/developers/list-developers");
         else
             if (httpResponseMessage is not null)
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

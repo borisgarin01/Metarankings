@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games.GamesGamersReviews;
 
 namespace BlazorClient.Pages.Games.Games;
@@ -24,7 +25,7 @@ public partial class GameDetails : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
     public string TextContent { get; set; }
     public double Score { get; set; }
 
@@ -69,7 +70,7 @@ public partial class GameDetails : ComponentBase
         var addGamePlayerReviewModel = new AddGamePlayerReviewModel(Id, Text, YourScore);
         HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClient.PostAsJsonAsync<AddGamePlayerReviewModel>("api/GamesGamersReviews", addGamePlayerReviewModel);
         if (!addingGamePlayerReviewHttpResponseMessage.IsSuccessStatusCode)
-            await JSRuntime.InvokeVoidAsync("alert", addingGamePlayerReviewHttpResponseMessage.StatusCode);
+            ToastService.ShowError(await addingGamePlayerReviewHttpResponseMessage.Content.ReadAsStringAsync());
         else
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }

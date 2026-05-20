@@ -10,6 +10,7 @@
 <EditForm OnValidSubmit="AddGameAsync" Model="this" Context="myContext">
 
     <DataAnnotationsValidator />
+    <ValidationSummary />
 
     @if (DevelopersToSelectFrom is null || GenresToSelectFrom is null || LocalizationsToSelectFrom is null || PlatformsToSelectFrom is null || PublishersToSelectFrom is null)
     {
@@ -20,86 +21,90 @@
         <p>
             <label>
                 Enter name:
-                <input @bind="@Name" />
+                <InputText @bind-Value="@Name" />
+                <ValidationMessage For="() => Name" />
             </label>
         </p>
         <p>
             <label>
                 Enter release date:
-                <input @bind="@ReleaseDate" />
+                <InputDate @bind-Value="@ReleaseDate" />
+                <ValidationMessage For="() => ReleaseDate" />
             </label>
         </p>
         <p>
             <label>
                 Enter description:
-                <textarea type="text" @bind="@Description" />
+                <InputTextArea @bind-Value="@Description" />
+                <ValidationMessage For="() => Description" />
             </label>
         </p>
         <p>
             <label>
                 Enter trailer:
-                <input @bind="@Trailer" />
+                <InputText @bind-Value="@Trailer" />
+                <ValidationMessage For="() => Trailer" />
             </label>
         </p>
 
         <p>
             <label>
                 Select developers:
-                <select @onchange="SelectDeveloper" multiple>
+                <InputSelect @bind-Value="SelectedDevelopersIds" multiple>
                     <option value="-1" selected>None</option>
                     @foreach (Developer developer in DevelopersToSelectFrom)
                     {
                         <option value="@developer.Id.ToString()">@developer.Name</option>
                     }
-                </select>
+                </InputSelect>
             </label>
         </p>
         <p>
             <label>
                 Select genres:
-                <select @onchange="SelectGenre" multiple>
+                <InputSelect @bind-Value="SelectedGenresIds" multiple>
                     <option value="-1" selected>None</option>
                     @foreach (Genre genre in GenresToSelectFrom)
                     {
                         <option value="@genre.Id.ToString()">@genre.Name</option>
                     }
-                </select>
+                </InputSelect>
             </label>
         </p>
         <p>
             <label>
                 Select localization:
-                <select @onchange="SelectLocalization">
+                <InputSelect @bind-Value="SelectedLocalizationId">
                     <option value="-1" selected>None</option>
                     @foreach (Localization localization in LocalizationsToSelectFrom)
                     {
                         <option value="@localization.Id.ToString()">@localization.Name</option>
                     }
-                </select>
+                </InputSelect>
             </label>
         </p>
         <p>
             <label>
                 Select platforms:
-                <select @onchange="SelectPlatform" multiple>
+                <InputSelect @bind-Value="SelectedPlatformsIds" multiple>
                     <option value="-1" selected>None</option>
                     @foreach (Platform platform in PlatformsToSelectFrom)
                     {
                         <option value="@platform.Id.ToString()">@platform.Name</option>
                     }
-                </select>
+                </InputSelect>
             </label>
         </p>
         <p>
             <label>
                 Select publisher:
-                <select @onchange="SelectPublisher" multiple>
+                <InputSelect @bind-Value="SelectedPublishersIds" multiple>
                     <option value="-1" selected>None</option>
                     @foreach (Publisher publisher in PublishersToSelectFrom)
                     {
                         <option value="@publisher.Id.ToString()">@publisher.Name</option>
                     }
-                </select>
+                </InputSelect>
             </label>
         </p>
         <p>

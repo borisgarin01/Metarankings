@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games.Genres;
 using WebManagers;
 
@@ -13,7 +14,7 @@ public partial class AddGenrePage : ComponentBase
     public IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel> GenresWebManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     public AddGameGenreModel AddGenreModel { get; } = new AddGameGenreModel();
 
@@ -24,6 +25,6 @@ public partial class AddGenrePage : ComponentBase
             NavigationManager.NavigateTo("/admin/games/genres/list-genres");
         else
             if (httpResponseMessage is not null)
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 }

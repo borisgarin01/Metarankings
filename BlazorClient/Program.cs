@@ -1,4 +1,5 @@
 using BlazorClient.Auth;
+using Blazored.Toast;
 using Domain.Games;
 using Domain.Games.Collections;
 using Domain.Movies;
@@ -56,6 +57,8 @@ internal class Program
 
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["HttpClientSettings:BaseUrl"]) });
         builder.Services.AddScoped<IAuthService, AuthService>();
+
+        builder.Services.AddBlazoredToast();
 
         await builder.Build().RunAsync();
     }

@@ -1,4 +1,5 @@
-﻿using Domain.Games;
+﻿using Blazored.Toast.Services;
+using Domain.Games;
 using Domain.RequestsModels.Games.Publishers;
 using WebManagers;
 
@@ -14,7 +15,7 @@ public partial class AddPublisherPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     public AddPublisherModel AddPublisherModel { get; } = new AddPublisherModel();
 
@@ -25,7 +26,7 @@ public partial class AddPublisherPage : ComponentBase
             NavigationManager.NavigateTo("/admin/Games/publishers/list-publishers");
         else
             if (httpResponseMessage is not null)
-            await JSRuntime.InvokeVoidAsync("alert", await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 
 }

@@ -1,4 +1,5 @@
 ﻿using API.Controllers.Auth;
+using Blazored.Toast.Services;
 using Domain.Auth;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
@@ -23,7 +24,7 @@ public class AuthService : IAuthService
     }
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IToastService ToastService { get; set; }
 
     public async Task<LoginResponse> LoginAsync(LoginModel loginModel)
     {
