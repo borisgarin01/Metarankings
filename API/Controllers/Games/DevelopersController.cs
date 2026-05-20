@@ -2,7 +2,6 @@
 using Domain.Games;
 using Domain.RequestsModels.Games.Developers;
 using ExcelProcessors;
-using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -18,15 +17,12 @@ public sealed class DevelopersController : ControllerBase
 
     private readonly ILogger<DevelopersController> _logger;
 
-    private readonly TelegramAuthenticator _telegramAuthenticator;
-
-    public DevelopersController(IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel> developersRepository, ILogger<DevelopersController> logger, IExcelDataReader<AddDeveloperModel> developersExcelDataReader, TelegramAuthenticator telegramAuthenticator)
+    public DevelopersController(IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel> developersRepository, ILogger<DevelopersController> logger, IExcelDataReader<AddDeveloperModel> developersExcelDataReader)
     {
         _developersRepository = developersRepository;
         _developersExcelDataReader = developersExcelDataReader;
 
         _logger = logger;
-        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpGet]
@@ -57,8 +53,6 @@ public sealed class DevelopersController : ControllerBase
         long insertedDeveloperId = await _developersRepository.AddAsync(addDeveloperModel);
 
         Developer insertedDeveloper = await _developersRepository.GetAsync(insertedDeveloperId);
-
-        await _telegramAuthenticator.SendMessageAsync($"New developer {insertedDeveloper.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/games/developers/{insertedDeveloper.Id}");
 
         return Created($"api/games/developers/{insertedDeveloper.Id}", insertedDeveloper);
     }

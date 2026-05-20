@@ -1,7 +1,6 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Games;
 using Domain.RequestsModels.Games.Platforms;
-using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -11,12 +10,9 @@ public sealed class PlatformsController : ControllerBase
 {
     private readonly IRepository<Platform, AddPlatformModel, UpdatePlatformModel> _platformsRepository;
 
-    private readonly TelegramAuthenticator _telegramAuthenticator;
-
-    public PlatformsController(IRepository<Platform, AddPlatformModel, UpdatePlatformModel> platformsRepository, TelegramAuthenticator telegramAuthenticator)
+    public PlatformsController(IRepository<Platform, AddPlatformModel, UpdatePlatformModel> platformsRepository)
     {
         _platformsRepository = platformsRepository;
-        _telegramAuthenticator = telegramAuthenticator;
     }
 
     [HttpGet]
@@ -40,7 +36,6 @@ public sealed class PlatformsController : ControllerBase
 
         Platform insertedPlatform = await _platformsRepository.GetAsync(insertedPlatformId);
 
-        await _telegramAuthenticator.SendMessageAsync($"New platform {addPlatformModel.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/games/platforms/{insertedPlatformId}");
         return Created($"api/games/platforms/{insertedPlatform.Id}", insertedPlatform);
     }
 

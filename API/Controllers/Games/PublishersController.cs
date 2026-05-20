@@ -2,7 +2,6 @@
 using Domain.Games;
 using Domain.RequestsModels.Games.Publishers;
 using ExcelProcessors;
-using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -18,11 +17,8 @@ public sealed class PublishersController : ControllerBase
 
     private readonly ILogger<PublishersController> _logger;
 
-    private readonly TelegramAuthenticator _telegramAuthenticator;
-
-    public PublishersController(TelegramAuthenticator telegramAuthenticator, IRepository<Publisher, AddPublisherModel, UpdatePublisherModel> publishersRepository, IExcelDataReader<AddPublisherModel> publishersExcelDataReader, IWebHostEnvironment webHostEnvironment, ILogger<PublishersController> logger)
+    public PublishersController(IRepository<Publisher, AddPublisherModel, UpdatePublisherModel> publishersRepository, IExcelDataReader<AddPublisherModel> publishersExcelDataReader, IWebHostEnvironment webHostEnvironment, ILogger<PublishersController> logger)
     {
-        _telegramAuthenticator = telegramAuthenticator;
         _publishersRepository = publishersRepository;
         _publishersExcelDataReader = publishersExcelDataReader;
         _webHostEnvironment = webHostEnvironment;
@@ -50,8 +46,6 @@ public sealed class PublishersController : ControllerBase
         long insertedPublisherId = await _publishersRepository.AddAsync(addPublisherModel);
 
         Publisher insertedPublisher = await _publishersRepository.GetAsync(insertedPublisherId);
-
-        await _telegramAuthenticator.SendMessageAsync($"New publisher {insertedPublisher.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/api/games/publishers/{insertedPublisher.Id}");
 
         return Created($"api/games/publishers/{insertedPublisher.Id}", insertedPublisher);
     }

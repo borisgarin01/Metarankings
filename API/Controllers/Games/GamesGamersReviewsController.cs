@@ -4,7 +4,6 @@ using Domain.Games;
 using Domain.RequestsModels.Games.GamesGamersReviews;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
-using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Games;
 
@@ -18,14 +17,11 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
     private readonly UserManager<ApplicationUser> _usersManager;
 
-    private readonly TelegramAuthenticator _telegramAuthenticator;
-
     private readonly ILogger<GamesGamersReviewsController> _logger;
 
-    public GamesGamersReviewsController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, TelegramAuthenticator telegramAuthenticator, IGamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, ILogger<GamesGamersReviewsController> logger, GamesPlayersReviewsShiftsRepository gamePlayerReviewsShiftsRepository)
+    public GamesGamersReviewsController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, IGamesRepository gamesRepository, UserManager<ApplicationUser> usersManager, ILogger<GamesGamersReviewsController> logger, GamesPlayersReviewsShiftsRepository gamePlayerReviewsShiftsRepository)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
-        _telegramAuthenticator = telegramAuthenticator;
         _gamesRepository = gamesRepository;
         _usersManager = usersManager;
         _logger = logger;
@@ -51,7 +47,6 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
         long gameReviewId = await _gamesPlayersReviewsRepository.AddAsync(addGameReviewWithUserIdAndDateModel);
         GameReview createdGameReview = await _gamesPlayersReviewsRepository.GetAsync(gameReviewId);
-        await _telegramAuthenticator.SendMessageAsync($"New game review for game {game.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/games/details/{createdGameReview.GameId}");
         return Created($"api/GamesReviews/{createdGameReview.Id}", createdGameReview);
 
     }

@@ -1,19 +1,15 @@
-﻿using IdentityLibrary.Telegram;
-
-namespace API.Controllers.Movies;
+﻿namespace API.Controllers.Movies;
 
 [ApiController]
 [Route("api/movies/[controller]")]
 public class ImagesController : ControllerBase
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
-    private readonly TelegramAuthenticator _telegramAuthenticator;
     private readonly string _baseImagesPath;
 
-    public ImagesController(IWebHostEnvironment webHostEnvironment, TelegramAuthenticator telegramAuthenticator)
+    public ImagesController(IWebHostEnvironment webHostEnvironment)
     {
         _webHostEnvironment = webHostEnvironment;
-        _telegramAuthenticator = telegramAuthenticator;
 
         // Use a consistent base path for images
         _baseImagesPath = Path.Combine(_webHostEnvironment.ContentRootPath, "Movies");

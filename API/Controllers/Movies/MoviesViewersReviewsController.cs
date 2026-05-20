@@ -3,7 +3,6 @@ using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesViewersReviews;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
-using IdentityLibrary.Telegram;
 
 namespace API.Controllers.Movies;
 
@@ -16,14 +15,11 @@ public sealed class MoviesViewersReviewsController : ControllerBase
 
     private readonly UserManager<ApplicationUser> _usersManager;
 
-    private readonly TelegramAuthenticator _telegramAuthenticator;
-
     private readonly ILogger<MoviesViewersReviewsController> _logger;
 
-    public MoviesViewersReviewsController(IMoviesViewersReviewsRepository moviesViewersReviewsRepository, TelegramAuthenticator telegramAuthenticator, IMoviesRepository moviesRepository, UserManager<ApplicationUser> usersManager, ILogger<MoviesViewersReviewsController> logger)
+    public MoviesViewersReviewsController(IMoviesViewersReviewsRepository moviesViewersReviewsRepository, IMoviesRepository moviesRepository, UserManager<ApplicationUser> usersManager, ILogger<MoviesViewersReviewsController> logger)
     {
         _moviesViewersReviewsRepository = moviesViewersReviewsRepository;
-        _telegramAuthenticator = telegramAuthenticator;
         _moviesRepository = moviesRepository;
         _usersManager = usersManager;
         _logger = logger;
@@ -48,7 +44,6 @@ public sealed class MoviesViewersReviewsController : ControllerBase
 
         var movieReviewId = await _moviesViewersReviewsRepository.AddAsync(addGameReviewWithUserIdAndDateModel);
         var createdMovieReview = await _moviesViewersReviewsRepository.GetAsync(movieReviewId);
-        await _telegramAuthenticator.SendMessageAsync($"New movie review for movie {movie.Name} at {Request.Scheme}://{Request.Host}{Request.PathBase}/movies/details/{createdMovieReview.MovieId}");
         return Created($"api/MoviesViewersReviews/{createdMovieReview.Id}", createdMovieReview);
 
     }

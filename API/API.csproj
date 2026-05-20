@@ -19,13 +19,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AspNet.Security.OAuth.Vkontakte" Version="9.4.1" />
 		<PackageReference Include="FluentMigrator" Version="7.1.0" />
 		<PackageReference Include="FluentMigrator.Console" Version="7.1.0" />
 		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="7.1.0" />
 		<PackageReference Include="MailKit" Version="4.13.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="9.0.16" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.12" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.16" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="9.0.16" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.5" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
@@ -53,6 +55,7 @@
 
 	<ItemGroup>
 		<Folder Include="SettingsDtos\" />
+		<Folder Include="Workers\" />
 	</ItemGroup>
 
 </Project>
