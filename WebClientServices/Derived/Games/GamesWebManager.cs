@@ -1,5 +1,4 @@
 ﻿using Domain.Games;
-using Domain.Movies;
 using Domain.RequestsModels.Games;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
@@ -74,9 +73,13 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
         return nearestGames;
     }
 
-    public async Task<IEnumerable<Game>> SearchByName(string name)
+    public async Task<IEnumerable<Game>> SearchByName(string? name)
     {
-        var games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/Search?name={name}");
+        IEnumerable<Game> games;
+        if (!string.IsNullOrWhiteSpace(name))
+            games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/Search?name={name}");
+        else
+            games = await GetAllAsync();
         return games;
     }
 }

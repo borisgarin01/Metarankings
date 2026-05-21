@@ -69,7 +69,11 @@ public sealed class MoviesWebManager : WebManager, IWebManager<Movie, AddMovieMo
 
     public async Task<IEnumerable<Movie>> SearchByName(string name)
     {
-        var movies = await HttpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/Search?name={name}");
+        IEnumerable<Movie> movies;
+        if (!string.IsNullOrWhiteSpace(name))
+            movies = await HttpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/Search?name={name}");
+        else
+            movies = await GetAllAsync();
         return movies;
     }
 }
