@@ -1,6 +1,4 @@
 ﻿using Domain.Games;
-using Domain.RequestsModels.Games;
-using WebManagers;
 using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Games.Games;

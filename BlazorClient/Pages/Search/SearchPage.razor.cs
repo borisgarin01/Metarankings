@@ -15,6 +15,9 @@ public partial class SearchPage : ComponentBase
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
+    [Inject]
+    public HttpClient HttpClient { get; set; }
+
     [SupplyParameterFromQuery]
     public string? SearchText
     {
