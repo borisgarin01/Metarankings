@@ -1,3 +1,16 @@
 ﻿@page "/movies/coming-soon"
+@using Domain.Movies
 
-<h3>Скоро выходят</h3>
+<div id="loop" class="list clear">
+    @foreach (Movie movie in Movies)
+    {
+        <div class="post clear">
+            <a href="/movies/Details/@movie.Id" title="Фильм «@movie.Name»" class="thumb"><img class="post-image" src="@movie.ImageSource" alt="@movie.Name"></a>
+            <a class="name" href="/movies/Details/@movie.Id">@movie.Name</a>
+            <div class="post-meta"><div class="date"><p>@(movie.PremierDate.HasValue? movie.PremierDate.Value.ToString("dd MMMM yyyy"):"неизвестна")</p></div></div>
+            <div class="post-meta"><p>@string.Join(" ", movie.Description.Split(' ').Take(12))...</p></div>
+            <div class="wait"><span class="w-yes"><span class='ldc-ul_wait' onclick="alter_ul_post_values(this,'29062','like')">+ <span>3</span></span></span> <span class="w-no"><span class='ldc-ul_wait' onclick="alter_ul_post_values(this,'29062','dislike')">- <span>1</span></span></span></div>
+            <div class="trailer" data-video="/movies/Details/@movie.Id/#content-trailer"></div>
+        </div>
+    }
+</div>
