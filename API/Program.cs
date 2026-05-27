@@ -1,6 +1,8 @@
 ﻿using API.Auth;
 using API.Hubs;
 using API.IServiceCollectionExtensions;
+using AspNet.Security.OAuth.MailRu;
+using AspNet.Security.OAuth.VkId;
 using Data.Migrations;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
@@ -73,7 +75,7 @@ internal class Program
         {
             googleOptions.ClientId = builder.Configuration["AuthSettings:Google:ClientId"];
             googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
-        }).AddOAuth("GitHub", "GitHub", githubOptions =>
+        }).AddGitHub(githubOptions =>
         {
             githubOptions.SignInScheme = "Cookies";
             githubOptions.ClientId = builder.Configuration["AuthSettings:GitHub:ClientId"];
@@ -85,7 +87,44 @@ internal class Program
             githubOptions.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
             githubOptions.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
             githubOptions.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-        }).AddCookie()
+        }).
+        AddMailRu(mailRuAuthenticationOptions =>
+        {
+            mailRuAuthenticationOptions.SignInScheme = "Cookies";
+            mailRuAuthenticationOptions.ClientId = builder.Configuration["AuthSettings:MailRu:ClientId"];
+            mailRuAuthenticationOptions.ClientSecret = builder.Configuration["AuthSettings:MailRu:ClientSecret"];
+            mailRuAuthenticationOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:MailRu:AuthUri"];
+            mailRuAuthenticationOptions.TokenEndpoint = builder.Configuration["AuthSettings:MailRu:TokenUri"];
+            mailRuAuthenticationOptions.CallbackPath = builder.Configuration["AuthSettings:MailRu:CallbackPath"];
+        }).
+        AddVkId(vkOptions =>
+        {
+            vkOptions.SignInScheme = "Cookies";
+            vkOptions.ClientId = builder.Configuration["AuthSettings:VkId:ClientId"];
+            vkOptions.ClientSecret = builder.Configuration["AuthSettings:VkId:ClientSecret"];
+            vkOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:VkId:AuthUri"];
+            vkOptions.TokenEndpoint = builder.Configuration["AuthSettings:VkId:TokenUri"];
+            vkOptions.CallbackPath = builder.Configuration["AuthSettings:VkId:CallbackPath"];
+        })
+        .AddVkontakte(vkontakteOptions =>
+        {
+            vkontakteOptions.SignInScheme = "Cookies";
+            vkontakteOptions.ClientId = builder.Configuration["AuthSettings:Vkontakte:ClientId"];
+            vkontakteOptions.ClientSecret = builder.Configuration["AuthSettings:Vkontakte:ClientSecret"];
+            vkontakteOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:Vkontakte:AuthUri"];
+            vkontakteOptions.TokenEndpoint = builder.Configuration["AuthSettings:Vkontakte:TokenUri"];
+            vkontakteOptions.CallbackPath = builder.Configuration["AuthSettings:Vkontakte:CallbackPath"];
+        })
+        .AddYandex(yandexOptions =>
+        {
+            yandexOptions.SignInScheme = "Cookies";
+            yandexOptions.ClientId = builder.Configuration["AuthSettings:Yandex:ClientId"];
+            yandexOptions.ClientSecret = builder.Configuration["AuthSettings:Yandex:ClientSecret"];
+            yandexOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:Yandex:AuthUri"];
+            yandexOptions.TokenEndpoint = builder.Configuration["AuthSettings:Yandex:TokenUri"];
+            yandexOptions.CallbackPath = builder.Configuration["AuthSettings:Yandex:CallbackPath"];
+        })
+        .AddCookie()
         .AddCookie("cookie");
 
         _ = builder.Services.AddAuthorization(options =>

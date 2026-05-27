@@ -62,6 +62,22 @@
                     {
                         <button @onclick="LoginGithub">@login.DisplayName</button>
                     }
+                    else if (login.DisplayName == "MailRu")
+                    {
+                        <button @onclick="LoginMailRu">@login.DisplayName</button>
+                    }
+                    else if (login.DisplayName == "VK ID")
+                    {
+                        <button @onclick="LoginVKID">@login.DisplayName</button>
+                    }
+                    else if (login.DisplayName == "Vkontakte")
+                    {
+                        <button @onclick="LoginVkontakte">@login.DisplayName</button>
+                    }
+                    else if (login.DisplayName == "Yandex")
+                    {
+                        <button @onclick="LoginYandex">@login.DisplayName</button>
+                    }
                 }
             }
         </div>

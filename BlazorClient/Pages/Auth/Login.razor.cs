@@ -175,11 +175,26 @@ public partial class Login : ComponentBase
 
     public async Task LoginVkontakte()
     {
-        NavigationManager.NavigateTo($"/api/auth/login-vk", forceLoad: true);
+        NavigationManager.NavigateTo($"/api/auth/login-vkontakte", forceLoad: true);
     }
 
     public async Task LoginGithub()
     {
         NavigationManager.NavigateTo($"/api/auth/login-github", forceLoad: true);
+    }
+
+    public async Task LoginMailRu()
+    {
+        NavigationManager.NavigateTo($"/api/auth/login-mailru", forceLoad: true);
+    }
+
+    public async Task LoginVKID()
+    {
+        NavigationManager.NavigateTo($"/api/auth/login-vkid", forceLoad: true);
+    }
+
+    public async Task LoginYandex()
+    {
+        NavigationManager.NavigateTo($"/api/auth/login-yandex", forceLoad: true);
     }
 }

@@ -19,6 +19,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="9.4.1" />
+		<PackageReference Include="AspNet.Security.OAuth.MailRu" Version="9.4.1" />
+		<PackageReference Include="AspNet.Security.OAuth.VkId" Version="9.4.1" />
+		<PackageReference Include="AspNet.Security.OAuth.Vkontakte" Version="9.4.1" />
+		<PackageReference Include="AspNet.Security.OAuth.Yandex" Version="9.4.1" />
 		<PackageReference Include="FluentMigrator" Version="7.1.0" />
 		<PackageReference Include="FluentMigrator.Console" Version="7.1.0" />
 		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="7.1.0" />

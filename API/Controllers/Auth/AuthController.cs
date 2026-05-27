@@ -567,6 +567,82 @@ public sealed class AuthController : ControllerBase
         }
     }
 
+    [HttpGet("login-vkontakte")]
+    public async Task<ActionResult> LoginVkontakte()
+    {
+        try
+        {
+            string redirectUrl = Url.Action(nameof(VkontakteCallback), "Auth", null, Request.Scheme);
+            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("Vkontakte", redirectUrl);
+            _logger.LogInformation("AllowRefresh: {AllowRefresh}", properties.AllowRefresh);
+            _logger.LogInformation("ExpiresUtc: {ExpiresUtc}", properties.ExpiresUtc);
+            _logger.LogInformation("IsPersistent: {IsPersistent}", properties.IsPersistent);
+            _logger.LogInformation("IssuedUtc: {IssuedUtc}", properties.IssuedUtc);
+            _logger.LogInformation("RedirectUri: {RedirectUri}", properties.RedirectUri);
+            _logger.LogInformation("Items: {Items}", string.Join(", ", properties.Items.Select(kvp => $"{kvp.Key}: {kvp.Value}")));
+            return Challenge(properties, "Vkontakte");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при попытке входа через Vkontakte: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            return StatusCode(500, $"Ошибка при попытке входа через Vkontakte: {ex.Message}");
+        }
+    }
+
+    [HttpGet("vkontakte-callback")]
+    public async Task<ActionResult> VkontakteCallback()
+    {
+        try
+        {
+            _logger.LogInformation("vkontakte-callback");
+
+            // Используем "cookie" (с маленькой буквы) - ту, что только что создали
+            var result = await HttpContext.AuthenticateAsync("cookie");
+
+            if (!result.Succeeded || result.Principal is null)
+            {
+                _logger.LogWarning("Vkontakte authentication failed");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkontakte_auth_failed");
+            }
+
+            // Извлекаем данные
+            string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            string? vkontakteUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string? phoneNumber = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
+            string? name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(vkontakteUserId))
+            {
+                _logger.LogError("Email or VkontakteUserId is null");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_required_data");
+            }
+
+            _logger.LogInformation("Processing Vkontakte login for email: {Email}, VkontakteUserId: {VkontakteUserId}", email, vkontakteUserId);
+
+            // ✅ ВЫЗЫВАЕМ УНИВЕРСАЛЬНЫЙ МЕТОД
+            var (success, token, error) = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
+                provider: "Vkontakte",
+                providerKey: vkontakteUserId,
+                email: email,
+                name: name,
+                phoneNumber: phoneNumber
+            );
+
+            if (success)
+            {
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/vkontakte-callback?Token={token}");
+            }
+
+            return Redirect($"{Request.Scheme}://{Request.Host}/login?error={error}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error in Vkontakte callback: {ex.Message}");
+            return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
+        }
+    }
+
+
     [HttpGet("current-user")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<ApplicationUser>> GetCurrentUserAsync()
