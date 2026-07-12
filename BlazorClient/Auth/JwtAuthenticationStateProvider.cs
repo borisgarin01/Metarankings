@@ -1,131 +1,110 @@
-﻿namespace BlazorClient.Auth;
+﻿using IdentityLibrary.Models;
+using System.IdentityModel.Tokens.Jwt;
+
+namespace BlazorClient.Auth;
 
 public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 {
     private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorage;
     private readonly ILogger<JwtAuthenticationStateProvider> _logger;
+    private readonly IAuthService _authService;
 
     public JwtAuthenticationStateProvider(
         HttpClient httpClient,
         ILocalStorageService localStorage,
-        ILogger<JwtAuthenticationStateProvider> logger)
+        ILogger<JwtAuthenticationStateProvider> logger,
+        IAuthService authService)
     {
         _httpClient = httpClient;
         _localStorage = localStorage;
         _logger = logger;
+        _authService = authService;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var savedToken = await _localStorage.GetItemAsync<string>("authToken");
-
-        if (string.IsNullOrWhiteSpace(savedToken))
-        {
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-        }
-
         try
         {
-            var claims = ParseClaimsFromJwt(savedToken);
-            var expiry = claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+            string? accessToken = await _localStorage.GetItemAsync<string>("accessToken");
 
-            if (expiry == null || DateTimeOffset.FromUnixTimeSeconds(long.Parse(expiry)) < DateTimeOffset.UtcNow)
-            {
-                await _localStorage.RemoveItemAsync("authToken");
+            if (string.IsNullOrEmpty(accessToken))
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+
+            // Проверяем, не истек ли токен
+            if (IsTokenExpired(accessToken))
+            {
+                // Пробуем обновить токен
+                TokenResponse? refreshResult = await _authService.RefreshTokenAsync();
+
+                if (refreshResult == null || !refreshResult.Success)
+                {
+                    await MarkUserAsLoggedOut();
+                    return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+                }
+
+                accessToken = refreshResult.AccessToken;
             }
 
-            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", savedToken);
-
+            ClaimsIdentity identity = GetClaimsIdentity(accessToken);
+            ClaimsPrincipal user = new(identity);
             return new AuthenticationState(user);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error parsing JWT");
-            await _localStorage.RemoveItemAsync("authToken");
+            _logger.LogError(ex, "Error in GetAuthenticationStateAsync");
+            await MarkUserAsLoggedOut();
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
     }
 
-    public void MarkUserAsAuthenticated(string token)
+    private bool IsTokenExpired(string token)
     {
+        if (string.IsNullOrEmpty(token))
+            return true;
+
         try
         {
-            var claims = ParseClaimsFromJwt(token);
-            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
-            var authState = Task.FromResult(new AuthenticationState(user));
-            NotifyAuthenticationStateChanged(authState);
+            JwtSecurityTokenHandler handler = new();
+            JwtSecurityToken? jwtToken = handler.ReadJwtToken(token);
 
-            // Also update HttpClient header
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            if (jwtToken == null)
+                return true;
+
+            return jwtToken.ValidTo <= DateTime.UtcNow.AddMinutes(-1); // Небольшой запас
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "Error marking user as authenticated");
-            MarkUserAsLoggedOut();
+            return true;
         }
     }
 
-    public void MarkUserAsLoggedOut()
+    private ClaimsIdentity GetClaimsIdentity(string token)
     {
-        var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
-        var authState = Task.FromResult(new AuthenticationState(anonymousUser));
-        NotifyAuthenticationStateChanged(authState);
+        JwtSecurityTokenHandler handler = new();
+        JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
+        IEnumerable<Claim> claims = jwtToken.Claims;
+        return new ClaimsIdentity(claims, "jwt");
     }
 
-
-    private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+    public async Task MarkUserAsAuthenticated(LoginResponseModel model)
     {
-        var claims = new List<Claim>();
-        string payload = jwt.Split('.')[1];
-        byte[] jsonBytes = ParseBase64WithoutPadding(payload);
-        var claimsStringsDictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+        await _localStorage.SetItemAsync("accessToken", model.AccessToken);
+        await _localStorage.SetItemAsync("refreshToken", model.RefreshToken);
+        await _localStorage.SetItemAsync("sessionState", model);
 
-        claimsStringsDictionary.TryGetValue(ClaimTypes.Role, out object roles);
-
-        if (roles is not null)
-        {
-            if (IsItArray(roles.ToString()))
-            {
-                var parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString());
-
-                foreach (string parsedRole in parsedRoles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, parsedRole));
-                }
-            }
-            else
-            {
-                //Only one role
-                claims.Add(new Claim(ClaimTypes.Role, roles.ToString()));
-            }
-
-            claimsStringsDictionary.Remove(ClaimTypes.Role);
-        }
-
-        claims.AddRange(claimsStringsDictionary.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString())));
-
-        return claims;
+        ClaimsIdentity identity = GetClaimsIdentity(model.AccessToken);
+        ClaimsPrincipal user = new(identity);
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
     }
 
-    private static bool IsItArray(string value)
+    public async Task MarkUserAsLoggedOut()
     {
-        return value.ToString().Trim().StartsWith("[");
-    }
-
-    private byte[] ParseBase64WithoutPadding(string payload)
-    {
-        switch (payload.Length % 4)
-        {
-            case 2:
-                payload += "==";
-                break;
-            case 3:
-                payload += "=";
-                break;
-        }
-        return Convert.FromBase64String(payload);
+        await _localStorage.RemoveItemAsync("sessionState");
+        await _localStorage.RemoveItemAsync("accessToken");
+        await _localStorage.RemoveItemAsync("refreshToken");
+        ClaimsIdentity identity = new();
+        ClaimsPrincipal user = new(identity);
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
     }
 }

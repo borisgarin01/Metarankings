@@ -3,6 +3,8 @@
 namespace IdentityLibrary.Models;
 
 public sealed record TokenResponse(
-    [property: JsonPropertyName("token")] string Token,
-    [property: JsonPropertyName("error")] string Error
+    [property: JsonPropertyName("success")] bool Success,
+    [property: JsonPropertyName("accessToken")] string AccessToken,
+    [property: JsonPropertyName("tokenExpired")] long TokenExpired,
+    [property: JsonPropertyName("refreshToken")] string RefreshToken
 );

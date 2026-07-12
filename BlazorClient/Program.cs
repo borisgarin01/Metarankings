@@ -4,7 +4,6 @@ using Domain.Games;
 using Domain.Games.Collections;
 using Domain.Movies;
 using Domain.Movies.Collections;
-using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Games.Collections;
 using Domain.RequestsModels.Games.Developers;
 using Domain.RequestsModels.Games.Genres;
@@ -12,7 +11,6 @@ using Domain.RequestsModels.Games.Localizations;
 using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Games.Publishers;
 using Domain.RequestsModels.Movies.Collections;
-using Domain.RequestsModels.Movies.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Domain.RequestsModels.Movies.MoviesGenres;
 using Domain.RequestsModels.Movies.MoviesStudios;
@@ -26,39 +24,41 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
-        var builder = WebAssemblyHostBuilder.CreateDefault(args);
+        WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
-        builder.Services.AddBlazoredLocalStorage();
-        builder.Services.AddAuthorizationCore(options =>
+        _ = builder.Services.AddBlazoredLocalStorage();
+        _ = builder.Services.AddAuthorizationCore(options =>
         {
-            options.AddPolicy("Admin", options => { options.RequireRole("Admin"); });
+            options.AddPolicy("Admin", options => { _ = options.RequireRole("Admin"); });
         });
 
-        builder.Services.AddScoped<IWebManager<Developer, AddDeveloperModel, UpdateDeveloperModel>, DevelopersWebManager>();
-        builder.Services.AddScoped<IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel>, GenresWebManager>();
-        builder.Services.AddScoped<IWebManager<Localization, AddLocalizationModel, UpdateLocalizationModel>, LocalizationsWebManager>();
-        builder.Services.AddScoped<IWebManager<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsWebManager>();
-        builder.Services.AddScoped<IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersWebManager>();
-        builder.Services.AddScoped<GamesWebManager>();
-        builder.Services.AddScoped<IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>, GamesCollectionsWebManager>();
-        builder.Services.AddScoped<IWebManager<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>, GamesCollectionsItemsWebManager>();
-        builder.Services.AddScoped<GamesPlayersReviewsShiftsWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<Developer, AddDeveloperModel, UpdateDeveloperModel>, DevelopersWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel>, GenresWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<Localization, AddLocalizationModel, UpdateLocalizationModel>, LocalizationsWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersWebManager>();
+        _ = builder.Services.AddScoped<GamesWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>, GamesCollectionsWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>, GamesCollectionsItemsWebManager>();
+        _ = builder.Services.AddScoped<GamesPlayersReviewsShiftsWebManager>();
 
-        builder.Services.AddScoped<IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsWebManager>();
-        builder.Services.AddScoped<IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>();
-        builder.Services.AddScoped<IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosWebManager>();
-        builder.Services.AddScoped<MoviesWebManager>();
-        builder.Services.AddScoped<IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>, MoviesCollectionsWebManager>();
-        builder.Services.AddScoped<IWebManager<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosWebManager>();
+        _ = builder.Services.AddScoped<MoviesWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>, MoviesCollectionsWebManager>();
+        _ = builder.Services.AddScoped<IWebManager<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsWebManager>();
 
-        builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
+        _ = builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["HttpClientSettings:BaseUrl"]) });
-        builder.Services.AddScoped<IAuthService, AuthService>();
+        _ = builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["HttpClientSettings:BaseUrl"]) });
+        _ = builder.Services.AddScoped<IAuthService, AuthService>();
+        _ = builder.Services.AddScoped<JwtAuthenticationStateProvider>();
+        _ = builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<JwtAuthenticationStateProvider>());
 
-        builder.Services.AddBlazoredToast();
+        _ = builder.Services.AddBlazoredToast();
 
         await builder.Build().RunAsync();
     }
