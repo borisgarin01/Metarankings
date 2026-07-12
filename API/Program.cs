@@ -1,13 +1,11 @@
 ﻿using API.Auth;
 using API.Hubs;
 using API.IServiceCollectionExtensions;
-using AspNet.Security.OAuth.MailRu;
 using AspNet.Security.OAuth.VkId;
 using Data.Migrations;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
-using IdentityLibrary.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -37,7 +35,7 @@ internal class Program
             ValidAudience = builder.Configuration["TokenValidationParameters:Audience"],
             ValidateLifetime = Convert.ToBoolean(builder.Configuration["TokenValidationParameters:ValidateLifetime"]),
             ClockSkew = TimeSpan.FromSeconds(Convert.ToInt64(builder.Configuration["TokenValidationParameters:ClockSkew"])),
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenValidationParameters:IssuerSigningKey"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenValidationParameters:IssuerSigningAccessKey"]))
         };
 
         _ = builder.Services.Configure<TokenValidationParameters>(builder.Configuration.GetSection(nameof(TokenValidationParameters)));

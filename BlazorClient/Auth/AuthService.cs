@@ -12,35 +12,81 @@ public class AuthService : IAuthService
 {
     private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorage;
-    private readonly AuthenticationStateProvider _authenticationStateProvider;
 
     public AuthService(HttpClient httpClient,
-                      ILocalStorageService localStorage,
-                      AuthenticationStateProvider authenticationStateProvider)
+                      ILocalStorageService localStorage)
     {
         _httpClient = httpClient;
         _localStorage = localStorage;
-        _authenticationStateProvider = authenticationStateProvider;
     }
 
     [Inject]
     public IToastService ToastService { get; set; }
 
-    public async Task<LoginResponse> LoginAsync(LoginModel loginModel)
+    public async Task<LoginResponseModel> LoginAsync(LoginModel loginModel)
     {
         HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/login", loginModel);
 
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content.ReadFromJsonAsync<LoginResponse>();
+            return await response.Content.ReadFromJsonAsync<LoginResponseModel>();
         }
 
-        return new LoginResponse();
+        throw new Exception(await response.Content.ReadAsStringAsync());
+    }
+
+    public async Task<TokenResponse> RefreshTokenAsync()
+    {
+        // Получаем refresh token из localStorage
+        string? refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
+
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return new TokenResponse(false, string.Empty, 0, "Refresh token is missing");
+        }
+
+        // Создаем запрос на обновление токена
+        RefreshTokenRequest refreshRequest = new()
+        {
+            RefreshToken = refreshToken
+        };
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/refresh-token", refreshRequest);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TokenResponse? tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
+
+                if (tokenResponse != null && tokenResponse.Success)
+                {
+                    // Сохраняем новые токены
+                    await StoreAccessTokenAsync(tokenResponse.AccessToken);
+                    await StoreRefreshTokenAsync(tokenResponse.RefreshToken);
+
+                    // Устанавливаем новый access token в HttpClient
+                    _httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenResponse.AccessToken);
+
+                    return tokenResponse;
+                }
+            }
+
+            // Если обновление не удалось - разлогиниваем пользователя
+            await LogoutAsync();
+            return new TokenResponse(false, string.Empty, 0, "Failed to refresh token");
+        }
+        catch (Exception ex)
+        {
+            await LogoutAsync();
+            return new TokenResponse(false, string.Empty, 0, $"Error refreshing token: {ex.Message}");
+        }
     }
 
     public async Task<TokenResponse> VerifyTwoFactorAsync(string userId, string token)
     {
-        var request = new ConfirmLoginModel(userId, token);
+        ConfirmLoginModel request = new(userId, token);
         HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/ConfirmLoginViaEmail", request);
 
         if (response.IsSuccessStatusCode)
@@ -48,22 +94,27 @@ public class AuthService : IAuthService
             return await JsonSerializer.DeserializeAsync<TokenResponse>(await response.Content.ReadAsStreamAsync());
         }
 
-        return new TokenResponse(string.Empty, "Ошибка верификации");
+        return new TokenResponse(false, string.Empty, 0, "Ошибка верификации");
     }
 
-    public async Task StoreTokenAsync(string token)
+    public async Task StoreAccessTokenAsync(string token)
     {
         // Store token in localStorage
-        await _localStorage.SetItemAsync<string>("authToken", token);
+        await _localStorage.SetItemAsync<string>("accessToken", token);
 
         // Also set in HTTP client headers
         _httpClient.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
     }
 
+    public async Task StoreRefreshTokenAsync(string refreshToken)
+    {
+        await _localStorage.SetItemAsync<string>("refreshToken", refreshToken);
+    }
+
     public async Task LogoutAsync()
     {
-        string? token = await _localStorage.GetItemAsync<string>("authToken");
+        string? token = await _localStorage.GetItemAsync<string>("accessToken");
 
         if (token is null)
             return;
@@ -75,9 +126,8 @@ public class AuthService : IAuthService
 
         if (httpResponseMessage.IsSuccessStatusCode)
         {
-            await _localStorage.RemoveItemAsync("authToken");
-            ((JwtAuthenticationStateProvider)_authenticationStateProvider)
-                .MarkUserAsLoggedOut();
+            await _localStorage.RemoveItemAsync("accessToken");
+            await _localStorage.RemoveItemAsync("refreshToken");
         }
     }
 
@@ -103,7 +153,7 @@ public class AuthService : IAuthService
 
     public async Task<HttpResponseMessage> SendTwoFactorEnabledMessage(SetTwoFactorEnabledModel setTwoFactorEnabledModel)
     {
-        string? token = await _localStorage.GetItemAsync<string>("authToken");
+        string? token = await _localStorage.GetItemAsync<string>("accessToken");
 
         if (token is not null)
         {
@@ -133,7 +183,7 @@ public class AuthService : IAuthService
 
     public Task<ApplicationUser> GetCurrentUserAsync()
     {
-        var applicaitonUser = _httpClient.GetFromJsonAsync<ApplicationUser>("api/auth/current-user");
+        Task<ApplicationUser?> applicaitonUser = _httpClient.GetFromJsonAsync<ApplicationUser>("api/auth/current-user");
 
         return applicaitonUser;
     }

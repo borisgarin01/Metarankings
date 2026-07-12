@@ -8,9 +8,17 @@ public partial class Login : ComponentBase
 {
     private IEnumerable<AuthenticationScheme> externalLogins = Enumerable.Empty<AuthenticationScheme>();
 
-    [Inject] private IAuthService AuthService { get; set; }
-    [Inject] private NavigationManager NavigationManager { get; set; }
-    [Inject] private IJSRuntime JSRuntime { get; set; }
+    [Inject]
+    private IAuthService AuthService { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; }
+
+    [Inject]
+    private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     private LoginModel LoginModel { get; set; } = new();
     private string TwoFactorCode { get; set; } = string.Empty;
@@ -50,7 +58,7 @@ public partial class Login : ComponentBase
             StateHasChanged();
 
             // First, try to login
-            LoginResponse loginResponse = await AuthService.LoginAsync(LoginModel);
+            LoginResponseModel loginResponse = await AuthService.LoginAsync(LoginModel);
 
             if (loginResponse.RequiresTwoFactor)
             {
@@ -59,10 +67,10 @@ public partial class Login : ComponentBase
                 UserIdFor2FA = loginResponse.UserId;
                 await JSRuntime.InvokeVoidAsync("alert", "Код подтверждения отправлен на вашу почту");
             }
-            else if (!string.IsNullOrWhiteSpace(loginResponse.Token))
+            else if (!string.IsNullOrWhiteSpace(loginResponse.AccessToken) && !string.IsNullOrWhiteSpace(loginResponse.RefreshToken))
             {
-                // No 2FA required - store token and redirect
-                await AuthService.StoreTokenAsync(loginResponse.Token);
+                await ((JwtAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(loginResponse);
+
                 NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
@@ -94,19 +102,25 @@ public partial class Login : ComponentBase
             IsLoading = true;
             StateHasChanged();
 
-            // Verify 2FA code
             TokenResponse verifyResponse = await AuthService.VerifyTwoFactorAsync(UserIdFor2FA, TwoFactorCode);
 
-            if (!string.IsNullOrWhiteSpace(verifyResponse.Token))
+            if (!string.IsNullOrWhiteSpace(verifyResponse.AccessToken))
             {
-                // 2FA successful - store token and redirect
-                await AuthService.StoreTokenAsync(verifyResponse.Token);
+                await AuthService.StoreAccessTokenAsync(verifyResponse.AccessToken);
+                await AuthService.StoreRefreshTokenAsync(verifyResponse.RefreshToken);
+
+                // Создаем LoginResponseModel для сохранения в sessionState
+                LoginResponseModel loginResponse = new(UserIdFor2FA, verifyResponse.AccessToken, verifyResponse.TokenExpired, verifyResponse.RefreshToken, false);
+
+                await ((JwtAuthenticationStateProvider)AuthenticationStateProvider)
+                    .MarkUserAsAuthenticated(loginResponse);
+
                 NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
             {
                 await JSRuntime.InvokeVoidAsync("alert", "Неверный код подтверждения");
-                TwoFactorCode = string.Empty; // Clear the input
+                TwoFactorCode = string.Empty;
             }
         }
         catch (Exception ex)
@@ -125,7 +139,7 @@ public partial class Login : ComponentBase
         try
         {
             // Resend by calling login again
-            LoginResponse loginResponse = await AuthService.LoginAsync(LoginModel);
+            LoginResponseModel loginResponse = await AuthService.LoginAsync(LoginModel);
 
             if (loginResponse.RequiresTwoFactor)
             {
