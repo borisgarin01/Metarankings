@@ -1,4 +1,5 @@
 ﻿using BlazorClient.Auth;
+using Blazored.Toast.Services;
 using Domain.Auth;
 using IdentityLibrary.Models;
 
@@ -15,7 +16,7 @@ public partial class Login : ComponentBase
     private NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    private IJSRuntime JSRuntime { get; set; }
+    private IToastService ToastService { get; set; }
 
     [Inject]
     private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
@@ -65,7 +66,7 @@ public partial class Login : ComponentBase
                 // 2FA is required - show 2FA input
                 IsTwoFactorRequired = true;
                 UserIdFor2FA = loginResponse.UserId;
-                await JSRuntime.InvokeVoidAsync("alert", "Код подтверждения отправлен на вашу почту");
+                ToastService.ShowInfo("Код подтверждения отправлен на вашу почту");
             }
             else if (!string.IsNullOrWhiteSpace(loginResponse.AccessToken) && !string.IsNullOrWhiteSpace(loginResponse.RefreshToken))
             {
@@ -74,13 +75,11 @@ public partial class Login : ComponentBase
                 NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
-            {
-                await JSRuntime.InvokeVoidAsync("alert", "Неверный логин или пароль");
-            }
+                ToastService.ShowError("Неверный логин или пароль");
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {ex.Message}");
+            ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
         }
         finally
         {
@@ -93,7 +92,7 @@ public partial class Login : ComponentBase
     {
         if (string.IsNullOrWhiteSpace(TwoFactorCode))
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Введите код подтверждения");
+            ToastService.ShowWarning("Введите код подтверждения");
             return;
         }
 
@@ -119,13 +118,13 @@ public partial class Login : ComponentBase
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Неверный код подтверждения");
+                ToastService.ShowError("Неверный код подтверждения");
                 TwoFactorCode = string.Empty;
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {ex.Message}");
+            ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
         }
         finally
         {
@@ -142,17 +141,13 @@ public partial class Login : ComponentBase
             LoginResponseModel loginResponse = await AuthService.LoginAsync(LoginModel);
 
             if (loginResponse.RequiresTwoFactor)
-            {
-                await JSRuntime.InvokeVoidAsync("alert", "Новый код подтверждения отправлен на вашу почту");
-            }
+                ToastService.ShowInfo("Новый код подтверждения отправлен на вашу почту");
             else
-            {
-                await JSRuntime.InvokeVoidAsync("alert", "Ошибка при повторной отправке кода");
-            }
+                ToastService.ShowError("Ошибка при повторной отправке кода");
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {ex.Message}");
+            ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
         }
     }
 
@@ -170,18 +165,12 @@ public partial class Login : ComponentBase
         return Task.CompletedTask;
     }
 
-    public async Task DisplayErrors() => await JSRuntime.InvokeVoidAsync("alert", "DisplayErrors");
-
     public async Task<IEnumerable<AuthenticationScheme>> GetExternalLogins()
     {
         IEnumerable<AuthenticationScheme> authenticationSchemes = await AuthService.GetAuthenticationSchemesAsync();
         return authenticationSchemes;
     }
 
-    public async Task ExternalLogin()
-    {
-        await JSRuntime.InvokeVoidAsync("alert", "External login");
-    }
     public async Task LoginGoogle()
     {
         NavigationManager.NavigateTo($"/api/auth/login-google", forceLoad: true);
