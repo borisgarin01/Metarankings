@@ -1,4 +1,5 @@
 ﻿using BlazorClient.Auth;
+using Blazored.Toast.Services;
 using Domain.Auth;
 using IdentityLibrary.Models;
 
@@ -10,7 +11,7 @@ public partial class Login : ComponentBase
 
     [Inject] private IAuthService AuthService { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
-    [Inject] private IJSRuntime JSRuntime { get; set; }
+    [Inject] private IToastService ToastService { get; set; }
 
     private LoginModel LoginModel { get; set; } = new();
     private string TwoFactorCode { get; set; } = string.Empty;
@@ -57,7 +58,7 @@ public partial class Login : ComponentBase
                 // 2FA is required - show 2FA input
                 IsTwoFactorRequired = true;
                 UserIdFor2FA = loginResponse.UserId;
-                await JSRuntime.InvokeVoidAsync("alert", "Код подтверждения отправлен на вашу почту");
+                ToastService.ShowInfo("Код подтверждения отправлен на вашу почту");
             }
             else if (!string.IsNullOrWhiteSpace(loginResponse.Token))
             {
@@ -67,12 +68,12 @@ public partial class Login : ComponentBase
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Неверный логин или пароль");
+                ToastService.ShowWarning("Неверный логин или пароль");
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {ex.Message}");
+            ToastService.ShowError($"Ошибка: {ex.Message} {ex.StackTrace}");
         }
         finally
         {
@@ -85,7 +86,7 @@ public partial class Login : ComponentBase
     {
         if (string.IsNullOrWhiteSpace(TwoFactorCode))
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Введите код подтверждения");
+            ToastService.ShowWarning("Введите код подтверждения");
             return;
         }
 
@@ -105,13 +106,13 @@ public partial class Login : ComponentBase
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Неверный код подтверждения");
+                ToastService.ShowWarning("Неверный код подтверждения");
                 TwoFactorCode = string.Empty; // Clear the input
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {ex.Message}");
+            ToastService.ShowError($"Ошибка: {ex.Message} {ex.StackTrace}");
         }
         finally
         {
@@ -129,16 +130,16 @@ public partial class Login : ComponentBase
 
             if (loginResponse.RequiresTwoFactor)
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Новый код подтверждения отправлен на вашу почту");
+                ToastService.ShowInfo("Новый код подтверждения отправлен на вашу почту");
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Ошибка при повторной отправке кода");
+                ToastService.ShowError("Ошибка при повторной отправке кода");
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка: {ex.Message}");
+            ToastService.ShowError($"Ошибка: {ex.Message} {ex.StackTrace}");
         }
     }
 
@@ -156,18 +157,6 @@ public partial class Login : ComponentBase
         return Task.CompletedTask;
     }
 
-    public async Task DisplayErrors() => await JSRuntime.InvokeVoidAsync("alert", "DisplayErrors");
-
-    public async Task<IEnumerable<AuthenticationScheme>> GetExternalLogins()
-    {
-        IEnumerable<AuthenticationScheme> authenticationSchemes = await AuthService.GetAuthenticationSchemesAsync();
-        return authenticationSchemes;
-    }
-
-    public async Task ExternalLogin()
-    {
-        await JSRuntime.InvokeVoidAsync("alert", "External login");
-    }
     public async Task LoginGoogle()
     {
         NavigationManager.NavigateTo($"/api/auth/login-google", forceLoad: true);
