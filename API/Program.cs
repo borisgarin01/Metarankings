@@ -150,10 +150,7 @@ internal class Program
 
         _ = builder.Services.AddEndpointsApiExplorer();
 
-        _ = builder.Services.AddOpenApi("v1", options =>
-        {
-            _ = options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
-        });
+        _ = builder.Services.AddOpenApi();
 
         _ = builder.Services.AddSignalR();
 

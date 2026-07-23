@@ -9,17 +9,9 @@ public partial class Login : ComponentBase
 {
     private IEnumerable<AuthenticationScheme> externalLogins = Enumerable.Empty<AuthenticationScheme>();
 
-    [Inject]
-    private IAuthService AuthService { get; set; }
-
-    [Inject]
-    private NavigationManager NavigationManager { get; set; }
-
-    [Inject]
-    private IToastService ToastService { get; set; }
-
-    [Inject]
-    private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+    [Inject] private IAuthService AuthService { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IToastService ToastService { get; set; }
 
     private LoginModel LoginModel { get; set; } = new();
     private string TwoFactorCode { get; set; } = string.Empty;
@@ -59,7 +51,7 @@ public partial class Login : ComponentBase
             StateHasChanged();
 
             // First, try to login
-            LoginResponseModel loginResponse = await AuthService.LoginAsync(LoginModel);
+            LoginResponse loginResponse = await AuthService.LoginAsync(LoginModel);
 
             if (loginResponse.RequiresTwoFactor)
             {
@@ -68,18 +60,20 @@ public partial class Login : ComponentBase
                 UserIdFor2FA = loginResponse.UserId;
                 ToastService.ShowInfo("Код подтверждения отправлен на вашу почту");
             }
-            else if (!string.IsNullOrWhiteSpace(loginResponse.AccessToken) && !string.IsNullOrWhiteSpace(loginResponse.RefreshToken))
+            else if (!string.IsNullOrWhiteSpace(loginResponse.Token))
             {
-                await ((JwtAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(loginResponse);
-
+                // No 2FA required - store token and redirect
+                await AuthService.StoreTokenAsync(loginResponse.Token);
                 NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
-                ToastService.ShowError("Неверный логин или пароль");
+            {
+                ToastService.ShowWarning("Неверный логин или пароль");
+            }
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
+            ToastService.ShowError($"Ошибка: {ex.Message} {ex.StackTrace}");
         }
         finally
         {
@@ -101,30 +95,24 @@ public partial class Login : ComponentBase
             IsLoading = true;
             StateHasChanged();
 
+            // Verify 2FA code
             TokenResponse verifyResponse = await AuthService.VerifyTwoFactorAsync(UserIdFor2FA, TwoFactorCode);
 
-            if (!string.IsNullOrWhiteSpace(verifyResponse.AccessToken))
+            if (!string.IsNullOrWhiteSpace(verifyResponse.Token))
             {
-                await AuthService.StoreAccessTokenAsync(verifyResponse.AccessToken);
-                await AuthService.StoreRefreshTokenAsync(verifyResponse.RefreshToken);
-
-                // Создаем LoginResponseModel для сохранения в sessionState
-                LoginResponseModel loginResponse = new(UserIdFor2FA, verifyResponse.AccessToken, verifyResponse.TokenExpired, verifyResponse.RefreshToken, false);
-
-                await ((JwtAuthenticationStateProvider)AuthenticationStateProvider)
-                    .MarkUserAsAuthenticated(loginResponse);
-
+                // 2FA successful - store token and redirect
+                await AuthService.StoreTokenAsync(verifyResponse.Token);
                 NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
             {
-                ToastService.ShowError("Неверный код подтверждения");
-                TwoFactorCode = string.Empty;
+                ToastService.ShowWarning("Неверный код подтверждения");
+                TwoFactorCode = string.Empty; // Clear the input
             }
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
+            ToastService.ShowError($"Ошибка: {ex.Message} {ex.StackTrace}");
         }
         finally
         {
@@ -138,16 +126,20 @@ public partial class Login : ComponentBase
         try
         {
             // Resend by calling login again
-            LoginResponseModel loginResponse = await AuthService.LoginAsync(LoginModel);
+            LoginResponse loginResponse = await AuthService.LoginAsync(LoginModel);
 
             if (loginResponse.RequiresTwoFactor)
+            {
                 ToastService.ShowInfo("Новый код подтверждения отправлен на вашу почту");
+            }
             else
+            {
                 ToastService.ShowError("Ошибка при повторной отправке кода");
+            }
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
+            ToastService.ShowError($"Ошибка: {ex.Message} {ex.StackTrace}");
         }
     }
 
@@ -163,12 +155,6 @@ public partial class Login : ComponentBase
     {
         NavigationManager.NavigateTo("/auth/resetPassword");
         return Task.CompletedTask;
-    }
-
-    public async Task<IEnumerable<AuthenticationScheme>> GetExternalLogins()
-    {
-        IEnumerable<AuthenticationScheme> authenticationSchemes = await AuthService.GetAuthenticationSchemesAsync();
-        return authenticationSchemes;
     }
 
     public async Task LoginGoogle()

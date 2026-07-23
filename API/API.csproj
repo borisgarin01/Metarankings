@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<UserSecretsId>11542b90-98c9-4fe0-a75d-746fe381ebc0</UserSecretsId>
@@ -19,24 +19,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="9.4.1" />
-		<PackageReference Include="AspNet.Security.OAuth.MailRu" Version="9.4.1" />
-		<PackageReference Include="AspNet.Security.OAuth.VkId" Version="9.4.1" />
-		<PackageReference Include="AspNet.Security.OAuth.Vkontakte" Version="9.4.1" />
-		<PackageReference Include="AspNet.Security.OAuth.Yandex" Version="9.4.1" />
-		<PackageReference Include="FluentMigrator" Version="7.1.0" />
-		<PackageReference Include="FluentMigrator.Console" Version="7.1.0" />
-		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="7.1.0" />
-		<PackageReference Include="MailKit" Version="4.13.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="9.0.16" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.12" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.16" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="9.0.16" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
-		<PackageReference Include="Scalar.AspNetCore" Version="2.12.5" />
+		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="10.0.0" />
+		<PackageReference Include="AspNet.Security.OAuth.MailRu" Version="10.0.0" />
+		<PackageReference Include="AspNet.Security.OAuth.VkId" Version="10.0.0" />
+		<PackageReference Include="AspNet.Security.OAuth.Vkontakte" Version="10.0.0" />
+		<PackageReference Include="AspNet.Security.OAuth.Yandex" Version="10.0.0" />
+		<PackageReference Include="FluentMigrator" Version="8.0.1" />
+		<PackageReference Include="FluentMigrator.Console" Version="8.0.1" />
+		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="8.0.1" />
+		<PackageReference Include="MailKit" Version="4.17.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="10.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="10.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="10.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+		<PackageReference Include="Scalar.AspNetCore" Version="2.16.16" />
 	</ItemGroup>
 
 	<ItemGroup>
