@@ -257,7 +257,7 @@ md.id, md.name
     LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
     LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
 WHERE m.premierDate between @dateFrom and @dateTo
-ORDER BY Id DESC;";
+ORDER BY m.id DESC;";
 
             var moviesDictionary = new Dictionary<long, Movie>();
 

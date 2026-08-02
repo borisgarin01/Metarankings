@@ -24,7 +24,7 @@ public partial class ValidateTwoFactorCodePage : ComponentBase
     {
         try
         {
-            TokenResponse tokenResponse = await AuthService.VerifyTwoFactorAsync(UserId, model.TwoFactorCode);
+            AuthResponseDto tokenResponse = await AuthService.VerifyTwoFactorAsync(UserId, model.TwoFactorCode);
 
             if (tokenResponse is not null && !string.IsNullOrWhiteSpace(tokenResponse.AccessToken))
             {

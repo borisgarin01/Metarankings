@@ -12,11 +12,11 @@ public interface IAuthService
     Task<HttpResponseMessage> SendResetPasswordMessage(ResetPasswordModel resetPasswordModel);
     Task<HttpResponseMessage> SendResetPasswordConfirmMessage(ResetPasswordConfirmModel resetPasswordModel);
     Task<HttpResponseMessage> SendTwoFactorEnabledMessage(SetTwoFactorEnabledModel setTwoFactorEnabledModel);
-    Task<TokenResponse> VerifyTwoFactorAsync(string userId, string token);
+    Task<AuthResponseDto> VerifyTwoFactorAsync(string userId, string token);
     Task StoreAccessTokenAsync(string token);
     Task StoreRefreshTokenAsync(string token);
     Task<IEnumerable<AuthenticationScheme>> GetAuthenticationSchemesAsync();
     Task<ApplicationUser> GetCurrentUserAsync();
     Task<HttpResponseMessage> SendChangePasswordMessageAsync(ChangePasswordModel changePasswordModel);
-    Task<TokenResponse> RefreshTokenAsync();
+    Task<AuthResponseDto> RefreshTokenAsync();
 }

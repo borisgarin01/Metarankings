@@ -1,5 +1,7 @@
 ﻿using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
+using IdentityLibrary.Repositories.Tokens.RefreshTokens.Interfaces;
+using IdentityLibrary.Services.Classes;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -12,22 +14,30 @@ public sealed class TwoFactorAuthEmailProcessor
     private readonly UserManager<ApplicationUser> _usersManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly AuthTokenGenerator _authTokenGenerator;
+    private readonly IRefreshTokensRepository _refreshTokensRepo;
     private readonly IOptionsMonitor<EmailSettings> _emailSettings;
     private readonly IOptionsMonitor<AuthSettings> _authSettings;
     private readonly ILogger<TwoFactorAuthEmailProcessor> _logger;
 
-    public TwoFactorAuthEmailProcessor(SignInManager<ApplicationUser> signInManager, ILogger<TwoFactorAuthEmailProcessor> logger, UserManager<ApplicationUser> usersManager, AuthTokenGenerator authTokenGenerator, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<AuthSettings> authSettings)
+    public TwoFactorAuthEmailProcessor(
+        SignInManager<ApplicationUser> signInManager,
+        ILogger<TwoFactorAuthEmailProcessor> logger,
+        UserManager<ApplicationUser> usersManager,
+        AuthTokenGenerator authTokenGenerator,
+        IRefreshTokensRepository refreshTokensRepo,
+        IOptionsMonitor<EmailSettings> emailSettings,
+        IOptionsMonitor<AuthSettings> authSettings)
     {
         _signInManager = signInManager;
         _logger = logger;
         _usersManager = usersManager;
         _authTokenGenerator = authTokenGenerator;
+        _refreshTokensRepo = refreshTokensRepo;
         _emailSettings = emailSettings;
         _authSettings = authSettings;
     }
 
-    // ✅ УНИВЕРСАЛЬНЫЙ МЕТОД ДЛЯ ВСЕХ ВНЕШНИХ ПРОВАЙДЕРОВ
-    public async Task<TokenResponse> ProcessExternalLoginAsync(
+    public async Task<AuthResponseDto> ProcessExternalLoginAsync(
         string provider,
         string providerKey,
         string email,
@@ -36,95 +46,95 @@ public sealed class TwoFactorAuthEmailProcessor
     {
         try
         {
-            // 1. Пытаемся войти через существующий внешний логин
-            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.ExternalLoginSignInAsync(
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(
                 loginProvider: provider,
                 providerKey: providerKey,
                 isPersistent: true);
 
             _logger.LogInformation("ExternalLoginSignInAsync result for {Provider}: {Result}", provider, signInResult);
 
-            // 2. Обработка успешного входа
             if (signInResult.Succeeded)
             {
-                ApplicationUser? user = await _usersManager.FindByLoginAsync(provider, providerKey);
+                var user = await _usersManager.FindByLoginAsync(provider, providerKey);
                 if (user != null)
                 {
-                    string accessToken = await _authTokenGenerator.GenerateAccessToken(user);
-                    string refreshToken = await _authTokenGenerator.GenerateRefreshToken(user);
-                    _ = await _usersManager.SetAuthenticationTokenAsync(user, "SQLServer", "AccessToken", accessToken);
-                    _ = await _usersManager.SetAuthenticationTokenAsync(user, "SQLServer", "RefreshToken", refreshToken);
-                    return new TokenResponse(true, accessToken, _authSettings.CurrentValue.AccessTokenLifetimeMinutes, null);
+                    await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
+
+                    var newAccessToken = await _authTokenGenerator.GenerateAccessToken(user);
+                    var newRefreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
+
+                    var newRefreshToken = new RefreshToken(0, Convert.ToInt64(user.Id), newRefreshTokenValue, false, DateTime.UtcNow);
+                    await _refreshTokensRepo.CreateAsync(newRefreshToken);
+
+                    return new AuthResponseDto(true, false, string.Empty, newAccessToken, newRefreshTokenValue);
                 }
-                return new TokenResponse(false, null, 0, "user_not_found");
+                return new AuthResponseDto(false, false, "user_not_found", string.Empty, string.Empty);
             }
 
-            // 3. Обработка 2FA
             if (signInResult.RequiresTwoFactor)
             {
-                ApplicationUser? user = await _usersManager.FindByLoginAsync(provider, providerKey);
+                var user = await _usersManager.FindByLoginAsync(provider, providerKey);
                 if (user != null)
                 {
                     string twoFactorToken = await _usersManager.GenerateTwoFactorTokenAsync(user, "Email");
                     await SendTwoFactorEmailAsync(user.Email, twoFactorToken);
 
-                    return new TokenResponse(false, null, 0, "requires_two_factor");
+                    return new AuthResponseDto(false, true, "requires_two_factor", string.Empty, string.Empty);
                 }
-                return new TokenResponse(false, null, 0, "user_not_found_for_2fa");
+                return new AuthResponseDto(false, false, "user_not_found_for_2fa", string.Empty, string.Empty);
             }
 
-            // 4. Обработка блокировки
             if (signInResult.IsLockedOut)
-                return new TokenResponse(false, null, 0, "account_locked");
+                return new AuthResponseDto(false, false, "account_locked", string.Empty, string.Empty);
 
-            // 5. Пользователь не найден - ищем по email или создаем нового
             return await CreateOrLinkUserAsync(provider, providerKey, email, name, phoneNumber);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing external login for {Provider}", provider);
-            return new TokenResponse(false, null, 0, $"processing_error: {ex.Message}");
+            return new AuthResponseDto(false, false, $"processing_error: {ex.Message}", string.Empty, string.Empty);
         }
     }
 
-    // ✅ МЕТОД ДЛЯ СОЗДАНИЯ ИЛИ ПРИВЯЗКИ ПОЛЬЗОВАТЕЛЯ
-    private async Task<TokenResponse> CreateOrLinkUserAsync(
+    private async Task<AuthResponseDto> CreateOrLinkUserAsync(
         string provider,
         string providerKey,
         string email,
         string? name = null,
         string? phoneNumber = null)
     {
-        // Проверяем, существует ли пользователь с таким email
-        ApplicationUser? existingUser = await _usersManager.FindByEmailAsync(email);
+        var existingUser = await _usersManager.FindByEmailAsync(email);
 
         if (existingUser != null)
         {
-            // Пользователь существует - привязываем внешний аккаунт
             _logger.LogInformation("Linking {Provider} account to existing user {Email}", provider, email);
 
-            // Проверяем, не привязан ли уже этот внешний аккаунт к кому-то другому
-            ApplicationUser? existingLogin = await _usersManager.FindByLoginAsync(provider, providerKey);
+            var existingLogin = await _usersManager.FindByLoginAsync(provider, providerKey);
             if (existingLogin != null)
-                return new TokenResponse(false, null, 0, "external_account_already_linked");
+                return new AuthResponseDto(false, false, "external_account_already_linked", string.Empty, string.Empty);
 
-            IdentityResult addLoginResult = await _usersManager.AddLoginAsync(existingUser,
+            var addLoginResult = await _usersManager.AddLoginAsync(existingUser,
                 new UserLoginInfo(provider, providerKey, provider));
 
             if (addLoginResult.Succeeded)
             {
-                string geteratedToken = await _authTokenGenerator.GenerateAccessToken(existingUser);
-                _ = await _usersManager.SetAuthenticationTokenAsync(existingUser, "SQLServer", "AccessToken", geteratedToken);
-                return new TokenResponse(true, geteratedToken, _authSettings.CurrentValue.AccessTokenLifetimeMinutes, null);
+                await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(existingUser.Id));
+
+                var linkedAccessToken = await _authTokenGenerator.GenerateAccessToken(existingUser);
+                var linkedRefreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
+
+                var linkedRefreshToken = new RefreshToken(0, Convert.ToInt64(existingUser.Id), linkedRefreshTokenValue, false, DateTime.UtcNow);
+                await _refreshTokensRepo.CreateAsync(linkedRefreshToken);
+
+                return new AuthResponseDto(true, false, string.Empty, linkedAccessToken, linkedRefreshTokenValue);
             }
 
-            return new TokenResponse(false, null, 0, $"link_failed: {string.Join(", ", addLoginResult.Errors.Select(e => e.Description))}");
+            return new AuthResponseDto(false, false, $"link_failed: {string.Join(", ", addLoginResult.Errors.Select(e => e.Description))}", string.Empty, string.Empty);
         }
 
-        // Создаем нового пользователя
         _logger.LogInformation("Creating new user for {Provider} login with email {Email}", provider, email);
 
-        ApplicationUser newUser = new()
+        var newUser = new ApplicationUser
         {
             Email = email,
             UserName = GenerateUniqueUsername(name ?? email),
@@ -139,57 +149,54 @@ public sealed class TwoFactorAuthEmailProcessor
             LockoutEnabled = true
         };
 
-        IdentityResult createResult = await _usersManager.CreateAsync(newUser);
+        var createResult = await _usersManager.CreateAsync(newUser);
 
         if (!createResult.Succeeded)
-            return new TokenResponse(false, null, 0, $"user_creation_failed: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
+            return new AuthResponseDto(false, false, $"user_creation_failed: {string.Join(", ", createResult.Errors.Select(e => e.Description))}", string.Empty, string.Empty);
 
-        // Получаем созданного пользователя
-        ApplicationUser? createdUser = await _usersManager.FindByEmailAsync(email);
+        var createdUser = await _usersManager.FindByEmailAsync(email);
         if (createdUser == null)
-            return new TokenResponse(false, null, 0, "user_not_found_after_creation");
+            return new AuthResponseDto(false, false, "user_not_found_after_creation", string.Empty, string.Empty);
 
-        // Добавляем внешний логин
-        IdentityResult addLoginResultForNew = await _usersManager.AddLoginAsync(createdUser,
+        var addLoginResultForNew = await _usersManager.AddLoginAsync(createdUser,
             new UserLoginInfo(provider, providerKey, provider));
 
         if (!addLoginResultForNew.Succeeded)
         {
-            // Откатываем создание пользователя
-            _ = await _usersManager.DeleteAsync(createdUser);
-            return new TokenResponse(false, null, 0, $"external_login_add_failed: {string.Join(", ", addLoginResultForNew.Errors.Select(e => e.Description))}");
+            await _usersManager.DeleteAsync(createdUser);
+            return new AuthResponseDto(false, false, $"external_login_add_failed: {string.Join(", ", addLoginResultForNew.Errors.Select(e => e.Description))}", string.Empty, string.Empty);
         }
 
-        // Генерируем токен
-        string token = await _authTokenGenerator.GenerateAccessToken(createdUser);
-        _ = await _usersManager.SetAuthenticationTokenAsync(createdUser, "SQLServer", "AccessToken", token);
+        await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(createdUser.Id));
 
-        return new TokenResponse(true, token, 0, null);
+        var createdAccessToken = await _authTokenGenerator.GenerateAccessToken(createdUser);
+        var createdRefreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
+
+        var createdRefreshToken = new RefreshToken(0, Convert.ToInt64(createdUser.Id), createdRefreshTokenValue, false, DateTime.UtcNow);
+        await _refreshTokensRepo.CreateAsync(createdRefreshToken);
+
+        return new AuthResponseDto(true, false, string.Empty, createdAccessToken, createdRefreshTokenValue);
     }
 
-    // ✅ ВСПОМОГАТЕЛЬНЫЙ МЕТОД ДЛЯ ГЕНЕРАЦИИ УНИКАЛЬНОГО USERNAME
     private string GenerateUniqueUsername(string baseUsername)
     {
-        // Очищаем username от пробелов и спецсимволов
         string cleanUsername = System.Text.RegularExpressions.Regex.Replace(baseUsername, @"[^a-zA-Z0-9_]", "");
 
         if (string.IsNullOrEmpty(cleanUsername))
             cleanUsername = $"user_{DateTime.Now.Ticks}";
 
-        // Проверяем уникальность
-        ApplicationUser? existingUser = _usersManager.FindByNameAsync(cleanUsername).Result;
+        var existingUser = _usersManager.FindByNameAsync(cleanUsername).Result;
         if (existingUser != null)
             return $"{cleanUsername}_{DateTime.Now.Ticks}";
 
         return cleanUsername.ToLowerInvariant();
     }
 
-    // ✅ ВСПОМОГАТЕЛЬНЫЙ МЕТОД ДЛЯ ОТПРАВКИ 2FA EMAIL
     private async Task SendTwoFactorEmailAsync(string email, string token)
     {
         try
         {
-            MimeMessage emailMessage = new();
+            var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
             emailMessage.To.Add(new MailboxAddress("", email));
             emailMessage.Subject = "Confirm login";
@@ -199,10 +206,10 @@ public sealed class TwoFactorAuthEmailProcessor
                        $"Enter this code to complete your login."
             };
 
-            using SmtpClient client = new();
+            using var client = new SmtpClient();
             await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
             await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
-            _ = await client.SendAsync(emailMessage);
+            await client.SendAsync(emailMessage);
             await client.DisconnectAsync(true);
 
             _logger.LogInformation("2FA email sent successfully to {Email}", email);

@@ -1,4 +1,4 @@
-﻿namespace Domain.Auth;
+﻿namespace IdentityLibrary.Models;
 
 public class RefreshTokenRequest
 {

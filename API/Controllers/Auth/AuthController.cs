@@ -2,6 +2,9 @@
 using Domain.Auth;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
+using IdentityLibrary.Repositories.Tokens.RefreshTokens.Interfaces;
+using IdentityLibrary.Services.Classes;
+using IdentityLibrary.Services.Interfaces;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -9,6 +12,7 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 using Settings;
 using System.Net;
+using Telegram.Bot.Types;
 
 namespace API.Controllers.Auth;
 
@@ -21,6 +25,8 @@ public sealed class AuthController : ControllerBase
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly AuthTokenGenerator _authTokenGenerator;
     private readonly TwoFactorAuthEmailProcessor _twoFactorAuthEmailProcessor;
+    private readonly ITokensService _tokenService;
+    private readonly IRefreshTokensRepository _refreshTokensRepo;
 
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly ILogger<AuthController> _logger;
@@ -28,7 +34,7 @@ public sealed class AuthController : ControllerBase
     private readonly IOptionsMonitor<TokenValidationParameters> _tokenValidationParameters;
     private readonly IOptionsMonitor<EmailSettings> _emailSettings;
 
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters, SignInManager<ApplicationUser> signInManager, AuthTokenGenerator authTokenGenerator, TwoFactorAuthEmailProcessor twoFactorAuthEmailProcessor)
+    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters, SignInManager<ApplicationUser> signInManager, AuthTokenGenerator authTokenGenerator, TwoFactorAuthEmailProcessor twoFactorAuthEmailProcessor, ITokensService tokenService, IRefreshTokensRepository refreshTokensRepo)
     {
         _configuration = configuration;
         _usersManager = usersManager;
@@ -40,6 +46,8 @@ public sealed class AuthController : ControllerBase
         _signInManager = signInManager;
         _authTokenGenerator = authTokenGenerator;
         _twoFactorAuthEmailProcessor = twoFactorAuthEmailProcessor;
+        _tokenService = tokenService;
+        _refreshTokensRepo = refreshTokensRepo;
     }
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -80,54 +88,33 @@ public sealed class AuthController : ControllerBase
         if (string.IsNullOrWhiteSpace(loginModel.UserEmail) || string.IsNullOrWhiteSpace(loginModel.Password))
             return BadRequest("Email и пароль должны быть указаны");
 
-        ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
+        var user = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
 
-        if (userToCheckExistance is null)
+        if (user is null)
             return NotFound("Пользователь не зарегистрирован");
 
-        PasswordVerificationResult passwordVerificationResult = _passwordHasher.VerifyHashedPassword(userToCheckExistance, userToCheckExistance.PasswordHash, loginModel.Password);
+        bool isValidPassword = await _usersManager.CheckPasswordAsync(user, loginModel.Password);
 
-        if (passwordVerificationResult != PasswordVerificationResult.Success)
+        if (!isValidPassword)
             return BadRequest("Неверный пароль");
 
-        // If 2FA is enabled, send email and return specific response
-        if (userToCheckExistance.TwoFactorEnabled is true)
+        if (user.TwoFactorEnabled)
         {
-            string twoFactorAuthToken = await _usersManager.GenerateTwoFactorTokenAsync(userToCheckExistance, "Email");
+            var token = await _usersManager.GenerateTwoFactorTokenAsync(user, "Email");
+            _logger.LogInformation("2FA code for {Email}: {Code}", user.Email, token);
 
-            MimeMessage emailMessage = new();
-
-            emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
-            emailMessage.To.Add(new MailboxAddress("", userToCheckExistance.Email));
-            emailMessage.Subject = "Confirm login";
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
-            {
-                Text = $"Your 2FA verification code is: <strong>{twoFactorAuthToken}</strong><br><br>" +
-                       $"Enter this code to complete your login."
-            };
-
-            using (SmtpClient client = new())
-            {
-                await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
-                await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
-                _ = await client.SendAsync(emailMessage);
-                await client.DisconnectAsync(true);
-            }
-
-            // Return specific response indicating 2FA is required
-            return Ok(new LoginResponseModel(userToCheckExistance.Id.ToString(), string.Empty, 0, string.Empty, userToCheckExistance.TwoFactorEnabled));
+            return Ok(new AuthResponseDto(false, true, "2FA required", string.Empty, string.Empty));
         }
 
-        string accessToken = await _authTokenGenerator.GenerateAccessToken(userToCheckExistance);
-        string refreshToken = await _authTokenGenerator.GenerateRefreshToken(userToCheckExistance);
+        await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
 
-        IdentityResult settingAccessTokenResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AccessToken", accessToken);
-        IdentityResult settingRefreshTokenResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "RefreshToken", refreshToken);
+        var accessToken = await _authTokenGenerator.GenerateAccessToken(user);
+        var refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
 
-        if (settingAccessTokenResult.Succeeded && settingRefreshTokenResult.Succeeded)
-            return Ok(new TokenResponse(true, accessToken, _authSettingsOptionsMonitor.CurrentValue.AccessTokenLifetimeMinutes, refreshToken));
+        var refreshToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), refreshTokenValue, false, DateTime.UtcNow);
+        await _refreshTokensRepo.CreateAsync(refreshToken);
 
-        return StatusCode(500, "Authentication token setting has been failed");
+        return Ok(new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue));
     }
 
     [HttpPost("ConfirmLoginViaEmail")]
@@ -136,52 +123,34 @@ public sealed class AuthController : ControllerBase
         if (string.IsNullOrWhiteSpace(model.UserId) || string.IsNullOrWhiteSpace(model.TwoFactorToken))
         {
             _logger.LogError("User ID and token are required");
-
             return BadRequest("User ID and token are required");
         }
-        _logger.LogInformation("ConfirmLoginViaEmail called with UserId: {UserId} and TwoFactorToken: {TwoFactorToken}", model.UserId, model.TwoFactorToken);
 
-        ApplicationUser? userToCheckExistance = await _usersManager.FindByIdAsync(model.UserId);
+        var user = await _usersManager.FindByIdAsync(model.UserId);
 
-        if (userToCheckExistance is null)
+        if (user is null)
         {
             _logger.LogError("User with ID {UserId} not found", model.UserId);
             return NotFound();
         }
 
-        _logger.LogInformation("User to check existance - {UserId}, {Email}", userToCheckExistance?.Id, userToCheckExistance?.Email);
+        bool isValidTwoFactorToken = await _usersManager.VerifyTwoFactorTokenAsync(user, "Email", model.TwoFactorToken);
 
-        bool isValidTwoFactorToken = await _usersManager.VerifyTwoFactorTokenAsync(userToCheckExistance, "Email", model.TwoFactorToken);
-
-        _logger.LogInformation("Is valid 2FA token for user {UserId}: {IsValidTwoFactorToken}", userToCheckExistance.Id, isValidTwoFactorToken);
-
-        if (isValidTwoFactorToken)
+        if (!isValidTwoFactorToken)
         {
-            string accessToken = await _authTokenGenerator.GenerateAccessToken(userToCheckExistance);
-            string refreshToken = await _authTokenGenerator.GenerateRefreshToken(userToCheckExistance);
-
-            _logger.LogInformation("Generated Access token for user {UserId}: {TokenString}", userToCheckExistance.Id, accessToken);
-            _logger.LogInformation("Generated Refresh token for user {UserId}: {TokenString}", userToCheckExistance.Id, refreshToken);
-
-            IdentityResult settingsAccessTokenResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "AccessToken", accessToken);
-            IdentityResult settingsRefreshTokenResult = await _usersManager.SetAuthenticationTokenAsync(userToCheckExistance, "SQLServer", "RefreshToken", refreshToken);
-
-            if (settingsAccessTokenResult.Succeeded && settingsRefreshTokenResult.Succeeded)
-            {
-                _logger.LogInformation("Authentication token set successfully for user {UserId} - {tokenString}", userToCheckExistance.Id, accessToken);
-                _logger.LogInformation("Authentication token set successfully for user {UserId} - {tokenString}", userToCheckExistance.Id, refreshToken);
-                return Ok(new TokenResponse(true, accessToken, _authSettingsOptionsMonitor.CurrentValue.AccessTokenLifetimeMinutes, refreshToken));
-            }
-
-            if (settingsAccessTokenResult.Errors.Any())
-                _logger.LogError("Failed to set authentication token for user {UserId}. Errors: {Errors}", userToCheckExistance.Id, string.Join(", ", settingsAccessTokenResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
-            if (settingsRefreshTokenResult.Errors.Any())
-                _logger.LogError("Failed to set authentication token for user {UserId}. Errors: {Errors}", userToCheckExistance.Id, string.Join(", ", settingsRefreshTokenResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
-
-            return BadRequest("Failed to set authentication token");
+            _logger.LogWarning("Invalid 2FA token for user {UserId}", user.Id);
+            return BadRequest("Invalid 2FA token");
         }
 
-        return BadRequest("Invalid 2FA token");
+        await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
+
+        var accessToken = await _authTokenGenerator.GenerateAccessToken(user);
+        var refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
+
+        var refreshToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), refreshTokenValue, false, DateTime.UtcNow);
+        await _refreshTokensRepo.CreateAsync(refreshToken);
+
+        return Ok(new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue));
     }
 
     [HttpPost("logout")]
@@ -190,21 +159,65 @@ public sealed class AuthController : ControllerBase
     {
         try
         {
-            ApplicationUser authorizedApplicationUser = await _usersManager.FindByIdAsync(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value);
-            IdentityResult accessTokenLogoutResult = await _usersManager.RemoveAuthenticationTokenAsync(authorizedApplicationUser, "SQLServer", "AccessToken");
-            IdentityResult refreshTokenlogoutResult = await _usersManager.RemoveAuthenticationTokenAsync(authorizedApplicationUser, "SQLServer", "RefreshToken");
-            if (accessTokenLogoutResult.Succeeded && refreshTokenlogoutResult.Succeeded)
-                return Ok();
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim is null)
+                return Unauthorized();
 
-            _logger.LogError("Ошибка отзыва токена авторизации");
-            return StatusCode(500, "Ошибка отзыва токена авторизации");
+            var user = await _usersManager.FindByIdAsync(userIdClaim.Value);
+            if (user is null)
+                return NotFound();
+
+            await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
+
+            return Ok("Logged out successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            return StatusCode(500, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            _logger.LogError(ex, "Error during logout");
+            return StatusCode(500, ex.Message);
         }
     }
+
+    [HttpPost("refresh-token")]
+    public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    {
+        if (string.IsNullOrEmpty(request.RefreshToken))
+            return BadRequest("Refresh token is required");
+
+        try
+        {
+            var storedToken = await _refreshTokensRepo.GetByValueAsync(request.RefreshToken);
+
+            if (storedToken is null)
+            {
+                _logger.LogWarning("Invalid refresh token: {Token}", request.RefreshToken);
+                return BadRequest("Invalid refresh token");
+            }
+
+            var user = await _usersManager.FindByIdAsync(storedToken.UserId.ToString());
+            if (user is null)
+            {
+                _logger.LogWarning("User not found for refresh token: {Token}", request.RefreshToken);
+                return BadRequest("User not found");
+            }
+
+            await _refreshTokensRepo.RevokeAsync(storedToken.Id);
+
+            var newAccessToken = await _authTokenGenerator.GenerateAccessToken(user);
+            var newRefreshToken = _authTokenGenerator.GenerateRefreshToken();
+
+            var newToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), newRefreshToken, false, DateTime.UtcNow);
+            await _refreshTokensRepo.CreateAsync(newToken);
+
+            return Ok(new AuthResponseDto(true, false, string.Empty, newAccessToken, newRefreshToken));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error refreshing token");
+            return StatusCode(500, "Internal server error during token refresh");
+        }
+    }
+
 
     [HttpPost("register")]
     public async Task<ActionResult<string>> Register(RegisterModel registerModel)
@@ -473,7 +486,7 @@ public sealed class AuthController : ControllerBase
             _logger.LogInformation("Processing Google login for email: {Email}, GoogleUserId: {GoogleUserId}", email, googleUserId);
 
             // ✅ ВЫЗЫВАЕМ УНИВЕРСАЛЬНЫЙ МЕТОД
-            TokenResponse tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
+            AuthResponseDto tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
                 provider: "Google",
                 providerKey: googleUserId,
                 email: email,
@@ -481,7 +494,7 @@ public sealed class AuthController : ControllerBase
                 phoneNumber: phoneNumber
             );
 
-            if (tokenResponse.Success)
+            if (tokenResponse.IsAuthSuccessful)
             {
                 return Redirect($"{Request.Scheme}://{Request.Host}/auth/google-callback?Token={tokenResponse.AccessToken}");
             }
@@ -548,7 +561,7 @@ public sealed class AuthController : ControllerBase
             _logger.LogInformation("Processing Github login for email: {Email}, GithubUserId: {GithubUserId}", email, githubUserId);
 
             // ✅ ВЫЗЫВАЕМ УНИВЕРСАЛЬНЫЙ МЕТОД
-            TokenResponse tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
+            AuthResponseDto tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
                 provider: "GitHub",
                 providerKey: githubUserId,
                 email: email,
@@ -556,7 +569,7 @@ public sealed class AuthController : ControllerBase
                 phoneNumber: phoneNumber
             );
 
-            if (tokenResponse.Success)
+            if (tokenResponse.IsAuthSuccessful)
             {
                 return Redirect($"{Request.Scheme}://{Request.Host}/auth/github-callback?Token={tokenResponse.AccessToken}");
             }
@@ -623,7 +636,7 @@ public sealed class AuthController : ControllerBase
             _logger.LogInformation("Processing Vkontakte login for email: {Email}, VkontakteUserId: {VkontakteUserId}", email, vkontakteUserId);
 
             // ✅ ВЫЗЫВАЕМ УНИВЕРСАЛЬНЫЙ МЕТОД
-            TokenResponse tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
+            AuthResponseDto tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
                 provider: "Vkontakte",
                 providerKey: vkontakteUserId,
                 email: email,
@@ -631,7 +644,7 @@ public sealed class AuthController : ControllerBase
                 phoneNumber: phoneNumber
             );
 
-            if (tokenResponse.Success)
+            if (tokenResponse.IsAuthSuccessful)
             {
                 return Redirect($"{Request.Scheme}://{Request.Host}/auth/vkontakte-callback?Token={tokenResponse.AccessToken}");
             }
@@ -702,92 +715,6 @@ public sealed class AuthController : ControllerBase
                 return Ok("Password has been added successfully");
 
             return StatusCode(StatusCodes.Status500InternalServerError, addPasswordResult);
-        }
-    }
-
-    [HttpPost("refresh-token")]
-    public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
-    {
-        if (string.IsNullOrEmpty(request.RefreshToken))
-            return BadRequest("Refresh token is required");
-
-        try
-        {
-            // Получаем principal из истекшего токена (мы все еще можем его прочитать)
-            ClaimsPrincipal? principal = null;
-            string? accessToken = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-
-            if (!string.IsNullOrEmpty(accessToken))
-            {
-                JwtSecurityTokenHandler tokenHandler = new();
-                try
-                {
-                    // Игнорируем срок действия токена при чтении
-                    principal = tokenHandler.ValidateToken(accessToken,
-                        new TokenValidationParameters
-                        {
-                            ValidateIssuerSigningKey = true,
-                            IssuerSigningKey = new SymmetricSecurityKey(
-                                Encoding.UTF8.GetBytes(_authSettingsOptionsMonitor.CurrentValue.RefreshSecret)),
-                            ValidateIssuer = false,
-                            ValidateAudience = false,
-                            ValidateLifetime = false // Не проверяем срок действия
-                        }, out _);
-                }
-                catch
-                {
-                    // Если не можем прочитать токен, пробуем найти пользователя по refresh token
-                }
-            }
-
-            ApplicationUser? user = null;
-
-            if (principal != null)
-            {
-                string? userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                if (!string.IsNullOrEmpty(userId))
-                {
-                    user = await _usersManager.FindByIdAsync(userId);
-                }
-            }
-
-            // Если пользователь не найден по токену, ищем по refresh token в базе
-            if (user == null)
-            {
-                // Поиск пользователя, у которого есть такой refresh token
-                user = _usersManager.Users
-                    .AsEnumerable() // Загружаем в память для поиска по токенам
-                    .FirstOrDefault(u =>
-                    {
-                        string? storedToken = _usersManager.GetAuthenticationTokenAsync(u, "SQLServer", "RefreshToken").Result;
-                        return storedToken == request.RefreshToken;
-                    });
-            }
-
-            if (user == null)
-                return BadRequest("Invalid refresh token");
-
-            // Проверяем, что refresh token совпадает с сохраненным
-            string? storedRefreshToken = await _usersManager.GetAuthenticationTokenAsync(user, "SQLServer", "RefreshToken");
-
-            if (storedRefreshToken != request.RefreshToken)
-                return BadRequest("Refresh token mismatch");
-
-            // Генерируем новые токены
-            string newAccessToken = await _authTokenGenerator.GenerateAccessToken(user);
-            string newRefreshToken = await _authTokenGenerator.GenerateRefreshToken(user);
-
-            // Сохраняем новые токены
-            _ = await _usersManager.SetAuthenticationTokenAsync(user, "SQLServer", "AccessToken", newAccessToken);
-            _ = await _usersManager.SetAuthenticationTokenAsync(user, "SQLServer", "RefreshToken", newRefreshToken);
-
-            return Ok(new TokenResponse(true, newAccessToken,
-                _authSettingsOptionsMonitor.CurrentValue.AccessTokenLifetimeMinutes, newRefreshToken));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error refreshing token");
-            return StatusCode(500, "Internal server error during token refresh");
         }
     }
 }
