@@ -38,24 +38,32 @@ public sealed class DevelopersWebManager : WebManager, IWebManager<Developer, Ad
 
     public async Task<IEnumerable<Developer>> GetAllAsync()
     {
+        Console.WriteLine($"Calling URL: {HttpClient.BaseAddress}/api/Games/Developers");
+
         var developers = await HttpClient.GetFromJsonAsync<IEnumerable<Developer>>($"/api/Games/Developers");
         return developers;
     }
 
     public async Task<IEnumerable<Developer>> GetFirstAsync(long offset, long limit)
     {
+        Console.WriteLine($"Calling URL: {HttpClient.BaseAddress}/api/Games/Developers/{offset}/{limit}");
+
         var developers = await HttpClient.GetFromJsonAsync<IEnumerable<Developer>>($"/api/Games/Developers/{offset}/{limit}");
         return developers;
     }
 
     public async Task<Developer> GetAsync(long id)
     {
+        Console.WriteLine($"Calling URL: {HttpClient.BaseAddress}/api/Games/Developers/{id}");
+
         var developer = await HttpClient.GetFromJsonAsync<Developer>($"/api/Games/Developers/{id}");
         return developer;
     }
 
     public async Task<Developer> UpdateAsync(long id, UpdateDeveloperModel tUpdate)
     {
+        Console.WriteLine($"Calling URL: {HttpClient.BaseAddress}/api/Games/Developers/{id}");
+
         HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync($"/api/Games/Developers/{id}", tUpdate);
         if (httpResponseMessage.IsSuccessStatusCode)
         {

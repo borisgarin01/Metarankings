@@ -15,7 +15,7 @@ public sealed class MoviesDirectorsWebManager : WebManager, IWebManager<MovieDir
 
     public async Task<HttpResponseMessage> AddAsync(AddMovieDirectorModel addMovieDirectorModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddMovieDirectorModel>("api/movies/moviesDirectors", addMovieDirectorModel);
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync<AddMovieDirectorModel>("/api/movies/moviesDirectors", addMovieDirectorModel);
         return httpResponseMessage;
     }
 
@@ -31,31 +31,31 @@ public sealed class MoviesDirectorsWebManager : WebManager, IWebManager<MovieDir
 
     public async Task<HttpResponseMessage> DeleteAsync(long id)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"api/movies/moviesDirectors/{id}");
+        HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"/api/movies/moviesDirectors/{id}");
         return httpResponseMessage;
     }
 
     public async Task<IEnumerable<MovieDirector>> GetAllAsync()
     {
-        var moviesDirectors = await HttpClient.GetFromJsonAsync<IEnumerable<MovieDirector>>("api/movies/moviesDirectors");
+        var moviesDirectors = await HttpClient.GetFromJsonAsync<IEnumerable<MovieDirector>>("/api/movies/moviesDirectors");
         return moviesDirectors;
     }
 
     public async Task<IEnumerable<MovieDirector>> GetFirstAsync(long offset, long limit)
     {
-        var moviesDirectors = await HttpClient.GetFromJsonAsync<IEnumerable<MovieDirector>>($"api/movies/moviesDirectors/{offset}/{limit}");
+        var moviesDirectors = await HttpClient.GetFromJsonAsync<IEnumerable<MovieDirector>>($"/api/movies/moviesDirectors/{offset}/{limit}");
         return moviesDirectors;
     }
 
     public async Task<MovieDirector> GetAsync(long id)
     {
-        var movieDirector = await HttpClient.GetFromJsonAsync<MovieDirector>($"api/movies/moviesDirectors/{id}");
+        var movieDirector = await HttpClient.GetFromJsonAsync<MovieDirector>($"/api/movies/moviesDirectors/{id}");
         return movieDirector;
     }
 
     public async Task<MovieDirector> UpdateAsync(long id, UpdateMovieDirectorModel updateMovieDirectorModel)
     {
-        HttpResponseMessage updateMovieDirectorHttpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateMovieDirectorModel>($"api/movies/moviesDirectors/{id}", updateMovieDirectorModel);
+        HttpResponseMessage updateMovieDirectorHttpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateMovieDirectorModel>($"/api/movies/moviesDirectors/{id}", updateMovieDirectorModel);
         if (updateMovieDirectorHttpResponseMessage.IsSuccessStatusCode)
             return await JsonSerializer.DeserializeAsync<MovieDirector>(await updateMovieDirectorHttpResponseMessage.Content.ReadAsStreamAsync());
         return null;

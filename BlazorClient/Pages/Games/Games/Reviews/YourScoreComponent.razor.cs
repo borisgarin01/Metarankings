@@ -39,7 +39,7 @@ public partial class YourScoreComponent : ComponentBase
     public async Task AddReviewAsync()
     {
         var addGamePlayerReviewModel = new AddGamePlayerReviewModel(GameId, YourScoreComponentModel.Text, YourScoreComponentModel.YourScore);
-        HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClient.PostAsJsonAsync<AddGamePlayerReviewModel>("api/Games/GamesGamersReviews", addGamePlayerReviewModel);
+        HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClient.PostAsJsonAsync<AddGamePlayerReviewModel>("/api/Games/GamesGamersReviews", addGamePlayerReviewModel);
         if (addingGamePlayerReviewHttpResponseMessage.IsSuccessStatusCode)
         {
             ToastService.ShowSuccess("Обзор добавлен");

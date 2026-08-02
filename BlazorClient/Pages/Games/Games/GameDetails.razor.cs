@@ -68,7 +68,7 @@ public partial class GameDetails : ComponentBase
     public async Task AddReviewAsync()
     {
         var addGamePlayerReviewModel = new AddGamePlayerReviewModel(Id, Text, YourScore);
-        HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClient.PostAsJsonAsync<AddGamePlayerReviewModel>("api/GamesGamersReviews", addGamePlayerReviewModel);
+        HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClient.PostAsJsonAsync<AddGamePlayerReviewModel>("/api/GamesGamersReviews", addGamePlayerReviewModel);
         if (!addingGamePlayerReviewHttpResponseMessage.IsSuccessStatusCode)
             ToastService.ShowError(await addingGamePlayerReviewHttpResponseMessage.Content.ReadAsStringAsync());
         else

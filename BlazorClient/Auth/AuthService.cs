@@ -32,7 +32,7 @@ public class AuthService : IAuthService
 
         try
         {
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/login", loginModel);
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/auth/login", loginModel);
 
             if (response.IsSuccessStatusCode)
             {
@@ -78,7 +78,7 @@ public class AuthService : IAuthService
             _logger.LogInformation("Sending refresh token request");
             _logger.LogDebug("RefreshToken: {Token}", refreshToken);
 
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/refresh-token", refreshRequest);
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/auth/refresh-token", refreshRequest);
             _logger.LogDebug("Response status: {StatusCode}", response.StatusCode);
 
             if (response.IsSuccessStatusCode)
@@ -136,7 +136,7 @@ public class AuthService : IAuthService
             ConfirmLoginModel request = new(userId, token);
             _logger.LogDebug("Sending 2FA code for {UserId}", userId);
 
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/ConfirmLoginViaEmail", request);
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/auth/ConfirmLoginViaEmail", request);
             _logger.LogDebug("2FA response: StatusCode = {StatusCode}", response.StatusCode);
 
             if (response.IsSuccessStatusCode)
@@ -234,7 +234,7 @@ public class AuthService : IAuthService
                 return;
             }
 
-            HttpRequestMessage httpRequest = new(HttpMethod.Post, "api/auth/logout");
+            HttpRequestMessage httpRequest = new(HttpMethod.Post, "/api/auth/logout");
             httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             _logger.LogDebug("Sending logout request");
 
@@ -276,7 +276,7 @@ public class AuthService : IAuthService
 
         try
         {
-            HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("api/auth/register", registerModel);
+            HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("/api/auth/register", registerModel);
             _logger.LogDebug("Registration response: StatusCode = {StatusCode}", httpResponseMessage.StatusCode);
 
             if (httpResponseMessage.StatusCode == HttpStatusCode.BadRequest ||
@@ -313,7 +313,7 @@ public class AuthService : IAuthService
         try
         {
             HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync(
-                "api/auth/resetPasswordConfirm", resetPasswordConfirmModel);
+                "/api/auth/resetPasswordConfirm", resetPasswordConfirmModel);
 
             _logger.LogDebug("Password reset confirmation response: {StatusCode}",
                 httpResponseMessage.StatusCode);
@@ -347,7 +347,7 @@ public class AuthService : IAuthService
         try
         {
             HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync<ResetPasswordModel>(
-                "api/auth/resetPassword", resetPasswordModel);
+                "/api/auth/resetPassword", resetPasswordModel);
 
             _logger.LogDebug("Password reset response: {StatusCode}", httpResponseMessage.StatusCode);
 
@@ -386,7 +386,7 @@ public class AuthService : IAuthService
                 return null;
             }
 
-            HttpRequestMessage httpRequest = new(HttpMethod.Post, "api/auth/setTwoFactorEnabled");
+            HttpRequestMessage httpRequest = new(HttpMethod.Post, "/api/auth/setTwoFactorEnabled");
             httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             _logger.LogDebug("Token for 2FA: {Token}", token.Substring(0, Math.Min(10, token.Length)) + "...");
 
@@ -427,7 +427,7 @@ public class AuthService : IAuthService
         try
         {
             IEnumerable<AuthenticationScheme>? schemes = await _httpClient.GetFromJsonAsync<IEnumerable<AuthenticationScheme>>(
-                "api/auth/external-providers");
+                "/api/auth/external-providers");
 
             int count = schemes?.Count() ?? 0;
             _logger.LogInformation("Got {Count} external providers", count);
@@ -453,7 +453,7 @@ public class AuthService : IAuthService
 
         try
         {
-            ApplicationUser? applicationUser = await _httpClient.GetFromJsonAsync<ApplicationUser>("api/auth/current-user");
+            ApplicationUser? applicationUser = await _httpClient.GetFromJsonAsync<ApplicationUser>("/api/auth/current-user");
 
             if (applicationUser != null)
             {
@@ -479,7 +479,7 @@ public class AuthService : IAuthService
         try
         {
             HttpResponseMessage changingPasswordHttpResponseMessage = await _httpClient.PostAsJsonAsync(
-                "api/auth/set-password", changePasswordModel);
+                "/api/auth/set-password", changePasswordModel);
 
             _logger.LogDebug("Change password response: {StatusCode}",
                 changingPasswordHttpResponseMessage.StatusCode);

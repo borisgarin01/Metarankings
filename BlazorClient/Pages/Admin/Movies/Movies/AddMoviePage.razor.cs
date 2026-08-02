@@ -141,7 +141,7 @@ public sealed partial class AddMoviePage : ComponentBase
                 string uploadingImageName = Uri.EscapeDataString(Path.GetRandomFileName());
                 string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
 
-                var url = $"api/movies/Images/{PremierDate.Value.Year}/{PremierDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
+                var url = $"/api/movies/Images/{PremierDate.Value.Year}/{PremierDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
 
                 // Send the request with authentication token
                 var response = await HttpClient.PostAsync(url, content);

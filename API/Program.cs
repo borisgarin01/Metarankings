@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using Settings;
 
@@ -214,12 +215,17 @@ internal class Program
         _ = app.MapOpenApi();
         _ = app.MapScalarApiReference(options =>
         {
-            _ = options.AddPreferredSecuritySchemes(["Bearer"]);
-            _ = options.AddHttpAuthentication("Bearer", bearer =>
-            {
-                bearer.Token = "Token";
-            });
+            options
+                .WithTitle("MetaRankings API")
+                .WithTheme(ScalarTheme.Purple)
+                .WithDarkModeToggle(true)
+                .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+
+            // В .NET 10 используется другой метод
+            options.AddPreferredSecuritySchemes("Bearer");
         });
+
+        _ = app.MapControllers();
 
         _ = app.MapControllers();
 
