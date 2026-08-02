@@ -51,7 +51,7 @@ public partial class Login : ComponentBase
             StateHasChanged();
 
             // First, try to login
-            LoginResponse loginResponse = await AuthService.LoginAsync(LoginModel);
+            LoginResponseModel loginResponse = await AuthService.LoginAsync(LoginModel);
 
             if (loginResponse.RequiresTwoFactor)
             {
@@ -60,10 +60,11 @@ public partial class Login : ComponentBase
                 UserIdFor2FA = loginResponse.UserId;
                 ToastService.ShowInfo("Код подтверждения отправлен на вашу почту");
             }
-            else if (!string.IsNullOrWhiteSpace(loginResponse.Token))
+            else if (!string.IsNullOrWhiteSpace(loginResponse.AccessToken))
             {
                 // No 2FA required - store token and redirect
-                await AuthService.StoreTokenAsync(loginResponse.Token);
+                await AuthService.StoreAccessTokenAsync(loginResponse.AccessToken);
+                await AuthService.StoreRefreshTokenAsync(loginResponse.RefreshToken);
                 NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
@@ -96,12 +97,13 @@ public partial class Login : ComponentBase
             StateHasChanged();
 
             // Verify 2FA code
-            TokenResponse verifyResponse = await AuthService.VerifyTwoFactorAsync(UserIdFor2FA, TwoFactorCode);
+            AuthResponseDto verifyResponse = await AuthService.VerifyTwoFactorAsync(UserIdFor2FA, TwoFactorCode);
 
-            if (!string.IsNullOrWhiteSpace(verifyResponse.Token))
+            if (!string.IsNullOrWhiteSpace(verifyResponse.AccessToken) && !string.IsNullOrWhiteSpace(verifyResponse.RefreshToken))
             {
                 // 2FA successful - store token and redirect
-                await AuthService.StoreTokenAsync(verifyResponse.Token);
+                await AuthService.StoreAccessTokenAsync(verifyResponse.AccessToken);
+                await AuthService.StoreRefreshTokenAsync(verifyResponse.RefreshToken);
                 NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
@@ -126,7 +128,7 @@ public partial class Login : ComponentBase
         try
         {
             // Resend by calling login again
-            LoginResponse loginResponse = await AuthService.LoginAsync(LoginModel);
+            LoginResponseModel loginResponse = await AuthService.LoginAsync(LoginModel);
 
             if (loginResponse.RequiresTwoFactor)
             {

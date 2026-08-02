@@ -6,6 +6,10 @@ using Data.Migrations;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Migrations;
 using IdentityLibrary.Repositories;
+using IdentityLibrary.Repositories.Tokens.RefreshTokens.Classes;
+using IdentityLibrary.Repositories.Tokens.RefreshTokens.Interfaces;
+using IdentityLibrary.Services.Classes;
+using IdentityLibrary.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -142,6 +146,9 @@ internal class Program
 
         _ = builder.Services.AddScoped<TwoFactorAuthEmailProcessor>();
 
+        builder.Services.AddScoped<ITokensService, TokensService>();
+
+
         _ = builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
             .AddJsonOptions(options =>
             {
@@ -181,6 +188,9 @@ internal class Program
           .AddRoleStore<RolesStore>()
           .AddTokenProvider<EmailTokenProvider<ApplicationUser>>("Email")
           .AddDefaultTokenProviders();
+
+        builder.Services.AddScoped<IRefreshTokensRepository>(sp =>
+            new RefreshTokensRepository(builder.Configuration.GetConnectionString("PostgresConnection")));
 
         WebApplication app = builder.Build();
 

@@ -60,6 +60,8 @@ internal class Program
 
         _ = builder.Services.AddBlazoredToast();
 
+        builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
         await builder.Build().RunAsync();
     }
 }
