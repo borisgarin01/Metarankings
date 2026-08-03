@@ -19,4 +19,5 @@ public interface IAuthService
     Task<ApplicationUser> GetCurrentUserAsync();
     Task<HttpResponseMessage> SendChangePasswordMessageAsync(ChangePasswordModel changePasswordModel);
     Task<AuthResponseDto> RefreshTokenAsync();
+    void AddDefaultRequestHeaderBearer(string accessToken);
 }

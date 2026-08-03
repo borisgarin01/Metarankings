@@ -17,7 +17,7 @@ public partial class Home : ComponentBase
     private IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemComponents;
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     public IEnumerable<Game> Games
     {
@@ -107,26 +107,36 @@ public partial class Home : ComponentBase
             PageNumber = 1;
         if (PageSize < 1)
             PageSize = 5;
+
+        var httpClient = HttpClientFactory.CreateClient("AuthorizedClient");
+
         // Fetch data based on the current PageSize and PageNumber
+        Task<IEnumerable<Game>?> gamesGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/First/{PageNumber}/{PageSize}");
+        Task<IEnumerable<GameReview>?> gamesGamersReviewsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<GameReview>>($"/api/Games/GamesGamersReviews/{GamesGamersReviewsOffset}/{GamesGamersReviewsLimit}");
+        Task<IEnumerable<Movie>?> moviesGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/{PageNumber}/{PageSize}");
+        Task<IEnumerable<MovieReview>?> moviesViewersReviewsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<MovieReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}");
+        Task<IEnumerable<CollectionsItemComponent>> collectionsItemsComponents = httpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>($"/api/home/collections/{PageNumber}/{PageSize}");
+        Task<IEnumerable<SoonAtCinemasItemComponent>> soonAtCinemasItemComponents = httpClient.GetFromJsonAsync<IEnumerable<SoonAtCinemasItemComponent>>($"/api/home/soon-at-cinemas");
+        Task<IEnumerable<GamesReleaseDateItemViewModel>> gamesReleaseDateItemComponents = httpClient.GetFromJsonAsync<IEnumerable<GamesReleaseDateItemViewModel>>($"/api/home/games-release-dates");
 
-        Task<IEnumerable<Game>?> gamesGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/First/{PageNumber}/{PageSize}");
-        Task<IEnumerable<GameReview>?> gamesGamersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<GameReview>>($"/api/Games/GamesGamersReviews/{GamesGamersReviewsOffset}/{GamesGamersReviewsLimit}");
-        Task<IEnumerable<Movie>?> moviesGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/{PageNumber}/{PageSize}");
-        Task<IEnumerable<MovieReview>?> moviesViewersReviewsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<MovieReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}");
-        Task<IEnumerable<CollectionsItemComponent>> collectionsItemsComponents = HttpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>($"/api/home/collections/{PageNumber}/{PageSize}");
-        Task<IEnumerable<SoonAtCinemasItemComponent>> soonAtCinemasItemComponents = HttpClient.GetFromJsonAsync<IEnumerable<SoonAtCinemasItemComponent>>($"/api/home/soon-at-cinemas");
-        Task<IEnumerable<GamesReleaseDateItemViewModel>> gamesReleaseDateItemComponents = HttpClient.GetFromJsonAsync<IEnumerable<GamesReleaseDateItemViewModel>>($"/api/home/games-release-dates");
+        // Wait for ALL tasks to complete
+        await Task.WhenAll(
+            gamesGettingTask,
+            gamesGamersReviewsGettingTask,
+            moviesGettingTask,
+            moviesViewersReviewsGettingTask,
+            collectionsItemsComponents,
+            soonAtCinemasItemComponents,  // Added
+            gamesReleaseDateItemComponents // Added
+        );
 
-        await Task.WhenAll(gamesGettingTask, gamesGamersReviewsGettingTask, moviesGettingTask, moviesViewersReviewsGettingTask, collectionsItemsComponents)
-            .ContinueWith(b =>
-        {
-            Games = gamesGettingTask.Result;
-            GamesReviews = gamesGamersReviewsGettingTask.Result;
-            Movies = moviesGettingTask.Result;
-            MoviesReviews = moviesViewersReviewsGettingTask.Result;
-            CollectionsItemComponents = collectionsItemsComponents.Result;
-            SoonAtCinemasItemComponents = soonAtCinemasItemComponents.Result;
-            GamesReleaseDateItemComponents = gamesReleaseDateItemComponents.Result;
-        });
+        // Then assign all results
+        Games = gamesGettingTask.Result;
+        GamesReviews = gamesGamersReviewsGettingTask.Result;
+        Movies = moviesGettingTask.Result;
+        MoviesReviews = moviesViewersReviewsGettingTask.Result;
+        CollectionsItemComponents = collectionsItemsComponents.Result;
+        SoonAtCinemasItemComponents = soonAtCinemasItemComponents.Result;
+        GamesReleaseDateItemComponents = gamesReleaseDateItemComponents.Result;
     }
 }

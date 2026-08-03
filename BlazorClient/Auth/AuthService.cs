@@ -39,6 +39,7 @@ public class AuthService : IAuthService
                 var result = await response.Content.ReadFromJsonAsync<LoginResponseModel>();
                 _logger.LogInformation("Login successful for {Email}, TwoFactor: {TwoFactor}",
                     loginModel.UserEmail, result?.RequiresTwoFactor);
+
                 return result;
             }
 
@@ -95,8 +96,8 @@ public class AuthService : IAuthService
                     await StoreAccessTokenAsync(tokenResponse.AccessToken);
                     await StoreRefreshTokenAsync(tokenResponse.RefreshToken);
 
-                    _httpClient.DefaultRequestHeaders.Authorization =
-                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenResponse.AccessToken);
+                    AddDefaultRequestHeaderBearer(tokenResponse.AccessToken);
+
 
                     _logger.LogInformation("New tokens saved - AccessToken length: {AccessLength}, RefreshToken length: {RefreshLength}",
                         tokenResponse.AccessToken?.Length ?? 0, tokenResponse.RefreshToken?.Length ?? 0);
@@ -153,8 +154,7 @@ public class AuthService : IAuthService
                     await StoreAccessTokenAsync(result.AccessToken);
                     await StoreRefreshTokenAsync(result.RefreshToken);
 
-                    _httpClient.DefaultRequestHeaders.Authorization =
-                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", result.AccessToken);
+                    AddDefaultRequestHeaderBearer(result.AccessToken);
 
                     return result;
                 }
@@ -182,9 +182,9 @@ public class AuthService : IAuthService
 
         try
         {
+            await _localStorage.RemoveItemAsync("accessToken");
             await _localStorage.SetItemAsync<string>("accessToken", token);
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            AddDefaultRequestHeaderBearer(token);
 
             _logger.LogDebug("Access token saved and set in HttpClient");
 
@@ -228,14 +228,12 @@ public class AuthService : IAuthService
             if (string.IsNullOrEmpty(token))
             {
                 _logger.LogWarning("Access token missing during logout");
-                await _localStorage.RemoveItemAsync("accessToken");
                 await _localStorage.RemoveItemAsync("refreshToken");
-                _httpClient.DefaultRequestHeaders.Authorization = null;
+                _httpClient.DefaultRequestHeaders.Remove("Authorization");
                 return;
             }
 
             HttpRequestMessage httpRequest = new(HttpMethod.Post, "/api/auth/logout");
-            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             _logger.LogDebug("Sending logout request");
 
             HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
@@ -243,7 +241,7 @@ public class AuthService : IAuthService
 
             await _localStorage.RemoveItemAsync("accessToken");
             await _localStorage.RemoveItemAsync("refreshToken");
-            _httpClient.DefaultRequestHeaders.Authorization = null;
+            _httpClient.DefaultRequestHeaders.Remove("Authorization");
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {
@@ -502,5 +500,11 @@ public class AuthService : IAuthService
             _logger.LogError(ex, "Exception changing password");
             throw;
         }
+    }
+
+    public void AddDefaultRequestHeaderBearer(string accessToken)
+    {
+        _httpClient.DefaultRequestHeaders.Remove("Authorization");
+        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
     }
 }

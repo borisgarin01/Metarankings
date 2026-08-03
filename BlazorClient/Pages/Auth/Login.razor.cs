@@ -65,6 +65,7 @@ public partial class Login : ComponentBase
                 // No 2FA required - store token and redirect
                 await AuthService.StoreAccessTokenAsync(loginResponse.AccessToken);
                 await AuthService.StoreRefreshTokenAsync(loginResponse.RefreshToken);
+                AuthService.AddDefaultRequestHeaderBearer(loginResponse.AccessToken);
                 NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
