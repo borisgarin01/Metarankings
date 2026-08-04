@@ -1,6 +1,5 @@
 ﻿using Domain.Games;
 using Domain.RequestsModels;
-using System;
 
 namespace BlazorClient.Pages.Games.Games;
 
@@ -24,7 +23,7 @@ public partial class BestGamesOfYearListPage : ComponentBase
     public IEnumerable<Game> Games { get; set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -32,7 +31,7 @@ public partial class BestGamesOfYearListPage : ComponentBase
         {
             if (Year.HasValue || PlatformId.HasValue || GenreId.HasValue || DeveloperId.HasValue || PublisherId.HasValue)
             {
-                var filter = new GameFilterRequest
+                GameFilterRequest filter = new GameFilterRequest
                 {
                     Skip = 0,
                     Take = 10
@@ -54,8 +53,8 @@ public partial class BestGamesOfYearListPage : ComponentBase
                     filter.PublishersIds = new[] { PublisherId.Value };
 
                 // Using HttpClient.PostAsJsonAsync for POST or custom query string building for GET
-                HttpResponseMessage response = await HttpClient.PostAsJsonAsync<GameFilterRequest>(
-                    $@"{HttpClient.BaseAddress}api/games/games/byParameters",
+                HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync<GameFilterRequest>(
+                    "/api/games/games/byParameters",
                     filter
                 );
 

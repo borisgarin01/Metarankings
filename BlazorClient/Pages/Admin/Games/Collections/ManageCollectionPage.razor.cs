@@ -15,9 +15,6 @@ public partial class ManageCollectionPage : ComponentBase
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    [Inject]
-    public HttpClient HttpClient { get; set; }
-
     private GamesCollection gameCollection;
 
     [Parameter, EditorRequired]

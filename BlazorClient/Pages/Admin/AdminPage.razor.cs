@@ -9,7 +9,7 @@ namespace BlazorClient.Pages.Admin;
 public partial class AdminPage : ComponentBase
 {
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     [Inject]
     public IToastService ToastService { get; set; }
@@ -21,9 +21,9 @@ public partial class AdminPage : ComponentBase
 
     public async Task AssignToAdminAsync()
     {
-        var userAssignToRoleModel = new UserAssignToRoleModel(FutureAdminEmail);
+        UserAssignToRoleModel userAssignToRoleModel = new UserAssignToRoleModel(FutureAdminEmail);
 
-        var response = await HttpClient.PostAsJsonAsync("/api/Auth/AssignToAdmin", userAssignToRoleModel);
+        var response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Auth/AssignToAdmin", userAssignToRoleModel);
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {

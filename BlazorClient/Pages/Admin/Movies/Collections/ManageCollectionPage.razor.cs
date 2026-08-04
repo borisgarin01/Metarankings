@@ -16,7 +16,7 @@ public partial class ManageCollectionPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     private MoviesCollection moviesCollection;
 

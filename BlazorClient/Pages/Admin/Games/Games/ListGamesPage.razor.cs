@@ -7,10 +7,10 @@ public partial class ListGamesPage : ComponentBase
     public IEnumerable<Game> Games { get; private set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Games = await HttpClient.GetFromJsonAsync<IEnumerable<Game>>(@"/api/Games/Games");
+        Games = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Game>>(@"/api/Games/Games");
     }
 }

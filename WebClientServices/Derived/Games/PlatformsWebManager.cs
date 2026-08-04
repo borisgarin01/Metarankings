@@ -8,19 +8,19 @@ namespace WebManagers.Derived.Games;
 
 public sealed class PlatformsWebManager : WebManager, IWebManager<Platform, AddPlatformModel, UpdatePlatformModel>
 {
-    public PlatformsWebManager(HttpClient httpClient) : base(httpClient)
+    public PlatformsWebManager(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
     {
     }
 
     public async Task<HttpResponseMessage> AddAsync(AddPlatformModel addPlatformModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Platforms", addPlatformModel);
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Games/Platforms", addPlatformModel);
         return httpResponseMessage;
     }
 
     public async Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Platforms/platforms-excel-upload", formFile);
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Games/Platforms/platforms-excel-upload", formFile);
         return httpResponseMessage;
     }
 
@@ -31,32 +31,32 @@ public sealed class PlatformsWebManager : WebManager, IWebManager<Platform, AddP
 
     public async Task<HttpResponseMessage> DeleteAsync(long id)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"/api/Games/Platforms/{id}");
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").DeleteAsync($"/api/Games/Platforms/{id}");
         return httpResponseMessage;
     }
 
-    public Task<IEnumerable<Platform>> GetAllAsync()
+    public async Task<IEnumerable<Platform>> GetAllAsync()
     {
-        var platforms = HttpClient.GetFromJsonAsync<IEnumerable<Platform>>("/api/Games/Platforms");
+        IEnumerable<Platform>? platforms = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Platform>>("/api/Games/Platforms");
         return platforms;
     }
 
-    public Task<IEnumerable<Platform>> GetFirstAsync(long offset, long limit)
+    public async Task<IEnumerable<Platform>> GetFirstAsync(long offset, long limit)
     {
-        var platforms = HttpClient.GetFromJsonAsync<IEnumerable<Platform>>($"/api/Games/Platforms/{offset}/{limit}");
+        IEnumerable<Platform>? platforms = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Platform>>($"/api/Games/Platforms/{offset}/{limit}");
         return platforms;
     }
 
-    public Task<Platform> GetAsync(long id)
+    public async Task<Platform> GetAsync(long id)
     {
-        var platform = HttpClient.GetFromJsonAsync<Platform>($"/api/Games/Platforms/{id}");
+        Platform? platform = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Platform>($"/api/Games/Platforms/{id}");
         return platform;
     }
 
     public async Task<Platform> UpdateAsync(long id, UpdatePlatformModel tUpdate)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync($"/api/Games/Platforms/{id}", tUpdate);
-        var platform = await JsonSerializer.DeserializeAsync<Platform>(await httpResponseMessage.Content.ReadAsStreamAsync());
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PutAsJsonAsync($"/api/Games/Platforms/{id}", tUpdate);
+        Platform? platform = await JsonSerializer.DeserializeAsync<Platform>(await httpResponseMessage.Content.ReadAsStreamAsync());
         return platform;
     }
 

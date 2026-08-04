@@ -8,55 +8,55 @@ namespace WebManagers.Derived.Games;
 
 public sealed class GenresWebManager : WebManager, IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel>
 {
-    public GenresWebManager(HttpClient httpClient) : base(httpClient)
+    public GenresWebManager(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
     {
     }
 
     public async Task<HttpResponseMessage> AddAsync(AddGameGenreModel addGenreModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Genres", addGenreModel);
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Games/Genres", addGenreModel);
         return httpResponseMessage;
     }
 
     public async Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Genres/genres-excel-upload", formFile);
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Games/Genres/genres-excel-upload", formFile);
         return httpResponseMessage;
     }
 
     public async Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddGameGenreModel> addGenresModels)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/Genres/upload-genres-from-json", addGenresModels);
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Games/Genres/upload-genres-from-json", addGenresModels);
         return httpResponseMessage;
     }
 
     public async Task<HttpResponseMessage> DeleteAsync(long id)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"/api/Games/Genres/{id}");
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").DeleteAsync($"/api/Games/Genres/{id}");
         return httpResponseMessage;
     }
 
     public async Task<IEnumerable<Genre>> GetAllAsync()
     {
-        var genres = await HttpClient.GetFromJsonAsync<IEnumerable<Genre>>($"/api/Games/Genres");
+        IEnumerable<Genre>? genres = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Genre>>($"/api/Games/Genres");
         return genres;
     }
 
     public async Task<IEnumerable<Genre>> GetFirstAsync(long offset, long limit)
     {
-        var genres = await HttpClient.GetFromJsonAsync<IEnumerable<Genre>>($"/api/Games/Genres/{offset}/{limit}");
+        IEnumerable<Genre>? genres = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Genre>>($"/api/Games/Genres/{offset}/{limit}");
         return genres;
     }
 
     public async Task<Genre> GetAsync(long id)
     {
-        var genre = await HttpClient.GetFromJsonAsync<Genre>($"/api/Games/Genres/{id}");
+        Genre? genre = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Genre>($"/api/Games/Genres/{id}");
         return genre;
     }
 
     public async Task<Genre> UpdateAsync(long id, UpdateGameGenreModel tUpdate)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync($"/api/Games/Genres/{id}", tUpdate);
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PutAsJsonAsync($"/api/Games/Genres/{id}", tUpdate);
         if (httpResponseMessage.IsSuccessStatusCode)
         {
             return await JsonSerializer.DeserializeAsync<Genre>(await httpResponseMessage.Content.ReadAsStreamAsync());

@@ -9,10 +9,10 @@ public partial class ListDevelopersPage : ComponentBase
     public IEnumerable<Developer> Developers { get; set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Developers = await HttpClient.GetFromJsonAsync<IEnumerable<Developer>>(@"/api/Games/Developers");
+        Developers = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Developer>>(@"/api/Games/Developers");
     }
 }

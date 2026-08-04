@@ -10,17 +10,17 @@ namespace BlazorClient.Auth;
 
 public class AuthService : IAuthService
 {
-    private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorage;
     private readonly ILogger<AuthService> _logger;
     private readonly IToastService _toastService;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public AuthService(HttpClient httpClient,
+    public AuthService(IHttpClientFactory httpClientFactory,
                       ILocalStorageService localStorage,
                       ILogger<AuthService> logger,
                       IToastService toastService)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
         _localStorage = localStorage;
         _logger = logger;
         _toastService = toastService;
@@ -32,18 +32,18 @@ public class AuthService : IAuthService
 
         try
         {
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/auth/login", loginModel);
+            HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/auth/login", loginModel);
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<LoginResponseModel>();
+                LoginResponseModel? result = await response.Content.ReadFromJsonAsync<LoginResponseModel>();
                 _logger.LogInformation("Login successful for {Email}, TwoFactor: {TwoFactor}",
                     loginModel.UserEmail, result?.RequiresTwoFactor);
 
                 return result;
             }
 
-            var error = await response.Content.ReadAsStringAsync();
+            string error = await response.Content.ReadAsStringAsync();
             _logger.LogError("Login failed for {Email}. Status: {Status}, Error: {Error}",
                 loginModel.UserEmail, response.StatusCode, error);
             throw new Exception(error);
@@ -79,12 +79,12 @@ public class AuthService : IAuthService
             _logger.LogInformation("Sending refresh token request");
             _logger.LogDebug("RefreshToken: {Token}", refreshToken);
 
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/auth/refresh-token", refreshRequest);
+            HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/auth/refresh-token", refreshRequest);
             _logger.LogDebug("Response status: {StatusCode}", response.StatusCode);
 
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
+                string responseContent = await response.Content.ReadAsStringAsync();
                 _logger.LogDebug("Response content: {Content}", responseContent);
 
                 AuthResponseDto? tokenResponse = JsonSerializer.Deserialize<AuthResponseDto>(responseContent);
@@ -111,7 +111,7 @@ public class AuthService : IAuthService
             }
             else
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
+                string errorContent = await response.Content.ReadAsStringAsync();
                 _logger.LogError("Token refresh failed. Status: {Status}, Error: {Error}",
                     response.StatusCode, errorContent);
             }
@@ -137,15 +137,15 @@ public class AuthService : IAuthService
             ConfirmLoginModel request = new(userId, token);
             _logger.LogDebug("Sending 2FA code for {UserId}", userId);
 
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/auth/ConfirmLoginViaEmail", request);
+            HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/auth/ConfirmLoginViaEmail", request);
             _logger.LogDebug("2FA response: StatusCode = {StatusCode}", response.StatusCode);
 
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
+                string responseContent = await response.Content.ReadAsStringAsync();
                 _logger.LogDebug("Verification response: {Content}", responseContent);
 
-                var result = JsonSerializer.Deserialize<AuthResponseDto>(responseContent);
+                AuthResponseDto? result = JsonSerializer.Deserialize<AuthResponseDto>(responseContent);
 
                 if (result != null && result.IsAuthSuccessful)
                 {
@@ -164,7 +164,7 @@ public class AuthService : IAuthService
                 }
             }
 
-            var error = await response.Content.ReadAsStringAsync();
+            string error = await response.Content.ReadAsStringAsync();
             _logger.LogError("2FA verification failed for {UserId}. Status: {Status}, Error: {Error}",
                 userId, response.StatusCode, error);
             return new AuthResponseDto(false, false, null, null, "Verification error");
@@ -188,7 +188,7 @@ public class AuthService : IAuthService
 
             _logger.LogDebug("Access token saved and set in HttpClient");
 
-            var saved = await _localStorage.GetItemAsync<string>("accessToken");
+            string? saved = await _localStorage.GetItemAsync<string>("accessToken");
             _logger.LogDebug("Save verification: {Saved}", string.IsNullOrEmpty(saved) ? "FAILED" : "success");
         }
         catch (Exception ex)
@@ -207,7 +207,7 @@ public class AuthService : IAuthService
             await _localStorage.SetItemAsync<string>("refreshToken", refreshToken);
             _logger.LogDebug("Refresh token saved");
 
-            var saved = await _localStorage.GetItemAsync<string>("refreshToken");
+            string? saved = await _localStorage.GetItemAsync<string>("refreshToken");
             _logger.LogDebug("Refresh save verification: {Saved}", string.IsNullOrEmpty(saved) ? "FAILED" : "success");
         }
         catch (Exception ex)
@@ -229,19 +229,19 @@ public class AuthService : IAuthService
             {
                 _logger.LogWarning("Access token missing during logout");
                 await _localStorage.RemoveItemAsync("refreshToken");
-                _httpClient.DefaultRequestHeaders.Remove("Authorization");
+                _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Remove("Authorization");
                 return;
             }
 
             HttpRequestMessage httpRequest = new(HttpMethod.Post, "/api/auth/logout");
             _logger.LogDebug("Sending logout request");
 
-            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
+            HttpResponseMessage httpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").SendAsync(httpRequest);
             _logger.LogDebug("Logout response: {StatusCode}", httpResponseMessage.StatusCode);
 
             await _localStorage.RemoveItemAsync("accessToken");
             await _localStorage.RemoveItemAsync("refreshToken");
-            _httpClient.DefaultRequestHeaders.Remove("Authorization");
+            _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Remove("Authorization");
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {
@@ -249,7 +249,7 @@ public class AuthService : IAuthService
             }
             else
             {
-                var error = await httpResponseMessage.Content.ReadAsStringAsync();
+                string error = await httpResponseMessage.Content.ReadAsStringAsync();
                 _logger.LogWarning("Logout returned error: {Status}, Error: {Error}",
                     httpResponseMessage.StatusCode, error);
             }
@@ -261,7 +261,7 @@ public class AuthService : IAuthService
             {
                 await _localStorage.RemoveItemAsync("accessToken");
                 await _localStorage.RemoveItemAsync("refreshToken");
-                _httpClient.DefaultRequestHeaders.Authorization = null;
+                _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Authorization = null;
             }
             catch { }
         }
@@ -274,13 +274,13 @@ public class AuthService : IAuthService
 
         try
         {
-            HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync("/api/auth/register", registerModel);
+            HttpResponseMessage httpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/auth/register", registerModel);
             _logger.LogDebug("Registration response: StatusCode = {StatusCode}", httpResponseMessage.StatusCode);
 
             if (httpResponseMessage.StatusCode == HttpStatusCode.BadRequest ||
                 httpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                var error = await httpResponseMessage.Content.ReadAsStringAsync();
+                string error = await httpResponseMessage.Content.ReadAsStringAsync();
                 _logger.LogError("Registration failed for {Email}. Status: {Status}, Error: {Error}",
                     registerModel.UserEmail, httpResponseMessage.StatusCode, error);
                 throw new Exception(error);
@@ -310,7 +310,7 @@ public class AuthService : IAuthService
 
         try
         {
-            HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync(
+            HttpResponseMessage httpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync(
                 "/api/auth/resetPasswordConfirm", resetPasswordConfirmModel);
 
             _logger.LogDebug("Password reset confirmation response: {StatusCode}",
@@ -323,7 +323,7 @@ public class AuthService : IAuthService
             }
             else
             {
-                var error = await httpResponseMessage.Content.ReadAsStringAsync();
+                string error = await httpResponseMessage.Content.ReadAsStringAsync();
                 _logger.LogWarning("Password reset confirmation error: {Status}, Error: {Error}",
                     httpResponseMessage.StatusCode, error);
             }
@@ -344,7 +344,7 @@ public class AuthService : IAuthService
 
         try
         {
-            HttpResponseMessage httpResponseMessage = await _httpClient.PostAsJsonAsync<ResetPasswordModel>(
+            HttpResponseMessage httpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync<ResetPasswordModel>(
                 "/api/auth/resetPassword", resetPasswordModel);
 
             _logger.LogDebug("Password reset response: {StatusCode}", httpResponseMessage.StatusCode);
@@ -356,7 +356,7 @@ public class AuthService : IAuthService
             }
             else
             {
-                var error = await httpResponseMessage.Content.ReadAsStringAsync();
+                string error = await httpResponseMessage.Content.ReadAsStringAsync();
                 _logger.LogWarning("Password reset error: {Status}, Error: {Error}",
                     httpResponseMessage.StatusCode, error);
             }
@@ -394,7 +394,7 @@ public class AuthService : IAuthService
 
             _logger.LogDebug("Sending 2FA change request: {Body}", jsonBody);
 
-            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequest);
+            HttpResponseMessage httpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").SendAsync(httpRequest);
             _logger.LogDebug("2FA change response: {StatusCode}", httpResponseMessage.StatusCode);
 
             if (httpResponseMessage.IsSuccessStatusCode)
@@ -404,7 +404,7 @@ public class AuthService : IAuthService
             }
             else
             {
-                var error = await httpResponseMessage.Content.ReadAsStringAsync();
+                string error = await httpResponseMessage.Content.ReadAsStringAsync();
                 _logger.LogWarning("2FA change error: {Status}, Error: {Error}",
                     httpResponseMessage.StatusCode, error);
             }
@@ -424,7 +424,7 @@ public class AuthService : IAuthService
 
         try
         {
-            IEnumerable<AuthenticationScheme>? schemes = await _httpClient.GetFromJsonAsync<IEnumerable<AuthenticationScheme>>(
+            IEnumerable<AuthenticationScheme>? schemes = await _httpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<AuthenticationScheme>>(
                 "/api/auth/external-providers");
 
             int count = schemes?.Count() ?? 0;
@@ -432,7 +432,7 @@ public class AuthService : IAuthService
 
             if (count > 0)
             {
-                var names = string.Join(", ", schemes.Select(s => s.Name));
+                string names = string.Join(", ", schemes.Select(s => s.Name));
                 _logger.LogDebug("Providers: {Names}", names);
             }
 
@@ -451,7 +451,7 @@ public class AuthService : IAuthService
 
         try
         {
-            ApplicationUser? applicationUser = await _httpClient.GetFromJsonAsync<ApplicationUser>("/api/auth/current-user");
+            ApplicationUser? applicationUser = await _httpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<ApplicationUser>("/api/auth/current-user");
 
             if (applicationUser != null)
             {
@@ -476,7 +476,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            HttpResponseMessage changingPasswordHttpResponseMessage = await _httpClient.PostAsJsonAsync(
+            HttpResponseMessage changingPasswordHttpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync(
                 "/api/auth/set-password", changePasswordModel);
 
             _logger.LogDebug("Change password response: {StatusCode}",
@@ -488,7 +488,7 @@ public class AuthService : IAuthService
             }
             else
             {
-                var error = await changingPasswordHttpResponseMessage.Content.ReadAsStringAsync();
+                string error = await changingPasswordHttpResponseMessage.Content.ReadAsStringAsync();
                 _logger.LogWarning("Change password error: {Status}, Error: {Error}",
                     changingPasswordHttpResponseMessage.StatusCode, error);
             }
@@ -504,7 +504,7 @@ public class AuthService : IAuthService
 
     public void AddDefaultRequestHeaderBearer(string accessToken)
     {
-        _httpClient.DefaultRequestHeaders.Remove("Authorization");
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+        _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Remove("Authorization");
+        _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
     }
 }

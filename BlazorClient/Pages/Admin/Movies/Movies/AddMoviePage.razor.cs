@@ -1,6 +1,5 @@
 ﻿using Blazored.Toast.Services;
 using Domain.Movies;
-using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Movies.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Domain.RequestsModels.Movies.MoviesGenres;
@@ -31,7 +30,7 @@ public sealed partial class AddMoviePage : ComponentBase
     }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     [Inject]
     public IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> MoviesDirectorsWebManager { get; set; }
@@ -108,14 +107,10 @@ public sealed partial class AddMoviePage : ComponentBase
     private async Task FileUploaded(InputFileChangeEventArgs e)
     {
         ImageToUpload = e.File;
-        using (Stream imageToUploadReadStream = ImageToUpload.OpenReadStream(MAX_FILESIZE))
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await imageToUploadReadStream.CopyToAsync(memoryStream);
-                ImageSource = $"data:{ImageToUpload.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
-            }
-        }
+        using Stream imageToUploadReadStream = ImageToUpload.OpenReadStream(MAX_FILESIZE);
+        using MemoryStream memoryStream = new MemoryStream();
+        await imageToUploadReadStream.CopyToAsync(memoryStream);
+        ImageSource = $"data:{ImageToUpload.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
     }
 
     private bool MovieModelToAddConfigured()
@@ -133,22 +128,22 @@ public sealed partial class AddMoviePage : ComponentBase
             try
             {
                 // Create multipart form data
-                var content = new MultipartFormDataContent();
-                var fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024)); // 50MB max
+                MultipartFormDataContent content = new MultipartFormDataContent();
+                StreamContent fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024)); // 50MB max
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
                 content.Add(fileContent, "formFile", ImageToUpload.Name);
 
                 string uploadingImageName = Uri.EscapeDataString(Path.GetRandomFileName());
                 string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
 
-                var url = $"/api/movies/Images/{PremierDate.Value.Year}/{PremierDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
+                string url = $"/api/movies/Images/{PremierDate.Value.Year}/{PremierDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
 
                 // Send the request with authentication token
-                var response = await HttpClient.PostAsync(url, content);
+                var response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var addMovieModel = new AddMovieModel(
+                    AddMovieModel addMovieModel = new AddMovieModel(
                         Name: Name,
                         OriginalName: OriginalName,
                         Description: Description,
@@ -175,13 +170,13 @@ public sealed partial class AddMoviePage : ComponentBase
                     }
                     else
                     {
-                        var error = await addingMovieResponseMessage.Content.ReadAsStringAsync();
+                        string error = await addingMovieResponseMessage.Content.ReadAsStringAsync();
                         ToastService.ShowError($"Failed to add movie: {error}");
                     }
                 }
                 else
                 {
-                    var problemDetails = await response.Content.ReadAsStringAsync();
+                    string problemDetails = await response.Content.ReadAsStringAsync();
                     ToastService.ShowError(problemDetails);
                 }
             }

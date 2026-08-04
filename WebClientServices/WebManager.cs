@@ -2,10 +2,10 @@
 
 public abstract class WebManager
 {
-    public WebManager(HttpClient httpClient)
+    public WebManager(IHttpClientFactory httpClientFactory)
     {
-        HttpClient = httpClient;
+        HttpClientFactory = httpClientFactory;
     }
 
-    public HttpClient HttpClient { get; }
+    public IHttpClientFactory HttpClientFactory { get; }
 }

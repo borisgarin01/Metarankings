@@ -9,10 +9,10 @@ public partial class ListPublishersPage : ComponentBase
     public IEnumerable<Publisher> Publishers { get; private set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Publishers = await HttpClient.GetFromJsonAsync<IEnumerable<Publisher>>(@"/api/Games/Publishers");
+        Publishers = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Publisher>>(@"/api/Games/Publishers");
     }
 }

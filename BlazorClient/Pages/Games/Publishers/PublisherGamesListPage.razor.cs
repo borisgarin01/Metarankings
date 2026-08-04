@@ -8,12 +8,12 @@ public partial class PublisherGamesListPage : ComponentBase
     public int PublisherId { get; set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     public Publisher Publisher { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        Publisher = await HttpClient.GetFromJsonAsync<Publisher>($"/api/Games/Publishers/{PublisherId}");
+        Publisher = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Publisher>($"/api/Games/Publishers/{PublisherId}");
     }
 }

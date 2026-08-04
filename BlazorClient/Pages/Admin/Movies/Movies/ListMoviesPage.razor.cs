@@ -7,10 +7,10 @@ public partial class ListMoviesPage : ComponentBase
     public IEnumerable<Movie> Movies { get; private set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Movies = await HttpClient.GetFromJsonAsync<IEnumerable<Movie>>(@"/api/Movies/Movies");
+        Movies = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Movie>>(@"/api/Movies/Movies");
     }
 }

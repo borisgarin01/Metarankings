@@ -1,5 +1,4 @@
-﻿using Domain.Games;
-using Domain.Games.Collections;
+﻿using Domain.Games.Collections;
 using Domain.RequestsModels.Games.Collections;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
@@ -9,13 +8,13 @@ namespace WebManagers.Derived.Games;
 
 public sealed class GamesCollectionsItemsWebManager : WebManager, IWebManager<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>
 {
-    public GamesCollectionsItemsWebManager(HttpClient httpClient) : base(httpClient)
+    public GamesCollectionsItemsWebManager(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
     {
     }
 
     public async Task<HttpResponseMessage> AddAsync(AddGamesCollectionItemModel addGamesCollectionItemModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Games/CollectionsItems", addGamesCollectionItemModel);
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Games/CollectionsItems", addGamesCollectionItemModel);
         return httpResponseMessage;
     }
 
@@ -31,25 +30,25 @@ public sealed class GamesCollectionsItemsWebManager : WebManager, IWebManager<Ga
 
     public async Task<HttpResponseMessage> DeleteAsync(long id)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"/api/Games/CollectionsItems/{id}");
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").DeleteAsync($"/api/Games/CollectionsItems/{id}");
         return httpResponseMessage;
     }
 
     public async Task<IEnumerable<GamesCollectionItem>> GetAllAsync()
     {
-        var gamesCollectionsItems = await HttpClient.GetFromJsonAsync<IEnumerable<GamesCollectionItem>>($"/api/Games/CollectionsItems");
+        IEnumerable<GamesCollectionItem>? gamesCollectionsItems = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<GamesCollectionItem>>($"/api/Games/CollectionsItems");
         return gamesCollectionsItems;
     }
 
     public async Task<GamesCollectionItem> GetAsync(long id)
     {
-        var gamesCollectionItem = await HttpClient.GetFromJsonAsync<GamesCollectionItem>($"/api/Games/CollectionsItems/{id}");
+        GamesCollectionItem? gamesCollectionItem = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<GamesCollectionItem>($"/api/Games/CollectionsItems/{id}");
         return gamesCollectionItem;
     }
 
     public async Task<IEnumerable<GamesCollectionItem>> GetFirstAsync(long offset, long limit)
     {
-        var gamesCollectionsItems = await HttpClient.GetFromJsonAsync<IEnumerable<GamesCollectionItem>>($"/api/Games/CollectionsItems/{offset}/{limit}");
+        IEnumerable<GamesCollectionItem>? gamesCollectionsItems = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<GamesCollectionItem>>($"/api/Games/CollectionsItems/{offset}/{limit}");
         return gamesCollectionsItems;
     }
 
@@ -60,11 +59,11 @@ public sealed class GamesCollectionsItemsWebManager : WebManager, IWebManager<Ga
 
     public async Task<GamesCollectionItem> UpdateAsync(long id, UpdateGamesCollectionItemModel updateGamesCollectionItemModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateGamesCollectionItemModel>($"/api/Games/CollectionsItems/{id}", updateGamesCollectionItemModel);
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PutAsJsonAsync<UpdateGamesCollectionItemModel>($"/api/Games/CollectionsItems/{id}", updateGamesCollectionItemModel);
 
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
         {
-            var updatedGameCollectionItem = await JsonSerializer.DeserializeAsync<GamesCollectionItem>(await httpResponseMessage.Content.ReadAsStreamAsync());
+            GamesCollectionItem? updatedGameCollectionItem = await JsonSerializer.DeserializeAsync<GamesCollectionItem>(await httpResponseMessage.Content.ReadAsStreamAsync());
             return updatedGameCollectionItem;
         }
 

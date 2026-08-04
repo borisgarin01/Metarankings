@@ -8,12 +8,12 @@ public partial class PlatformGamesListPage : ComponentBase
     public int PlatformId { get; set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     public Platform Platform { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        Platform = await HttpClient.GetFromJsonAsync<Platform>($"/api/Games/Platforms/{PlatformId}");
+        Platform = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Platform>($"/api/Games/Platforms/{PlatformId}");
     }
 }

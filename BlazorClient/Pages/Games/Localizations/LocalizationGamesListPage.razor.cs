@@ -9,7 +9,7 @@ public partial class LocalizationGamesListPage : ComponentBase
     public Localization Localization { get; set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     [SupplyParameterFromQuery]
     [Parameter]
@@ -19,11 +19,11 @@ public partial class LocalizationGamesListPage : ComponentBase
     {
         if (PlatformId is null)
         {
-            Localization = await HttpClient.GetFromJsonAsync<Localization>($"/api/Games/Localizations/{LocalizationId}");
+            Localization = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Localization>($"/api/Games/Localizations/{LocalizationId}");
         }
         else
         {
-            Localization = await HttpClient.GetFromJsonAsync<Localization>($"/api/Games/Localizations/{LocalizationId}/{PlatformId}");
+            Localization = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Localization>($"/api/Games/Localizations/{LocalizationId}/{PlatformId}");
         }
     }
 }

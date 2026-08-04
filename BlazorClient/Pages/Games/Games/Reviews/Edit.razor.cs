@@ -18,7 +18,8 @@ public partial class Edit : ComponentBase
     private UpdateGamePlayerReviewModel UpdateGamePlayerReviewModel { get; set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
+
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
@@ -27,7 +28,7 @@ public partial class Edit : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        var gameReview = await HttpClient.GetFromJsonAsync<GameReview>(@$"/api/Games/GamesGamersReviews/{Id}");
+        GameReview? gameReview = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<GameReview>(@$"/api/Games/GamesGamersReviews/{Id}");
         GameId = gameReview.GameId;
         TextContent = gameReview.TextContent;
         Score = gameReview.Score;
@@ -41,7 +42,7 @@ public partial class Edit : ComponentBase
 
     public async Task UpdateAsync()
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateGamePlayerReviewModel>($"/api/Games/gamesGamersReviews/{Id}",
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PutAsJsonAsync<UpdateGamePlayerReviewModel>($"/api/Games/gamesGamersReviews/{Id}",
             UpdateGamePlayerReviewModel);
 
         if (httpResponseMessage.IsSuccessStatusCode)

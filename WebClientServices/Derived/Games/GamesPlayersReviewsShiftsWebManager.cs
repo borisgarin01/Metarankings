@@ -1,5 +1,4 @@
-﻿using Domain.Auth;
-using Domain.Games;
+﻿using Domain.Games;
 using Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Frontend;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
@@ -8,13 +7,13 @@ namespace WebManagers.Derived.Games;
 
 public sealed class GamesPlayersReviewsShiftsWebManager : WebManager, IWebManager<GamePlayerReviewShift, AddGamePlayerReviewShiftModel, UpdateGamePlayerReviewShiftModel>
 {
-    public GamesPlayersReviewsShiftsWebManager(HttpClient httpClient) : base(httpClient)
+    public GamesPlayersReviewsShiftsWebManager(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
     {
     }
 
     public async Task<HttpResponseMessage> AddAsync(AddGamePlayerReviewShiftModel addGamePlayerReviewShiftModel)
     {
-        var response = await HttpClient.PostAsJsonAsync("/api/games/GamesGamersReviews/shift", addGamePlayerReviewShiftModel);
+        HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/games/GamesGamersReviews/shift", addGamePlayerReviewShiftModel);
         return response;
     }
 

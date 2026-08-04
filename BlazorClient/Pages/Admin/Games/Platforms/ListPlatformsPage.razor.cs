@@ -9,10 +9,10 @@ public partial class ListPlatformsPage : ComponentBase
     public IEnumerable<Platform> Platforms { get; private set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Platforms = await HttpClient.GetFromJsonAsync<IEnumerable<Platform>>(@"/api/Games/Platforms");
+        Platforms = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Platform>>(@"/api/Games/Platforms");
     }
 }

@@ -19,7 +19,7 @@ public partial class GameDetails : ComponentBase
 
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -45,7 +45,7 @@ public partial class GameDetails : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Game = await HttpClient.GetFromJsonAsync<Game>($"/api/Games/Games/{Id}");
+        Game = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Game>($"/api/Games/Games/{Id}");
 
         if (authenticationState is not null)
         {
@@ -67,8 +67,8 @@ public partial class GameDetails : ComponentBase
 
     public async Task AddReviewAsync()
     {
-        var addGamePlayerReviewModel = new AddGamePlayerReviewModel(Id, Text, YourScore);
-        HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClient.PostAsJsonAsync<AddGamePlayerReviewModel>("/api/GamesGamersReviews", addGamePlayerReviewModel);
+        AddGamePlayerReviewModel addGamePlayerReviewModel = new AddGamePlayerReviewModel(Id, Text, YourScore);
+        HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync<AddGamePlayerReviewModel>("/api/GamesGamersReviews", addGamePlayerReviewModel);
         if (!addingGamePlayerReviewHttpResponseMessage.IsSuccessStatusCode)
             ToastService.ShowError(await addingGamePlayerReviewHttpResponseMessage.Content.ReadAsStringAsync());
         else
@@ -78,7 +78,7 @@ public partial class GameDetails : ComponentBase
     // В основном компоненте страницы
     private async Task RefreshGameData()
     {
-        Game = await HttpClient.GetFromJsonAsync<Game>($"/api/Games/Games/{Id}");
+        Game = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Game>($"/api/Games/Games/{Id}");
         StateHasChanged();
     }
 }

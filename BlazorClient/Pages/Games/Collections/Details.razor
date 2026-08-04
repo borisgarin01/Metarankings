@@ -1,6 +1,8 @@
 ﻿@page "/games/collections/{GameCollectionId:long}"
+@inject IConfiguration Configuration
 @using Domain.Games
 @using Domain.Games.Collections
+@using Microsoft.Extensions.Configuration
 
 @if (GameCollection is null)
 {
@@ -29,11 +31,11 @@ else
                     {
                         <article class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
                             <a href="/games/details/@gamesCollectionItem.Game.Id" class="thumb">
-                                <img class="post-image" src="@($"{HttpClient.BaseAddress}{gamesCollectionItem.Game.Image}")" alt="@gamesCollectionItem.Game.Name">
+                                <img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}/{gamesCollectionItem.Game.Image}")" alt="@gamesCollectionItem.Game.Name">
                             </a>
                             <div itemprop="item" itemscope="" itemtype="https://schema.org/VideoGame">
                                 <link itemprop="url" href="/games/details/@gamesCollectionItem.Game.Id">
-                                <link itemprop="image" href="@($"{HttpClient.BaseAddress}api/games/images/{gamesCollectionItem.Game.ReleaseDate.Value.Year}/{gamesCollectionItem.Game.ReleaseDate.Value.Month}/{gamesCollectionItem.Game.Image}")">
+                                <link itemprop="image" href="@($"{Configuration["HttpClientSettings:BaseUrl"]}/api/games/images/{gamesCollectionItem.Game.ReleaseDate.Value.Year}/{gamesCollectionItem.Game.ReleaseDate.Value.Month}/{gamesCollectionItem.Game.Image}")">
                                 <meta itemprop="dateCreated" content="@gamesCollectionItem.Game.ReleaseDate.Value.Year">
                                 <div itemprop="name"><a class="name" href="/games/details/@gamesCollectionItem.Game.Id">@gamesCollectionItem.Game.Name</a></div>
                                 <div class="post-meta">@gamesCollectionItem.Game.ReleaseDate.Value.ToString("dd MMMM yyyy")</div>

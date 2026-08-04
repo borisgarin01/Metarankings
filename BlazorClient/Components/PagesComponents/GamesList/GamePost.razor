@@ -1,10 +1,10 @@
 ﻿@using BlazorClient.Components.PagesComponents.Common
 @using BlazorClient.Components.PagesComponents.GameDetails
-
-@inject HttpClient HttpClient
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 
 <div class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
-    <a href="/games/Details/@Id" title="Игра @Name" class="thumb"><img class="post-image" src="@($"{HttpClient.BaseAddress}api/games/images/{ReleaseDate.Value.Year}/{ReleaseDate.Value.Month}/{Image}")" alt="Игра @Name"></a>
+    <a href="/games/Details/@Id" title="Игра @Name" class="thumb"><img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}/api/games/images/{ReleaseDate.Value.Year}/{ReleaseDate.Value.Month}/{Image}")" alt="Игра @Name"></a>
     <div class="best-prod">
         <div class="counter" itemprop="position">@Id</div>
         <span class="star">★</span>

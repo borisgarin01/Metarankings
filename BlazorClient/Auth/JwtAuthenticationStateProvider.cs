@@ -5,18 +5,18 @@ namespace BlazorClient.Auth;
 
 public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILocalStorageService _localStorage;
     private readonly ILogger<JwtAuthenticationStateProvider> _logger;
     private readonly IAuthService _authService;
 
     public JwtAuthenticationStateProvider(
-        HttpClient httpClient,
+        IHttpClientFactory httpClientFactory,
         ILocalStorageService localStorage,
         ILogger<JwtAuthenticationStateProvider> logger,
         IAuthService authService)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
         _localStorage = localStorage;
         _logger = logger;
         _authService = authService;
@@ -61,7 +61,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
                 accessToken = refreshResult.AccessToken;
                 _logger.LogInformation("Token successfully refreshed, new access token obtained");
 
-                _httpClient.DefaultRequestHeaders.Authorization =
+                _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
             }
 
@@ -119,12 +119,12 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 
             if (isExpired)
             {
-                var timeLeft = now - expirationTime;
+                TimeSpan timeLeft = now - expirationTime;
                 _logger.LogWarning("Token expired {TimeLeft} ago", timeLeft);
             }
             else
             {
-                var timeLeft = expirationTime - now;
+                TimeSpan timeLeft = expirationTime - now;
                 _logger.LogDebug("Token valid, time left: {TimeLeft}", timeLeft);
             }
 
@@ -152,7 +152,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 
             if (claimCount > 0 && _logger.IsEnabled(LogLevel.Trace))
             {
-                var claimNames = string.Join(", ", claims.Select(c => $"{c.Type}: {c.Value}"));
+                string claimNames = string.Join(", ", claims.Select(c => $"{c.Type}: {c.Value}"));
                 _logger.LogTrace("Claims: {Claims}", claimNames);
             }
 
@@ -185,7 +185,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
             _logger.LogDebug("Access token length: {AccessLength}, Refresh token length: {RefreshLength}",
                 model.AccessToken?.Length ?? 0, model.RefreshToken?.Length ?? 0);
 
-            _httpClient.DefaultRequestHeaders.Authorization =
+            _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", model.AccessToken);
 
             ClaimsIdentity identity = GetClaimsIdentity(model.AccessToken);
@@ -217,8 +217,8 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 
         try
         {
-            var accessToken = await _localStorage.GetItemAsync<string>("accessToken");
-            var refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
+            string? accessToken = await _localStorage.GetItemAsync<string>("accessToken");
+            string? refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
 
             _logger.LogDebug("Current tokens: Access = {AccessStatus}, Refresh = {RefreshStatus}",
                 string.IsNullOrEmpty(accessToken) ? "MISSING" : "present",
@@ -228,7 +228,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
             await _localStorage.RemoveItemAsync("accessToken");
             await _localStorage.RemoveItemAsync("refreshToken");
 
-            _httpClient.DefaultRequestHeaders.Authorization = null;
+            _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Authorization = null;
 
             _logger.LogDebug("Tokens removed from localStorage and headers");
 

@@ -8,13 +8,13 @@ namespace WebManagers.Derived.Movies;
 
 public sealed class MoviesCollectionsWebManager : WebManager, IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>
 {
-    public MoviesCollectionsWebManager(HttpClient httpClient) : base(httpClient)
+    public MoviesCollectionsWebManager(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
     {
     }
 
     public async Task<HttpResponseMessage> AddAsync(AddMoviesCollectionModel addGameCollectionModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("/api/Movies/Collections", addGameCollectionModel);
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Movies/Collections", addGameCollectionModel);
         return httpResponseMessage;
     }
 
@@ -30,35 +30,35 @@ public sealed class MoviesCollectionsWebManager : WebManager, IWebManager<Movies
 
     public async Task<HttpResponseMessage> DeleteAsync(long id)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.DeleteAsync($"/api/Movies/Collections/{id}");
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").DeleteAsync($"/api/Movies/Collections/{id}");
         return httpResponseMessage;
     }
 
     public async Task<IEnumerable<MoviesCollection>> GetAllAsync()
     {
-        var moviesCollections = await HttpClient.GetFromJsonAsync<IEnumerable<MoviesCollection>>($"/api/Movies/Collections");
+        IEnumerable<MoviesCollection>? moviesCollections = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<MoviesCollection>>($"/api/Movies/Collections");
         return moviesCollections;
     }
 
     public async Task<IEnumerable<MoviesCollection>> GetFirstAsync(long offset, long limit)
     {
-        var moviesCollections = await HttpClient.GetFromJsonAsync<IEnumerable<MoviesCollection>>($"/api/Movies/Collections/{offset}/{limit}");
+        IEnumerable<MoviesCollection>? moviesCollections = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<MoviesCollection>>($"/api/Movies/Collections/{offset}/{limit}");
         return moviesCollections;
     }
 
     public async Task<MoviesCollection> GetAsync(long id)
     {
-        var moviesCollection = await HttpClient.GetFromJsonAsync<MoviesCollection>($"/api/Movies/Collections/{id}");
+        MoviesCollection? moviesCollection = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<MoviesCollection>($"/api/Movies/Collections/{id}");
         return moviesCollection;
     }
 
     public async Task<MoviesCollection> UpdateAsync(long id, UpdateMoviesCollectionModel updateMovieCollectionModel)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClient.PutAsJsonAsync<UpdateMoviesCollectionModel>($"/api/Movies/Collections/{id}", updateMovieCollectionModel);
+        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PutAsJsonAsync<UpdateMoviesCollectionModel>($"/api/Movies/Collections/{id}", updateMovieCollectionModel);
 
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
         {
-            var updatedMoviesCollection = await JsonSerializer.DeserializeAsync<MoviesCollection>(await httpResponseMessage.Content.ReadAsStreamAsync());
+            MoviesCollection? updatedMoviesCollection = await JsonSerializer.DeserializeAsync<MoviesCollection>(await httpResponseMessage.Content.ReadAsStreamAsync());
             return updatedMoviesCollection;
         }
 

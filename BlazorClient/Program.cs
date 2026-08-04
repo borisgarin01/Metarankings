@@ -2,7 +2,6 @@ using BlazorClient;
 using BlazorClient.Auth;
 using BlazorClient.IServiceCollectionsExtensions;
 using Blazored.Toast;
-using Blazored.Toast.Services;
 
 internal class Program
 {
@@ -18,7 +17,7 @@ internal class Program
             options.AddPolicy("Admin", options => { _ = options.RequireRole("Admin"); });
         });
 
-        var baseUrl = builder.Configuration["HttpClientSettings:BaseUrl"];
+        string? baseUrl = builder.Configuration["HttpClientSettings:BaseUrl"];
         // Регистрируем обработчик
         builder.Services.AddScoped<JwtAuthorizationHandler>();
 
@@ -32,21 +31,12 @@ internal class Program
                     new MediaTypeWithQualityHeaderValue("application/json"));
             });
 
-        // 🔥 ВАЖНО: Регистрируем AuthService через фабрику с именованным клиентом
-        builder.Services.AddScoped<IAuthService>(sp =>
-        {
-            var clientFactory = sp.GetRequiredService<IHttpClientFactory>();
-            var client = clientFactory.CreateClient("AuthorizedClient");
-            var localStorage = sp.GetRequiredService<ILocalStorageService>();
-            var logger = sp.GetRequiredService<ILogger<AuthService>>();
-            var toastService = sp.GetRequiredService<IToastService>();
-            return new AuthService(client, localStorage, logger, toastService);
-        });
+        builder.Services.AddScoped<IAuthService, AuthService>();
 
-        // Регистрируем все WebManager
-        builder.Services.RegisterWebManagers();
+        builder.Services.AddGamesWebManagers();
 
-        // JwtAuthenticationStateProvider
+        builder.Services.AddMoviesWebManagers();
+
         builder.Services.AddScoped<JwtAuthenticationStateProvider>();
         builder.Services.AddScoped<AuthenticationStateProvider>(
             provider => provider.GetRequiredService<JwtAuthenticationStateProvider>());

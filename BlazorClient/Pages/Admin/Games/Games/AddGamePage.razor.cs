@@ -4,8 +4,6 @@ using Domain.RequestsModels.Games;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO;
-using System.Net.Http;
-using WebManagers;
 using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Games;
@@ -15,11 +13,13 @@ public partial class AddGamePage : ComponentBase
 {
     protected override async Task OnInitializedAsync()
     {
-        Task<IEnumerable<Developer>> developersGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Developer>>("/api/Games/Developers");
-        Task<IEnumerable<Genre>> genresGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Genre>>("/api/Games/Genres");
-        Task<IEnumerable<Localization>> localizationsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Localization>>("/api/Games/Localizations");
-        Task<IEnumerable<Platform>> platformsGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Platform>>("/api/Games/Platforms");
-        Task<IEnumerable<Publisher>> publishersGettingTask = HttpClient.GetFromJsonAsync<IEnumerable<Publisher>>("/api/Games/Publishers");
+        HttpClient httpClient = HttpClientFactory.CreateClient("AuthorizedClient");
+
+        Task<IEnumerable<Developer>> developersGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Developer>>("/api/Games/Developers");
+        Task<IEnumerable<Genre>> genresGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Genre>>("/api/Games/Genres");
+        Task<IEnumerable<Localization>> localizationsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Localization>>("/api/Games/Localizations");
+        Task<IEnumerable<Platform>> platformsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Platform>>("/api/Games/Platforms");
+        Task<IEnumerable<Publisher>> publishersGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Publisher>>("/api/Games/Publishers");
 
         await Task.WhenAll(developersGettingTask, genresGettingTask, localizationsGettingTask, platformsGettingTask, publishersGettingTask);
 
@@ -33,7 +33,7 @@ public partial class AddGamePage : ComponentBase
     const int MAX_FILESIZE = 5000 * 1024;
 
     [Inject]
-    public HttpClient HttpClient { get; private set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     [Inject]
     public IToastService ToastService { get; set; }
@@ -68,8 +68,8 @@ public partial class AddGamePage : ComponentBase
             try
             {
                 // Create multipart form data
-                var content = new MultipartFormDataContent();
-                var fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024)); // 50MB max
+                MultipartFormDataContent content = new MultipartFormDataContent();
+                StreamContent fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024)); // 50MB max
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
                 content.Add(fileContent, "formFile", ImageToUpload.Name);
 
@@ -77,17 +77,17 @@ public partial class AddGamePage : ComponentBase
                 string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
 
                 // Build the URL with parameters
-                var url = $"/api/games/images/{ReleaseDate.Year}/{ReleaseDate.Month}/{uploadingFileNameWithCorrectExtention}";
+                string url = $"/api/games/images/{ReleaseDate.Year}/{ReleaseDate.Month}/{uploadingFileNameWithCorrectExtention}";
 
                 // Send the request with authentication token
-                var response = await HttpClient.PostAsync(url, content);
+                var response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)
                 {
                     // Extract the URL from the response
-                    var responseContent = await response.Content.ReadAsStringAsync();
+                    string responseContent = await response.Content.ReadAsStringAsync();
 
-                    var addGameModel = new AddGameModel(Name, url, SelectedDevelopersIds, SelectedPublishersIds, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
+                    AddGameModel addGameModel = new AddGameModel(Name, url, SelectedDevelopersIds, SelectedPublishersIds, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
 
                     HttpResponseMessage addingGameResponseMessage = await GetWebManager.AddAsync(addGameModel);
 
@@ -117,13 +117,9 @@ public partial class AddGamePage : ComponentBase
     private async Task FileUploaded(InputFileChangeEventArgs e)
     {
         ImageToUpload = e.File;
-        using (Stream imageToUploadReadStream = ImageToUpload.OpenReadStream(MAX_FILESIZE))
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await imageToUploadReadStream.CopyToAsync(memoryStream);
-                ImageSource = $"data:{ImageToUpload.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
-            }
-        }
+        using Stream imageToUploadReadStream = ImageToUpload.OpenReadStream(MAX_FILESIZE);
+        using MemoryStream memoryStream = new MemoryStream();
+        await imageToUploadReadStream.CopyToAsync(memoryStream);
+        ImageSource = $"data:{ImageToUpload.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
     }
 }

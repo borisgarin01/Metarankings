@@ -16,7 +16,7 @@ public partial class SearchPage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     [SupplyParameterFromQuery]
     public string? SearchText
@@ -88,7 +88,7 @@ public partial class SearchPage : ComponentBase
         IsSearching = true;
 
         // Обновляем URL при поиске (НО без перезагрузки страницы)
-        var currentUri = NavigationManager.Uri;
+        string currentUri = NavigationManager.Uri;
         var uriBuilder = new UriBuilder(currentUri);
         var query = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
 
@@ -102,7 +102,7 @@ public partial class SearchPage : ComponentBase
         }
 
         uriBuilder.Query = query.ToString();
-        var newUri = uriBuilder.Uri.PathAndQuery;
+        string newUri = uriBuilder.Uri.PathAndQuery;
 
         // Обновляем URL без перезагрузки страницы
         if (NavigationManager.Uri != NavigationManager.BaseUri + newUri.TrimStart('/'))

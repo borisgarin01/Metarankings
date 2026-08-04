@@ -19,10 +19,10 @@ public partial class Details : ComponentBase
     }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        GameCollection = await HttpClient.GetFromJsonAsync<GamesCollection>($"/api/games/collections/{GameCollectionId}");
+        GameCollection = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<GamesCollection>($"/api/games/collections/{GameCollectionId}");
     }
 }

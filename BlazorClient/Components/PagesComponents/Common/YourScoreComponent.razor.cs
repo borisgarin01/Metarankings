@@ -41,9 +41,6 @@ public abstract partial class YourScoreComponent : ComponentBase
     public long GameId { get; set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
-
-    [Inject]
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]

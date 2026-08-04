@@ -2,6 +2,8 @@
 @using Domain.Games
 @using Domain.Movies
 @using System.Globalization
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 
 <div class="container mt-4">
     <div class="row mb-4">
@@ -90,7 +92,7 @@
                         @foreach (Movie movie in Movies)
                         {
                             <div class="item">
-                                <a href="/movies/details/@movie.Id" title="Фильм @movie.Name"><img class="post-image" src="@($"{HttpClient.BaseAddress}{movie.ImageSource}")" alt="@movie.Name"></a>
+                                <a href="/movies/details/@movie.Id" title="Фильм @movie.Name"><img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}/{movie.ImageSource}")" alt="@movie.Name"></a>
                                 <div class="small-score mark-@(movie.MovieReviews.Any() ? Math.Round(movie.MovieReviews.Average(mr => mr.Score)) : 0)">
                                     <span data-title="Рейтинг фильма" class="tooltip">@(movie.MovieReviews.Any() ? Math.Round(movie.MovieReviews.Average(mr => mr.Score)) : 0)</span>
                                 </div>
@@ -123,7 +125,7 @@
                         @foreach (Game game in Games)
                         {
                             <div class="item">
-                                <a href="/games/details/@game.Id" title="Игра @game.Name"><img class="post-image" src="@($"{HttpClient.BaseAddress}{game.Image}")" alt="@game.Name"></a>
+                                <a href="/games/details/@game.Id" title="Игра @game.Name"><img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}/{game.Image}")" alt="@game.Name"></a>
                                 <div class="small-score mark-@Math.Round(game.GamesPlayersReviews.Any() ? Math.Round(game.GamesPlayersReviews.Average(mr => mr.Score)) : 0)"><span data-title="Рейтинг игры" class="tooltip">0</span></div>
                                 <span class="item-name"><a href="/games/details/@game.Id">@game.Name</a></span>
                                 <span class="item-meta">

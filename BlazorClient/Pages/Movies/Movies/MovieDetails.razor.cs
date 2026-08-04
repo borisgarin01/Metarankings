@@ -9,12 +9,12 @@ public partial class MovieDetails : ComponentBase
     public long Id { get; set; }
 
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; }
 
     public Movie Movie { get; private set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Movie = await HttpClient.GetFromJsonAsync<Movie>($"/api/Movies/Movies/{Id}");
+        Movie = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Movie>($"/api/Movies/Movies/{Id}");
     }
 }
