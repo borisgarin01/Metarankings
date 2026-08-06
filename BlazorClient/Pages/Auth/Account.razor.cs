@@ -101,11 +101,11 @@ public partial class Account : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         // Using CascadingParameter approach
-        var authState = await AuthenticationStateTask;
-        var user = authState.User;
+        AuthenticationState authState = await AuthenticationStateTask;
+        ClaimsPrincipal user = authState.User;
 
-        var claim = user.FindFirst("TwoFactorEnabled");
-        if (claim != null && bool.TryParse(claim.Value, out var enabled))
+        Claim? claim = user.FindFirst("TwoFactorEnabled");
+        if (claim != null && bool.TryParse(claim.Value, out bool enabled))
         {
             // Set the private field directly without triggering the property setter
             TwoFactorEnabled = enabled;
@@ -124,8 +124,8 @@ public partial class Account : ComponentBase
             await AuthService.SendTwoFactorEnabledMessage(new SetTwoFactorEnabledModel(newValue));
 
             await AuthService.LogoutAsync();
-
             ToastService.ShowError("Настройки обновлены!");
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -148,6 +148,7 @@ public partial class Account : ComponentBase
             if (httpResponseMessage.IsSuccessStatusCode)
             {
                 await AuthService.LogoutAsync();
+                StateHasChanged();
                 ToastService.ShowSuccess("Пароль успешно изменён!");
             }
             else

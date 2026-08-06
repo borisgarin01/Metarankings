@@ -1,5 +1,4 @@
 ﻿using BlazorClient.Auth;
-using IdentityLibrary.Models;
 
 namespace BlazorClient.Pages.Auth;
 
@@ -14,16 +13,19 @@ public partial class Logout : ComponentBase
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            await AuthService.LogoutAsync();
-            NavigationManager.NavigateTo("/");
-        }
-        catch (Exception ex)
-        {
-             //Log exception
+            try
+            {
+                await AuthService.LogoutAsync();
+                NavigationManager.NavigateTo("/", forceLoad: true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{ex.Message}\t{ex.StackTrace}");
+            }
         }
     }
 }

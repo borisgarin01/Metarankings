@@ -19,15 +19,15 @@ public sealed class MoviesRepository : Repository, IMoviesRepository
         List<MovieStudio> insertedMovieStudios = new List<MovieStudio>();
         List<MovieDirector> insertedMovieDirectors = new List<MovieDirector>();
 
-        foreach (var movieGenreName in entity.MoviesGenresNames)
+        foreach (string movieGenreName in entity.MoviesGenresNames)
         {
-            var movieGenreToFind = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"SELECT Id, Name
+            MovieGenre? movieGenreToFind = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"SELECT Id, Name
 FROM MoviesGenres
 WHERE Name=@Name;", new { Name = movieGenreName });
 
             if (movieGenreToFind is null)
             {
-                var insertedMovieGenre = await connection.QueryFirstAsync<MovieGenre>(@"INSERT INTO MoviesGenres 
+                MovieGenre insertedMovieGenre = await connection.QueryFirstAsync<MovieGenre>(@"INSERT INTO MoviesGenres 
 (Name)
 VALUES (@Name)
 RETURNING Id, Name;", new { Name = movieGenreName });
@@ -38,13 +38,13 @@ RETURNING Id, Name;", new { Name = movieGenreName });
         }
         foreach (string movieStudioName in entity.MoviesStudiosNames)
         {
-            var moviesStudioToFind = await connection.QueryFirstOrDefaultAsync<MovieStudio>(@"SELECT Id, Name
+            MovieStudio? moviesStudioToFind = await connection.QueryFirstOrDefaultAsync<MovieStudio>(@"SELECT Id, Name
 FROM MoviesStudios
 WHERE Name=@Name;", new { Name = movieStudioName });
 
             if (moviesStudioToFind is null)
             {
-                var insertedMovieStudio = await connection.QueryFirstAsync<MovieStudio>(@"INSERT INTO MoviesStudios 
+                MovieStudio insertedMovieStudio = await connection.QueryFirstAsync<MovieStudio>(@"INSERT INTO MoviesStudios 
 (Name)
 VALUES (@Name)
 RETURNING Id, Name;", new { Name = movieStudioName });
@@ -56,15 +56,15 @@ RETURNING Id, Name;", new { Name = movieStudioName });
             }
         }
 
-        foreach (var movieDirectorName in entity.MoviesDirectorsNames)
+        foreach (string movieDirectorName in entity.MoviesDirectorsNames)
         {
-            var moviesDirectorToFind = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"SELECT Id, Name
+            MovieDirector? moviesDirectorToFind = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"SELECT Id, Name
 FROM MoviesDirectors
 WHERE Name=@Name;", new { Name = movieDirectorName });
 
             if (moviesDirectorToFind is null)
             {
-                var insertedMovieDirector = await connection.QueryFirstAsync<MovieDirector>(@"INSERT INTO MoviesDirectors 
+                MovieDirector insertedMovieDirector = await connection.QueryFirstAsync<MovieDirector>(@"INSERT INTO MoviesDirectors 
 (Name)
 VALUES (@Name)
 RETURNING Id, Name;", new { Name = movieDirectorName });
@@ -76,7 +76,7 @@ RETURNING Id, Name;", new { Name = movieDirectorName });
             }
         }
 
-        var insertedMovie = await connection.QueryFirstAsync<Movie>(@"INSERT INTO Movies 
+        Movie insertedMovie = await connection.QueryFirstAsync<Movie>(@"INSERT INTO Movies 
 (Name, OriginalName, ImageSource, PremierDate, Description) 
 VALUES
 (@Name, @OriginalName, @ImageSource, CAST(@PremierDate AS DATE), @Description)
@@ -89,21 +89,21 @@ RETURNING Id, Name, OriginalName, ImageSource, PremierDate, Description;", new
             entity.Description
         });
 
-        foreach (var movieGenre in insertedMovieGenres)
+        foreach (MovieGenre movieGenre in insertedMovieGenres)
         {
             await connection.ExecuteAsync(@"INSERT INTO MoviesMoviesGenres (MovieId, MovieGenreId)
 VALUES (@MovieId, @MovieGenreId);",
 new { MovieId = insertedMovie.Id, MovieGenreId = movieGenre.Id });
         }
 
-        foreach (var movieStudio in insertedMovieStudios)
+        foreach (MovieStudio movieStudio in insertedMovieStudios)
         {
             await connection.ExecuteAsync(@"INSERT INTO MoviesMoviesStudios (MovieId, MovieStudioId)
 VALUES (@MovieId, @MovieStudioId);",
 new { MovieId = insertedMovie.Id, MovieStudioId = movieStudio.Id });
         }
 
-        foreach (var insertedMovieDirector in insertedMovieDirectors)
+        foreach (MovieDirector insertedMovieDirector in insertedMovieDirectors)
         {
             await connection.ExecuteAsync(@"INSERT INTO MoviesMoviesDirectors (MovieId, MovieDirectorId)
 VALUES (@MovieId, @MovieDirectorId);",
@@ -115,7 +115,7 @@ new { MovieId = insertedMovie.Id, MovieDirectorId = insertedMovieDirector.Id });
 
     public async Task AddRangeAsync(IEnumerable<AddMovieModel> entities)
     {
-        foreach (var movieModel in entities)
+        foreach (AddMovieModel movieModel in entities)
         {
             await AddAsync(movieModel);
         }
@@ -124,7 +124,7 @@ new { MovieId = insertedMovie.Id, MovieDirectorId = insertedMovieDirector.Id });
     public async Task<IEnumerable<Movie>> GetAllAsync()
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
-        var sql = @"SELECT         
+        string sql = @"SELECT         
 m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
 mg.Id, mg.Name,
 ms.Id, ms.Name,
@@ -139,11 +139,11 @@ md.Id, md.Name
 
         Dictionary<long, Movie> moviesDictionary = new Dictionary<long, Movie>();
 
-        var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
+        IEnumerable<Movie> query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
             sql,
             (movie, movieGenre, movieStudio, movieDirector) =>
             {
-                if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                if (!moviesDictionary.TryGetValue(movie.Id, out Movie? movieEntry))
                 {
                     movieEntry = movie;
                     movieEntry.MovieGenres = new List<MovieGenre>();
@@ -174,7 +174,7 @@ md.Id, md.Name
     public async Task<Movie> GetAsync(long id)
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
-        var sql = @"select m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
+        string sql = @"select m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
 mg.Id, mg.Name,
 ms.Id, ms.Name,
 md.Id, md.Name,
@@ -195,11 +195,11 @@ WHERE m.id=@id";
 
         Dictionary<long, Movie> moviesDictionary = new Dictionary<long, Movie>();
 
-        var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, MovieReview, ApplicationUser, Movie>(
+        IEnumerable<Movie> query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, MovieReview, ApplicationUser, Movie>(
             sql,
             (movie, movieGenre, movieStudio, movieDirector, movieReview, applicationUser) =>
             {
-                if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                if (!moviesDictionary.TryGetValue(movie.Id, out Movie? movieEntry))
                 {
                     movieEntry = movie;
                     movieEntry.MovieGenres = new List<MovieGenre>();
@@ -229,7 +229,7 @@ WHERE m.id=@id";
             splitOn: "Id,Id,Id,Id,MovieId,Id" // The columns where each new entity starts
         );
 
-        var result = moviesDictionary.Values.FirstOrDefault();
+        Movie? result = moviesDictionary.Values.FirstOrDefault();
 
         return result;
     }
@@ -237,7 +237,7 @@ WHERE m.id=@id";
     public async Task<IEnumerable<Movie>> GetAsync(DateTime dateFrom, DateTime dateTo)
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
-        var sql = @"SELECT         
+        string sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
 mg.id, mg.name,
 ms.id, ms.name,
@@ -254,11 +254,11 @@ ORDER BY m.id DESC;";
 
         Dictionary<long, Movie> moviesDictionary = new Dictionary<long, Movie>();
 
-        var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
+        IEnumerable<Movie> query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
             sql,
             (movie, movieGenre, movieStudio, movieDirector) =>
             {
-                if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                if (!moviesDictionary.TryGetValue(movie.Id, out Movie? movieEntry))
                 {
                     movieEntry = movie;
                     movieEntry.MovieGenres = new List<MovieGenre>();
@@ -289,7 +289,7 @@ ORDER BY m.id DESC;";
     public async Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
-        var sql = @"SELECT         
+        string sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
 mg.id, mg.name,
 ms.id, ms.name,
@@ -308,11 +308,11 @@ md.id, md.name
 
         Dictionary<long, Movie> moviesDictionary = new Dictionary<long, Movie>();
 
-        var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
+        IEnumerable<Movie> query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
             sql,
             (movie, movieGenre, movieStudio, movieDirector) =>
             {
-                if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                if (!moviesDictionary.TryGetValue(movie.Id, out Movie? movieEntry))
                 {
                     movieEntry = movie;
                     movieEntry.MovieGenres = new List<MovieGenre>();
@@ -343,7 +343,7 @@ md.id, md.name
     public async Task<IEnumerable<Movie>> GetByNameAsync(string name)
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
-        var sql = @"SELECT         
+        string sql = @"SELECT         
             m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
             mg.id, mg.name,
             ms.id, ms.name,
@@ -360,11 +360,11 @@ md.id, md.name
 
         Dictionary<long, Movie> moviesDictionary = new Dictionary<long, Movie>();
 
-        var query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
+        IEnumerable<Movie> query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
             sql,
             (movie, movieGenre, movieStudio, movieDirector) =>
             {
-                if (!moviesDictionary.TryGetValue(movie.Id, out var movieEntry))
+                if (!moviesDictionary.TryGetValue(movie.Id, out Movie? movieEntry))
                 {
                     movieEntry = movie;
                     movieEntry.MovieGenres = new List<MovieGenre>();
