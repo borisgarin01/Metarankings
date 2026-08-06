@@ -12,7 +12,6 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 using Settings;
 using System.Net;
-using Telegram.Bot.Types;
 
 namespace API.Controllers.Auth;
 
@@ -88,7 +87,7 @@ public sealed class AuthController : ControllerBase
         if (string.IsNullOrWhiteSpace(loginModel.UserEmail) || string.IsNullOrWhiteSpace(loginModel.Password))
             return BadRequest("Email и пароль должны быть указаны");
 
-        var user = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
+        ApplicationUser? user = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
 
         if (user is null)
             return NotFound("Пользователь не зарегистрирован");
@@ -100,7 +99,7 @@ public sealed class AuthController : ControllerBase
 
         if (user.TwoFactorEnabled)
         {
-            var token = await _usersManager.GenerateTwoFactorTokenAsync(user, "Email");
+            string token = await _usersManager.GenerateTwoFactorTokenAsync(user, "Email");
             _logger.LogInformation("2FA code for {Email}: {Code}", user.Email, token);
 
             return Ok(new AuthResponseDto(false, true, "2FA required", string.Empty, string.Empty));
@@ -108,10 +107,10 @@ public sealed class AuthController : ControllerBase
 
         await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
 
-        var accessToken = await _authTokenGenerator.GenerateAccessToken(user);
-        var refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
+        string accessToken = await _authTokenGenerator.GenerateAccessToken(user);
+        string refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
 
-        var refreshToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), refreshTokenValue, false, DateTime.UtcNow);
+        IdentityLibrary.DTOs.RefreshToken refreshToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), refreshTokenValue, false, DateTime.UtcNow);
         await _refreshTokensRepo.CreateAsync(refreshToken);
 
         return Ok(new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue));
@@ -126,7 +125,7 @@ public sealed class AuthController : ControllerBase
             return BadRequest("User ID and token are required");
         }
 
-        var user = await _usersManager.FindByIdAsync(model.UserId);
+        ApplicationUser? user = await _usersManager.FindByIdAsync(model.UserId);
 
         if (user is null)
         {
@@ -144,10 +143,10 @@ public sealed class AuthController : ControllerBase
 
         await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
 
-        var accessToken = await _authTokenGenerator.GenerateAccessToken(user);
-        var refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
+        string accessToken = await _authTokenGenerator.GenerateAccessToken(user);
+        string refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
 
-        var refreshToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), refreshTokenValue, false, DateTime.UtcNow);
+        IdentityLibrary.DTOs.RefreshToken refreshToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), refreshTokenValue, false, DateTime.UtcNow);
         await _refreshTokensRepo.CreateAsync(refreshToken);
 
         return Ok(new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue));
@@ -159,11 +158,11 @@ public sealed class AuthController : ControllerBase
     {
         try
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            Claim? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim is null)
                 return Unauthorized();
 
-            var user = await _usersManager.FindByIdAsync(userIdClaim.Value);
+            ApplicationUser? user = await _usersManager.FindByIdAsync(userIdClaim.Value);
             if (user is null)
                 return NotFound();
 
@@ -186,7 +185,7 @@ public sealed class AuthController : ControllerBase
 
         try
         {
-            var storedToken = await _refreshTokensRepo.GetByValueAsync(request.RefreshToken);
+            IdentityLibrary.DTOs.RefreshToken? storedToken = await _refreshTokensRepo.GetByValueAsync(request.RefreshToken);
 
             if (storedToken is null)
             {
@@ -194,7 +193,7 @@ public sealed class AuthController : ControllerBase
                 return BadRequest("Invalid refresh token");
             }
 
-            var user = await _usersManager.FindByIdAsync(storedToken.UserId.ToString());
+            ApplicationUser? user = await _usersManager.FindByIdAsync(storedToken.UserId.ToString());
             if (user is null)
             {
                 _logger.LogWarning("User not found for refresh token: {Token}", request.RefreshToken);
@@ -203,10 +202,10 @@ public sealed class AuthController : ControllerBase
 
             await _refreshTokensRepo.RevokeAsync(storedToken.Id);
 
-            var newAccessToken = await _authTokenGenerator.GenerateAccessToken(user);
-            var newRefreshToken = _authTokenGenerator.GenerateRefreshToken();
+            string newAccessToken = await _authTokenGenerator.GenerateAccessToken(user);
+            string newRefreshToken = _authTokenGenerator.GenerateRefreshToken();
 
-            var newToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), newRefreshToken, false, DateTime.UtcNow);
+            IdentityLibrary.DTOs.RefreshToken newToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), newRefreshToken, false, DateTime.UtcNow);
             await _refreshTokensRepo.CreateAsync(newToken);
 
             return Ok(new AuthResponseDto(true, false, string.Empty, newAccessToken, newRefreshToken));
@@ -583,77 +582,77 @@ public sealed class AuthController : ControllerBase
         }
     }
 
-    [HttpGet("login-vkontakte")]
-    public async Task<ActionResult> LoginVkontakte()
+    [HttpGet("login-vkid")]
+    public async Task<ActionResult> LoginVKID()
     {
         try
         {
-            string redirectUrl = Url.Action(nameof(VkontakteCallback), "Auth", null, Request.Scheme);
-            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("Vkontakte", redirectUrl);
-            _logger.LogInformation("AllowRefresh: {AllowRefresh}", properties.AllowRefresh);
-            _logger.LogInformation("ExpiresUtc: {ExpiresUtc}", properties.ExpiresUtc);
-            _logger.LogInformation("IsPersistent: {IsPersistent}", properties.IsPersistent);
-            _logger.LogInformation("IssuedUtc: {IssuedUtc}", properties.IssuedUtc);
-            _logger.LogInformation("RedirectUri: {RedirectUri}", properties.RedirectUri);
-            _logger.LogInformation("Items: {Items}", string.Join(", ", properties.Items.Select(kvp => $"{kvp.Key}: {kvp.Value}")));
-            return Challenge(properties, "Vkontakte");
+            string redirectUrl = Url.Action(nameof(VKIDCallback), "Auth", null, Request.Scheme);
+            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("VK IDVK ID", redirectUrl);
+            _logger.LogInformation("VK ID login initiated");
+            return Challenge(properties, "VK ID");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Ошибка при попытке входа через Vkontakte: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            return StatusCode(500, $"Ошибка при попытке входа через Vkontakte: {ex.Message}");
+            _logger.LogError(ex, $"Ошибка при попытке входа через VK ID: {ex.Message}");
+            return StatusCode(500, $"Ошибка при попытке входа через VK ID: {ex.Message}");
         }
     }
 
-    [HttpGet("vkontakte-callback")]
-    public async Task<ActionResult> VkontakteCallback()
+    [HttpGet("vkid-callback")]
+    public async Task<ActionResult> VKIDCallback()
     {
         try
         {
-            _logger.LogInformation("vkontakte-callback");
+            _logger.LogInformation("vkid-callback");
 
-            // Используем "cookie" (с маленькой буквы) - ту, что только что создали
             AuthenticateResult result = await HttpContext.AuthenticateAsync("cookie");
 
             if (!result.Succeeded || result.Principal is null)
             {
-                _logger.LogWarning("Vkontakte authentication failed");
-                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkontakte_auth_failed");
+                _logger.LogWarning("VK ID authentication failed");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkid_auth_failed");
             }
 
             // Извлекаем данные
             string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
-            string? vkontakteUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string? vkUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             string? phoneNumber = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
             string? name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
 
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(vkontakteUserId))
+            if (string.IsNullOrEmpty(vkUserId))
             {
-                _logger.LogError("Email or VkontakteUserId is null");
-                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_required_data");
+                _logger.LogError("VK UserId is null");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_vk_id");
             }
 
-            _logger.LogInformation("Processing Vkontakte login for email: {Email}, VkontakteUserId: {VkontakteUserId}", email, vkontakteUserId);
+            _logger.LogInformation("Processing VK ID login for email: {Email}, VKUserId: {VKUserId}", email, vkUserId);
 
-            // ✅ ВЫЗЫВАЕМ УНИВЕРСАЛЬНЫЙ МЕТОД
             AuthResponseDto tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
-                provider: "Vkontakte",
-                providerKey: vkontakteUserId,
-                email: email,
+                provider: "VK ID",
+                providerKey: vkUserId,
+                email: email ?? "", // VK может не дать email, если пользователь скрыл
                 name: name,
                 phoneNumber: phoneNumber
             );
 
             if (tokenResponse.IsAuthSuccessful)
             {
-                return Redirect($"{Request.Scheme}://{Request.Host}/auth/vkontakte-callback?Token={tokenResponse.AccessToken}");
+                // ВАЖНО: VK может не дать email, нужно обработать этот кейс
+                if (string.IsNullOrEmpty(email))
+                {
+                    // Если email нет - редиректим на страницу где пользователь введет email сам
+                    return Redirect($"{Request.Scheme}://{Request.Host}/auth/complete-profile?token={tokenResponse.AccessToken}&provider=vkid");
+                }
+
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/vkid-callback?Token={tokenResponse.AccessToken}");
             }
 
-            return Redirect($"{Request.Scheme}://{Request.Host}/login?error=ОШИБКА");
+            return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkid_auth_failed");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error in Vkontakte callback: {ex.Message}");
+            _logger.LogError(ex, $"Error in VK ID callback: {ex.Message}");
             return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
         }
     }
