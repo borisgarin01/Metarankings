@@ -1,0 +1,76 @@
+﻿.search_form {
+    width: 300px;
+    margin-top: 15px;
+    float: right;
+    position: relative;
+}
+
+    .search_form fieldset {
+        background: #fff;
+        border: 1px solid #ccc;
+        height: 30px;
+    }
+
+    .search_form input {
+        width: 270px;
+        border: none;
+        background: none;
+        padding: 6px;
+        color: #555;
+        vertical-align: middle;
+    }
+
+    .search_form button {
+        width: 16px;
+        height: 16px;
+        background: url("images/search.png") 50% 50% no-repeat;
+        cursor: pointer;
+        border: none;
+        vertical-align: middle;
+    }
+
+#search_form-result {
+    background: #fff;
+    position: absolute;
+    padding: 0 10px;
+    z-index: 1100;
+    top: 100%;
+    right: 0;
+    left: 0;
+    box-shadow: 0 3px 12px rgba(0,0,0,.1);
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #555 transparent;
+}
+
+    #search_form-result .index-games, #search_form-result .index-movies, #search_form-result .specials-index .news-item {
+        float: none;
+        display: block;
+        width: 100%;
+    }
+
+        #search_form-result .index-games h3 a, #search_form-result .index-movies h3 a, #search_form-result .specials-index h3 a {
+            color: #0082ae;
+        }
+
+        #search_form-result .index-games .item, #search_form-result .index-movies .item {
+            padding: 10px 0;
+            border-right: none;
+        }
+
+    #search_form-result .item-name {
+        font-weight: 500;
+    }
+
+    #search_form-result .item:hover .item-description, #search_form-result .news-item .rubrika {
+        display: none;
+    }
+
+    #search_form-result .index-games .item img, #search_form-result .index-movies .item img, #search_form-result .index-games .item .item-meta, #search_form-result .index-movies .item .item-meta {
+        display: none;
+    }
+
+    #search_form-result .news-item .news-title {
+        height: auto;
+    }

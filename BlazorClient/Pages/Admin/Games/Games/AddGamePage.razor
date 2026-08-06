@@ -1,14 +1,13 @@
 ﻿@page "/admin/games/games/add-game"
 @using Domain.Games
+@using BlazorClient.Components.PagesComponents.Common
 
 <h3>Add game page</h3>
 
 <a href="/admin/games/games/list-games" class="list-group-item link-dark">Игры</a>
-
 <a href="/admin">К странице админа</a>
 
 <EditForm OnValidSubmit="AddGameAsync" Model="this" Context="myContext">
-
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -48,65 +47,84 @@
         </p>
 
         <p>
-            <label>
-                Select developers:
-                <InputSelect @bind-Value="SelectedDevelopersIds" multiple>
-                    <option value="-1" selected>None</option>
-                    @foreach (Developer developer in DevelopersToSelectFrom)
-                    {
-                        <option value="@developer.Id.ToString()">@developer.Name</option>
-                    }
-                </InputSelect>
-            </label>
+            <label>Select developers:</label>
+            @{
+                var devSelector = (Developer d) => d.Id;
+                var devDisplay = (Developer d) => d.Name;
+            }
+            <MultiSelect TItem="Developer"
+                         TId="long"
+                         Items="DevelopersToSelectFrom.ToList()"
+                         @bind-SelectedIds="SelectedDevelopersIds"
+                         IdSelector="devSelector"
+                         DisplaySelector="devDisplay"
+                         Placeholder="Select developers..."
+                         LabelPlural="developers" />
         </p>
+
         <p>
-            <label>
-                Select genres:
-                <InputSelect @bind-Value="SelectedGenresIds" multiple>
-                    <option value="-1" selected>None</option>
-                    @foreach (Genre genre in GenresToSelectFrom)
-                    {
-                        <option value="@genre.Id.ToString()">@genre.Name</option>
-                    }
-                </InputSelect>
-            </label>
+            <label>Select genres:</label>
+            @{
+                var genreSelector = (Genre g) => g.Id;
+                var genreDisplay = (Genre g) => g.Name;
+            }
+            <MultiSelect TItem="Genre"
+                         TId="long"
+                         Items="GenresToSelectFrom.ToList()"
+                         @bind-SelectedIds="SelectedGenresIds"
+                         IdSelector="genreSelector"
+                         DisplaySelector="genreDisplay"
+                         Placeholder="Select genres..."
+                         LabelPlural="genres" />
         </p>
+
         <p>
-            <label>
-                Select localization:
-                <InputSelect @bind-Value="SelectedLocalizationId">
-                    <option value="-1" selected>None</option>
-                    @foreach (Localization localization in LocalizationsToSelectFrom)
-                    {
-                        <option value="@localization.Id.ToString()">@localization.Name</option>
-                    }
-                </InputSelect>
-            </label>
+            <label>Select localization:</label>
+            @{
+                var locSelector = (Localization l) => (long?)l.Id;
+                var locDisplay = (Localization l) => l.Name;
+            }
+            <SingleSelect TItem="Localization"
+                          TId="long?"
+                          Items="LocalizationsToSelectFrom.ToList()"
+                          @bind-SelectedId="SelectedLocalizationId"
+                          IdSelector="locSelector"
+                          DisplaySelector="locDisplay"
+                          Placeholder="Select localization..." />
         </p>
+
         <p>
-            <label>
-                Select platforms:
-                <InputSelect @bind-Value="SelectedPlatformsIds" multiple>
-                    <option value="-1" selected>None</option>
-                    @foreach (Platform platform in PlatformsToSelectFrom)
-                    {
-                        <option value="@platform.Id.ToString()">@platform.Name</option>
-                    }
-                </InputSelect>
-            </label>
+            <label>Select platforms:</label>
+            @{
+                var platSelector = (Platform p) => p.Id;
+                var platDisplay = (Platform p) => p.Name;
+            }
+            <MultiSelect TItem="Platform"
+                         TId="long"
+                         Items="PlatformsToSelectFrom.ToList()"
+                         @bind-SelectedIds="SelectedPlatformsIds"
+                         IdSelector="platSelector"
+                         DisplaySelector="platDisplay"
+                         Placeholder="Select platforms..."
+                         LabelPlural="platforms" />
         </p>
+
         <p>
-            <label>
-                Select publisher:
-                <InputSelect @bind-Value="SelectedPublishersIds" multiple>
-                    <option value="-1" selected>None</option>
-                    @foreach (Publisher publisher in PublishersToSelectFrom)
-                    {
-                        <option value="@publisher.Id.ToString()">@publisher.Name</option>
-                    }
-                </InputSelect>
-            </label>
+            <label>Select publishers:</label>
+            @{
+                var pubSelector = (Publisher p) => p.Id;
+                var pubDisplay = (Publisher p) => p.Name;
+            }
+            <MultiSelect TItem="Publisher"
+                         TId="long"
+                         Items="PublishersToSelectFrom.ToList()"
+                         @bind-SelectedIds="SelectedPublishersIds"
+                         IdSelector="pubSelector"
+                         DisplaySelector="pubDisplay"
+                         Placeholder="Select publishers..."
+                         LabelPlural="publishers" />
         </p>
+
         <p>
             <label>
                 Enter image:

@@ -26,5 +26,5 @@ public partial class GamesReleaseDateItemComponent : ComponentBase
     public Link[] Genres { get; set; }
 
     [Parameter, EditorRequired]
-    public DateTime ReleaseDate { get; set; }
+    public DateOnly ReleaseDate { get; set; }
 }

@@ -45,7 +45,7 @@ public partial class AddGamePage : ComponentBase
     public NavigationManager NavigationManager { get; private set; }
 
     public string Name { get; set; }
-    public DateTime ReleaseDate { get; set; }
+    public DateTime? ReleaseDate { get; set; }
     public string Description { get; set; }
     public string Trailer { get; set; }
     public IEnumerable<Developer> DevelopersToSelectFrom { get; private set; }
@@ -56,7 +56,7 @@ public partial class AddGamePage : ComponentBase
 
     public List<long> SelectedDevelopersIds { get; private set; } = new List<long>();
     public List<long> SelectedGenresIds { get; private set; } = new List<long>();
-    public long SelectedLocalizationId { get; private set; }
+    public long? SelectedLocalizationId { get; private set; }
     public List<long> SelectedPlatformsIds { get; private set; } = new List<long>();
     public List<long> SelectedPublishersIds { get; private set; } = new List<long>();
     public string ImageSource { get; private set; }
@@ -77,17 +77,17 @@ public partial class AddGamePage : ComponentBase
                 string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
 
                 // Build the URL with parameters
-                string url = $"/api/games/images/{ReleaseDate.Year}/{ReleaseDate.Month}/{uploadingFileNameWithCorrectExtention}";
+                string url = $"/api/games/images/{ReleaseDate.Value.Year}/{ReleaseDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
 
                 // Send the request with authentication token
-                var response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content);
+                HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)
                 {
                     // Extract the URL from the response
                     string responseContent = await response.Content.ReadAsStringAsync();
 
-                    AddGameModel addGameModel = new AddGameModel(Name, url, SelectedDevelopersIds, SelectedPublishersIds, SelectedGenresIds, SelectedLocalizationId, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
+                    AddGameModel addGameModel = new AddGameModel(Name, url, SelectedDevelopersIds, SelectedPublishersIds, SelectedGenresIds, SelectedLocalizationId.Value, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
 
                     HttpResponseMessage addingGameResponseMessage = await GetWebManager.AddAsync(addGameModel);
 
@@ -106,12 +106,12 @@ public partial class AddGamePage : ComponentBase
 
     private bool GameModelToAddConfigured()
     {
-        return !SelectedDevelopersIds.Contains(-1)
-            && !SelectedGenresIds.Contains(-1)
-            && SelectedLocalizationId != -1
-            && !SelectedPlatformsIds.Contains(-1)
-            && !SelectedPublishersIds.Contains(-1)
-            && ImageToUpload is not null;
+        return SelectedDevelopersIds.Any()
+        && SelectedGenresIds.Any()
+        && SelectedLocalizationId.HasValue // Проверяем что выбран
+        && SelectedPlatformsIds.Any()
+        && SelectedPublishersIds.Any()
+        && ImageToUpload is not null;
     }
 
     private async Task FileUploaded(InputFileChangeEventArgs e)

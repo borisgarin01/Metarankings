@@ -6,7 +6,7 @@
 @using Domain.Reviews
 
 <Headerer />
-<GameMenu Year="@((Game.ReleaseDate ?? DateTime.Now).Year)" />
+<GameMenu Year="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
 
 @if (Game is null)
 {
@@ -18,12 +18,12 @@ else
         <GameHeader Name="@Game.Name"
                     Description="@Game.Description"
                     Id="@Id"
-                    ReleaseYear=@((Game.ReleaseDate ?? DateTime.Now).Year)" />
+                    ReleaseYear=@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
 
         <div class="post-content">
             <Thumbnail Name="@Game.Name"
-                       ReleaseYear="@((Game.ReleaseDate ?? DateTime.Now).Year)"
-                       ReleaseMonth="@((Game.ReleaseDate ?? DateTime.Now).Month)"
+                       ReleaseYear="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)"
+                       ReleaseMonth="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Month)"
                        ImageSource="@Game.Image"
                        Prefix="Games" />
 
@@ -36,7 +36,7 @@ else
                           Platforms="@Game.Platforms"
                           Genres="@Game.Genres"
                           Localization="@Game.Localization"
-                          ReleaseDate="@(Game.ReleaseDate ?? DateTime.Now)" />
+                          ReleaseDate="@(Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now))" />
 
             <Description TextContent="@Game.Description" />
 
@@ -51,7 +51,7 @@ else
                        Screenshots="@Game.Screenshots"
                        Name="@Game.Name"
                        Image="@Game.Image"
-                       ReleaseDate="@(Game.ReleaseDate ?? DateTime.Now)"
+                       ReleaseDate="@(Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now))"
                        GameId="@Game.Id" />
 
             <div class="user-reviews comments">

@@ -1,0 +1,57 @@
+﻿@typeparam TItem
+@typeparam TId
+
+<div class="singleselect-container">
+    <div class="singleselect-wrapper" @onclick="ToggleDropdown" @onclick:stopPropagation="true">
+        <div class="singleselect-display">
+            <span class="selected-display">
+                @if (SelectedItem != null)
+                {
+                    <span>@GetDisplayText(SelectedItem)</span>
+                }
+                else
+                {
+                    <span class="placeholder">@Placeholder</span>
+                }
+            </span>
+            <span class="dropdown-arrow @(IsOpen ? "open" : "")">▼</span>
+        </div>
+
+        @if (IsOpen)
+        {
+            <div class="dropdown-list">
+                <div class="search-wrapper">
+                    <input type="text"
+                           class="search-input"
+                           placeholder="Search..."
+                           @bind="SearchTerm"
+                           @bind:event="oninput" />
+                </div>
+                <ul class="options-list">
+                    @if (FilteredItems.Any())
+                    {
+                        @foreach (var item in FilteredItems)
+                        {
+                            var id = GetId(item);
+                            var isSelected = SelectedId != null && SelectedId.Equals(id);
+                            <li class="option-item @(isSelected ? "selected" : "")"
+                                @onclick="() => SelectItem(item)">
+                                <span class="option-check">
+                                    @if (isSelected)
+                                    {
+                                        <span>✓</span>
+                                    }
+                                </span>
+                                <span class="option-name">@GetDisplayText(item)</span>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="option-item no-results">No results found</li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,80 @@
+﻿@typeparam TItem
+@typeparam TId
+
+<div class="multiselect-container">
+    <div class="multiselect-wrapper" @onclick="ToggleDropdown" @onclick:stopPropagation="true">
+        <div class="multiselect-display">
+            <div class="selected-items">
+                @if (SelectedItems.Any())
+                {
+                    @foreach (var item in SelectedItems)
+                    {
+                        <span class="selected-tag">
+                            @GetDisplayText(item)
+                            <span class="remove-btn" @onclick:stopPropagation="true" @onclick="() => RemoveItem(GetId(item))">×</span>
+                        </span>
+                    }
+                }
+                else
+                {
+                    <span class="placeholder">@Placeholder</span>
+                }
+            </div>
+            <span class="dropdown-arrow @(IsOpen ? "open" : "")">▼</span>
+        </div>
+
+        @if (IsOpen)
+        {
+            <div class="dropdown-list">
+                <div class="search-wrapper">
+                    <input type="text"
+                           class="search-input"
+                           placeholder="Search..."
+                           @bind="SearchTerm"
+                           @bind:event="oninput" />
+                </div>
+                <ul class="options-list">
+                    @if (FilteredItems.Any())
+                    {
+                        @foreach (var item in FilteredItems)
+                        {
+                            var id = GetId(item);
+                            var isSelected = SelectedIds.Contains(id);
+                            <li class="option-item @(isSelected ? "selected" : "")"
+                                @onclick="() => ToggleSelection(item)">
+                                <span class="option-check">
+                                    @if (isSelected)
+                                    {
+                                        <span>✓</span>
+                                    }
+                                </span>
+                                <span class="option-name">@GetDisplayText(item)</span>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="option-item no-results">No results found</li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+
+    @* Selected items summary below the select *@
+    @if (SelectedItems.Any())
+    {
+        <div class="selected-summary">
+            <span class="summary-label">Selected @LabelPlural:</span>
+            <div class="summary-items">
+                @foreach (var item in SelectedItems)
+                {
+                    <span class="summary-tag">
+                        @GetDisplayText(item)
+                        <span class="remove-btn" @onclick="() => RemoveItem(GetId(item))">×</span>
+                    </span>
+                }
+            </div>
+        </div>
+    }
+</div>

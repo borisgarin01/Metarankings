@@ -20,5 +20,5 @@ public partial class GameMedia : ComponentBase
     public string Image { get; set; }
 
     [Parameter, EditorRequired]
-    public DateTime? ReleaseDate { get; set; }
+    public DateOnly? ReleaseDate { get; set; }
 }

@@ -1,5 +1,4 @@
-﻿using Domain.Common;
-using Domain.Games.Collections;
+﻿using Domain.Games.Collections;
 using Domain.Reviews;
 
 namespace Domain.Games;
@@ -20,7 +19,7 @@ public sealed record Game
     public required List<Publisher> Publishers { get; set; } = new();
 
     [JsonPropertyName("releaseDate")]
-    public required DateTime? ReleaseDate { get; set; }
+    public required DateOnly? ReleaseDate { get; set; }
 
     [JsonPropertyName("description")]
     public required string Description { get; set; }

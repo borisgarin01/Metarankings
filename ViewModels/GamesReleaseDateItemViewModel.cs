@@ -11,4 +11,4 @@ public sealed record GamesReleaseDateItemViewModel
     [property: JsonPropertyName("itemName")] string ItemName,
     [property: JsonPropertyName("platforms")] Link[] Platforms,
     [property: JsonPropertyName("genres")] Link[] Genres,
-    [property: JsonPropertyName("releaseDate")] DateTime ReleaseDate);
+    [property: JsonPropertyName("releaseDate")] DateOnly ReleaseDate);

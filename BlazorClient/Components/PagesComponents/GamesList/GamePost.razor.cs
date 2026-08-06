@@ -35,7 +35,7 @@ public partial class GamePost : ComponentBase
     public required Localization Localization { get; set; }
 
     [Parameter, EditorRequired]
-    public DateTime? ReleaseDate { get; set; }
+    public DateOnly? ReleaseDate { get; set; }
 
     [Parameter, EditorRequired]
     public required string Description { get; set; }
