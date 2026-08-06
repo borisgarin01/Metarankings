@@ -29,7 +29,7 @@ public sealed record GameReview
     public string TextContent { get; set; }
 
     [JsonPropertyName("date")]
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
 
     public List<GamePlayerReviewShift> GamePlayerReviewShifts { get; set; } = new();
 }

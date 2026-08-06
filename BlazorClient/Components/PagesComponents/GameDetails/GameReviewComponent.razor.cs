@@ -1,7 +1,6 @@
 ﻿
 
 using Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Frontend;
-using System.Threading.Tasks;
 using WebManagers.Derived.Games;
 
 namespace BlazorClient.Components.PagesComponents.GameDetails;
@@ -21,7 +20,7 @@ public partial class GameReviewComponent : ComponentBase
     public string UserName { get; set; }
 
     [Parameter, EditorRequired]
-    public DateTime PublishDate { get; set; }
+    public DateOnly PublishDate { get; set; }
 
     [Parameter, EditorRequired]
     public string TextContent { get; set; }
@@ -51,7 +50,7 @@ public partial class GameReviewComponent : ComponentBase
         if (authState is not null
             && authState.User is not null)
         {
-            foreach (var claim in authState.User.Claims)
+            foreach (Claim claim in authState.User.Claims)
             {
                 Console.WriteLine($"{claim.Type}\t{claim.Value}");
             }
