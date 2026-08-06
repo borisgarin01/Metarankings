@@ -120,49 +120,49 @@ public sealed class HomeController : ControllerBase
     {
         IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemsComponents = new GamesReleaseDateItemViewModel[]
         {
-            new("https://metarankings.ru/dying-light-the-beast/","Игра Dying Light: The Beast", "https://metarankings.ru/images/uploads/2025/07/dying-light-the-beast-boxart-cover-50x70.jpg", "Dying Light: The Beast", "Dying Light: The Beast", new Link[]{new("PC", "https://metarankings.ru/meta/games/pc/"),
-                    new("PS5", "https://metarankings.ru/meta/games/ps5/"),
-                    new("Xbox Series X", "https://metarankings.ru/meta/games/xbox-series-x/")}, new Link[]
+            new("/dying-light-the-beast/","Игра Dying Light: The Beast", "/images/uploads/2025/07/dying-light-the-beast-boxart-cover-50x70.jpg", "Dying Light: The Beast", "Dying Light: The Beast", new Link[]{new("PC", "/meta/games/pc/"),
+                    new("PS5", "/meta/games/ps5/"),
+                    new("Xbox Series X", "/meta/games/xbox-series-x/")}, new Link[]
                 {
-                    new("РПГ", "https://metarankings.ru/genre/rpg/"),
-                    new("Хоррор", "https://metarankings.ru/genre/xorror/"),
-                    new("Экшен", "https://metarankings.ru/genre/ekshen/")
+                    new("РПГ", "/genre/rpg/"),
+                    new("Хоррор", "/genre/xorror/"),
+                    new("Экшен", "/genre/ekshen/")
                 }, new DateOnly(2025,6,1)),
-            new("https://metarankings.ru/donkey-kong-bananza/","Игра Donkey Kong Bananza", "https://metarankings.ru/images/uploads/2025/07/donkey-kong-bananza-boxart-cover-50x70.jpg", "Donkey Kong Bananza", "Donkey Kong Bananza", new Link[]{new("Switch 2", "https://metarankings.ru/meta/games/switch-2/") }, new Link[]
+            new("/donkey-kong-bananza/","Игра Donkey Kong Bananza", "/images/uploads/2025/07/donkey-kong-bananza-boxart-cover-50x70.jpg", "Donkey Kong Bananza", "Donkey Kong Bananza", new Link[]{new("Switch 2", "/meta/games/switch-2/") }, new Link[]
                 {
-                    new("РПГ", "https://metarankings.ru/genre/rpg/"),
-                    new("Хоррор", "https://metarankings.ru/genre/xorror/"),
-                    new("Экшен", "https://metarankings.ru/genre/ekshen/")
+                    new("РПГ", "/genre/rpg/"),
+                    new("Хоррор", "/genre/xorror/"),
+                    new("Экшен", "/genre/ekshen/")
                 },new DateOnly(2025,7,17)),
-            new("https://metarankings.ru/mindseye/","Игра MindsEye", "https://metarankings.ru/images/uploads/2025/08/mindseye-boxart-cover-50x70.jpg", "MindsEye", "MindsEye",
+            new("/mindseye/","Игра MindsEye", "/images/uploads/2025/08/mindseye-boxart-cover-50x70.jpg", "MindsEye", "MindsEye",
             new Link[]
-            {new("PC", "https://metarankings.ru/meta/games/pc/"),
-                    new("PS5", "https://metarankings.ru/meta/games/ps5/"),
-                    new("Xbox Series X", "https://metarankings.ru/meta/games/xbox-series-x/")}, new Link[]
+            {new("PC", "/meta/games/pc/"),
+                    new("PS5", "/meta/games/ps5/"),
+                    new("Xbox Series X", "/meta/games/xbox-series-x/")}, new Link[]
                 {
-                    new("Шутер", "https://metarankings.ru/genre/shuter/"),
-                    new("Приключение", "https://metarankings.ru/genre/priklyuchenie/"),
-                    new("Экшен", "https://metarankings.ru/genre/ekshen/")
+                    new("Шутер", "/genre/shuter/"),
+                    new("Приключение", "/genre/priklyuchenie/"),
+                    new("Экшен", "/genre/ekshen/")
                 },new DateOnly(2025, 6, 1)),
-            new("https://metarankings.ru/shinobi-art-of-vengeance/","Игра SHINOBI: Art of Vengeance","https://metarankings.ru/images/uploads/2025/08/shinobi-art-of-vengeance-boxart-cover-50x70.jpg", "SHINOBI: Art of Vengeance","SHINOBI: Art of Vengeance",new Link[]
+            new("/shinobi-art-of-vengeance/","Игра SHINOBI: Art of Vengeance","/images/uploads/2025/08/shinobi-art-of-vengeance-boxart-cover-50x70.jpg", "SHINOBI: Art of Vengeance","SHINOBI: Art of Vengeance",new Link[]
                 {
-                    new("Аркада", "https://metarankings.ru/genre/arkada/"),
-                    new("Платформер", "https://metarankings.ru/genre/platformer/"),
-                    new("Экшен", "https://metarankings.ru/genre/ekshen/")
+                    new("Аркада", "/genre/arkada/"),
+                    new("Платформер", "/genre/platformer/"),
+                    new("Экшен", "/genre/ekshen/")
                 }, new Link[]
                 {
-                    new("PC", "https://metarankings.ru/meta/games/pc/"),
-                    new("PS5", "https://metarankings.ru/meta/games/ps5/"),
-                    new("Xbox Series X", "https://metarankings.ru/meta/games/xbox-series-x/")
+                    new("PC", "/meta/games/pc/"),
+                    new("PS5", "/meta/games/ps5/"),
+                    new("Xbox Series X", "/meta/games/xbox-series-x/")
                 }, new DateOnly(2025, 8, 26)),
-            new("https://metarankings.ru/game-metal-gear-solid-delta-snake-eater/", "Игра Metal Gear Solid Delta: Snake Eater", "https://metarankings.ru/images/uploads/2023/05/metal-gear-solid-delta-snake-eater-boxart-cover-50x70.jpg", "Metal Gear Solid Delta: Snake Eater","Metal Gear Solid Delta: Snake Eater", new Link[]
+            new("/game-metal-gear-solid-delta-snake-eater/", "Игра Metal Gear Solid Delta: Snake Eater", "/images/uploads/2023/05/metal-gear-solid-delta-snake-eater-boxart-cover-50x70.jpg", "Metal Gear Solid Delta: Snake Eater","Metal Gear Solid Delta: Snake Eater", new Link[]
                 {
-                    new("Экшен", "https://metarankings.ru/genre/ekshen/")
+                    new("Экшен", "/genre/ekshen/")
                 }, new Link[]
                 {
-                    new("PC", "https://metarankings.ru/meta/games/pc/"),
-                    new("PS5", "https://metarankings.ru/meta/games/ps5/"),
-                    new("Xbox Series X", "https://metarankings.ru/meta/games/xbox-series-x/")
+                    new("PC", "/meta/games/pc/"),
+                    new("PS5", "/meta/games/ps5/"),
+                    new("Xbox Series X", "/meta/games/xbox-series-x/")
                 }, new DateOnly(2025, 8, 28))
         };
 

@@ -26,6 +26,6 @@ public partial class SoonAtCinemasItemComponent : ComponentBase
     [Parameter, EditorRequired]
     public Link[] Genres { get; set; } = new Link[]
     {
-        new Link("Боевики", "https://metarankings.ru/meta/movies/boeviki/")
+        new Link("Боевики", "/meta/movies/boeviki/")
     };
 }

@@ -1,10 +1,10 @@
 ﻿@using ViewModels
 <div class="index-games">
-    <h3><a href="https://metarankings.ru/release-date/">Дата выхода игр</a></h3>
+    <h3><a href="/release-date/">Дата выхода игр</a></h3>
 
     @foreach (GamesReleaseDateItemViewModel gamesReleaseDateItemViewModel in GamesReleaseDateItemComponents)
     {
         <GamesReleaseDateItemComponent Genres="@gamesReleaseDateItemViewModel.Genres" Href="@gamesReleaseDateItemViewModel.Href" ImageAlt="@gamesReleaseDateItemViewModel.ImageAlt" ImageSource="@gamesReleaseDateItemViewModel.ImageSource" ItemName="@gamesReleaseDateItemViewModel.ItemName" Platforms="@gamesReleaseDateItemViewModel.Platforms" ReleaseDate="@gamesReleaseDateItemViewModel.ReleaseDate" Title="@gamesReleaseDateItemViewModel.Title" />
     }
-    <a href="https://metarankings.ru/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
+    <a href="/most-waiting-games/" class="allreviews">Самые ожидаемые игры</a>
 </div>
