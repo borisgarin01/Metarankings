@@ -30,11 +30,11 @@ else
                     {
                         <article class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
                             <a href="/movies/details/@moviesCollectionItem.Movie.Id" class="thumb">
-                                <img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}/{moviesCollectionItem.Movie.ImageSource}")" alt="@moviesCollectionItem.Movie.Name">
+                                <img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}{moviesCollectionItem.Movie.ImageSource}")" alt="@moviesCollectionItem.Movie.Name">
                             </a>
                             <div itemprop="item" itemscope="" itemtype="https://schema.org/Movie">
                                 <link itemprop="url" href="/movies/details/@moviesCollectionItem.Movie.Id">
-                                <link itemprop="image" href="@($"{Configuration["HttpClientSettings:BaseUrl"]}/api/movies/images/{moviesCollectionItem.Movie.PremierDate.Value.Year}/{moviesCollectionItem.Movie.PremierDate.Value.Month}/{moviesCollectionItem.Movie.ImageSource}")">
+                                <link itemprop="image" href="@($"{Configuration["HttpClientSettings:BaseUrl"]}{moviesCollectionItem.Movie.ImageSource}")">
                                 <meta itemprop="dateCreated" content="@moviesCollectionItem.Movie.PremierDate.Value.Year">
                                 <div itemprop="name"><a class="name" href="/games/details/@moviesCollectionItem.Movie.Id">@moviesCollectionItem.Movie.Name</a></div>
                                 <div class="post-meta">@moviesCollectionItem.Movie.PremierDate.Value.ToString("dd MMMM yyyy")</div>
