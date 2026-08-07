@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Pages.Games.Games
 {
-    public partial class BestGameOfYearListElement : ComponentBase
+    public partial class BestGamesListElement : ComponentBase
     {
         [Parameter, EditorRequired]
         public Game Game { get; set; }

@@ -2,11 +2,8 @@
 
 namespace BlazorClient.Components.PagesComponents.GamesList;
 
-public partial class BestGamesOfYearByPlatformsComponent : ComponentBase
+public partial class BestGamesOfPlatformsComponent : ComponentBase
 {
-    [Parameter, EditorRequired]
-    public long Year { get; set; }
-
     [Parameter, EditorRequired]
     public IEnumerable<Platform> Platforms { get; set; }
 }

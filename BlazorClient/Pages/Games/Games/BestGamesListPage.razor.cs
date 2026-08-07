@@ -1,9 +1,11 @@
 ﻿using Domain.Games;
 using Domain.RequestsModels;
+using Domain.RequestsModels.Games.Platforms;
+using WebManagers;
 
 namespace BlazorClient.Pages.Games.Games;
 
-public partial class BestGamesOfYearListPage : ComponentBase
+public partial class BestGamesListPage : ComponentBase
 {
     [SupplyParameterFromQuery]
     public int? Year { get; set; }
@@ -22,8 +24,13 @@ public partial class BestGamesOfYearListPage : ComponentBase
 
     public IEnumerable<Game> Games { get; set; }
 
+    public IEnumerable<Platform> Platforms { get; set; }
+
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
+
+    [Inject]
+    public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> PlatformsWebManager { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -64,6 +71,7 @@ public partial class BestGamesOfYearListPage : ComponentBase
                 }
                 else
                 {
+                    Games = Enumerable.Empty<Game>();
                     Console.WriteLine($"Failed to load games: {response.ReasonPhrase}");
                 }
             }
@@ -72,5 +80,11 @@ public partial class BestGamesOfYearListPage : ComponentBase
         {
             Console.WriteLine($"Error loading games: {ex.Message}");
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Platforms = await PlatformsWebManager.GetAllAsync();
+        Console.WriteLine(Platforms);
     }
 }

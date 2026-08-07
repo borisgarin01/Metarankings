@@ -1,0 +1,79 @@
+﻿.content-title {
+    color: #333;
+    font-size: 22px;
+    padding: 0 0 5px;
+    position: relative;
+    margin: 10px 0;
+}
+
+    .content-title h1 {
+        font-size: 26px;
+        display: inline;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .content-title a {
+        color: #000;
+        text-decoration: none;
+    }
+
+    .content-title span {
+        font-size: 18px;
+        display: block;
+        font-weight: 300;
+    }
+
+        .content-title span a {
+            color: #d9d9d9;
+            text-decoration: none;
+        }
+
+            .content-title span a:hover {
+                color: #000;
+                text-decoration: none;
+            }
+
+.post-info h2, .page-description h2 {
+    font-size: 18px;
+    font-weight: 550;
+    margin: 10px 0;
+}
+
+.post-info {
+    color: #555;
+    margin: 0 0 20px;
+    font-size: 14px;
+    line-height: 1.4;
+    overflow: hidden;
+    position: relative;
+}
+
+    .post-info .read-more {
+        background: #fff;
+        color: #0082ae;
+        position: absolute;
+        bottom: 0;
+        cursor: pointer;
+        right: 0;
+        left: 0;
+        opacity: 0.9;
+    }
+
+    .post-info p {
+        padding: 5px 0;
+    }
+
+    .post-info a {
+        color: #0082ae;
+        text-decoration: none;
+    }
+
+        .post-info a:hover {
+            text-decoration: underline;
+        }
+
+.post-info, .list .post-content {
+    font-size: 16px;
+    line-height: 1.5;
+}

@@ -1,4 +1,4 @@
-﻿namespace BlazorClient.Pages.Games.Games;
+﻿namespace BlazorClient.Components.PagesComponents.GamesList;
 
 public partial class BestGamesOfYearsComponent : ComponentBase
 {

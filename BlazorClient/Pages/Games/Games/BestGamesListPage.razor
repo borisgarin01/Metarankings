@@ -1,12 +1,11 @@
-﻿@page "/games/best-games/@Year"
+﻿@page "/games/best-games"
 @using BlazorClient.Components.PagesComponents.GamesList
-@using BlazorClient.Pages.Games.Developers
 
 <BlazorClient.Components.PagesComponents.Common.Headerer />
-<BlazorClient.Components.PagesComponents.Common.GameMenu Year="@DateTime.Today.Year" />
+<BlazorClient.Components.PagesComponents.Common.GameMenu Year="@((Year.HasValue) ? Year.Value : DateTime.Now.Year)" />
 
 <div class="content-title">
-    <h1>Лучшие игры @Year года</h1>
+    <h1>Лучшие игры</h1>
 </div>
 <div class="post-info" style="max-height: 85px;">
     <p>Здесь собраны лучшие игры @Year года — Самые интересные и популярные всех жанров для всех актуальных игровых платформ (ПК, PlayStation, Xbox и Nintendo). Топ формировался по наибольшему рейтингу в десятибалльной рейтинговой системе по данным оценок критиков и проголосовавших пользователей. Пользуясь навигацией, вы можете выбрать конкретную интересующую вас игровую платформу. Выставляйте оценки, оставляйте отзывы и делитесь с друзьями в социальных сетях!</p>
@@ -15,8 +14,8 @@
     <span class="read-more">Читать полностью</span>
 </div>
 <div id="filter">
-    <BestGamesOfYearsComponent Year="@Year.Value" />
-    <BestGamesOfYearByPlatformsComponent Year="@Year.Value" />
+    <BestGamesOfYearsComponent Year="@((Year.HasValue) ? Year.Value : DateTime.Now.Year)" />
+    <BestGamesOfYearByPlatformsComponent Year="@((Year.HasValue) ? Year.Value : DateTime.Now.Year)" Platforms="@Platforms" />
 </div>
 
 @if (Games is null)
@@ -28,7 +27,7 @@ else
     <div id="loop" class="list clear best">
         @for (int i = 0; i < Games.Count(); i++)
         {
-            <BestGameOfYearListElement Game="Games.ElementAt(i)" Order="@(i + 1)" />
+            <BestGamesListElement Game="Games.ElementAt(i)" Order="@(i + 1)" />
         }
     </div>
 }
