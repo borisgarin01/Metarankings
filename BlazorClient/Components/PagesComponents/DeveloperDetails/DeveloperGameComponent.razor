@@ -4,7 +4,7 @@
 
 <div class="post clear">
     <a href="/games/details/@Game.Id" title="«@Game.Name»" class="thumb">
-        <img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}/api/games/images/{Game.ReleaseDate.Value.Year}/{Game.ReleaseDate.Value.Month}/{Game.Image}")" alt="@Game.Name">
+        <img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}{Game.Image}")" alt="@Game.Name">
     </a>
     <h3><a class="name" href="/games/details/@Game.Id">@Game.Name</a></h3>
     <div class="post-meta"><p>@string.Join(", ", Game.Platforms.Select(b => b.Name))</p></div>
