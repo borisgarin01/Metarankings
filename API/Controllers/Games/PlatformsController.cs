@@ -49,6 +49,20 @@ public sealed class PlatformsController : ControllerBase
             return Ok(platform);
     }
 
+    [HttpGet("{offset:long}/{limit:long}")]
+    public async Task<ActionResult<IEnumerable<Platform>>> GetAsync(long offset, long limit)
+    {
+        try
+        {
+            IEnumerable<Platform>? platforms = await _platformsRepository.GetAsync(offset, limit);
+            return Ok(platforms);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { ex.Message, ex.StackTrace });
+        }
+    }
+
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult> DeleteAsync(long id)

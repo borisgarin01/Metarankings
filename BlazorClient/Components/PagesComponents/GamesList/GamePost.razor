@@ -4,7 +4,7 @@
 @inject IConfiguration Configuration
 
 <div class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
-    <a href="/games/Details/@Id" title="Игра @Name" class="thumb"><img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}/api/games/images/{ReleaseDate.Value.Year}/{ReleaseDate.Value.Month}/{Image}")" alt="Игра @Name"></a>
+    <a href="/games/Details/@Id" title="Игра @Name" class="thumb"><img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}{Image}")" alt="Игра @Name"></a>
     <div class="best-prod">
         <div class="counter" itemprop="position">@Id</div>
         <span class="star">★</span>
@@ -21,7 +21,7 @@
     <div class="trailer" data-video="/games/Details/@Id/#content-trailer"></div>
     <div class="ratings-graph">
         <div class="graph">
-            <div class="small-score mark-@Math.Round(Score.HasValue ? Score.Value : 0)">@(Score.HasValue? Score.Value: 0)</div>
+            <div class="small-score mark-@Math.Round(Score.HasValue ? Score.Value : 0)">@(Score.HasValue ? Score.Value : 0)</div>
             <div class="graph-body"><div style="width:@((Score.HasValue ? Score.Value : 0) * 10)%" class="rating-graph mark-@Math.Round(Score.HasValue ? Score.Value : 0)"></div></div>
         </div>
     </div>

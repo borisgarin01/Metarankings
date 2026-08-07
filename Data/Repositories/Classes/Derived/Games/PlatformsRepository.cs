@@ -12,18 +12,16 @@ public sealed class PlatformsRepository : Repository, IRepository<Platform, AddP
 
     public async Task<long> AddAsync(AddPlatformModel platform)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
-        {
-            var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Platforms
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        long id = await connection.QueryFirstAsync<long>(@"INSERT INTO Platforms
 (Name)
 VALUES (@Name)
 RETURNING Id;"
- , new
- {
-     platform.Name
- });
-            return id;
-        }
+, new
+{
+    platform.Name
+});
+        return id;
     }
 
     public async Task AddRangeAsync(IEnumerable<AddPlatformModel> platfroms)
@@ -36,12 +34,11 @@ RETURNING Id;"
 
     public async Task<IEnumerable<Platform>> GetAllAsync()
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
-        {
-            var platformDictionary = new Dictionary<long, Platform>();
-            var gameDictionary = new Dictionary<long, Game>();
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        Dictionary<long, Platform> platformDictionary = new Dictionary<long, Platform>();
+        Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
-            await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+        await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
             SELECT 
                 p1.Id, p1.Name,
                 g.Id, g.Name, g.Image, g.LocalizationId,
@@ -52,56 +49,54 @@ RETURNING Id;"
             LEFT JOIN Games g ON g.Id = gp.GameId
             LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
             LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId",
-                (platform, game, gamePlatform) =>
+            (platform, game, gamePlatform) =>
+            {
+                // Get or create the platform
+                if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
                 {
-                    // Get or create the platform
-                    if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
+                    platformEntry = platform;
+                    platformEntry.Games = new List<Game>();
+                    platformDictionary.Add(platformEntry.Id, platformEntry);
+                }
+
+                if (game != null)
+                {
+                    // Get or create the game
+                    if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
                     {
-                        platformEntry = platform;
-                        platformEntry.Games = new List<Game>();
-                        platformDictionary.Add(platformEntry.Id, platformEntry);
-                    }
+                        gameEntry = game;
+                        gameEntry.Platforms = new List<Platform>();
+                        gameDictionary.Add(gameEntry.Id, gameEntry);
 
-                    if (game != null)
-                    {
-                        // Get or create the game
-                        if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
+                        // Add game to platform if not already present
+                        if (!platformEntry.Games.Any(g => g.Id == game.Id))
                         {
-                            gameEntry = game;
-                            gameEntry.Platforms = new List<Platform>();
-                            gameDictionary.Add(gameEntry.Id, gameEntry);
-
-                            // Add game to platform if not already present
-                            if (!platformEntry.Games.Any(g => g.Id == game.Id))
-                            {
-                                platformEntry.Games.Add(gameEntry);
-                            }
-                        }
-
-                        // Add platform to game if it exists and isn't already added
-                        if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
-                        {
-                            gameEntry.Platforms.Add(gamePlatform);
+                            platformEntry.Games.Add(gameEntry);
                         }
                     }
 
-                    return platformEntry;
-                },
-                splitOn: "Id,Id"
-            );
+                    // Add platform to game if it exists and isn't already added
+                    if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
+                    {
+                        gameEntry.Platforms.Add(gamePlatform);
+                    }
+                }
 
-            return platformDictionary.Values;
-        }
+                return platformEntry;
+            },
+            splitOn: "Id,Id"
+        );
+
+        return platformDictionary.Values;
     }
 
     public async Task<Platform> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
-        {
-            var platformDictionary = new Dictionary<long, Platform>();
-            var gameDictionary = new Dictionary<long, Game>();
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        Dictionary<long, Platform> platformDictionary = new Dictionary<long, Platform>();
+        Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
-            await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+        await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
             SELECT 
                 p1.Id, p1.Name,
                 g.Id, g.Name, g.Image, g.LocalizationId,
@@ -113,60 +108,58 @@ RETURNING Id;"
             LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
             LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId
             WHERE p1.Id = @id",
-                (platform, game, gamePlatform) =>
+            (platform, game, gamePlatform) =>
+            {
+                // Get or create the platform
+                if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
                 {
-                    // Get or create the platform
-                    if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
+                    platformEntry = platform;
+                    platformEntry.Games = new List<Game>();
+                    platformDictionary.Add(platformEntry.Id, platformEntry);
+                }
+
+                if (game != null)
+                {
+                    // Get or create the game
+                    if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
                     {
-                        platformEntry = platform;
-                        platformEntry.Games = new List<Game>();
-                        platformDictionary.Add(platformEntry.Id, platformEntry);
-                    }
+                        gameEntry = game;
+                        gameEntry.Platforms = new List<Platform>();
+                        gameDictionary.Add(gameEntry.Id, gameEntry);
 
-                    if (game != null)
-                    {
-                        // Get or create the game
-                        if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
+                        // Add game to platform if not already present
+                        if (!platformEntry.Games.Any(g => g.Id == game.Id))
                         {
-                            gameEntry = game;
-                            gameEntry.Platforms = new List<Platform>();
-                            gameDictionary.Add(gameEntry.Id, gameEntry);
-
-                            // Add game to platform if not already present
-                            if (!platformEntry.Games.Any(g => g.Id == game.Id))
-                            {
-                                platformEntry.Games.Add(gameEntry);
-                            }
-                        }
-
-                        // Add platform to game if it exists and isn't already added
-                        if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
-                        {
-                            gameEntry.Platforms.Add(gamePlatform);
+                            platformEntry.Games.Add(gameEntry);
                         }
                     }
 
-                    return platformEntry;
-                },
-                new { id },
-                splitOn: "Id,Id"
-            );
+                    // Add platform to game if it exists and isn't already added
+                    if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
+                    {
+                        gameEntry.Platforms.Add(gamePlatform);
+                    }
+                }
 
-            return platformDictionary.Values.FirstOrDefault();
-        }
+                return platformEntry;
+            },
+            new { id },
+            splitOn: "Id,Id"
+        );
+
+        return platformDictionary.Values.FirstOrDefault();
     }
 
     public async Task<IEnumerable<Platform>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
-        {
-            var platformDictionary = new Dictionary<long, Platform>();
-            var gameDictionary = new Dictionary<long, Game>();
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        Dictionary<long, Platform> platformDictionary = new Dictionary<long, Platform>();
+        Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
-            await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+        await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
             SELECT 
                 p1.Id, p1.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId, g.PublisherId,
+                g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer,
                 p2.Id, p2.Name
             FROM (
@@ -179,58 +172,55 @@ RETURNING Id;"
             LEFT JOIN Games g ON g.Id = gp.GameId
             LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
             LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId",
-                (platform, game, gamePlatform) =>
+            (platform, game, gamePlatform) =>
+            {
+                // Get or create the platform
+                if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
                 {
-                    // Get or create the platform
-                    if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
+                    platformEntry = platform;
+                    platformEntry.Games = new List<Game>();
+                    platformDictionary.Add(platformEntry.Id, platformEntry);
+                }
+
+                if (game != null)
+                {
+                    // Get or create the game
+                    if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
                     {
-                        platformEntry = platform;
-                        platformEntry.Games = new List<Game>();
-                        platformDictionary.Add(platformEntry.Id, platformEntry);
+                        gameEntry = game;
+                        gameEntry.Platforms = new List<Platform>();
+                        gameDictionary.Add(gameEntry.Id, gameEntry);
+
+                        // Add game to platform if not already present
+                        platformEntry.Games.Add(gameEntry);
                     }
 
-                    if (game != null)
+                    // Add platform to game if it exists and isn't already added
+                    if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
                     {
-                        // Get or create the game
-                        if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
-                        {
-                            gameEntry = game;
-                            gameEntry.Platforms = new List<Platform>();
-                            gameDictionary.Add(gameEntry.Id, gameEntry);
-
-                            // Add game to platform if not already present
-                            platformEntry.Games.Add(gameEntry);
-                        }
-
-                        // Add platform to game if it exists and isn't already added
-                        if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
-                        {
-                            gameEntry.Platforms.Add(gamePlatform);
-                        }
+                        gameEntry.Platforms.Add(gamePlatform);
                     }
+                }
 
-                    return platformEntry;
-                },
-                new { offset, limit },
-                splitOn: "Id,Id"
-            );
+                return platformEntry;
+            },
+            new { offset, limit },
+            splitOn: "Id,Id"
+        );
 
-            return platformDictionary.Values;
-        }
+        return platformDictionary.Values;
     }
 
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
-        {
-            await connection.ExecuteAsync(@"DELETE FROM 
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        await connection.ExecuteAsync(@"DELETE FROM 
 Platforms WHERE Id=@id", new { id });
-        }
     }
 
     public async Task RemoveRangeAsync(IEnumerable<long> ids)
     {
-        foreach (var id in ids)
+        foreach (long id in ids)
         {
             await RemoveAsync(id);
         }
@@ -238,17 +228,15 @@ Platforms WHERE Id=@id", new { id });
 
     public async Task<Platform> UpdateAsync(UpdatePlatformModel platform, long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
-        {
-            var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name 
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name 
 WHERE Id=@Id
 RETURNING Name, Href, Id;", new
-            {
-                platform.Name,
-                id
-            });
+        {
+            platform.Name,
+            id
+        });
 
-            return updatedPlatform;
-        }
+        return updatedPlatform;
     }
 }
