@@ -1,0 +1,13 @@
+@using Domain.Games
+<div id="filter">
+    <div class="filter-nav">
+        <div class="filter-name">Платформа</div>
+        <a class="selected" href="/localizations/@Localization.Id">Все</a>
+        @foreach (Platform platform in Platforms)
+        {
+            <a href="/games/best-games?LocalizationId=@Localization.Id&PlatformId=@platform.Id">@platform.Name</a>
+        }
+
+    </div>
+    <h2>На русском</h2>
+</div>

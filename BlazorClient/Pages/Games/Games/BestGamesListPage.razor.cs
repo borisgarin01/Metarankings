@@ -22,6 +22,9 @@ public partial class BestGamesListPage : ComponentBase
     [SupplyParameterFromQuery]
     public long? PublisherId { get; set; }
 
+    [SupplyParameterFromQuery]
+    public long? LocalizationId { get; set; }
+
     public IEnumerable<Game> Games { get; set; }
 
     public IEnumerable<Platform> Platforms { get; set; }
@@ -58,6 +61,9 @@ public partial class BestGamesListPage : ComponentBase
 
                 if (PublisherId.HasValue)
                     filter.PublishersIds = new[] { PublisherId.Value };
+
+                if (LocalizationId.HasValue)
+                    filter.LocalizationIds = new[] { LocalizationId.Value };
 
                 // Using HttpClient.PostAsJsonAsync for POST or custom query string building for GET
                 HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync<GameFilterRequest>(

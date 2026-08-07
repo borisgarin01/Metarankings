@@ -100,6 +100,7 @@ public sealed class GamesController : ControllerBase
             filter.Years,
             filter.DevelopersIds,
             filter.PublishersIds,
+            filter.LocalizationIds,
             filter.Skip,
             filter.Take
         );

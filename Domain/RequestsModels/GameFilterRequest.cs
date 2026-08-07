@@ -7,6 +7,7 @@ public sealed record GameFilterRequest
     public int[] Years { get; set; } = Array.Empty<int>();
     public long[] DevelopersIds { get; set; } = Array.Empty<long>();
     public long[] PublishersIds { get; set; } = Array.Empty<long>();
+    public long[] LocalizationIds { get; set; } = Array.Empty<long>();
     public int Skip { get; set; } = 0;
     public int Take { get; set; } = 10;
 }
