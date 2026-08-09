@@ -5,12 +5,8 @@ using Domain.RequestsModels.Games.Collections;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesCollectionsItemsRepository : Repository, IRepository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>
+public sealed class GamesCollectionsItemsRepository(string connectionString) : Repository(connectionString), IRepository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>
 {
-    public GamesCollectionsItemsRepository(string connectionString) : base(connectionString)
-    {
-    }
-
     public async Task<long> AddAsync(AddGamesCollectionItemModel entity)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
