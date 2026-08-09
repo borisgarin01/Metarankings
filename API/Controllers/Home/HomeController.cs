@@ -105,7 +105,7 @@ public sealed class HomeController : ControllerBase
         }
     }
 
-    [HttpGet("nearest/{offset}")]
+    [HttpGet("nearest/{limit}")]
     public async Task<ActionResult<IEnumerable<GamesReleaseDateItemViewModel>>> GetNearestAsync(short limit)
     {
         IEnumerable<Game> games = await _gamesRepository.GetNearestAsync(limit);
@@ -115,56 +115,13 @@ public sealed class HomeController : ControllerBase
         return Ok(gamesReleaseDatetItemViewModels);
     }
 
-    [HttpGet("games-release-dates")]
-    public async Task<ActionResult<IEnumerable<GamesReleaseDateItemComponent>>> GetGamesReleasesDatesAsync(long pageNumber, long pageSize)
+    [HttpGet("games-release-dates/{pageNumber}/{pageSize}")]
+    public async Task<ActionResult<IEnumerable<GamesReleaseDateItemComponent>>> GetGamesReleasesDatesAsync(int pageNumber, int pageSize)
     {
-        IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemsComponents = new GamesReleaseDateItemViewModel[]
-        {
-            new("/dying-light-the-beast/","Игра Dying Light: The Beast", "/images/uploads/2025/07/dying-light-the-beast-boxart-cover-50x70.jpg", "Dying Light: The Beast", "Dying Light: The Beast", new Link[]{new("PC", "/meta/games/pc/"),
-                    new("PS5", "/meta/games/ps5/"),
-                    new("Xbox Series X", "/meta/games/xbox-series-x/")}, new Link[]
-                {
-                    new("РПГ", "/genre/rpg/"),
-                    new("Хоррор", "/genre/xorror/"),
-                    new("Экшен", "/genre/ekshen/")
-                }, new DateOnly(2025,6,1)),
-            new("/donkey-kong-bananza/","Игра Donkey Kong Bananza", "/images/uploads/2025/07/donkey-kong-bananza-boxart-cover-50x70.jpg", "Donkey Kong Bananza", "Donkey Kong Bananza", new Link[]{new("Switch 2", "/meta/games/switch-2/") }, new Link[]
-                {
-                    new("РПГ", "/genre/rpg/"),
-                    new("Хоррор", "/genre/xorror/"),
-                    new("Экшен", "/genre/ekshen/")
-                },new DateOnly(2025,7,17)),
-            new("/mindseye/","Игра MindsEye", "/images/uploads/2025/08/mindseye-boxart-cover-50x70.jpg", "MindsEye", "MindsEye",
-            new Link[]
-            {new("PC", "/meta/games/pc/"),
-                    new("PS5", "/meta/games/ps5/"),
-                    new("Xbox Series X", "/meta/games/xbox-series-x/")}, new Link[]
-                {
-                    new("Шутер", "/genre/shuter/"),
-                    new("Приключение", "/genre/priklyuchenie/"),
-                    new("Экшен", "/genre/ekshen/")
-                },new DateOnly(2025, 6, 1)),
-            new("/shinobi-art-of-vengeance/","Игра SHINOBI: Art of Vengeance","/images/uploads/2025/08/shinobi-art-of-vengeance-boxart-cover-50x70.jpg", "SHINOBI: Art of Vengeance","SHINOBI: Art of Vengeance",new Link[]
-                {
-                    new("Аркада", "/genre/arkada/"),
-                    new("Платформер", "/genre/platformer/"),
-                    new("Экшен", "/genre/ekshen/")
-                }, new Link[]
-                {
-                    new("PC", "/meta/games/pc/"),
-                    new("PS5", "/meta/games/ps5/"),
-                    new("Xbox Series X", "/meta/games/xbox-series-x/")
-                }, new DateOnly(2025, 8, 26)),
-            new("/game-metal-gear-solid-delta-snake-eater/", "Игра Metal Gear Solid Delta: Snake Eater", "/images/uploads/2023/05/metal-gear-solid-delta-snake-eater-boxart-cover-50x70.jpg", "Metal Gear Solid Delta: Snake Eater","Metal Gear Solid Delta: Snake Eater", new Link[]
-                {
-                    new("Экшен", "/genre/ekshen/")
-                }, new Link[]
-                {
-                    new("PC", "/meta/games/pc/"),
-                    new("PS5", "/meta/games/ps5/"),
-                    new("Xbox Series X", "/meta/games/xbox-series-x/")
-                }, new DateOnly(2025, 8, 28))
-        };
+        IEnumerable<Game> nearestNextReleaseDatesGames = await _gamesRepository.GetLastAsync((pageNumber - 1) * pageSize, pageSize);
+
+        IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemsComponents = nearestNextReleaseDatesGames
+            .Select(b => new GamesReleaseDateItemViewModel($"/games/Details/{b.Id}", b.Name, b.Image, b.Name, b.Name, b.Platforms.Select(a => new Link(a.Name, $"/platforms/{a.Id}")).ToArray(), b.Genres.Select(a => new Link(a.Name, $"/genres/{a.Id}")).ToArray(), b.ReleaseDate.HasValue ? b.ReleaseDate.Value : default));
 
         return Ok(gamesReleaseDateItemsComponents);
     }
