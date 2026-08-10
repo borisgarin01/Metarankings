@@ -1,4 +1,27 @@
-﻿* {
-    text-decoration: none;
-    font-family: Tahoma;
+﻿
+div.headerer {
+    width: 100%;
+    top: 0;
+    height: 100px;
+}
+
+div.header-bottom {
+    background: #fff;
+    width: 100%;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, .06);
+    height: 55px;
+    position: fixed;
+    z-index: 10000;
+    top: 0;
+}
+
+div.nav {
+    position: relative;
+}
+
+.nav ul {
+    float: left;
+    list-style: outside none none;
+    text-align: center;
+    margin-left: 20px;
 }

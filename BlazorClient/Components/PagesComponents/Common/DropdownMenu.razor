@@ -1,0 +1,23 @@
+﻿<li @onmouseenter="OpenDropdown"
+    @onmouseleave="CloseDropdown"
+    @onclick="ToggleDropdown"
+    class="@(IsActive ? "active" : "")">
+    <span><a href="@MainLink">@Title</a></span>
+    <div class="@DropdownClass" style="display: @(isOpen ? "block" : "none")">
+        @ChildContent
+    </div>
+</li>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string MainLink { get; set; } = "#";
+    [Parameter] public string DropdownClass { get; set; } = "dropdown";
+    [Parameter] public bool IsActive { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; } = null!;
+
+    private bool isOpen = false;
+
+    private void OpenDropdown() => isOpen = true;
+    private void CloseDropdown() => isOpen = false;
+    private void ToggleDropdown() => isOpen = !isOpen;
+}

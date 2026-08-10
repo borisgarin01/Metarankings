@@ -1,0 +1,37 @@
+﻿@using BlazorClient.Components.PagesComponents.Common
+@using Domain.Movies
+
+<DropdownMenu Title="Фильмы"
+              MainLink="@($"/movies/best-movies?Year={DateTime.Now.Year}")"
+              DropdownClass="movie-drop">
+
+    <!-- Основные ссылки -->
+    <a href="/new-movies/">Новинки</a>
+    <a href="/coming-soon/">Скоро</a>
+    <a href="/most-waiting-films/">Ожидаемые</a>
+    <a href="/best-movies/">Топ фильмов</a>
+    <a href="/best-movies-@DateTime.Now.Year/">Фильмы @DateTime.Now.Year</a>
+
+    <!-- Разделитель -->
+    <div class="dropdown-divider"></div>
+
+    <!-- Жанры -->
+    @if (Genres.Any())
+    {
+        <div class="dropdown-header">Жанры</div>
+        @foreach (MovieGenre genre in Genres)
+        {
+            <a href="/movies/best-movies?GenreId=@genre.Id">@genre.Name</a>
+        }
+    }
+
+    <!-- Разделитель -->
+    <div class="dropdown-divider"></div>
+
+    <!-- Годы -->
+    <div class="dropdown-header">Годы</div>
+    @foreach (var year in GetYears())
+    {
+        <a href="/movies/best-movies?Year=@year">Фильмы @year</a>
+    }
+</DropdownMenu>

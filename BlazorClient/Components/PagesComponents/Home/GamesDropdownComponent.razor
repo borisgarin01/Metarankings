@@ -1,15 +1,49 @@
-﻿<div class="title-index">
-    <div class="dropdown-menu genre">
-        <span class="title">Год</span>
-        <ul>
-            <li><a href="/best-games-2025/">Игры 2025</a></li>
-            <li><a href="/best-games-2024/">Игры 2024</a></li>
-            <li><a href="/best-games-2023/">Игры 2023</a></li>
-            <li><a href="/best-games-2022/">Игры 2022</a></li>
-            <li><a href="/best-games-2021/">Игры 2021</a></li>
-            <li><a href="/best-games-2020/">Игры 2020</a></li>
-            <li><a href="/best-games-2019/">Игры 2019</a></li>
-            <li><a href="/best-games-2018/">Игры 2018</a></li>
-        </ul>
-    </div>
-</div>
+﻿@using BlazorClient.Components.PagesComponents.Common
+
+<DropdownMenu Title="Игры"
+              MainLink="@($"/games/best-games?Year={DateTime.Now.Year}")"
+              DropdownClass="game-drop"
+              IsActive="true">
+
+    <!-- Основные ссылки -->
+    <a href="/games/new-games/">Новинки</a>
+    <a href="/games/release-date/">Дата выхода</a>
+    <a href="/games/most-waiting-games/">Ожидаемые</a>
+    <a href="/games/meta/games/">Обзоры</a>
+    <a href="/games/best-games?Year=@DateTime.Now.Year">Топ игр</a>
+    <a href="/games/best-games?Year=@(DateTime.Now.Year - 1)">Игры @(DateTime.Now.Year - 1)</a>
+
+    <!-- Разделитель -->
+    <div class="dropdown-divider"></div>
+
+    <!-- Платформы -->
+    @if (Platforms.Any())
+    {
+        <div class="dropdown-header">Платформы</div>
+        @foreach (var platform in Platforms)
+        {
+            <a href="/games/best-games?PlatformId=@platform.Id">@platform.Name</a>
+        }
+    }
+
+    <!-- Разделитель -->
+    <div class="dropdown-divider"></div>
+
+    <!-- Жанры -->
+    @if (Genres.Any())
+    {
+        <div class="dropdown-header">Жанры</div>
+        @foreach (var genre in Genres)
+        {
+            <a href="/games/best-games?GenreId=@genre.Id">@genre.Name</a>
+        }
+    }
+
+    <!-- Годы (как в вашем примере) -->
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-header">Годы</div>
+    @foreach (var year in GetYears())
+    {
+        <a href="/games/best-games?Year=@year">Игры @year</a>
+    }
+</DropdownMenu>
