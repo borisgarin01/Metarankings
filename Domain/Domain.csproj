@@ -5,13 +5,7 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Auth\RefreshToken.cs~RF96d44e.TMP" />
-    <None Remove="Games\GamesCollections\Collection.cs~RF553e53.TMP" />
-    <None Remove="Games\GamesCollections\CollectionItem.cs~RF57c665.TMP" />
-  </ItemGroup>
-
+	
   <ItemGroup>
     <Folder Include="Files\" />
   </ItemGroup>

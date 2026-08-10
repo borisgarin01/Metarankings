@@ -16,4 +16,17 @@
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="BlazorClient\BlazorClient.csproj" />
+    <ProjectReference Include="API\API.csproj" />
+    <ProjectReference Include="Data\Data.csproj" />
+    <ProjectReference Include="Domain\Domain.csproj" />
+    <ProjectReference Include="ExcelProcessors\ExcelProcessors.csproj" />
+    <ProjectReference Include="FilesManagement\FilesManagement.csproj" />
+    <ProjectReference Include="IdentityLibrary\IdentityLibrary.csproj" />
+    <ProjectReference Include="Settings\Settings.csproj" />
+    <ProjectReference Include="Shared\Shared.csproj" />
+    <ProjectReference Include="ViewModels\ViewModels.csproj" />
+    <ProjectReference Include="WebClientServices\WebManagers.csproj" />
+  </ItemGroup>
 </Project>

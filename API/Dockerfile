@@ -1,7 +1,7 @@
 # См. статью по ссылке https://aka.ms/customizecontainer, чтобы узнать как настроить контейнер отладки и как Visual Studio использует этот Dockerfile для создания образов для ускорения отладки.
 
 # Этот этап используется при запуске из VS в быстром режиме (по умолчанию для конфигурации отладки)
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8081
@@ -9,7 +9,7 @@ EXPOSE 8080
 
 
 # Этот этап используется для сборки проекта службы
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["API/API.csproj", "API/"]
@@ -22,7 +22,7 @@ COPY ["Data/Data.csproj", "Data/"]
 COPY ["ExcelProcessors/ExcelProcessors.csproj", "ExcelProcessors/"]
 COPY ["Settings/Settings.csproj", "Settings/"]
 COPY ["ViewModels/ViewModels.csproj", "ViewModels/"]
-RUN dotnet restore "./API/API.csproj"
+RUN dotnet restore "/src/API/API.csproj"
 COPY . .
 WORKDIR "/src/API"
 RUN dotnet build "./API.csproj" -c $BUILD_CONFIGURATION -o /app/build

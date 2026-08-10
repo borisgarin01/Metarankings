@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/WebClientServices/">
+    <Project Path="WebClientServices/WebManagers.csproj" />
+  </Folder>
+  <Project Path="API/API.csproj" />
+  <Project Path="BlazorClient/BlazorClient.csproj" />
+  <Project Path="Data/Data.csproj" />
+  <Project Path="Domain/Domain.csproj" />
+  <Project Path="ExcelProcessors/ExcelProcessors.csproj" />
+  <Project Path="IdentityLibrary/IdentityLibrary.csproj" />
+  <Project Path="Settings/Settings.csproj" />
+  <Project Path="Shared/Shared.csproj" />
+  <Project Path="ViewModels/ViewModels.csproj" />
+</Solution>
