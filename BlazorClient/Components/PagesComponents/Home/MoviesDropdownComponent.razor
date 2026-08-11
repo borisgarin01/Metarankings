@@ -1,37 +1,17 @@
-﻿@using BlazorClient.Components.PagesComponents.Common
-@using Domain.Movies
+﻿@using Domain.Movies
 
-<DropdownMenu Title="Фильмы"
-              MainLink="@($"/movies/best-movies?Year={DateTime.Now.Year}")"
-              DropdownClass="movie-drop">
+<li class="nav-link services">
+    <a href="/best-movies/">Фильмы<span class="material-icons dropdown-icon">arrow_drop_down</span></a>
+    <div class="drop-down">
+        <a href="/new-movies/">Новинки</a>
+        <a href="/coming-soon/">Скоро</a>
+        <a href="/most-waiting-films/">Ожидаемые</a>
+        <a href="/best-movies/">Топ фильмов</a>
+        <a href="/movies/best-movies?Year=@DateTime.Now.Year">Фильмы @DateTime.Now.Year</a>
 
-    <!-- Основные ссылки -->
-    <a href="/new-movies/">Новинки</a>
-    <a href="/coming-soon/">Скоро</a>
-    <a href="/most-waiting-films/">Ожидаемые</a>
-    <a href="/best-movies/">Топ фильмов</a>
-    <a href="/best-movies-@DateTime.Now.Year/">Фильмы @DateTime.Now.Year</a>
-
-    <!-- Разделитель -->
-    <div class="dropdown-divider"></div>
-
-    <!-- Жанры -->
-    @if (Genres.Any())
-    {
-        <div class="dropdown-header">Жанры</div>
-        @foreach (MovieGenre genre in Genres)
+        @foreach (MovieGenre movieGenre in Genres)
         {
-            <a href="/movies/best-movies?GenreId=@genre.Id">@genre.Name</a>
+            <a href="/movies/best-movies?GenreId=@movieGenre.Id">@movieGenre.Name</a>
         }
-    }
-
-    <!-- Разделитель -->
-    <div class="dropdown-divider"></div>
-
-    <!-- Годы -->
-    <div class="dropdown-header">Годы</div>
-    @foreach (var year in GetYears())
-    {
-        <a href="/movies/best-movies?Year=@year">Фильмы @year</a>
-    }
-</DropdownMenu>
+    </div>
+</li>
