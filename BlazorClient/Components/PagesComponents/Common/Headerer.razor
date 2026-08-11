@@ -1,55 +1,44 @@
 ﻿@using BlazorClient.Components.PagesComponents.Home
 @using BlazorClient.Pages.Movies.Movies
 @using Domain.Games
-@using Domain.Movies
-<div class="headerer">
-    <div class="header-bottom">
-        <div class="header clear nav-menu">
-            <div class="menu-icon">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <div class="logo">
-                <a href=""><span>Meta</span>Rankings</a>
-            </div>
-            <div class="nav">
-                <ul>
-                    <MoviesDropdownComponent Genres="@MoviesGenres" />
-                    <GamesDropdownComponent Platforms="@Platforms" Genres="@GamesGenres" />
 
-                    <li>
-                        <a href="/collections/">Подборки</a>
-                    </li>
-                    <li>
-                        <a href="/user-reviews/">Отзывы</a>
-                    </li>
-                    <AuthorizeView>
-                        <Authorized>
-                            <li class="single-line">Привет, <a href="/auth/account/@context.User.FindFirstValue("UserId")">@context.User.FindFirstValue("UserName")</a></li>
-                            <li class="single-line"><a href="/auth/logout">Выйти</a></li>
-                        </Authorized>
-                        <NotAuthorized>
-                            <li class="single-line"><a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a></li>
-                        </NotAuthorized>
-                    </AuthorizeView>
-                </ul>
-            </div>
-            <div class="nav_login">
-                <ul>
-                    <li><span class="user-login popauthor" title="Войти на сайт"></span></li>
-                </ul>
-            </div>
-            <div class="search_form">
-                <form method="get" id="searchform" action="/search/">
-                    <fieldset>
-                        <input name="SearchText" type="search" id="search" placeholder="Название игры или фильма..." autocomplete="off">
-                        <button type="submit">Искать</button>
-                    </fieldset>
-                </form>
-                <div id="search_form-result"></div>
-            </div>
-        </div>
+<div class="container">
+    <div class="navbar">
+        <ul class="nav-links">
+            <MoviesDropdownComponent Genres="@MoviesGenres" />
+            <GamesDropdownComponent Platforms="@Platforms" Genres="@GamesGenres" />
+
+            <li class="nav-link">
+                <a href="/collections/">Подборки</a>
+            </li>
+            <li class="nav-link">
+                <a href="/user-reviews/">Отзывы</a>
+            </li>
+            <AuthorizeView>
+                <Authorized>
+                    <li class="single-line">Привет, <a href="/auth/account/@context.User.FindFirstValue("UserId")">@context.User.FindFirstValue("UserName")</a></li>
+                    <li class="single-line"><a href="/auth/logout">Выйти</a></li>
+                </Authorized>
+                <NotAuthorized>
+                    <li class="single-line"><a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a></li>
+                </NotAuthorized>
+            </AuthorizeView>
+        </ul>
+    </div>
+    <div class="nav_login">
+        <ul>
+            <li><span class="user-login popauthor" title="Войти на сайт"></span></li>
+        </ul>
+    </div>
+    <div class="search_form">
+        <form method="get" id="searchform" action="/search/">
+            <fieldset>
+                <input name="SearchText" type="search" id="search" placeholder="Название игры или фильма..." autocomplete="off">
+                <button type="submit">Искать</button>
+            </fieldset>
+        </form>
+        <div id="search_form-result"></div>
     </div>
 </div>
+
+        
