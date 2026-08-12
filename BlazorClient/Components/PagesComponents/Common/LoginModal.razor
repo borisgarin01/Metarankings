@@ -1,0 +1,101 @@
+﻿@if (IsVisible)
+{
+    <div class="modal-overlay" @onclick="CloseOnOverlayAsync">
+        <div class="popup_block" @onclick:stopPropagation="true">
+            <div class="close" @onclick="CloseAsync">
+                <span>&times;</span>
+            </div>
+
+            <form id="loginForm" @onsubmit="PerformLoginAsync">
+                @if (!IsTwoFactorRequired)
+                {
+                    <!-- Обычная форма входа -->
+                    <div class="field">
+                        <label>Имя пользователя</label>
+                        <div class="input">
+                            <input type="email"
+                                   placeholder="Введите email"
+                                   @bind="LoginModel.UserEmail"
+                                   @bind:event="oninput" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <a rel="nofollow" id="forgot" href="/auth/resetPassword">Забыли?</a>
+                        <label>Пароль</label>
+                        <div class="input">
+                            <input type="password"
+                                   placeholder="Введите пароль"
+                                   @bind="LoginModel.Password"
+                                   @bind:event="oninput" />
+                        </div>
+                    </div>
+
+                    <div class="submit">
+                        <button name="submit" type="submit" disabled="@IsLoading">
+                            @if (IsLoading)
+                            {
+                                <span>Загрузка...</span>
+                            }
+                            else
+                            {
+                                <span>Войти</span>
+                            }
+                        </button>
+                        <div class="registr">
+                            <a rel="nofollow" href="/register">Регистрация</a>
+                        </div>
+                    </div>
+
+                    <!-- Соцсети -->
+                    @if (ExternalLogins.Any())
+                    {
+                        <div class="social-login">
+                            <div class="divider"><span>или</span></div>
+                            <div class="social-buttons">
+                                @foreach (var login in ExternalLogins)
+                                {
+                                    <button type="button" class="social-btn" @onclick="() => LoginExternal(login)">
+                                        @login.DisplayName
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <!-- 2FA -->
+                    <div class="field">
+                        <label>Код подтверждения</label>
+                        <div class="input">
+                            <input type="text"
+                                   placeholder="6-значный код"
+                                   maxlength="6"
+                                   @bind="TwoFactorCode"
+                                   @bind:event="oninput" />
+                        </div>
+                    </div>
+
+                    <div class="submit">
+                        <button type="button" @onclick="VerifyTwoFactorAsync" disabled="@IsLoading">
+                            @if (IsLoading)
+                            {
+                                <span>Проверка...</span>
+                            }
+                            else
+                            {
+                                <span>Подтвердить</span>
+                            }
+                        </button>
+                        <button type="button" class="btn-secondary" @onclick="CancelTwoFactor">Назад</button>
+                    </div>
+
+                    <div class="resend-link">
+                        <a @onclick="ResendTwoFactorCode">Отправить код повторно</a>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+}

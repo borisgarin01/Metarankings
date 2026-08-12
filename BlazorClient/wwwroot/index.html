@@ -1,49 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru-RU">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Копия metarankings.ru на ASP.Net Core Web API + Blazor WASM. metarankings,рейтинг фильмов и игр,рейтинги фильмов и игр" />
-    <meta name="robots" content="index,follow">
-    <title>Metarankings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Рейтинги фильмов и игр — MetaRankings.ru</title>
+
+    <!-- SEO -->
+    <meta name="description" content="MetaRankings - рейтинг фильмов, игр и сериалов пользователями интернета с подробным описанием, оценками, отзывами, обзорами критиков и датами выхода.">
     <meta name="keywords" content="metarankings,рейтинг фильмов и игр,рейтинги фильмов и игр">
-    <base href="/" />
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://metarankings.ru">
 
-    <!-- СТАНДАРТНАЯ ИКОНКА ДЛЯ АДРЕСНОЙ СТРОКИ (ICO) -->
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <!-- Иконки -->
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="32x32" href="/apple-touch-icon-32x32.png">
+    <link rel="apple-touch-icon" sizes="16x16" href="/apple-touch-icon-16x16.png">
 
-    <!-- ИКОНКИ ДЛЯ APPLE (iPhone, iPad) - ОБЯЗАТЕЛЬНО PNG -->
-    <link rel="apple-touch-icon" sizes="192x192" href="/images/favicon.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="/images/favicon.png">
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#fff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="MetaRankings">
 
-    <!-- МАНИФЕСТ ДЛЯ ANDROID / CHROME -->
-    <link href="manifest.webmanifest" rel="manifest" />
-
-    <!-- ОСТАЛЬНЫЕ СТИЛИ И СКРИПТЫ -->
-    <link rel="stylesheet" href="css/app.css" />
-    <link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css" />
+    <!-- Стили -->
+    <link rel="stylesheet" href="/css/app.css" />
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="BlazorClient.styles.css" rel="stylesheet" />
+
+    <!-- Скрипты -->
+    <script src="https://yandex.ru/ads/system/context.js" async=""></script>
 </head>
 
 <body>
+    <!-- КОРНЕВОЙ ЭЛЕМЕНТ BLAZOR -->
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <!-- СЮДА ПОДКЛЮЧАЕТСЯ App.razor (который содержит Routes) -->
     </div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
+    <!-- Подключаем Blazor -->
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="css/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="js/header.js"></script>
 </body>
 
 </html>

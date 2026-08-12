@@ -1,50 +1,81 @@
 ﻿using Domain.Games;
 using Domain.Movies;
-using Domain.RequestsModels.Games.Genres;
-using Domain.RequestsModels.Games.Platforms;
-using Domain.RequestsModels.Movies.MoviesGenres;
-using WebManagers;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 
 namespace BlazorClient.Components.PagesComponents.Common;
 
 public partial class Headerer : ComponentBase
 {
-    [Inject]
-    public IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresWebManager { get; set; }
+    // ===== ПАРАМЕТРЫ =====
+    [Parameter]
+    public IEnumerable<MovieGenre>? MoviesGenres { get; set; }
 
-    [Inject]
-    public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> PlatformsWebManager { get; set; }
+    [Parameter]
+    public IEnumerable<Platform>? Platforms { get; set; }
 
-    [Inject]
-    public IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel> GamesGenresWebManager { get; set; }
+    [Parameter]
+    public IEnumerable<Genre>? GamesGenres { get; set; }
 
-    public IEnumerable<MovieGenre> MoviesGenres { get; set; }
-    public IEnumerable<Platform> Platforms { get; set; }
-    public IEnumerable<Genre> GamesGenres { get; set; }
+    // ===== СОСТОЯНИЕ =====
+    private bool isMenuOpen = false;
+    private bool isLoginOpen = false;
+    private bool isSticky = false;
+    private string searchQuery = "";
+    private ElementReference headerBottomRef;
 
-    protected override async Task OnInitializedAsync()
+    // ===== INJECT =====
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    // ===== ЖИЗНЕННЫЙ ЦИКЛ =====
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        Task<IEnumerable<MovieGenre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
-        Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetAllAsync();
-        Task<IEnumerable<Genre>> gamesGenresGettingTask = GamesGenresWebManager.GetAllAsync();
-
-        await Task.WhenAll(moviesGenresGettingTask, platformsGettingTask, gamesGenresGettingTask).ContinueWith(b =>
+        if (firstRender)
         {
-            MoviesGenres = moviesGenresGettingTask.Result;
-            Platforms = platformsGettingTask.Result;
-            GamesGenres = gamesGenresGettingTask.Result;
-        });
+            // Инициализируем скролл и клики
+            await JS.InvokeVoidAsync("initHeader", headerBottomRef);
+        }
     }
 
-    private bool isActive = false;
-
-    private void Show()
+    // ===== МЕТОДЫ =====
+    private async Task ToggleMenu()
     {
-        isActive = true;
+        isMenuOpen = !isMenuOpen;
+        if (isMenuOpen)
+        {
+            await JS.InvokeVoidAsync("document.body.classList.add", "menu-open");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("document.body.classList.remove", "menu-open");
+        }
     }
 
-    private void Hide()
+    private void OpenLogin()
     {
-        isActive = false;
+        isLoginOpen = true;
+        // Закрываем меню если открыто
+        if (isMenuOpen)
+        {
+            _ = ToggleMenu();
+        }
+    }
+
+    private async Task OnLoginSuccessHandler()
+    {
+        isLoginOpen = false;
+        await AuthProvider.GetAuthenticationStateAsync();
+        StateHasChanged();
+    }
+
+    private void Search()
+    {
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            NavigationManager.NavigateTo($"/search/?SearchText={Uri.EscapeDataString(searchQuery)}");
+        }
     }
 }

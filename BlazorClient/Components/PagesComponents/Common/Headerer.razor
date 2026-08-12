@@ -1,44 +1,92 @@
-﻿@using BlazorClient.Components.PagesComponents.Home
-@using BlazorClient.Pages.Movies.Movies
-@using Domain.Games
+﻿@namespace BlazorClient.Components.PagesComponents.Common
+@using BlazorClient.Components.PagesComponents.Home
+@using Microsoft.AspNetCore.Components.Authorization
 
-<div class="container">
-    <div class="navbar">
-        <ul class="nav-links">
-            <MoviesDropdownComponent Genres="@MoviesGenres" />
-            <GamesDropdownComponent Platforms="@Platforms" Genres="@GamesGenres" />
+<header>
+    <div class="headerer">
+        <div class="header-bottom @(isSticky ? "sticky" : "")" @ref="headerBottomRef">
+            <div class="header clear nav-menu @(isMenuOpen ? "menu-open" : "")">
+                <!-- Бургер-меню -->
+                <div class="menu-icon" @onclick="ToggleMenu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
 
-            <li class="nav-link">
-                <a href="/collections/">Подборки</a>
-            </li>
-            <li class="nav-link">
-                <a href="/user-reviews/">Отзывы</a>
-            </li>
-            <AuthorizeView>
-                <Authorized>
-                    <li class="single-line">Привет, <a href="/auth/account/@context.User.FindFirstValue("UserId")">@context.User.FindFirstValue("UserName")</a></li>
-                    <li class="single-line"><a href="/auth/logout">Выйти</a></li>
-                </Authorized>
-                <NotAuthorized>
-                    <li class="single-line"><a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a></li>
-                </NotAuthorized>
-            </AuthorizeView>
-        </ul>
-    </div>
-    <div class="nav_login">
-        <ul>
-            <li><span class="user-login popauthor" title="Войти на сайт"></span></li>
-        </ul>
-    </div>
-    <div class="search_form">
-        <form method="get" id="searchform" action="/search/">
-            <fieldset>
-                <input name="SearchText" type="search" id="search" placeholder="Название игры или фильма..." autocomplete="off">
-                <button type="submit">Искать</button>
-            </fieldset>
-        </form>
-        <div id="search_form-result"></div>
-    </div>
-</div>
+                <!-- Логотип -->
+                <div class="logo">
+                    <a href="/"><span>Meta</span>Rankings</a>
+                </div>
 
-        
+                <!-- Навигация -->
+                <div class="nav">
+                    <ul class="nav-links">
+                        <MoviesDropdownComponent Genres="@MoviesGenres" />
+                        <GamesDropdownComponent Platforms="@Platforms" Genres="@GamesGenres" />
+
+                        <li class="nav-link">
+                            <a href="/collections/">Подборки</a>
+                        </li>
+                        <li class="nav-link">
+                            <a href="/user-reviews/">Отзывы</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Авторизация -->
+                <div class="nav-login-wrapper">
+                    <ul class="nav-login">
+                        <AuthorizeView>
+                            <Authorized>
+                                <li class="user-info">
+                                    <span class="user-avatar">
+                                        <i class="bi bi-person-circle"></i>
+                                    </span>
+                                    <span class="user-name">
+                                        <a href="/auth/account/@context.User.FindFirstValue("UserId")">
+                                            @context.User.FindFirstValue("UserName")
+                                        </a>
+                                    </span>
+                                </li>
+                                <li class="logout-link">
+                                    <a href="/auth/logout">
+                                        <i class="bi bi-box-arrow-right"></i>
+                                    </a>
+                                </li>
+                            </Authorized>
+                            <NotAuthorized>
+                                <li class="login-btn" @onclick="OpenLogin">
+                                    <span class="user-login" title="Войти на сайт">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                </li>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </ul>
+                </div>
+
+                <!-- Поиск -->
+                <div class="search_form">
+                    <form method="get" action="/search/" @onsubmit="Search">
+                        <fieldset>
+                            <input name="SearchText"
+                                   type="search"
+                                   id="search"
+                                   placeholder="Название игры или фильма..."
+                                   autocomplete="off"
+                                   @bind="searchQuery" />
+                            <button type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </fieldset>
+                    </form>
+                    <div id="search_form-result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Модалка логина -->
+<LoginModal @bind-IsVisible="isLoginOpen" OnLoginSuccess="OnLoginSuccessHandler" />

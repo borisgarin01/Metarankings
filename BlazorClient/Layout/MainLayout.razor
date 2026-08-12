@@ -1,13 +1,29 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+@using BlazorClient.Components.PagesComponents.Common
+@using Blazored.Toast
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+<!-- Хедер -->
+<Headerer />
+
+<!-- Основной контент -->
+<main>
+    <div class="wrapper">
+        @Body
+    </div>
+</main>
+
+<!-- Футер -->
+<Footer />
+
+<!-- Кнопка "Наверх" -->
+<ToTopButton />
+
+<!-- Ошибки Blazor -->
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
 </div>
+
+<!-- Тосты -->
 <BlazoredToasts />

@@ -1,6 +1,7 @@
 using BlazorClient;
 using BlazorClient.Auth;
 using BlazorClient.IServiceCollectionsExtensions;
+using BlazorClient.Modal;
 using Blazored.Toast;
 
 internal class Program
@@ -36,6 +37,8 @@ internal class Program
         builder.Services.AddGamesWebManagers();
 
         builder.Services.AddMoviesWebManagers();
+
+        builder.Services.AddScoped<IModalService, ModalService>();
 
         builder.Services.AddScoped<JwtAuthenticationStateProvider>();
         builder.Services.AddScoped<AuthenticationStateProvider>(
