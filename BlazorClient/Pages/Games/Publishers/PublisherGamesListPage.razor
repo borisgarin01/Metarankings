@@ -1,11 +1,8 @@
 ﻿@page "/publishers/{PublisherId:int}"
 
 @using BlazorClient.Components.PagesComponents.GamesList
-@using BlazorClient.Pages.Games.Games
-@using Domain
 @using Domain.Games
 
-<BlazorClient.Components.PagesComponents.Common.Headerer />
 <BlazorClient.Components.PagesComponents.Common.GameMenu Year="@DateTime.Today.Year" />
 
 @if (Publisher is null)
