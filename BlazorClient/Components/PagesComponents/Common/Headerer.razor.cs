@@ -64,6 +64,14 @@ public partial class Headerer : ComponentBase
         }
     }
 
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            Search();
+        }
+    }
+
     private async Task OnLoginSuccessHandler()
     {
         isLoginOpen = false;
