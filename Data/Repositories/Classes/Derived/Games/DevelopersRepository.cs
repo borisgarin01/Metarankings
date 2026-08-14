@@ -1,11 +1,12 @@
-﻿using Domain.Games;
-using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Interfaces;
+using Data.Repositories.Interfaces.Derived;
+using Domain.Games;
 using Domain.RequestsModels.Games.Developers;
 using Npgsql;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class DevelopersRepository : Repository, IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel>
+public sealed class DevelopersRepository : Repository, IDevelopersRepository
 {
     public DevelopersRepository(string connectionString) : base(connectionString)
     {
@@ -213,13 +214,68 @@ RETURNING Id;"
         }
     }
 
+    public async Task<Developer> GetByNameAsync(string name)
+    {
+        using var connection = new NpgsqlConnection(ConnectionString);
+        var developersDictionary = new Dictionary<long, Developer>();
+        var gamesDictionary = new Dictionary<long, Game>();
+
+        await connection.QueryAsync<Developer, Game, Platform, Developer>(@"
+            select 
+                developers.id, developers.name, 
+                games.Id, games.Name, games.Image, 
+                games.releasedate, 
+                games.description, games.trailer,
+                platforms.id, platforms.name
+            from developers
+            left join gamesdevelopers
+                on gamesdevelopers.developerid=developers.id
+            left join games
+                on games.id=gamesdevelopers.gameid
+            left join gamesplatforms
+                on gamesplatforms.gameid=games.id
+            left join platforms 
+                on platforms.id=gamesplatforms.platformid
+            WHERE developers.name=@Name",
+            (developer, game, platform) =>
+            {
+                if (!developersDictionary.TryGetValue(developer.Id, out var developerEntry))
+                {
+                    developerEntry = developer;
+                    developerEntry = developerEntry with { Games = new List<Game>() };
+                    developersDictionary.Add(developerEntry.Id, developerEntry);
+                }
+
+                if (game != null)
+                {
+                    if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
+                    {
+                        gameEntry = game;
+                        gameEntry.Platforms = new List<Platform>();
+                        gamesDictionary.Add(gameEntry.Id, gameEntry);
+                        developerEntry.Games.Add(gameEntry);
+                    }
+
+                    if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                    {
+                        gameEntry.Platforms.Add(platform);
+                    }
+                }
+
+                return developerEntry;
+            },
+            splitOn: "Id,Id", // Explicitly specify split points
+            param: new { Name = name }
+        );
+
+        return developersDictionary.Values.FirstOrDefault();
+    }
+
     public async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
-        {
-            await connection.ExecuteAsync(@"DELETE FROM 
+        using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.ExecuteAsync(@"DELETE FROM 
 Developers WHERE Id=@id", new { id });
-        }
     }
 
     public async Task RemoveRangeAsync(IEnumerable<long> ids)

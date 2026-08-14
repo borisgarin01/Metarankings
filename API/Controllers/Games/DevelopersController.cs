@@ -1,4 +1,5 @@
 ﻿using Data.Repositories.Interfaces;
+using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.RequestsModels.Games.Developers;
 using ExcelProcessors;
@@ -10,14 +11,14 @@ namespace API.Controllers.Games;
 public sealed class DevelopersController : ControllerBase
 {
 
-    private readonly IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel> _developersRepository;
+    private readonly IDevelopersRepository _developersRepository;
     private readonly IExcelDataReader<AddDeveloperModel> _developersExcelDataReader;
 
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     private readonly ILogger<DevelopersController> _logger;
 
-    public DevelopersController(IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel> developersRepository, ILogger<DevelopersController> logger, IExcelDataReader<AddDeveloperModel> developersExcelDataReader)
+    public DevelopersController(IDevelopersRepository developersRepository, ILogger<DevelopersController> logger, IExcelDataReader<AddDeveloperModel> developersExcelDataReader)
     {
         _developersRepository = developersRepository;
         _developersExcelDataReader = developersExcelDataReader;
@@ -49,6 +50,11 @@ public sealed class DevelopersController : ControllerBase
         {
             return BadRequest(ModelState);
         }
+
+        Developer existingDeveloper = await _developersRepository.GetByNameAsync(addDeveloperModel.Name);
+
+        if (existingDeveloper is not null)
+            return BadRequest($"Разраб с именем {existingDeveloper.Name} уже существует");
 
         long insertedDeveloperId = await _developersRepository.AddAsync(addDeveloperModel);
 

@@ -26,7 +26,7 @@ public static class RepositoriesRegistrator
     {
         string metarankingsConnectionString = configuration.GetConnectionString("PostgresConnection");
 
-        services.AddScoped<IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel>, DevelopersRepository>(instance => new DevelopersRepository(metarankingsConnectionString));
+        services.AddScoped<IDevelopersRepository, DevelopersRepository>(instance => new DevelopersRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel>, GamesGenresRepository>(instance => new GamesGenresRepository(metarankingsConnectionString));
 
