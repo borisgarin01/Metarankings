@@ -14,7 +14,10 @@
 </div>
 <div id="filter">
     <BestGamesOfYearsComponent Year="@((Year.HasValue) ? Year.Value : DateTime.Now.Year)" />
-    <BestGamesOfYearByPlatformsComponent Year="@((Year.HasValue) ? Year.Value : DateTime.Now.Year)" Platforms="@Platforms" />
+    @if (Platforms is not null)
+    {
+        <BestGamesOfYearByPlatformsComponent Year="@((Year.HasValue) ? Year.Value : DateTime.Now.Year)" Platforms="@Platforms" />
+    }
 </div>
 
 @if (Games is null)

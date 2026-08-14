@@ -1,4 +1,5 @@
 ﻿using Data.Repositories.Interfaces.Derived;
+using Domain.Games;
 using Domain.Movies;
 using Domain.RequestsModels.Movies.Movies;
 using Domain.Reviews;
@@ -338,6 +339,56 @@ md.id, md.name
         List<Movie> result = moviesDictionary.Values.ToList();
 
         return result;
+    }
+
+    public async Task<IEnumerable<Movie>> GetByGenreAsync(long genreId)
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        string sql = @"SELECT         
+            m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
+            mg.id, mg.name,
+            ms.id, ms.name,
+            md.id, md.name
+        FROM movies m
+        LEFT JOIN moviesMoviesGenres mmg ON mmg.movieId = m.Id
+        LEFT JOIN moviesGenres mg ON mg.id = mmg.moviegenreid
+        LEFT JOIN moviesMoviesStudios mms ON mms.movieId = m.Id
+        LEFT JOIN moviesStudios ms ON mms.movieStudioId = ms.id
+        LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
+        LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
+        WHERE mg.Id=@GenreId";
+
+        Dictionary<long, Movie> moviesDictionary = new Dictionary<long, Movie>();
+
+        IEnumerable<Movie> query = await connection.QueryAsync<Movie, MovieGenre, MovieStudio, MovieDirector, Movie>(
+            sql,
+            (movie, movieGenre, movieStudio, movieDirector) =>
+            {
+                if (!moviesDictionary.TryGetValue(movie.Id, out Movie? movieEntry))
+                {
+                    movieEntry = movie;
+                    movieEntry.MovieGenres = new List<MovieGenre>();
+                    movieEntry.MoviesStudios = new List<MovieStudio>();
+                    movieEntry.MoviesDirectors = new List<MovieDirector>();
+                    moviesDictionary.Add(movieEntry.Id, movieEntry);
+                }
+
+                if (movieGenre is not null && !movieEntry.MovieGenres.Any(d => d.Id == movieGenre.Id))
+                    movieEntry.MovieGenres.Add(movieGenre);
+
+                if (movieStudio is not null && !movieEntry.MoviesStudios.Any(g => g.Id == movieStudio.Id))
+                    movieEntry.MoviesStudios.Add(movieStudio);
+
+                if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(p => p.Id == movieDirector.Id))
+                    movieEntry.MoviesDirectors.Add(movieDirector);
+
+                return movieEntry;
+            },
+            new { GenreId = genreId }, // Pass parameter as anonymous object
+            splitOn: "Id,Id,Id,Id" // You had one too many "Id"
+        );
+
+        return moviesDictionary.Values;
     }
 
     public async Task<IEnumerable<Movie>> GetByNameAsync(string name)

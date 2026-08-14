@@ -1,15 +1,10 @@
-﻿@using BlazorClient.Components.PagesComponents.GamesList
-@using BlazorClient.Pages.Games.Games
-@using BlazorClient.Pages.Movies.Movies
-@using Domain.Games
-@using Domain.Movies
-@using Domain.Reviews
-
-<div class="specials-index">
+﻿<div class="specials-index">
     <h3><a href="/meta/collections/">Подборки</a></h3>
-
-    @foreach (CollectionsItemComponent collectionsItemComponent in CollectionsItemComponents)
+    @if (CollectionsItemComponents is not null)
     {
-        <CollectionsItemComponent Href="@collectionsItemComponent.Href" ImageAlt="@collectionsItemComponent.ImageAlt" ImageSource="@collectionsItemComponent.ImageSource" Title="@collectionsItemComponent.Title" />
+        foreach (CollectionsItemComponent collectionsItemComponent in CollectionsItemComponents)
+        {
+            <CollectionsItemComponent Href="@collectionsItemComponent.Href" ImageAlt="@collectionsItemComponent.ImageAlt" ImageSource="@collectionsItemComponent.ImageSource" Title="@collectionsItemComponent.Title" />
+        }
     }
 </div>

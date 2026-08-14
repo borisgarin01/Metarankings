@@ -7,6 +7,8 @@ namespace BlazorClient.Pages.Games.Games;
 
 public partial class BestGamesListPage : ComponentBase
 {
+    private IEnumerable<Platform> platforms;
+
     [SupplyParameterFromQuery]
     public int? Year { get; set; }
 
@@ -27,7 +29,15 @@ public partial class BestGamesListPage : ComponentBase
 
     public IEnumerable<Game> Games { get; set; }
 
-    public IEnumerable<Platform> Platforms { get; set; }
+    public IEnumerable<Platform> Platforms
+    {
+        get => platforms;
+        set
+        {
+            platforms = value;
+            StateHasChanged();
+        }
+    }
 
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }

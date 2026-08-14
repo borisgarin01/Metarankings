@@ -8,13 +8,16 @@
         <a href="/most-waiting-games/">Ожидаемые</a>
         <a href="/best-games/">Топ игр</a>
         <a href="/games/best-games?Year=@DateTime.Now.Year">Игры @DateTime.Now.Year</a>
-        @foreach (Platform platform in Platforms)
+        @if (Platforms is not null && Genres is not null)
         {
-            <a href="/games/best-games?platofrmId=@platform.Id">@platform.Name</a>
-        }
-        @foreach (Genre genre in Genres)
-        {
-            <a href="/games/best-games?genreId=@genre.Id">@genre.Name</a>
+            foreach (Platform platform in Platforms)
+            {
+                <a href="/games/best-games?platofrmId=@platform.Id">@platform.Name</a>
+            }
+            foreach (Genre genre in Genres)
+            {
+                <a href="/games/best-games?genreId=@genre.Id">@genre.Name</a>
+            }
         }
     </div>
 </li>

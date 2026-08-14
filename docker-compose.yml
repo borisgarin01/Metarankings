@@ -12,25 +12,25 @@ services:
     image: postgres:17.7
     restart: unless-stopped
     environment:
-      POSTGRES_USER: borisgarin
+      POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: Metarankings
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U borisgarin || exit 1" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME} || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
 
   api:
-    image: ghcr.io/borisgarin01/metarankings-api:v1 # <- ваш реестр/имя/тег
+    build: .
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8081
-      ConnectionStrings__DefaultConnection: Host=db;Database=Metarankings;Username=borisgarin;Password=${DB_PASSWORD}
+      ConnectionStrings__PostgresConnection: "Host=db;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};Include Error Detail=true"
     depends_on:
       db:
         condition: service_healthy
@@ -47,8 +47,8 @@ services:
     image: nginx:latest
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "4443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./certbot/conf:/etc/letsencrypt

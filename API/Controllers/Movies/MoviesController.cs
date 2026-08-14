@@ -57,7 +57,7 @@ public sealed class MoviesController : ControllerBase
         return Ok(movies);
     }
 
-    [HttpGet("{offset:long}/{limit:long}")]
+    [HttpGet("{pageNumber:long}/{pageSize:long}")]
     public async Task<ActionResult<IEnumerable<Movie>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
     {
         IEnumerable<Movie> movies = await _moviesModelsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
@@ -96,5 +96,11 @@ public sealed class MoviesController : ControllerBase
     public async Task<ActionResult<IEnumerable<Movie>>> Search([FromQuery] string name)
     {
         return Ok(await _moviesModelsRepository.GetByNameAsync(name));
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Movie>>> SearchByGenreId([FromQuery] long genreId)
+    {
+        return Ok(await _moviesModelsRepository.GetByGenreAsync(genreId));
     }
 }

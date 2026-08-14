@@ -9,8 +9,14 @@ public partial class MoviesListPage : ComponentBase
 
     public IEnumerable<Movie> Movies { get; private set; }
 
+    [SupplyParameterFromQuery]
+    public long? GenreId { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        Movies = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Movie>>(@"/api/movies/movies");
+        if (GenreId is null)
+            Movies = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Movie>>("/api/movies/movies");
+        else
+            Movies = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Movie>>($"/api/movies/movies?genreId={GenreId}");
     }
 }

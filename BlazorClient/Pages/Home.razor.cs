@@ -15,6 +15,7 @@ public partial class Home : ComponentBase
     private IEnumerable<CollectionsItemComponent> collectionsItemsComponents;
     private IEnumerable<SoonAtCinemasItemComponent> soonAtCinemasItemComponents;
     private IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemComponents;
+    private IEnumerable<MovieGenre> moviesGenres;
 
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
@@ -35,6 +36,16 @@ public partial class Home : ComponentBase
         private set
         {
             movies = value;
+            StateHasChanged();
+        }
+    }
+
+    public IEnumerable<MovieGenre> MoviesGenres
+    {
+        get => moviesGenres;
+        set
+        {
+            moviesGenres = value;
             StateHasChanged();
         }
     }
@@ -118,6 +129,7 @@ public partial class Home : ComponentBase
         Task<IEnumerable<CollectionsItemComponent>> collectionsItemsComponents = httpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>($"/api/home/collections/{PageNumber}/{PageSize}");
         Task<IEnumerable<SoonAtCinemasItemComponent>> soonAtCinemasItemComponents = httpClient.GetFromJsonAsync<IEnumerable<SoonAtCinemasItemComponent>>($"/api/home/soon-at-cinemas");
         Task<IEnumerable<GamesReleaseDateItemViewModel>> gamesReleaseDateItemComponents = httpClient.GetFromJsonAsync<IEnumerable<GamesReleaseDateItemViewModel>>($"/api/home/games-release-dates/{PageNumber}/{PageSize}");
+        Task<IEnumerable<MovieGenre>> moviesGenresGettingTask = httpClient.GetFromJsonAsync<IEnumerable<MovieGenre>>($"/api/home/games-release-dates/{PageNumber}/{PageSize}");
 
         // Wait for ALL tasks to complete
         await Task.WhenAll(
@@ -127,7 +139,8 @@ public partial class Home : ComponentBase
             moviesViewersReviewsGettingTask,
             collectionsItemsComponents,
             soonAtCinemasItemComponents,  // Added
-            gamesReleaseDateItemComponents // Added
+            gamesReleaseDateItemComponents,
+            moviesGenresGettingTask// Added
         );
 
         // Then assign all results
@@ -138,5 +151,6 @@ public partial class Home : ComponentBase
         CollectionsItemComponents = collectionsItemsComponents.Result;
         SoonAtCinemasItemComponents = soonAtCinemasItemComponents.Result;
         GamesReleaseDateItemComponents = gamesReleaseDateItemComponents.Result;
+        MoviesGenres = moviesGenresGettingTask.Result;
     }
 }

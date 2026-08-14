@@ -1,17 +1,19 @@
 ﻿@using Domain.Movies
 
 <li class="nav-link services">
-    <a href="/best-movies/">Фильмы<span class="material-icons dropdown-icon">arrow_drop_down</span></a>
+    <span><a href="/best-movies/">Фмльмы</a></span>
     <div class="drop-down">
         <a href="/new-movies/">Новинки</a>
-        <a href="/coming-soon/">Скоро</a>
-        <a href="/most-waiting-films/">Ожидаемые</a>
+        <a href="/release-date/">Дата выхода</a>
+        <a href="/most-waiting-moives/">Ожидаемые</a>
         <a href="/best-movies/">Топ фильмов</a>
         <a href="/movies/best-movies?Year=@DateTime.Now.Year">Фильмы @DateTime.Now.Year</a>
-
-        @foreach (MovieGenre movieGenre in Genres)
+        @if (Genres is not null)
         {
-            <a href="/movies/best-movies?GenreId=@movieGenre.Id">@movieGenre.Name</a>
+            foreach (MovieGenre moviesGenre in Genres)
+            {
+                <a href="/movies/movies-list?genreId=@moviesGenre.Id">@moviesGenre.Name</a>
+            }
         }
     </div>
 </li>
