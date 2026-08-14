@@ -62,8 +62,6 @@ public class AuthService : IAuthService
         try
         {
             string? refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
-            _logger.LogDebug("Refresh token from localStorage: {TokenStatus}",
-                string.IsNullOrEmpty(refreshToken) ? "MISSING" : "present");
 
             if (string.IsNullOrEmpty(refreshToken))
             {
@@ -71,52 +69,33 @@ public class AuthService : IAuthService
                 return new AuthResponseDto(false, false, null, null, "Refresh token is missing");
             }
 
-            RefreshTokenRequest refreshRequest = new()
-            {
-                RefreshToken = refreshToken
-            };
+            // Используем клиент без авторизации, чтобы избежать циклических вызовов
+            var client = _httpClientFactory.CreateClient("UnauthorizedClient"); // Создайте отдельный клиент
 
-            _logger.LogInformation("Sending refresh token request");
-            _logger.LogDebug("RefreshToken: {Token}", refreshToken);
-
-            HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/auth/refresh-token", refreshRequest);
-            _logger.LogDebug("Response status: {StatusCode}", response.StatusCode);
+            var response = await client.PostAsJsonAsync("/api/auth/refresh-token", new RefreshTokenRequest { RefreshToken = refreshToken });
 
             if (response.IsSuccessStatusCode)
             {
-                string responseContent = await response.Content.ReadAsStringAsync();
-                _logger.LogDebug("Response content: {Content}", responseContent);
-
-                AuthResponseDto? tokenResponse = JsonSerializer.Deserialize<AuthResponseDto>(responseContent);
+                var tokenResponse = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
 
                 if (tokenResponse != null && tokenResponse.IsAuthSuccessful)
                 {
                     _logger.LogInformation("Token refreshed successfully");
 
+                    // Сохраняем токены
                     await StoreAccessTokenAsync(tokenResponse.AccessToken);
                     await StoreRefreshTokenAsync(tokenResponse.RefreshToken);
 
-                    AddDefaultRequestHeaderBearer(tokenResponse.AccessToken);
-
-
-                    _logger.LogInformation("New tokens saved - AccessToken length: {AccessLength}, RefreshToken length: {RefreshLength}",
-                        tokenResponse.AccessToken?.Length ?? 0, tokenResponse.RefreshToken?.Length ?? 0);
+                    // Обновляем заголовок для авторизованного клиента
+                    var authorizedClient = _httpClientFactory.CreateClient("AuthorizedClient");
+                    authorizedClient.DefaultRequestHeaders.Remove("Authorization");
+                    authorizedClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {tokenResponse.AccessToken}");
 
                     return tokenResponse;
                 }
-                else
-                {
-                    _logger.LogWarning("Token refresh returned Success=false");
-                }
-            }
-            else
-            {
-                string errorContent = await response.Content.ReadAsStringAsync();
-                _logger.LogError("Token refresh failed. Status: {Status}, Error: {Error}",
-                    response.StatusCode, errorContent);
             }
 
-            _logger.LogWarning("Logging out due to failed token refresh");
+            _logger.LogWarning("Token refresh failed");
             await LogoutAsync();
             return new AuthResponseDto(false, false, null, null, "Failed to refresh token");
         }

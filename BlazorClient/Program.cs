@@ -32,6 +32,13 @@ internal class Program
                     new MediaTypeWithQualityHeaderValue("application/json"));
             });
 
+        builder.Services.AddHttpClient("UnauthorizedClient", client =>
+        {
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+        });
+
         builder.Services.AddScoped<IAuthService, AuthService>();
 
         builder.Services.AddGamesWebManagers();
