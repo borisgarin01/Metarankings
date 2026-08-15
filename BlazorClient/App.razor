@@ -1,4 +1,6 @@
 ﻿@using BlazorClient.Components
+@using Blazored.Toast
+
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
@@ -13,3 +15,11 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+<!-- Тосты и ошибки вынесите сюда или оставьте в MainLayout -->
+<BlazoredToasts />
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
