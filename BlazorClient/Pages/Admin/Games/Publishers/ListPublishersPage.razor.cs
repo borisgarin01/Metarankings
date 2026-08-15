@@ -6,7 +6,17 @@ namespace BlazorClient.Pages.Admin.Games.Publishers;
 [Authorize(Policy = "Admin")]
 public partial class ListPublishersPage : ComponentBase
 {
-    public IEnumerable<Publisher> Publishers { get; private set; }
+    private IEnumerable<Publisher> publishers;
+
+    public IEnumerable<Publisher> Publishers
+    {
+        get => publishers;
+        private set
+        {
+            publishers = value;
+            StateHasChanged();
+        }
+    }
 
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
