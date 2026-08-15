@@ -26,7 +26,7 @@ public partial class AddPublisherPage : ComponentBase
             NavigationManager.NavigateTo("/admin/Games/publishers/list-publishers");
         else
             if (httpResponseMessage is not null)
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+                ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
     }
 
 }
