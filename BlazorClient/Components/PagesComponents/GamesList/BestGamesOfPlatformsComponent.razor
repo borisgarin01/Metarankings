@@ -3,7 +3,7 @@
     <div class="filter-menu">
         @for (int i = 0; i < Platforms.Count(); i++)
         {
-            <a title="Лучшие игры для @Platforms.ElementAt(i).Name" href="/games/best-games?platformId=@Platforms.ElementAt(i).Id">@Platforms.ElementAt(i).Name</a>
+            <a title="Лучшие игры для @Platforms.ElementAt(i).Name" href="/games/best-games/?platformId=@Platforms.ElementAt(i).Id">@Platforms.ElementAt(i).Name</a>
         }
     </div>
 </div>

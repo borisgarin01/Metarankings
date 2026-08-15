@@ -28,7 +28,7 @@
         @for (int i = 0; i < count; i++)
         {
             int yearToShow = startYear - i;
-            <a href="/games/best-games?Year=@yearToShow"
+            <a href="/games/best-games/?Year=@yearToShow"
                class="@(yearToShow == selectedYear ? "selected" : "")">
                 @yearToShow
             </a>

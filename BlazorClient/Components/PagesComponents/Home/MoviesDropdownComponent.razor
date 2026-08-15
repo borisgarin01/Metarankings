@@ -7,7 +7,7 @@
         <a href="/release-date/">Дата выхода</a>
         <a href="/most-waiting-moives/">Ожидаемые</a>
         <a href="/best-movies/">Топ фильмов</a>
-        <a href="/movies/best-movies?Year=@DateTime.Now.Year">Фильмы @DateTime.Now.Year</a>
+        <a href="/movies/best-movies/?Year=@DateTime.Now.Year">Фильмы @DateTime.Now.Year</a>
         @if (Genres is not null)
         {
             foreach (MovieGenre moviesGenre in Genres)

@@ -8,6 +8,7 @@ namespace BlazorClient.Pages.Games.Games;
 public partial class BestGamesListPage : ComponentBase
 {
     private IEnumerable<Platform> platforms;
+    private IEnumerable<Game> games;
 
     [SupplyParameterFromQuery]
     public int? Year { get; set; }
@@ -27,7 +28,15 @@ public partial class BestGamesListPage : ComponentBase
     [SupplyParameterFromQuery]
     public long? LocalizationId { get; set; }
 
-    public IEnumerable<Game> Games { get; set; }
+    public IEnumerable<Game> Games
+    {
+        get => games;
+        set
+        {
+            games = value;
+            StateHasChanged();
+        }
+    }
 
     public IEnumerable<Platform> Platforms
     {
