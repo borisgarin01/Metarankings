@@ -114,7 +114,7 @@ public partial class Headerer : ComponentBase
     {
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {
-            NavigationManager.NavigateTo($"/search/?SearchText={Uri.EscapeDataString(searchQuery)}");
+            NavigationManager.NavigateTo($"/search?SearchText={Uri.EscapeDataString(searchQuery)}");
         }
     }
 }
