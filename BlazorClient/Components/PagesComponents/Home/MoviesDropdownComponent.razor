@@ -1,8 +1,8 @@
 ﻿@using Domain.Movies
 
-<li class="nav-link services">
-    <span><a href="/best-movies/">Фмльмы</a></span>
-    <div class="drop-down">
+<li @onmouseenter="ShowMovies" @onmouseleave="HideMovies">
+    <span><a href="/best-movies/">Фильмы</a></span>
+    <div class="movie-drop @(moviesDropdownClass)">
         <a href="/new-movies/">Новинки</a>
         <a href="/release-date/">Дата выхода</a>
         <a href="/most-waiting-moives/">Ожидаемые</a>

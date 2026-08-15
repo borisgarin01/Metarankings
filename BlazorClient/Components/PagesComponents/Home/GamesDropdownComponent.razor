@@ -1,8 +1,8 @@
 ﻿@using Domain.Games
 
-<li class="nav-link services">
+<li @onmouseenter="ShowGames" @onmouseleave="HideGames">
     <span><a href="/best-games/">Игры</a></span>
-    <div class="drop-down">
+    <div class="game-drop @(gamesDropdownClass)">
         <a href="/new-games/">Новинки</a>
         <a href="/release-date/">Дата выхода</a>
         <a href="/most-waiting-games/">Ожидаемые</a>
