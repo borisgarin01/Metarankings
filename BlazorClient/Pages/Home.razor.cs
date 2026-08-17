@@ -73,7 +73,7 @@ public partial class Home : ComponentBase
     public IEnumerable<CollectionsItemComponent> CollectionsItemComponents
     {
         get => collectionsItemsComponents;
-        private set
+        set
         {
             collectionsItemsComponents = value;
             StateHasChanged();

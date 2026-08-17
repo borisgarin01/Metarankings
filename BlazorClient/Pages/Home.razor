@@ -77,17 +77,27 @@ else
                     <!-- Yandex.RTB R-A-201169-5 -->
                     <div id="yandex_rtb_R-A-201169-5"></div>
                     <script>
-                        window.yaContextCb.push(()=>{
-                          Ya.Context.AdvManager.render({
-                            renderTo: "yandex_rtb_R-A-201169-5",
-                            blockId: "R-A-201169-5"
-                          })
+                                        window.yaContextCb.push(() => {
+                                            Ya.Context.AdvManager.render({
+                                                renderTo: "yandex_rtb_R-A-201169-5",
+                                                blockId: "R-A-201169-5"
+                                            })
                         })</script>
+                    </div>
+
+                    @if (CollectionsItemComponents is not null)
+                    {
+                        <CollectionsComponent CollectionsItemComponents="CollectionsItemComponents" />
+                    }
+                    @if (SoonAtCinemasItemComponents is not null)
+                    {
+                        <SoonAtCinemasComponent SoonAtCinemasItemComponents="SoonAtCinemasItemComponents" />
+                    }
+                    @if (GamesReleaseDateItemComponents is not null)
+                    {
+                        <GamesReleaseDateComponent GamesReleaseDateItemComponents="GamesReleaseDateItemComponents" />
+                    }
                 </div>
-                <CollectionsComponent CollectionsItemComponents="CollectionsItemComponents" />
-                <SoonAtCinemasComponent SoonAtCinemasItemComponents="SoonAtCinemasItemComponents" />
-                <GamesReleaseDateComponent GamesReleaseDateItemComponents="@GamesReleaseDateItemComponents" />
             </div>
         </div>
-    </div>
-}
+    }
