@@ -1,0 +1,11 @@
+﻿.game .thumb, .movie .thumb {
+    height: 281px;
+}
+.thumb {
+    float: left;
+    width: 200px;
+    position: relative;
+    margin: 0 15px 0 0;
+    overflow: hidden;
+    border-radius: 4px;
+}
