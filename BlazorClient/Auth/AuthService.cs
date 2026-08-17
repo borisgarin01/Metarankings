@@ -1,5 +1,4 @@
-﻿using API.Controllers.Auth;
-using Blazored.Toast.Services;
+﻿using Blazored.Toast.Services;
 using Domain.Auth;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
@@ -69,8 +68,8 @@ public class AuthService : IAuthService
                 return new AuthResponseDto(false, false, null, null, "Refresh token is missing");
             }
 
-            // Используем клиент без авторизации, чтобы избежать циклических вызовов
-            var client = _httpClientFactory.CreateClient("UnauthorizedClient"); // Создайте отдельный клиент
+            // ВАЖНО: Используем UnauthorizedClient для refresh-token!
+            var client = _httpClientFactory.CreateClient("UnauthorizedClient");
 
             var response = await client.PostAsJsonAsync("/api/auth/refresh-token", new RefreshTokenRequest { RefreshToken = refreshToken });
 
@@ -86,13 +85,14 @@ public class AuthService : IAuthService
                     await StoreAccessTokenAsync(tokenResponse.AccessToken);
                     await StoreRefreshTokenAsync(tokenResponse.RefreshToken);
 
-                    // Обновляем заголовок для авторизованного клиента
-                    var authorizedClient = _httpClientFactory.CreateClient("AuthorizedClient");
-                    authorizedClient.DefaultRequestHeaders.Remove("Authorization");
-                    authorizedClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {tokenResponse.AccessToken}");
-
                     return tokenResponse;
                 }
+            }
+            else
+            {
+                // Логируем ошибку
+                string error = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Refresh token failed: {Status}, {Error}", response.StatusCode, error);
             }
 
             _logger.LogWarning("Token refresh failed");

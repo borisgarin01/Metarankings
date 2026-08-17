@@ -189,23 +189,47 @@ public sealed class AuthController : ControllerBase
 
             if (storedToken is null)
             {
-                _logger.LogWarning("Invalid refresh token: {Token}", request.RefreshToken);
+                _logger.LogWarning("Invalid refresh token");
                 return BadRequest("Invalid refresh token");
+            }
+
+            // ✅ ПРОВЕРЯЕМ СРОК ГОДНОСТИ
+            var refreshTokenLifetime = _authSettingsOptionsMonitor.CurrentValue.RefreshTokenLifetimeDays;
+            if (storedToken.CreatedAt.AddDays(refreshTokenLifetime) < DateTime.UtcNow)
+            {
+                _logger.LogWarning("Refresh token expired for user {UserId}", storedToken.UserId);
+                await _refreshTokensRepo.RevokeAsync(storedToken.Id);
+                return BadRequest("Refresh token expired");
+            }
+
+            // ✅ ПРОВЕРЯЕМ, НЕ ОТОЗВАН ЛИ ТОКЕН
+            if (storedToken.IsRevoked)
+            {
+                _logger.LogWarning("Refresh token is revoked for user {UserId}", storedToken.UserId);
+                return BadRequest("Refresh token is revoked");
             }
 
             ApplicationUser? user = await _usersManager.FindByIdAsync(storedToken.UserId.ToString());
             if (user is null)
             {
-                _logger.LogWarning("User not found for refresh token: {Token}", request.RefreshToken);
+                _logger.LogWarning("User not found for refresh token");
                 return BadRequest("User not found");
             }
 
+            // Отзываем старый токен
             await _refreshTokensRepo.RevokeAsync(storedToken.Id);
 
+            // Создаем новые токены
             string newAccessToken = await _authTokenGenerator.GenerateAccessToken(user);
             string newRefreshToken = _authTokenGenerator.GenerateRefreshToken();
 
-            IdentityLibrary.DTOs.RefreshToken newToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), newRefreshToken, false, DateTime.UtcNow);
+            IdentityLibrary.DTOs.RefreshToken newToken = new(
+                0,
+                Convert.ToInt64(user.Id),
+                newRefreshToken,
+                false,
+                DateTime.UtcNow
+            );
             await _refreshTokensRepo.CreateAsync(newToken);
 
             return Ok(new AuthResponseDto(true, false, string.Empty, newAccessToken, newRefreshToken));
@@ -216,7 +240,6 @@ public sealed class AuthController : ControllerBase
             return StatusCode(500, "Internal server error during token refresh");
         }
     }
-
 
     [HttpPost("register")]
     public async Task<ActionResult<string>> Register(RegisterModel registerModel)

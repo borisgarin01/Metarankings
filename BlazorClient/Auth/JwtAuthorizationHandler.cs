@@ -23,50 +23,62 @@ public class JwtAuthorizationHandler : DelegatingHandler
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        string accessToken = await _localStorage.GetItemAsync<string>("accessToken");
+        string? path = request.RequestUri?.AbsolutePath;
 
-        if (!string.IsNullOrEmpty(accessToken))
+        // КРИТИЧНО: Пропускаем refresh-token, чтобы избежать бесконечного цикла
+        bool isRefreshToken = path?.Contains("/api/auth/refresh-token") == true;
+
+        if (!isRefreshToken)
         {
-            // Проверяем, не истек ли токен
-            if (IsTokenExpired(accessToken))
-            {
-                _logger.LogInformation("Token expired, attempting to refresh before request: {Url}", request.RequestUri);
-
-                var refreshResult = await _authService.RefreshTokenAsync();
-
-                if (refreshResult != null && refreshResult.IsAuthSuccessful)
-                {
-                    accessToken = refreshResult.AccessToken;
-                    _logger.LogInformation("Token refreshed successfully");
-                }
-                else
-                {
-                    _logger.LogWarning("Failed to refresh token");
-                    // Убираем токен, чтобы запрос не был отправлен с истекшим токеном
-                    request.Headers.Authorization = null;
-                    return await base.SendAsync(request, cancellationToken);
-                }
-            }
+            string? accessToken = await _localStorage.GetItemAsync<string>("accessToken", cancellationToken);
 
             if (!string.IsNullOrEmpty(accessToken))
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                // Проверяем, не истек ли токен
+                if (IsTokenExpired(accessToken))
+                {
+                    _logger.LogInformation("Token expired for request: {Url}, attempting to refresh", request.RequestUri);
+
+                    var refreshResult = await _authService.RefreshTokenAsync();
+
+                    if (refreshResult != null && refreshResult.IsAuthSuccessful)
+                    {
+                        accessToken = refreshResult.AccessToken;
+                        _logger.LogInformation("Token refreshed successfully before request");
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to refresh token before request");
+                        // Отправляем запрос без токена, сервер вернет 401
+                        request.Headers.Authorization = null;
+                        return await base.SendAsync(request, cancellationToken);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                }
             }
+        }
+        else
+        {
+            _logger.LogDebug("Skipping auth for refresh-token endpoint");
         }
 
         HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
-        // Если сервер вернул 401, пробуем обновить токен и повторить запрос
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        // Обрабатываем 401 только если это НЕ refresh-token запрос
+        if (response.StatusCode == HttpStatusCode.Unauthorized && !isRefreshToken)
         {
             _logger.LogWarning("Received 401 for request: {Url}", request.RequestUri);
 
-            // Отключаем автоматическую обработку повторных попыток, чтобы избежать бесконечного цикла
-            // Используем флаг, чтобы не повторять запрос больше одного раза
+            // Проверяем, не пытались ли мы уже обновить токен для этого запроса
             if (!request.Properties.ContainsKey("TokenRefreshed"))
             {
                 request.Properties["TokenRefreshed"] = true;
 
+                _logger.LogInformation("Attempting to refresh token after 401");
                 var refreshResult = await _authService.RefreshTokenAsync();
 
                 if (refreshResult != null && refreshResult.IsAuthSuccessful)
@@ -76,7 +88,7 @@ public class JwtAuthorizationHandler : DelegatingHandler
                     // Обновляем заголовок с новым токеном
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.AccessToken);
 
-                    // Создаем новый запрос с тем же содержимым
+                    // Создаем клон запроса для повторной отправки
                     var retryRequest = await CloneHttpRequestMessageAsync(request);
 
                     // Повторяем запрос
@@ -85,7 +97,13 @@ public class JwtAuthorizationHandler : DelegatingHandler
                 else
                 {
                     _logger.LogWarning("Failed to refresh token after 401");
+                    // Вызываем logout, чтобы очистить состояние
+                    await _authService.LogoutAsync();
                 }
+            }
+            else
+            {
+                _logger.LogWarning("Token already refreshed for this request, not retrying again");
             }
         }
 
@@ -98,11 +116,22 @@ public class JwtAuthorizationHandler : DelegatingHandler
         {
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
-            return jwtToken.ValidTo <= DateTime.UtcNow.AddMinutes(-1);
+
+            // Добавляем небольшой запас в 1 минуту
+            bool isExpired = jwtToken.ValidTo <= DateTime.UtcNow.AddMinutes(-1);
+
+            if (isExpired)
+            {
+                _logger.LogDebug("Token expired at: {Expiry}, Current UTC: {Now}",
+                    jwtToken.ValidTo, DateTime.UtcNow);
+            }
+
+            return isExpired;
         }
-        catch
+        catch (Exception ex)
         {
-            return true;
+            _logger.LogError(ex, "Error checking token expiration");
+            return true; // В случае ошибки считаем токен истекшим
         }
     }
 
@@ -116,25 +145,34 @@ public class JwtAuthorizationHandler : DelegatingHandler
             clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
 
+        // Копируем свойства
+        foreach (var prop in original.Properties)
+        {
+            clone.Properties[prop.Key] = prop.Value;
+        }
+
         // Копируем тело запроса
         if (original.Content != null)
         {
+            // Сохраняем позицию, чтобы не нарушить оригинальный поток
             var contentStream = await original.Content.ReadAsStreamAsync();
+
+            if (contentStream.CanSeek)
+            {
+                contentStream.Position = 0;
+            }
+
             var memoryStream = new MemoryStream();
             await contentStream.CopyToAsync(memoryStream);
             memoryStream.Position = 0;
 
             clone.Content = new StreamContent(memoryStream);
+
+            // Копируем заголовки контента
             foreach (var header in original.Content.Headers)
             {
                 clone.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
             }
-        }
-
-        // Копируем свойства
-        foreach (var prop in original.Properties)
-        {
-            clone.Properties[prop.Key] = prop.Value;
         }
 
         return clone;

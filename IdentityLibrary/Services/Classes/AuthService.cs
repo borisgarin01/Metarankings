@@ -2,6 +2,8 @@
 using IdentityLibrary.Models;
 using IdentityLibrary.Repositories.Tokens.RefreshTokens.Interfaces;
 using IdentityLibrary.Services.Interfaces;
+using Microsoft.Extensions.Options;
+using Settings;
 
 namespace IdentityLibrary.Services.Classes
 {
@@ -10,43 +12,40 @@ namespace IdentityLibrary.Services.Classes
         private readonly IRefreshTokensRepository _refreshTokensRepo;
         private readonly AuthTokenGenerator _tokenGenerator;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IOptionsMonitor<AuthSettings> _authSettings;
 
         public AuthService(
             IRefreshTokensRepository refreshTokensRepo,
             AuthTokenGenerator tokenGenerator,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IOptionsMonitor<AuthSettings> authSettings)
         {
             _refreshTokensRepo = refreshTokensRepo;
             _tokenGenerator = tokenGenerator;
             _userManager = userManager;
+            _authSettings = authSettings;
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginModel loginModel)
         {
-            // 1. Находим пользователя
             var user = await _userManager.FindByEmailAsync(loginModel.UserEmail);
             if (user == null || !await _userManager.CheckPasswordAsync(user, loginModel.Password))
             {
                 return new AuthResponseDto(false, false, "Invalid credentials", string.Empty, string.Empty);
             }
 
-            // 2. Проверяем 2FA (если нужно)
             if (user.TwoFactorEnabled)
             {
-                // Твоя логика отправки кода
                 return new AuthResponseDto(false, true, "Two-factor authentication required", string.Empty, string.Empty);
             }
 
-            // 3. Отзываем старые токены
+            // ✅ Отзываем все старые токены
             await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
 
-            // 4. Генерируем токены
             var accessToken = await _tokenGenerator.GenerateAccessToken(user);
             var refreshTokenValue = _tokenGenerator.GenerateRefreshToken();
 
-            // 5. Сохраняем refresh токен
             var refreshToken = new RefreshToken(0, Convert.ToInt64(user.Id), refreshTokenValue, false, DateTime.UtcNow);
-
             await _refreshTokensRepo.CreateAsync(refreshToken);
 
             return new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue);
@@ -59,6 +58,21 @@ namespace IdentityLibrary.Services.Classes
             if (storedToken == null)
             {
                 return new AuthResponseDto(false, false, "Invalid refresh token", string.Empty, string.Empty);
+            }
+
+            // ✅ ПРОВЕРЯЕМ СРОК ГОДНОСТИ!
+            var refreshTokenLifetime = _authSettings.CurrentValue.RefreshTokenLifetimeDays;
+            if (storedToken.CreatedAt.AddDays(refreshTokenLifetime) < DateTime.UtcNow)
+            {
+                // Отзываем истекший токен
+                await _refreshTokensRepo.RevokeAsync(storedToken.Id);
+                return new AuthResponseDto(false, false, "Refresh token expired", string.Empty, string.Empty);
+            }
+
+            // ✅ ПРОВЕРЯЕМ, НЕ ОТОЗВАН ЛИ ТОКЕН
+            if (storedToken.IsRevoked)
+            {
+                return new AuthResponseDto(false, false, "Refresh token is revoked", string.Empty, string.Empty);
             }
 
             // 2. Получаем пользователя
@@ -77,7 +91,6 @@ namespace IdentityLibrary.Services.Classes
 
             // 5. Сохраняем новый refresh токен
             var newToken = new RefreshToken(0, Convert.ToInt64(user.Id), newRefreshToken, false, DateTime.UtcNow);
-
             await _refreshTokensRepo.CreateAsync(newToken);
 
             return new AuthResponseDto(true, false, string.Empty, newAccessToken, newRefreshToken);
