@@ -6,20 +6,17 @@ namespace BlazorClient.Auth;
 public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILocalStorageService _localStorage;
-    private readonly ILogger<JwtAuthenticationStateProvider> _logger;
     private readonly IAuthService _authService;
+    private readonly ILogger<JwtAuthenticationStateProvider> _logger;
 
     public JwtAuthenticationStateProvider(
         IHttpClientFactory httpClientFactory,
-        ILocalStorageService localStorage,
-        ILogger<JwtAuthenticationStateProvider> logger,
-        IAuthService authService)
+        IAuthService authService,
+        ILogger<JwtAuthenticationStateProvider> logger)
     {
         _httpClientFactory = httpClientFactory;
-        _localStorage = localStorage;
-        _logger = logger;
         _authService = authService;
+        _logger = logger;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -28,9 +25,8 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 
         try
         {
-            string? accessToken = await _localStorage.GetItemAsync<string>("accessToken");
-            _logger.LogDebug("Access token from localStorage: {TokenStatus}",
-                string.IsNullOrEmpty(accessToken) ? "MISSING" : "present");
+            // Используем сервис для получения токена
+            var accessToken = await _authService.GetCurrentAccessTokenAsync();
 
             if (string.IsNullOrEmpty(accessToken))
             {
@@ -38,123 +34,72 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
 
-            _logger.LogDebug("Access token: {Token}", accessToken);
-
-            bool isExpired = IsTokenExpired(accessToken);
-            _logger.LogInformation("Token expiration check: {IsExpired}", isExpired);
-
-            if (isExpired)
+            // Проверяем, не истек ли токен
+            if (IsTokenExpired(accessToken))
             {
                 _logger.LogWarning("Token expired, attempting refresh");
 
-                AuthResponseDto? refreshResult = await _authService.RefreshTokenAsync();
-                _logger.LogDebug("Token refresh result: Success = {Success}",
-                    refreshResult?.IsAuthSuccessful ?? false);
+                var refreshResult = await _authService.RefreshTokenAsync();
 
                 if (refreshResult == null || !refreshResult.IsAuthSuccessful || string.IsNullOrEmpty(refreshResult.AccessToken))
                 {
-                    _logger.LogWarning("Token refresh failed or token empty, logging out");
-                    await MarkUserAsLoggedOut();
+                    _logger.LogWarning("Token refresh failed, logging out");
+                    await _authService.LogoutAsync();
                     return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
                 }
 
                 accessToken = refreshResult.AccessToken;
-                _logger.LogInformation("Token successfully refreshed, new access token obtained");
-
-                _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                _logger.LogInformation("Token successfully refreshed");
             }
 
-            ClaimsIdentity identity = GetClaimsIdentity(accessToken);
+            // Создаем identity из токена
+            var identity = GetClaimsIdentity(accessToken);
 
             if (!identity.IsAuthenticated)
             {
                 _logger.LogWarning("Identity not authenticated, logging out");
-                await MarkUserAsLoggedOut();
+                await _authService.LogoutAsync();
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
 
-            ClaimsPrincipal user = new(identity);
-
-            _logger.LogInformation("User authenticated: {User}",
-                user.Identity?.Name ?? "Unknown");
+            var user = new ClaimsPrincipal(identity);
+            _logger.LogInformation("User authenticated: {User}", user.Identity?.Name ?? "Unknown");
 
             return new AuthenticationState(user);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error in GetAuthenticationStateAsync");
-            await MarkUserAsLoggedOut();
+            await _authService.LogoutAsync();
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
     }
 
     private bool IsTokenExpired(string token)
     {
-        _logger.LogDebug("Checking token expiration");
-
         if (string.IsNullOrEmpty(token))
-        {
-            _logger.LogWarning("Token empty during expiration check");
             return true;
-        }
 
         try
         {
-            JwtSecurityTokenHandler handler = new();
-            JwtSecurityToken? jwtToken = handler.ReadJwtToken(token);
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
 
-            if (jwtToken == null)
-            {
-                _logger.LogWarning("Failed to read JWT token");
-                return true;
-            }
-
-            DateTime expirationTime = jwtToken.ValidTo;
-            DateTime now = DateTime.UtcNow;
-            bool isExpired = expirationTime <= now.AddMinutes(-1);
-
-            _logger.LogDebug("Token expiration: {Expiration}, Current time: {Now}, Expired: {IsExpired}",
-                expirationTime, now, isExpired);
-
-            if (isExpired)
-            {
-                TimeSpan timeLeft = now - expirationTime;
-                _logger.LogWarning("Token expired {TimeLeft} ago", timeLeft);
-            }
-            else
-            {
-                TimeSpan timeLeft = expirationTime - now;
-                _logger.LogDebug("Token valid, time left: {TimeLeft}", timeLeft);
-            }
-
-            return isExpired;
+            return jwtToken.ValidTo <= DateTime.UtcNow.AddMinutes(-1);
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "Error checking token expiration");
             return true;
         }
     }
 
     private ClaimsIdentity GetClaimsIdentity(string token)
     {
-        _logger.LogDebug("Extracting claims from token");
-
         try
         {
-            JwtSecurityTokenHandler handler = new();
-            JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
-            IEnumerable<Claim> claims = jwtToken.Claims;
-
-            int claimCount = claims.Count();
-            _logger.LogDebug("Extracted {Count} claims", claimCount);
-
-            if (claimCount > 0 && _logger.IsEnabled(LogLevel.Trace))
-            {
-                string claimNames = string.Join(", ", claims.Select(c => $"{c.Type}: {c.Value}"));
-                _logger.LogTrace("Claims: {Claims}", claimNames);
-            }
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var claims = jwtToken.Claims;
 
             return new ClaimsIdentity(claims, "jwt");
         }
@@ -177,18 +122,13 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
                 throw new InvalidOperationException("Access token cannot be null or empty");
             }
 
-            _logger.LogDebug("Saving tokens to localStorage");
-            await _localStorage.SetItemAsync("accessToken", model.AccessToken);
-            await _localStorage.SetItemAsync("refreshToken", model.RefreshToken);
-            await _localStorage.SetItemAsync("sessionState", model);
+            // Сохраняем токены через сервис
+            await _authService.StoreAccessTokenAsync(model.AccessToken);
+            await _authService.StoreRefreshTokenAsync(model.RefreshToken);
+            _authService.AddDefaultRequestHeaderBearer(model.AccessToken);
 
-            _logger.LogDebug("Access token length: {AccessLength}, Refresh token length: {RefreshLength}",
-                model.AccessToken?.Length ?? 0, model.RefreshToken?.Length ?? 0);
-
-            _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", model.AccessToken);
-
-            ClaimsIdentity identity = GetClaimsIdentity(model.AccessToken);
+            // Создаем identity и уведомляем об изменении состояния
+            var identity = GetClaimsIdentity(model.AccessToken);
 
             if (!identity.IsAuthenticated)
             {
@@ -196,13 +136,11 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
                 throw new InvalidOperationException("Failed to create authenticated identity");
             }
 
-            ClaimsPrincipal user = new(identity);
-
+            var user = new ClaimsPrincipal(identity);
             _logger.LogInformation("User successfully authenticated: {User}",
                 user.Identity?.Name ?? "Unknown");
 
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
-            _logger.LogDebug("Authentication state change notification sent");
         }
         catch (Exception ex)
         {
@@ -217,28 +155,13 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 
         try
         {
-            string? accessToken = await _localStorage.GetItemAsync<string>("accessToken");
-            string? refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
+            await _authService.LogoutAsync();
 
-            _logger.LogDebug("Current tokens: Access = {AccessStatus}, Refresh = {RefreshStatus}",
-                string.IsNullOrEmpty(accessToken) ? "MISSING" : "present",
-                string.IsNullOrEmpty(refreshToken) ? "MISSING" : "present");
-
-            await _localStorage.RemoveItemAsync("sessionState");
-            await _localStorage.RemoveItemAsync("accessToken");
-            await _localStorage.RemoveItemAsync("refreshToken");
-
-            _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Authorization = null;
-
-            _logger.LogDebug("Tokens removed from localStorage and headers");
-
-            ClaimsIdentity identity = new();
-            ClaimsPrincipal user = new(identity);
+            var identity = new ClaimsIdentity();
+            var user = new ClaimsPrincipal(identity);
 
             _logger.LogInformation("User successfully logged out");
-
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
-            _logger.LogDebug("Authentication state change notification sent (logout)");
         }
         catch (Exception ex)
         {

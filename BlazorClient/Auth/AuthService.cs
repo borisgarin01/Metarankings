@@ -14,6 +14,8 @@ public class AuthService : IAuthService
     private readonly IToastService _toastService;
     private readonly IHttpClientFactory _httpClientFactory;
 
+    private string? _cachedAccessToken;
+
     public AuthService(IHttpClientFactory httpClientFactory,
                       ILocalStorageService localStorage,
                       ILogger<AuthService> logger,
@@ -25,24 +27,37 @@ public class AuthService : IAuthService
         _toastService = toastService;
     }
 
+    private const string ACCESS_KEY = nameof(ACCESS_KEY);
+    private const string REFRESH_KEY = nameof(REFRESH_KEY);
+
     public async Task<LoginResponseModel> LoginAsync(LoginModel loginModel)
     {
         _logger.LogInformation("Login attempt for user: {Email}", loginModel.UserEmail);
 
         try
         {
-            HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/auth/login", loginModel);
+            // ВАЖНО: Используем UnauthorizedClient для логина!
+            var response = await _httpClientFactory.CreateClient("UnauthorizedClient")
+                .PostAsJsonAsync("/api/auth/login", loginModel);
 
             if (response.IsSuccessStatusCode)
             {
-                LoginResponseModel? result = await response.Content.ReadFromJsonAsync<LoginResponseModel>();
+                var result = await response.Content.ReadFromJsonAsync<LoginResponseModel>();
                 _logger.LogInformation("Login successful for {Email}, TwoFactor: {TwoFactor}",
                     loginModel.UserEmail, result?.RequiresTwoFactor);
+
+                // Если токены получены сразу (без 2FA) - сохраняем
+                if (result != null && !string.IsNullOrEmpty(result.AccessToken))
+                {
+                    await StoreAccessTokenAsync(result.AccessToken);
+                    await StoreRefreshTokenAsync(result.RefreshToken);
+                    AddDefaultRequestHeaderBearer(result.AccessToken);
+                }
 
                 return result;
             }
 
-            string error = await response.Content.ReadAsStringAsync();
+            var error = await response.Content.ReadAsStringAsync();
             _logger.LogError("Login failed for {Email}. Status: {Status}, Error: {Error}",
                 loginModel.UserEmail, response.StatusCode, error);
             throw new Exception(error);
@@ -60,18 +75,20 @@ public class AuthService : IAuthService
 
         try
         {
-            string? refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
+            var refreshToken = await _localStorage.GetItemAsync<string>(REFRESH_KEY);
 
             if (string.IsNullOrEmpty(refreshToken))
             {
                 _logger.LogWarning("Refresh token missing");
+                await LogoutAsync();
                 return new AuthResponseDto(false, false, null, null, "Refresh token is missing");
             }
 
             // ВАЖНО: Используем UnauthorizedClient для refresh-token!
             var client = _httpClientFactory.CreateClient("UnauthorizedClient");
 
-            var response = await client.PostAsJsonAsync("/api/auth/refresh-token", new RefreshTokenRequest { RefreshToken = refreshToken });
+            var request = new RefreshTokenRequest { RefreshToken = refreshToken };
+            var response = await client.PostAsJsonAsync("/api/auth/refresh-token", request);
 
             if (response.IsSuccessStatusCode)
             {
@@ -81,17 +98,17 @@ public class AuthService : IAuthService
                 {
                     _logger.LogInformation("Token refreshed successfully");
 
-                    // Сохраняем токены
+                    // Сохраняем новые токены
                     await StoreAccessTokenAsync(tokenResponse.AccessToken);
                     await StoreRefreshTokenAsync(tokenResponse.RefreshToken);
+                    AddDefaultRequestHeaderBearer(tokenResponse.AccessToken);
 
                     return tokenResponse;
                 }
             }
             else
             {
-                // Логируем ошибку
-                string error = await response.Content.ReadAsStringAsync();
+                var error = await response.Content.ReadAsStringAsync();
                 _logger.LogError("Refresh token failed: {Status}, {Error}", response.StatusCode, error);
             }
 
@@ -157,18 +174,14 @@ public class AuthService : IAuthService
 
     public async Task StoreAccessTokenAsync(string token)
     {
-        _logger.LogInformation("Saving access token, length: {Length}", token?.Length ?? 0);
+        _logger.LogInformation("Saving access token");
 
         try
         {
-            await _localStorage.RemoveItemAsync("accessToken");
-            await _localStorage.SetItemAsync<string>("accessToken", token);
+            await _localStorage.SetItemAsync(ACCESS_KEY, token);
+            _cachedAccessToken = token; // Обновляем кеш
             AddDefaultRequestHeaderBearer(token);
-
-            _logger.LogDebug("Access token saved and set in HttpClient");
-
-            string? saved = await _localStorage.GetItemAsync<string>("accessToken");
-            _logger.LogDebug("Save verification: {Saved}", string.IsNullOrEmpty(saved) ? "FAILED" : "success");
+            _logger.LogDebug("Access token saved");
         }
         catch (Exception ex)
         {
@@ -179,15 +192,12 @@ public class AuthService : IAuthService
 
     public async Task StoreRefreshTokenAsync(string refreshToken)
     {
-        _logger.LogInformation("Saving refresh token, length: {Length}", refreshToken?.Length ?? 0);
+        _logger.LogInformation("Saving refresh token");
 
         try
         {
-            await _localStorage.SetItemAsync<string>("refreshToken", refreshToken);
+            await _localStorage.SetItemAsync(REFRESH_KEY, refreshToken);
             _logger.LogDebug("Refresh token saved");
-
-            string? saved = await _localStorage.GetItemAsync<string>("refreshToken");
-            _logger.LogDebug("Refresh save verification: {Saved}", string.IsNullOrEmpty(saved) ? "FAILED" : "success");
         }
         catch (Exception ex)
         {
@@ -202,45 +212,44 @@ public class AuthService : IAuthService
 
         try
         {
-            string? token = await _localStorage.GetItemAsync<string>("accessToken");
+            // Отправляем запрос на сервер для аннулирования токена
+            var token = await GetCurrentAccessTokenAsync();
 
-            if (string.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(token))
             {
-                _logger.LogWarning("Access token missing during logout");
-                await _localStorage.RemoveItemAsync("refreshToken");
-                _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Remove("Authorization");
-                return;
+                try
+                {
+                    var client = _httpClientFactory.CreateClient("AuthorizedClient");
+                    var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/logout");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    await client.SendAsync(request);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error during logout request to server");
+                }
             }
 
-            HttpRequestMessage httpRequest = new(HttpMethod.Post, "/api/auth/logout");
-            _logger.LogDebug("Sending logout request");
+            // Очищаем локальное состояние
+            await _localStorage.RemoveItemAsync(ACCESS_KEY);
+            await _localStorage.RemoveItemAsync(REFRESH_KEY);
+            _cachedAccessToken = null;
 
-            HttpResponseMessage httpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").SendAsync(httpRequest);
-            _logger.LogDebug("Logout response: {StatusCode}", httpResponseMessage.StatusCode);
+            var client2 = _httpClientFactory.CreateClient("AuthorizedClient");
+            client2.DefaultRequestHeaders.Remove("Authorization");
 
-            await _localStorage.RemoveItemAsync("accessToken");
-            await _localStorage.RemoveItemAsync("refreshToken");
-            _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Remove("Authorization");
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                _logger.LogInformation("Logout successful, tokens removed");
-            }
-            else
-            {
-                string error = await httpResponseMessage.Content.ReadAsStringAsync();
-                _logger.LogWarning("Logout returned error: {Status}, Error: {Error}",
-                    httpResponseMessage.StatusCode, error);
-            }
+            _logger.LogInformation("Logout completed");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception during logout");
+            // Пытаемся очистить состояние даже в случае ошибки
             try
             {
-                await _localStorage.RemoveItemAsync("accessToken");
-                await _localStorage.RemoveItemAsync("refreshToken");
-                _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Authorization = null;
+                await _localStorage.RemoveItemAsync(ACCESS_KEY);
+                await _localStorage.RemoveItemAsync(REFRESH_KEY);
+                _cachedAccessToken = null;
+                _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Remove("Authorization");
             }
             catch { }
         }
@@ -355,7 +364,7 @@ public class AuthService : IAuthService
 
         try
         {
-            string? token = await _localStorage.GetItemAsync<string>("accessToken");
+            string? token = await _localStorage.GetItemAsync<string>(ACCESS_KEY);
 
             if (string.IsNullOrEmpty(token))
             {
@@ -483,7 +492,25 @@ public class AuthService : IAuthService
 
     public void AddDefaultRequestHeaderBearer(string accessToken)
     {
-        _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Remove("Authorization");
-        _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+        var client = _httpClientFactory.CreateClient("AuthorizedClient");
+        client.DefaultRequestHeaders.Remove("Authorization");
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+    }
+
+    public async Task<string?> GetCurrentAccessTokenAsync()
+    {
+        if (!string.IsNullOrEmpty(_cachedAccessToken))
+            return _cachedAccessToken;
+
+        try
+        {
+            _cachedAccessToken = await _localStorage.GetItemAsync<string>(ACCESS_KEY);
+            return _cachedAccessToken;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting access token");
+            return null;
+        }
     }
 }
