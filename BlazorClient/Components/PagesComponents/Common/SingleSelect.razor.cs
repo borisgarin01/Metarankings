@@ -5,19 +5,42 @@ public partial class SingleSelect<TItem, TId> : ComponentBase
     [Parameter] public List<TItem> Items { get; set; } = new();
     [Parameter] public TId? SelectedId { get; set; }
     [Parameter] public EventCallback<TId?> SelectedIdChanged { get; set; }
-    [Parameter] public Func<TItem, TId?> IdSelector { get; set; } // Changed to nullable
+    [Parameter] public Func<TItem, TId?> IdSelector { get; set; }
     [Parameter] public Func<TItem, string> DisplaySelector { get; set; }
     [Parameter] public string Placeholder { get; set; } = "Select an item...";
 
     private bool IsOpen { get; set; }
-    private string SearchTerm { get; set; } = string.Empty;
+    private string _searchTerm = string.Empty;
+
+    private string SearchTerm
+    {
+        get => _searchTerm;
+        set
+        {
+            if (_searchTerm != value)
+            {
+                _searchTerm = value;
+                StateHasChanged(); // Обновляем UI при изменении поиска
+            }
+        }
+    }
 
     private TItem? SelectedItem => Items.FirstOrDefault(x => SelectedId != null && SelectedId.Equals(IdSelector(x)));
-    private List<TItem> FilteredItems => string.IsNullOrWhiteSpace(SearchTerm)
-        ? Items
-        : Items.Where(x => DisplaySelector(x).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
 
-    private TId? GetId(TItem item) => IdSelector(item); // Returns nullable
+    private List<TItem> FilteredItems
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(SearchTerm))
+                return Items;
+
+            return Items.Where(x =>
+                DisplaySelector(x)?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true
+            ).ToList();
+        }
+    }
+
+    private TId? GetId(TItem item) => IdSelector(item);
     private string GetDisplayText(TItem item) => DisplaySelector(item);
 
     private void ToggleDropdown()
@@ -27,6 +50,7 @@ public partial class SingleSelect<TItem, TId> : ComponentBase
         {
             SearchTerm = string.Empty;
         }
+        StateHasChanged();
     }
 
     private async Task SelectItem(TItem item)

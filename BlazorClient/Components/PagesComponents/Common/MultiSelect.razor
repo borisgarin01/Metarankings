@@ -25,15 +25,16 @@
 
         @if (IsOpen)
         {
-            <div class="dropdown-list">
-                <div class="search-wrapper">
+            <div class="dropdown-list" @onclick:stopPropagation="true">
+                <div class="search-wrapper" @onclick:stopPropagation="true">
                     <input type="text"
                            class="search-input"
                            placeholder="Search..."
                            @bind="SearchTerm"
-                           @bind:event="oninput" />
+                           @bind:event="oninput"
+                           @onclick:stopPropagation="true" />
                 </div>
-                <ul class="options-list">
+                <ul class="options-list" @onclick:stopPropagation="true">
                     @if (FilteredItems.Any())
                     {
                         @foreach (var item in FilteredItems)
@@ -41,7 +42,8 @@
                             var id = GetId(item);
                             var isSelected = SelectedIds.Contains(id);
                             <li class="option-item @(isSelected ? "selected" : "")"
-                                @onclick="() => ToggleSelection(item)">
+                                @onclick="() => ToggleSelection(item)"
+                                @onclick:stopPropagation="true">
                                 <span class="option-check">
                                     @if (isSelected)
                                     {

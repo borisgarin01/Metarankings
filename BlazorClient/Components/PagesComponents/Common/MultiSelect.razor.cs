@@ -11,12 +11,35 @@ public partial class MultiSelect<TItem, TId> : ComponentBase
     [Parameter] public string LabelPlural { get; set; } = "items";
 
     private bool IsOpen { get; set; }
-    private string SearchTerm { get; set; } = string.Empty;
+    private string _searchTerm = string.Empty;
+
+    private string SearchTerm
+    {
+        get => _searchTerm;
+        set
+        {
+            if (_searchTerm != value)
+            {
+                _searchTerm = value;
+                StateHasChanged(); // Важно! Обновляем UI при изменении поиска
+            }
+        }
+    }
 
     private List<TItem> SelectedItems => Items.Where(x => SelectedIds.Contains(IdSelector(x))).ToList();
-    private List<TItem> FilteredItems => string.IsNullOrWhiteSpace(SearchTerm)
-        ? Items
-        : Items.Where(x => DisplaySelector(x).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    private List<TItem> FilteredItems
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(SearchTerm))
+                return Items;
+
+            return Items.Where(x =>
+                DisplaySelector(x)?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true
+            ).ToList();
+        }
+    }
 
     private TId GetId(TItem item) => IdSelector(item);
     private string GetDisplayText(TItem item) => DisplaySelector(item);
@@ -28,11 +51,12 @@ public partial class MultiSelect<TItem, TId> : ComponentBase
         {
             SearchTerm = string.Empty;
         }
+        StateHasChanged();
     }
 
     private async Task ToggleSelection(TItem item)
     {
-        TId? id = GetId(item);
+        TId id = GetId(item);
         if (SelectedIds.Contains(id))
         {
             SelectedIds.Remove(id);
