@@ -42,6 +42,8 @@ internal class Program
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenValidationParameters:IssuerSigningAccessKey"]))
         };
 
+        builder.Configuration.AddEnvironmentVariables();
+
         _ = builder.Services.Configure<TokenValidationParameters>(builder.Configuration.GetSection(nameof(TokenValidationParameters)));
 
         _ = builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection(nameof(AuthSettings)));
