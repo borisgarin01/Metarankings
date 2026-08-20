@@ -15,6 +15,9 @@
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: "http://0.0.0.0:3000"
       ConnectionStrings__PostgresConnection: Host=db; Port=5432; Database=${DB_NAME}; Trust Server Certificate=true; Username=${DB_USER}; Password=${DB_PASSWORD}
+    volumes:
+      - ./Games:/app/Games
+      - ./Movies:/app/Movies
     restart: unless-stopped
 
   db:
