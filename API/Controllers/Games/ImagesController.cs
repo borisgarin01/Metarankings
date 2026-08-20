@@ -59,7 +59,7 @@ public class ImagesController : ControllerBase
             }
 
             // Return the URL to access the image
-            string imageUrl = $"/api/movies/Images/{year}/{month}/{fileName}";
+            string imageUrl = $"/api/games/Images/{year}/{month}/{fileName}";
             return Created(imageUrl, new { fileName, size = formFile.Length, url = imageUrl });
         }
         catch (Exception ex)
