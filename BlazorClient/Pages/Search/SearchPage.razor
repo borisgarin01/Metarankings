@@ -92,7 +92,7 @@
                         @foreach (Movie movie in Movies)
                         {
                             <div class="item">
-                                <a href="/movies/details/@movie.Id" title="Фильм @movie.Name"><img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}/{movie.ImageSource}")" alt="@movie.Name"></a>
+                                <a href="/movies/details/@movie.Id" title="Фильм @movie.Name"><img class="post-image" src="@movie.ImageSource" alt="@movie.Name"></a>
                                 <div class="small-score mark-@(movie.MovieReviews.Any() ? Math.Round(movie.MovieReviews.Average(mr => mr.Score)) : 0)">
                                     <span data-title="Рейтинг фильма" class="tooltip">@(movie.MovieReviews.Any() ? Math.Round(movie.MovieReviews.Average(mr => mr.Score)) : 0)</span>
                                 </div>
@@ -109,7 +109,7 @@
                                     <a href="/movies/details/@movie.Id/#comments">Отзывы (@movie.MovieReviews.Count)</a>
                                 </span>
                                 <span class="item-meta" style="display: block;">
-                                    @(movie.PremierDate.HasValue? movie.PremierDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU")) : "Нет даты премьеры")
+                                    @(movie.PremierDate.HasValue ? movie.PremierDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU")) : "Нет даты премьеры")
                                 </span>
                                 <span class="item-description">@string.Join(" ", movie.Description.Split(' ').Take(12))...</span>
                             </div>
@@ -125,7 +125,7 @@
                         @foreach (Game game in Games)
                         {
                             <div class="item">
-                                <a href="/games/details/@game.Id" title="Игра @game.Name"><img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}/{game.Image}")" alt="@game.Name"></a>
+                                <a href="/games/details/@game.Id" title="Игра @game.Name"><img class="post-image" src="@game.Image" alt="@game.Name"></a>
                                 <div class="small-score mark-@Math.Round(game.GamesPlayersReviews.Any() ? Math.Round(game.GamesPlayersReviews.Average(mr => mr.Score)) : 0)"><span data-title="Рейтинг игры" class="tooltip">0</span></div>
                                 <span class="item-name"><a href="/games/details/@game.Id">@game.Name</a></span>
                                 <span class="item-meta">
@@ -137,7 +137,7 @@
                                 </span>
                                 <span class="item-meta"><a href="/games/details/@game.Id/#reviews">Рецензии (@game.GamesPlayersReviews.Count)</a> <a href="/games/details/@game.Id/#comments">Отзывы (@game.GamesPlayersReviews.Count)</a></span>
                                 <span class="item-meta" style="display: block;">
-                                    @(game.ReleaseDate.HasValue? game.ReleaseDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU")) : "Нет даты релиза")
+                                    @(game.ReleaseDate.HasValue ? game.ReleaseDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU")) : "Нет даты релиза")
                                 </span>
                                 <span class="item-description">@string.Join(" ", game.Description.Split(' ').Take(12))...</span>
                             </div>

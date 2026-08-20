@@ -4,7 +4,7 @@
 @inject IConfiguration Configuration
 
 <div class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
-    <a href="/games/Details/@Id" title="Игра @Name" class="thumb"><img class="post-image" src="@($"{Configuration["HttpClientSettings:BaseUrl"]}{Image}")" alt="Игра @Name"></a>
+    <a href="/games/Details/@Id" title="Игра @Name" class="thumb"><img class="post-image" src="@Image" alt="Игра @Name"></a>
     <div class="best-prod">
         <div class="counter" itemprop="position">@Id</div>
         <span class="star">★</span>
