@@ -1,5 +1,10 @@
 <Solution>
+  <Folder Name="/certbot/" />
+  <Folder Name="/certbot/conf/" />
+  <Folder Name="/certbot/www/" />
   <Folder Name="/Solution Items/">
+    <File Path="docker-compose.dcproj" />
+    <File Path="docker-compose.yml" />
     <File Path="Dockerfile" />
   </Folder>
   <Folder Name="/WebClientServices/">
