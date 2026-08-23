@@ -47,6 +47,7 @@
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./BlazorClient/wwwroot:/usr/share/nginx/html:ro
     networks:
       - metarankings-api-network
     depends_on:
