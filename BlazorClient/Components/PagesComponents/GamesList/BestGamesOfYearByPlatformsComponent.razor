@@ -4,11 +4,12 @@
 <div class="filter-nav">
     <div class="filter-name">Платформа</div>
     <div class="filter-menu">
-        <a class="@(PlatformId is not null ? "selected" : "")" href="/games/best-games/?Year=@Year">Все</a>
+        <a class="@(PlatformId is null ? "selected" : "")"
+           href="@BuildUrl(null)">Все</a>
         @foreach (Platform platform in Platforms)
         {
             <a class="@(PlatformId == platform.Id ? "selected" : "")"
-               href="/games/best-games/?Year=@Year&PlatformId=@platform.Id">
+               href="@BuildUrl(platform.Id)">
                 @platform.Name
             </a>
         }

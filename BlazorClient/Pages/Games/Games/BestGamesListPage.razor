@@ -20,7 +20,18 @@
         @if (Platforms is not null)
         {
             <CascadingValue Name="PlatformId" Value="PlatformId">
-                <BestGamesOfYearByPlatformsComponent Platforms="@Platforms" />
+                <CascadingValue Name="GenreId" Value="GenreId">
+                    <BestGamesOfYearByPlatformsComponent Platforms="@Platforms" />
+                </CascadingValue>
+            </CascadingValue>
+        }
+
+        @if (Genres is not null)
+        {
+            <CascadingValue Name="PlatformId" Value="PlatformId">
+                <CascadingValue Name="GenreId" Value="GenreId">
+                    <BestGamesOfYearByGenresComponent />
+                </CascadingValue>
             </CascadingValue>
         }
     </CascadingValue>

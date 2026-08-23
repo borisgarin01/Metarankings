@@ -5,20 +5,15 @@
         @{
             int currentYear = DateTime.Today.Year;
             int count = 8;
-            int selectedYear = Year; // Year уже int, не nullable
+            int selectedYear = Year ?? currentYear;
 
-            int startYear;
+            int startYear = selectedYear + 3;
 
-            // Всегда показываем 4 года после и 3 до выбранного
-            startYear = selectedYear + 3;
-
-            // Если выбранный год близок к текущему, показываем от текущего вниз
             if (selectedYear > currentYear - 4)
             {
                 startYear = currentYear;
             }
 
-            // Если выбранный год слишком старый, корректируем
             if (startYear > currentYear)
             {
                 startYear = currentYear;
@@ -28,7 +23,26 @@
         @for (int i = 0; i < count; i++)
         {
             int yearToShow = startYear - i;
-            <a href="/games/best-games/?Year=@yearToShow"
+
+            // Строим URL
+            string queryParams = "";
+
+            // Добавляем год
+            queryParams = $"?Year={yearToShow}";
+
+            // Сохраняем PlatformId если есть
+            if (PlatformId.HasValue)
+            {
+                queryParams += $"&PlatformId={PlatformId}";
+            }
+
+            // Сохраняем GenreId если есть
+            if (GenreId.HasValue)
+            {
+                queryParams += $"&GenreId={GenreId}";
+            }
+
+            <a href="/games/best-games/@queryParams"
                class="@(yearToShow == selectedYear ? "selected" : "")">
                 @yearToShow
             </a>
