@@ -748,29 +748,78 @@ footer {
     }
 }
 
-@media only screen and (max-width: 670px) {
+/* ===== ФИЛЬТРЫ — ПЕРЕОПРЕДЕЛЕНИЕ BOOTSTRAP ===== */
+
+.filter-nav {
+    margin-bottom: 25px !important;
+}
+
     .filter-nav a {
-        font-size: 16px;
+        background: #e7e7e7 !important;
+        font-size: 14px !important;
+        color: #000 !important;
+        border-radius: 8px !important;
+        padding: 8px 10px !important;
+        display: inline-block !important;
+        margin: 10px 5px 0 0 !important;
+        font-weight: 500 !important;
+        text-decoration: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        line-height: 1 !important;
+    }
+
+        .filter-nav a:hover {
+            background: #d0d0d0 !important;
+            color: #000 !important;
+        }
+
+    .filter-nav .selected {
+        background: #7e7e7e !important;
+        color: #fff !important;
+    }
+
+        .filter-nav .selected:hover {
+            background: #6a6a6a !important;
+            color: #fff !important;
+        }
+
+    .filter-nav .filter-name {
+        font-weight: 600 !important;
+        font-size: 15px !important;
+        color: #333 !important;
+        margin-bottom: 8px !important;
+        display: block !important;
+    }
+
+@media only screen and (max-width: 670px) {
+    .filter-menu,
+    .platform-menu,
+    .genre-menu {
+        overflow-x: scroll !important;
+        overflow-y: hidden !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .filter-menu {
+        padding-bottom: 10px !important;
+    }
+
+        .filter-menu::-webkit-scrollbar,
+        .platform-menu::-webkit-scrollbar,
+        .genre-menu::-webkit-scrollbar {
+            display: none !important;
+        }
+
+    .filter-nav a {
+        font-size: 16px !important;
     }
 }
 
-.filter-nav a {
-    background: #e7e7e7;
-    font-size: 14px;
-    color: #000;
-    border-radius: 8px;
-    padding: 8px 10px;
-    display: inline-block;
-    margin: 10px 5px 0 0;
-    font-weight: 500;
-    text-decoration: none;
-}
-
-@media only screen and (max-width: 670px) {
-    .filter-menu, .platform-menu, .genre-menu {
-        overflow-x: scroll;
-        overflow-y: hidden;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
+@media only screen and (max-width: 400px) {
+    .filter-nav a {
+        font-size: 14px !important;
+        padding: 6px 8px !important;
     }
 }

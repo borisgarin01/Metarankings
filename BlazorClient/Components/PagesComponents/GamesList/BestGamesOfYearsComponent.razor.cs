@@ -2,6 +2,6 @@
 
 public partial class BestGamesOfYearsComponent : ComponentBase
 {
-    [Parameter, EditorRequired]
+    [CascadingParameter(Name = "Year")]
     public int Year { get; set; }
 }

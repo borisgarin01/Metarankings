@@ -12,12 +12,18 @@
     <p>Страница динамически меняется, выставляемые оценки влияют на положение проекта в топе, так что зайдя в следующий раз на эту страницу, вы можете видеть обновленные данные с актуальными оценками и сформированным списком топа.</p>
     <span class="read-more">Читать полностью</span>
 </div>
+
 <div id="filter">
-    <BestGamesOfYearsComponent Year="@((Year.HasValue) ? Year.Value : DateTime.Now.Year)" />
-    @if (Platforms is not null)
-    {
-        <BestGamesOfYearByPlatformsComponent Year="@((Year.HasValue) ? Year.Value : DateTime.Now.Year)" Platforms="@Platforms" />
-    }
+    <CascadingValue Name="Year" Value="@((Year.HasValue) ? Year.Value : DateTime.Now.Year)">
+        <BestGamesOfYearsComponent />
+
+        @if (Platforms is not null)
+        {
+            <CascadingValue Name="PlatformId" Value="PlatformId">
+                <BestGamesOfYearByPlatformsComponent Platforms="@Platforms" />
+            </CascadingValue>
+        }
+    </CascadingValue>
 </div>
 
 @if (Games is null)
