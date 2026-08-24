@@ -95,7 +95,7 @@ RETURNING Id;"
                     publisherDictionary.Add(publisherEntry.Id, publisherEntry);
                 }
 
-                if (game is not null)
+                if (game is not null && !publisherEntry.Games.Any(g => g.Id == game.Id))
                 {
                     if (platform is not null)
                         game.Platforms.Add(platform);

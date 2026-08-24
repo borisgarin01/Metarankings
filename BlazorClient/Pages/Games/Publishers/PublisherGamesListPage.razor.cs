@@ -8,6 +8,10 @@ namespace BlazorClient.Pages.Games.Publishers;
 
 public partial class PublisherGamesListPage : ComponentBase
 {
+    private Publisher publisher;
+    private IEnumerable<Platform> platforms;
+    private IEnumerable<Developer> developers;
+
     [Parameter]
     public int PublisherId { get; set; }
 
@@ -20,9 +24,33 @@ public partial class PublisherGamesListPage : ComponentBase
     [Inject]
     public IWebManager<Developer, AddDeveloperModel, UpdateDeveloperModel> DevelopersWebManager { get; set; }
 
-    public Publisher Publisher { get; set; }
-    public IEnumerable<Platform> Platforms { get; set; }
-    public IEnumerable<Developer> Developers { get; set; }
+    public Publisher Publisher
+    {
+        get => publisher;
+        set
+        {
+            publisher = value;
+            StateHasChanged();
+        }
+    }
+    public IEnumerable<Platform> Platforms
+    {
+        get => platforms;
+        set
+        {
+            platforms = value;
+            StateHasChanged();
+        }
+    }
+    public IEnumerable<Developer> Developers
+    {
+        get => developers;
+        set
+        {
+            developers = value;
+            StateHasChanged();
+        }
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -30,7 +58,7 @@ public partial class PublisherGamesListPage : ComponentBase
         Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetFirstAsync(0, 5);
         Task<IEnumerable<Developer>> developersGettingTask = DevelopersWebManager.GetFirstAsync(0, 5);
 
-        await Task.WhenAll(publisherGettingTask, platformsGettingTask).ContinueWith(b =>
+        await Task.WhenAll(publisherGettingTask, platformsGettingTask, developersGettingTask).ContinueWith(b =>
         {
             Publisher = publisherGettingTask.Result;
             Platforms = platformsGettingTask.Result;

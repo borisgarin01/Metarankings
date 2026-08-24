@@ -5,7 +5,7 @@
 
 <BlazorClient.Components.PagesComponents.Common.GameMenu Year="@DateTime.Today.Year" />
 
-@if (Publisher is null)
+@if (Publisher is null || Developers is null || Platforms is null)
 {
     <p>Загружается...</p>
 }
