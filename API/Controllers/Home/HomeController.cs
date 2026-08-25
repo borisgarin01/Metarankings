@@ -110,7 +110,7 @@ public sealed class HomeController : ControllerBase
     {
         IEnumerable<Game> games = await _gamesRepository.GetNearestAsync(limit);
 
-        IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDatetItemViewModels = games.Select(b => new GamesReleaseDateItemViewModel($"/games/Details/{b.Id}", b.Name, b.Image, b.Name, b.Name, b.Platforms.Select(c => new Link(c.Name, $"/platforms/{c.Id}")).ToArray(), b.Genres.Select(c => new Link(c.Name, $"/genres/{c.Id}")).ToArray(), b.ReleaseDate.HasValue ? b.ReleaseDate.Value : DateOnly.FromDateTime(DateTime.Today.AddYears(5))));
+        IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDatetItemViewModels = games.Select(b => new GamesReleaseDateItemViewModel($"/games/Details/{b.Id}", b.Name, b.Image, b.Name, b.Name, b.Platforms.Select(c => new Link(c.Name, $"/platforms/{c.Id}")).ToArray(), b.Genres.Select(c => new Link(c.Name, $"/games/genres/{c.Id}")).ToArray(), b.ReleaseDate.HasValue ? b.ReleaseDate.Value : DateOnly.FromDateTime(DateTime.Today.AddYears(5))));
 
         return Ok(gamesReleaseDatetItemViewModels);
     }
@@ -121,7 +121,7 @@ public sealed class HomeController : ControllerBase
         IEnumerable<Game> nearestNextReleaseDatesGames = await _gamesRepository.GetLastAsync((pageNumber - 1) * pageSize, pageSize);
 
         IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemsComponents = nearestNextReleaseDatesGames
-            .Select(b => new GamesReleaseDateItemViewModel($"/games/Details/{b.Id}", b.Name, b.Image, b.Name, b.Name, b.Platforms.Select(a => new Link(a.Name, $"/platforms/{a.Id}")).ToArray(), b.Genres.Select(a => new Link(a.Name, $"/genres/{a.Id}")).ToArray(), b.ReleaseDate.HasValue ? b.ReleaseDate.Value : default));
+            .Select(b => new GamesReleaseDateItemViewModel($"/games/Details/{b.Id}", b.Name, b.Image, b.Name, b.Name, b.Platforms.Select(a => new Link(a.Name, $"/platforms/{a.Id}")).ToArray(), b.Genres.Select(a => new Link(a.Name, $"/games/genres/{a.Id}")).ToArray(), b.ReleaseDate.HasValue ? b.ReleaseDate.Value : default));
 
         return Ok(gamesReleaseDateItemsComponents);
     }
