@@ -40,18 +40,14 @@
                     <ul>
                         <AuthorizeView>
                             <Authorized>
-                                <li style="display:flex; align-items:center; gap:10px; padding:22px 12px;">
-                                    <span style="color:#777;">
-                                        <i class="bi bi-person-circle" style="font-size:20px;"></i>
-                                    </span>
-                                    <span style="font-size:14px; color:#777;">
-                                        <a href="/auth/account"
-                                           style="color:#777; text-decoration:none;">
-                                            @context.User.FindFirstValue("UserName")
-                                        </a>
-                                    </span>
-                                    <a href="/auth/logout" style="color:#777; text-decoration:none; font-size:16px;" title="Выйти">
-                                        <i class="bi bi-box-arrow-right"></i>
+                                <li class="nav-link">
+                                    <a href="/auth/account">
+                                        @context.User.FindFirstValue("UserName")
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/auth/logout">
+                                        Выйти
                                     </a>
                                 </li>
                             </Authorized>
