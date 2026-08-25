@@ -11,12 +11,12 @@ public partial class BestGamesOfYearByPlatformsComponent : ComponentBase
     public long? PlatformId { get; set; }
 
     [CascadingParameter(Name = "GenreId")]
-    public long? GenreId { get; set; }  // ← ДОБАВЬ ЭТО!
+    public long? GenreId { get; set; }
 
-    [Parameter, EditorRequired]
-    public IEnumerable<Platform> Platforms { get; set; }
+    [CascadingParameter(Name = "Platforms")]
+    public IEnumerable<Platform>? Platforms { get; set; }
 
-    private string BuildUrl(long? platformId)
+    private string BuildUrl(long? platformId = null)
     {
         var parameters = new List<string>();
 

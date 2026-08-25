@@ -4,37 +4,11 @@
     <div class="filter-menu">
         <a class="@(GenreId is null ? "selected" : "")"
            href="@BuildUrl(null)">Все</a>
-        <a class="@(GenreId == 3 ? "selected" : "")"
-           href="@BuildUrl(3)">Экшены</a>
-        <a class="@(GenreId == 9 ? "selected" : "")"
-           href="@BuildUrl(9)">Шутеры</a>
-        <a class="@(GenreId == 4 ? "selected" : "")"
-           href="@BuildUrl(4)">RPG</a>
-        <a class="@(GenreId == 1 ? "selected" : "")"
-           href="@BuildUrl(1)">Приключения</a>
-        <a class="@(GenreId == 11 ? "selected" : "")"
-           href="@BuildUrl(11)">Гонки</a>
-        <a class="@(GenreId == 2 ? "selected" : "")"
-           href="@BuildUrl(2)">Хорроры</a>
-        <a class="@(GenreId == 10 ? "selected" : "")"
-           href="@BuildUrl(10)">Стратегии</a>
-        <a class="@(GenreId == 13 ? "selected" : "")"
-           href="@BuildUrl(13)">ММО</a>
-        <a class="@(GenreId == 6 ? "selected" : "")"
-           href="@BuildUrl(6)">Аркады</a>
-        <a class="@(GenreId == 7 ? "selected" : "")"
-           href="@BuildUrl(7)">Платформеры</a>
-        <a class="@(GenreId == 14 ? "selected" : "")"
-           href="@BuildUrl(14)">Спорт</a>
-        <a class="@(GenreId == 15 ? "selected" : "")"
-           href="@BuildUrl(15)">Файтинги</a>
-        <a class="@(GenreId == 16 ? "selected" : "")"
-           href="@BuildUrl(16)">Тактика</a>
-        <a class="@(GenreId == 17 ? "selected" : "")"
-           href="@BuildUrl(17)">Симуляторы</a>
-        <a class="@(GenreId == 8 ? "selected" : "")"
-           href="@BuildUrl(8)">Головоломки</a>
-        <a class="@(GenreId == 5 ? "selected" : "")"
-           href="@BuildUrl(5)">JRPG</a>
+
+        @foreach (var genre in Genres)
+        {
+            <a class="@(GenreId == genre.Id ? "selected" : "")"
+               href="@BuildUrl(genre.Id)">@genre.Name</a>
+        }
     </div>
 </div>

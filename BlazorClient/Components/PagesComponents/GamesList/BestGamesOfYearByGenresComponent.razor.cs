@@ -1,8 +1,11 @@
-﻿namespace BlazorClient.Components.PagesComponents.GamesList;
+﻿using Domain.Games;
+using Domain.RequestsModels.Games.Genres;
+using WebManagers;
+
+namespace BlazorClient.Components.PagesComponents.GamesList;
 
 public partial class BestGamesOfYearByGenresComponent : ComponentBase
 {
-
     [CascadingParameter(Name = "Year")]
     public int? Year { get; set; }
 
@@ -12,7 +15,17 @@ public partial class BestGamesOfYearByGenresComponent : ComponentBase
     [CascadingParameter(Name = "PlatformId")]
     public long? PlatformId { get; set; }
 
-    private string BuildUrl(long? genreId)
+    private IEnumerable<Genre> Genres { get; set; } = new List<Genre>();
+
+    [Inject]
+    private IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel> GenresWebManager { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Genres = await GenresWebManager.GetAllAsync();
+    }
+
+    private string BuildUrl(long? genreId = null)
     {
         var parameters = new List<string>();
 
