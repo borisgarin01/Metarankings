@@ -13,6 +13,8 @@ public partial class LoginModal : ComponentBase
     private string UserIdFor2FA { get; set; } = string.Empty;
     private bool IsTwoFactorRequired { get; set; } = false;
     private bool IsLoading { get; set; } = false;
+    private string LoginError { get; set; } = string.Empty;
+    private string TwoFactorError { get; set; } = string.Empty;
     private IEnumerable<AuthenticationScheme> ExternalLogins { get; set; } = Enumerable.Empty<AuthenticationScheme>();
 
     [Parameter] public bool IsVisible { get; set; }
@@ -39,17 +41,35 @@ public partial class LoginModal : ComponentBase
     {
         if (IsVisible)
         {
+            // Сброс всех полей при открытии
             IsTwoFactorRequired = false;
             TwoFactorCode = string.Empty;
             UserIdFor2FA = string.Empty;
             LoginModel = new LoginModel();
             IsLoading = false;
+            LoginError = string.Empty;
+            TwoFactorError = string.Empty;
         }
         await base.OnParametersSetAsync();
     }
 
     private async Task PerformLoginAsync()
     {
+        LoginError = string.Empty;
+
+        // Валидация
+        if (string.IsNullOrWhiteSpace(LoginModel.UserEmail))
+        {
+            LoginError = "Введите email";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(LoginModel.Password))
+        {
+            LoginError = "Введите пароль";
+            return;
+        }
+
         try
         {
             IsLoading = true;
@@ -61,6 +81,7 @@ public partial class LoginModal : ComponentBase
             {
                 IsTwoFactorRequired = true;
                 UserIdFor2FA = loginResponse.UserId;
+                TwoFactorError = string.Empty;
                 ToastService.ShowInfo("Код подтверждения отправлен на вашу почту");
             }
             else if (!string.IsNullOrWhiteSpace(loginResponse.AccessToken))
@@ -76,12 +97,12 @@ public partial class LoginModal : ComponentBase
             }
             else
             {
-                ToastService.ShowWarning("Неверный логин или пароль");
+                LoginError = "Неверный логин или пароль";
             }
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"Ошибка: {ex.Message}");
+            LoginError = "Ошибка входа. Проверьте данные и попробуйте снова.";
         }
         finally
         {
@@ -92,9 +113,11 @@ public partial class LoginModal : ComponentBase
 
     private async Task VerifyTwoFactorAsync()
     {
+        TwoFactorError = string.Empty;  // ← СБРОС
+
         if (string.IsNullOrWhiteSpace(TwoFactorCode))
         {
-            ToastService.ShowWarning("Введите код подтверждения");
+            TwoFactorError = "Введите код подтверждения";
             return;
         }
 
@@ -117,13 +140,13 @@ public partial class LoginModal : ComponentBase
             }
             else
             {
-                ToastService.ShowWarning("Неверный код подтверждения");
+                TwoFactorError = "Неверный код подтверждения";
                 TwoFactorCode = string.Empty;
             }
         }
         catch (Exception ex)
         {
-            ToastService.ShowError($"Ошибка: {ex.Message}");
+            TwoFactorError = "Ошибка проверки кода. Попробуйте снова.";
         }
         finally
         {
@@ -158,6 +181,7 @@ public partial class LoginModal : ComponentBase
         IsTwoFactorRequired = false;
         TwoFactorCode = string.Empty;
         UserIdFor2FA = string.Empty;
+        TwoFactorError = string.Empty;  // ← СБРОС
         StateHasChanged();
     }
 
@@ -185,10 +209,5 @@ public partial class LoginModal : ComponentBase
     {
         IsVisible = false;
         await IsVisibleChanged.InvokeAsync(false);
-    }
-
-    private async Task CloseOnOverlayAsync(MouseEventArgs e)
-    {
-        await CloseAsync();
     }
 }

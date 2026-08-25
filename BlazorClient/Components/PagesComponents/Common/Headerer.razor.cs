@@ -13,7 +13,6 @@ namespace BlazorClient.Components.PagesComponents.Common;
 public partial class Headerer : ComponentBase
 {
 
-    // ===== СОСТОЯНИЕ =====
     private bool isMenuOpen = false;
     private bool isLoginOpen = false;
     private bool isSticky = false;
