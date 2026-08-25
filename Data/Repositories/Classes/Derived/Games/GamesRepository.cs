@@ -487,87 +487,112 @@ WHERE Id=@id", new { id });
     int[]? years,
     long[]? developersIds,
     long[]? publishersIds,
-    long[]?localizationsIds,
+    long[]? localizationsIds,
     int skip,
     int take)
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
-        // Build the base SQL with all joins
-        StringBuilder sqlBuilder = new StringBuilder(@"SELECT DISTINCT
-    g.Id, g.Name, g.Image, g.ReleaseDate, g.Description,
-    d.Id, d.Name,
-    p.Id, p.Name,
-    gen.Id, gen.Name,
-    l.Id, l.Name,
-    platf.Id, platf.Name,
-    gs.Id, gs.GameId, gs.ImageUrl,
-    gc.Id, gc.Name, gc.Description
-FROM games g
-LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
-LEFT JOIN developers d ON d.id = gd.developerid
-LEFT JOIN gamespublishers gpub on gpub.gameid = g.id
-LEFT JOIN publishers p on p.id = gpub.publisherid
-LEFT JOIN gamesgenres gg ON gg.gameid = g.id
-LEFT JOIN genres gen ON gen.id = gg.genreid
-LEFT JOIN localizations l ON l.id = g.localizationid
-LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
-LEFT JOIN platforms platf ON platf.id = gplatf.platformid
-LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
-LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
-LEFT JOIN gamescollections gc on gc.Id = gci.GameCollectionId
-WHERE 1=1");
+
+        // 1. Сначала получаем ID игр, прошедших фильтрацию
+        StringBuilder filterSql = new StringBuilder(@"
+    SELECT DISTINCT g.Id, g.Name  -- ДОБАВЛЯЕМ g.Name в SELECT
+    FROM games g
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN gamespublishers gpub ON gpub.gameid = g.id
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    WHERE 1=1
+");
 
         DynamicParameters parameters = new DynamicParameters();
 
-        // Add filters conditionally
+        // Фильтры для отбора игр
         if (genresIds != null && genresIds.Length > 0)
         {
-            sqlBuilder.Append(" AND gg.genreid = ANY(@GenresIds)");
+            filterSql.Append(" AND gg.genreid = ANY(@GenresIds)");
             parameters.Add("GenresIds", genresIds);
         }
 
         if (platformsIds != null && platformsIds.Length > 0)
         {
-            sqlBuilder.Append(" AND gplatf.platformid = ANY(@PlatformsIds)");
+            filterSql.Append(" AND gplatf.platformid = ANY(@PlatformsIds)");
             parameters.Add("PlatformsIds", platformsIds);
         }
 
         if (years != null && years.Length > 0)
         {
-            sqlBuilder.Append(" AND EXTRACT(YEAR FROM g.ReleaseDate) = ANY(@Years)");
+            filterSql.Append(" AND EXTRACT(YEAR FROM g.ReleaseDate) = ANY(@Years)");
             parameters.Add("Years", years);
         }
 
         if (developersIds != null && developersIds.Length > 0)
         {
-            sqlBuilder.Append(" AND gd.developerid = ANY(@DevelopersIds)");
+            filterSql.Append(" AND gd.developerid = ANY(@DevelopersIds)");
             parameters.Add("DevelopersIds", developersIds);
         }
 
         if (publishersIds != null && publishersIds.Length > 0)
         {
-            sqlBuilder.Append(" AND gpub.publisherid = ANY(@PublishersIds)");
+            filterSql.Append(" AND gpub.publisherid = ANY(@PublishersIds)");
             parameters.Add("PublishersIds", publishersIds);
         }
 
         if (localizationsIds != null && localizationsIds.Length > 0)
         {
-            sqlBuilder.Append(" AND l.Id = ANY(@LocalizationsIds)");
+            filterSql.Append(" AND g.localizationid = ANY(@LocalizationsIds)");
             parameters.Add("LocalizationsIds", localizationsIds);
         }
 
-        // Add pagination
-        sqlBuilder.Append(" ORDER BY g.Name OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY");
+        // Пагинация применяется к ID
+        filterSql.Append(" ORDER BY g.Name OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY");
         parameters.Add("Skip", skip);
         parameters.Add("Take", take);
 
-        Dictionary<string, Game> gameDictionary = new Dictionary<string, Game>();
+        // Получаем ID и Name игр (исправлено с QueryAsync<long> на QueryAsync<(long Id, string Name)>)
+        var gameIdsWithNames = await connection.QueryAsync<(long Id, string Name)>(filterSql.ToString(), parameters);
+
+        if (!gameIdsWithNames.Any())
+            return Enumerable.Empty<Game>();
+
+        // Извлекаем только ID для второго запроса
+        var gameIds = gameIdsWithNames.Select(x => x.Id).ToArray();
+
+        // 2. Теперь загружаем ПОЛНЫЕ данные по этим играм (ВСЕ платформы, жанры и т.д.)
+        string dataSql = @"
+    SELECT 
+        g.Id, g.Name, g.Image, g.ReleaseDate, g.Description,
+        d.Id, d.Name,
+        p.Id, p.Name,
+        gen.Id, gen.Name,
+        l.Id, l.Name,
+        platf.Id, platf.Name,
+        gs.Id, gs.GameId, gs.ImageUrl,
+        gc.Id, gc.Name, gc.Description
+    FROM games g
+    LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+    LEFT JOIN developers d ON d.id = gd.developerid
+    LEFT JOIN gamespublishers gpub ON gpub.gameid = g.id
+    LEFT JOIN publishers p ON p.id = gpub.publisherid
+    LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+    LEFT JOIN genres gen ON gen.id = gg.genreid
+    LEFT JOIN localizations l ON l.id = g.localizationid
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    LEFT JOIN platforms platf ON platf.id = gplatf.platformid
+    LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
+    LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
+    LEFT JOIN gamescollections gc ON gc.Id = gci.GameCollectionId
+    WHERE g.Id = ANY(@GameIds)
+    ORDER BY g.Name";
+
+        parameters.Add("GameIds", gameIds);
+
+        Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
         IEnumerable<Game> query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
-            sqlBuilder.ToString(),
+            dataSql,
             (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
             {
-                if (!gameDictionary.TryGetValue(game.Name, out Game? gameEntry))
+                if (!gameDictionary.TryGetValue(game.Id, out Game? gameEntry))
                 {
                     gameEntry = game;
                     gameEntry.Developers = new List<Developer>();
@@ -576,7 +601,7 @@ WHERE 1=1");
                     gameEntry.Screenshots = new List<GameScreenshot>();
                     gameEntry.Publishers = new List<Publisher>();
                     gameEntry.GameCollections = new List<GamesCollection>();
-                    gameDictionary.Add(gameEntry.Name, gameEntry);
+                    gameDictionary.Add(gameEntry.Id, gameEntry);
                 }
 
                 if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
@@ -606,8 +631,7 @@ WHERE 1=1");
             splitOn: "Id,Id,Id,Id,Id,Id,Id"
         );
 
-        List<Game> result = gameDictionary.Values.ToList();
-        return result;
+        return gameDictionary.Values.ToList();
     }
 
     public async Task<IEnumerable<Game>> GetByNameAsync(string name)
