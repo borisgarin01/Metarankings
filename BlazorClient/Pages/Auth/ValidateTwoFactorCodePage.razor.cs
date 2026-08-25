@@ -6,6 +6,8 @@ namespace BlazorClient.Pages.Auth;
 
 public partial class ValidateTwoFactorCodePage : ComponentBase
 {
+    private ValidateTwoFactorCodeModel model = new();
+
     [Parameter]
     public string UserId { get; set; }
 
@@ -17,8 +19,6 @@ public partial class ValidateTwoFactorCodePage : ComponentBase
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
-
-    private ValidateTwoFactorCodeModel model = new();
 
     private async Task HandleValidSubmitAsync()
     {

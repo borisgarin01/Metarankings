@@ -18,6 +18,7 @@ public partial class Login : ComponentBase
     private string UserIdFor2FA { get; set; } = string.Empty;
     private bool IsTwoFactorRequired { get; set; } = false;
     private bool IsLoading { get; set; } = false;
+
     private IEnumerable<AuthenticationScheme> ExternalLogins
     {
         get => externalLogins;
@@ -27,6 +28,7 @@ public partial class Login : ComponentBase
             StateHasChanged();
         }
     }
+    
     protected override async Task OnInitializedAsync()
     {
         ExternalLogins = await AuthService.GetAuthenticationSchemesAsync();

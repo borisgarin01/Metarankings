@@ -24,6 +24,7 @@ public partial class RemoveGamePage : ComponentBase
     {
         Game = await GamesWebManager.GetAsync(Id);
     }
+
     public async Task RemoveGameAsync()
     {
         HttpResponseMessage httpResponseMessage = await GamesWebManager.DeleteAsync(Id);

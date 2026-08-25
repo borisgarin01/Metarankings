@@ -54,18 +54,6 @@ public partial class Account : ComponentBase
         }
     }
 
-    public string NewPasswordConfirm
-    {
-        get => newPasswordConfirm;
-        set
-        {
-            if (newPasswordConfirm != value)
-            {
-                newPasswordConfirm = value;
-                StateHasChanged();
-            }
-        }
-    }
 
     [Inject]
     public IToastService ToastService { get; set; }
@@ -95,6 +83,19 @@ public partial class Account : ComponentBase
         {
             applicationUser = value;
             StateHasChanged();
+        }
+    }
+
+    public string NewPasswordConfirm
+    {
+        get => newPasswordConfirm;
+        set
+        {
+            if (newPasswordConfirm != value)
+            {
+                newPasswordConfirm = value;
+                StateHasChanged();
+            }
         }
     }
 

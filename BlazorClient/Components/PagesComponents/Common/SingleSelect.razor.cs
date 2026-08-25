@@ -2,15 +2,27 @@
 
 public partial class SingleSelect<TItem, TId> : ComponentBase
 {
-    [Parameter] public List<TItem> Items { get; set; } = new();
-    [Parameter] public TId? SelectedId { get; set; }
-    [Parameter] public EventCallback<TId?> SelectedIdChanged { get; set; }
-    [Parameter] public Func<TItem, TId?> IdSelector { get; set; }
-    [Parameter] public Func<TItem, string> DisplaySelector { get; set; }
-    [Parameter] public string Placeholder { get; set; } = "Select an item...";
+    private string _searchTerm = string.Empty;
+    
+    [Parameter] 
+    public List<TItem> Items { get; set; } = new();
+    
+    [Parameter] 
+    public TId? SelectedId { get; set; }
+    
+    [Parameter] 
+    public EventCallback<TId?> SelectedIdChanged { get; set; }
+    
+    [Parameter] 
+    public Func<TItem, TId?> IdSelector { get; set; }
+    
+    [Parameter] 
+    public Func<TItem, string> DisplaySelector { get; set; }
+    
+    [Parameter] 
+    public string Placeholder { get; set; } = "Select an item...";
 
     private bool IsOpen { get; set; }
-    private string _searchTerm = string.Empty;
 
     private string SearchTerm
     {

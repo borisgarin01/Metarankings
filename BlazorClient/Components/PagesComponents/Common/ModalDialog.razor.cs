@@ -7,7 +7,8 @@ public partial class ModalDialog : ComponentBase
     private bool IsVisible = false;
     private ModalDialogParameters Parameters { get; set; } = new();
 
-    [Inject] private IModalService ModalService { get; set; } = default!;
+    [Inject] 
+    private IModalService ModalService { get; set; } = default!;
 
     protected override void OnInitialized()
     {

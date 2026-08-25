@@ -2,7 +2,8 @@
 
 public partial class RedirectToLogin : ComponentBase
 {
-    [Inject] public NavigationManager Navigation { get; set; }
+    [Inject] 
+    public NavigationManager Navigation { get; set; }
 
     protected override void OnInitialized()
     {

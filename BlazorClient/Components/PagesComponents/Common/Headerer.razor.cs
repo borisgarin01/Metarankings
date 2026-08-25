@@ -3,9 +3,6 @@ using Domain.Movies;
 using Domain.RequestsModels.Games.Genres;
 using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Movies.MoviesGenres;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.JSInterop;
 using WebManagers;
 
 namespace BlazorClient.Components.PagesComponents.Common;

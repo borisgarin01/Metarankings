@@ -4,12 +4,7 @@ namespace BlazorClient.Pages.Games.Games.Chat;
 
 public partial class Chat : ComponentBase, IAsyncDisposable
 {
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
-
-    [Parameter, EditorRequired]
-    public long? GameId { get; set; }
-
+    private ClaimsPrincipal currentUser;
     private HubConnection? hubConnection;
     private List<string> messages = [];
     private string? messageInput;
@@ -17,6 +12,18 @@ public partial class Chat : ComponentBase, IAsyncDisposable
     private string joinRoomStyle = "display:block";
     private string sendMessageStyle = "display:none";
     private string connectionStatus = "Disconnected";
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [Parameter, EditorRequired]
+    public long? GameId { get; set; }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,16 +71,11 @@ public partial class Chat : ComponentBase, IAsyncDisposable
         }
     }
 
-    [CascadingParameter]
-    private Task<AuthenticationState>? authenticationState { get; set; }
-
-    private ClaimsPrincipal currentUser;
-
     protected override async Task OnParametersSetAsync()
     {
-        if (authenticationState is not null)
+        if (AuthenticationState is not null)
         {
-            AuthenticationState authState = await authenticationState;
+            AuthenticationState authState = await AuthenticationState;
             currentUser = authState?.User;
         }
         await JoinRoom();
@@ -113,9 +115,6 @@ public partial class Chat : ComponentBase, IAsyncDisposable
             }
         }
     }
-
-    public bool IsConnected =>
-        hubConnection?.State == HubConnectionState.Connected;
 
     public async ValueTask DisposeAsync()
     {

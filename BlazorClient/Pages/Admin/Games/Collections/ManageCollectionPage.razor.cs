@@ -6,6 +6,8 @@ namespace BlazorClient.Pages.Admin.Games.Collections;
 
 public partial class ManageCollectionPage : ComponentBase
 {
+    private GamesCollection gameCollection;
+    
     [Inject]
     public IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> GamesCollectionsWebManager { get; set; }
 
@@ -14,8 +16,6 @@ public partial class ManageCollectionPage : ComponentBase
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
-
-    private GamesCollection gameCollection;
 
     [Parameter, EditorRequired]
     public long Id { get; set; }

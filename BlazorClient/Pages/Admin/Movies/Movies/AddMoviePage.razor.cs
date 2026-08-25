@@ -15,20 +15,6 @@ public sealed partial class AddMoviePage : ComponentBase
 {
     const int MAX_FILESIZE = 5000 * 1024;
 
-    protected override async Task OnInitializedAsync()
-    {
-        Task<IEnumerable<MovieDirector>> moviesDirectorsGetttingTask = MoviesDirectorsWebManager.GetAllAsync();
-        Task<IEnumerable<MovieGenre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
-        Task<IEnumerable<MovieStudio>> moviesStudiosGettingTask = MoviesStudiosWebManager.GetAllAsync();
-
-        await Task.WhenAll(moviesDirectorsGetttingTask, moviesGenresGettingTask, moviesStudiosGettingTask).ContinueWith(a =>
-        {
-            MoviesDirectorsToSelectFrom = moviesDirectorsGetttingTask.Result;
-            MoviesGenresToSelectFrom = moviesGenresGettingTask.Result;
-            MoviesStudiosToSelectFrom = moviesStudiosGettingTask.Result;
-        });
-    }
-
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
 
@@ -76,6 +62,20 @@ public sealed partial class AddMoviePage : ComponentBase
     public IEnumerable<long> SelectedMoviesStudiosIds { get; private set; }
 
     public IBrowserFile ImageToUpload { get; private set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Task<IEnumerable<MovieDirector>> moviesDirectorsGetttingTask = MoviesDirectorsWebManager.GetAllAsync();
+        Task<IEnumerable<MovieGenre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
+        Task<IEnumerable<MovieStudio>> moviesStudiosGettingTask = MoviesStudiosWebManager.GetAllAsync();
+
+        await Task.WhenAll(moviesDirectorsGetttingTask, moviesGenresGettingTask, moviesStudiosGettingTask).ContinueWith(a =>
+        {
+            MoviesDirectorsToSelectFrom = moviesDirectorsGetttingTask.Result;
+            MoviesGenresToSelectFrom = moviesGenresGettingTask.Result;
+            MoviesStudiosToSelectFrom = moviesStudiosGettingTask.Result;
+        });
+    }
 
     private Task SelectMovieDirector(ChangeEventArgs e)
     {

@@ -6,8 +6,12 @@ namespace BlazorClient.Pages.Games.Games;
 
 public partial class GameDetails : ComponentBase
 {
+    private ClaimsPrincipal currentUser;
+
+    private bool isAbleToWriteComments = false;
+
     [CascadingParameter]
-    private Task<AuthenticationState>? authenticationState { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
     public Game Game { get; set; }
 
     public float YourScore { get; set; }
@@ -29,10 +33,6 @@ public partial class GameDetails : ComponentBase
     public string TextContent { get; set; }
     public double Score { get; set; }
 
-    private ClaimsPrincipal currentUser;
-
-    private bool isAbleToWriteComments = false;
-
     public bool IsAbleToWriteComments
     {
         get => isAbleToWriteComments;
@@ -47,9 +47,9 @@ public partial class GameDetails : ComponentBase
     {
         Game = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Game>($"/api/Games/Games/{Id}");
 
-        if (authenticationState is not null)
+        if (AuthenticationState is not null)
         {
-            AuthenticationState authState = await authenticationState;
+            AuthenticationState authState = await AuthenticationState;
             currentUser = authState?.User;
 
             if (currentUser is not null

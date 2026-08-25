@@ -21,8 +21,6 @@ public partial class RemoveDeveloperPage : ComponentBase
     [Inject]
     public IWebManager<Developer, AddDeveloperModel, UpdateDeveloperModel> DevelopersWebManager { get; set; }
 
-
-
     protected override async Task OnInitializedAsync()
     {
         Developer = await DevelopersWebManager.GetAsync(Id);

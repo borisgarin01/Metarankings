@@ -2,16 +2,30 @@
 
 public partial class MultiSelect<TItem, TId> : ComponentBase
 {
-    [Parameter] public List<TItem> Items { get; set; } = new();
-    [Parameter] public List<TId> SelectedIds { get; set; } = new();
-    [Parameter] public EventCallback<List<TId>> SelectedIdsChanged { get; set; }
-    [Parameter] public Func<TItem, TId> IdSelector { get; set; }
-    [Parameter] public Func<TItem, string> DisplaySelector { get; set; }
-    [Parameter] public string Placeholder { get; set; } = "Select items...";
-    [Parameter] public string LabelPlural { get; set; } = "items";
+    private string _searchTerm = string.Empty;
+
+    [Parameter] 
+    public List<TItem> Items { get; set; } = new();
+    
+    [Parameter] 
+    public List<TId> SelectedIds { get; set; } = new();
+    
+    [Parameter] 
+    public EventCallback<List<TId>> SelectedIdsChanged { get; set; }
+    
+    [Parameter] 
+    public Func<TItem, TId> IdSelector { get; set; }
+    
+    [Parameter] 
+    public Func<TItem, string> DisplaySelector { get; set; }
+    
+    [Parameter] 
+    public string Placeholder { get; set; } = "Select items...";
+    
+    [Parameter] 
+    public string LabelPlural { get; set; } = "items";
 
     private bool IsOpen { get; set; }
-    private string _searchTerm = string.Empty;
 
     private string SearchTerm
     {

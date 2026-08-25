@@ -9,6 +9,8 @@ namespace BlazorClient.Pages.Admin.Games.Collections;
 
 public partial class AddCollectionPage : ComponentBase
 {
+    const int MAX_FILESIZE = 5000 * 1024;
+
     [Inject]
     public IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> GamesCollectionsWebManager { get; set; }
 
@@ -30,8 +32,6 @@ public partial class AddCollectionPage : ComponentBase
     public IBrowserFile ImageToUpload { get; private set; }
 
     public string ImageSource { get; set; }
-
-    const int MAX_FILESIZE = 5000 * 1024;
 
     public async Task AddGameCollectionAsync()
     {

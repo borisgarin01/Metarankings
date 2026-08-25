@@ -18,10 +18,10 @@ public partial class ManageCollectionPage : ComponentBase
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
 
-    private MoviesCollection moviesCollection;
-
     [Parameter, EditorRequired]
     public long Id { get; set; }
+
+    private MoviesCollection moviesCollection;
 
     public MoviesCollection MoviesCollection
     {

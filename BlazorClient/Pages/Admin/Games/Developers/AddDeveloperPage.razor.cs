@@ -19,6 +19,7 @@ public partial class AddDeveloperPage : ComponentBase
     public IToastService ToastService { get; set; }
 
     public AddDeveloperModel AddDeveloperModel { get; } = new AddDeveloperModel();
+
     protected override Task OnInitializedAsync()
     {
         return base.OnInitializedAsync();

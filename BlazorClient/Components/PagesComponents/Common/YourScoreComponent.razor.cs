@@ -5,15 +5,15 @@ namespace BlazorClient.Components.PagesComponents.Common;
 public abstract partial class YourScoreComponent : ComponentBase
 {
     [CascadingParameter]
-    private Task<AuthenticationState>? authenticationState { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     private ClaimsPrincipal currentUser;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (authenticationState is not null)
+        if (AuthenticationState is not null)
         {
-            AuthenticationState authState = await authenticationState;
+            AuthenticationState authState = await AuthenticationState;
             currentUser = authState?.User;
         }
         StateHasChanged();

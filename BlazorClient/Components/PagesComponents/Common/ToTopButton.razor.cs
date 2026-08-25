@@ -2,6 +2,10 @@
 
 public partial class ToTopButton : ComponentBase
 {
+
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -14,6 +18,4 @@ public partial class ToTopButton : ComponentBase
     {
         await JS.InvokeVoidAsync("scrollToTop");
     }
-
-    [Inject] private IJSRuntime JS { get; set; } = default!;
 }

@@ -8,6 +8,7 @@ public partial class Details : ComponentBase
 
     [Parameter, EditorRequired]
     public long GameCollectionId { get; set; }
+
     public GamesCollection GameCollection
     {
         get => gameCollection;

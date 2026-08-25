@@ -6,23 +6,12 @@ namespace BlazorClient.Pages.Games.Games.Reviews;
 
 public partial class YourScoreComponent : ComponentBase
 {
-    [CascadingParameter]
-    private Task<AuthenticationState>? authenticationState { get; set; }
-
     private ClaimsPrincipal currentUser;
 
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
     private YourScoreComponentModel YourScoreComponentModel { get; } = new();
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (authenticationState is not null)
-        {
-            AuthenticationState authState = await authenticationState;
-            currentUser = authState?.User;
-        }
-        StateHasChanged();
-    }
-
 
     [Parameter, EditorRequired]
     public long GameId { get; set; }
@@ -35,6 +24,16 @@ public partial class YourScoreComponent : ComponentBase
 
     [Inject]
     public IToastService ToastService { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (AuthenticationState is not null)
+        {
+            AuthenticationState authState = await AuthenticationState;
+            currentUser = authState?.User;
+        }
+        StateHasChanged();
+    }
 
     public async Task AddReviewAsync()
     {

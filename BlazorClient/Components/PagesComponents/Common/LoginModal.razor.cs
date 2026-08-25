@@ -1,5 +1,4 @@
 ﻿using BlazorClient.Auth;
-using BlazorClient.Modal;
 using Blazored.Toast.Services;
 using Domain.Auth;
 using IdentityLibrary.Models;
@@ -17,13 +16,23 @@ public partial class LoginModal : ComponentBase
     private string TwoFactorError { get; set; } = string.Empty;
     private IEnumerable<AuthenticationScheme> ExternalLogins { get; set; } = Enumerable.Empty<AuthenticationScheme>();
 
-    [Parameter] public bool IsVisible { get; set; }
-    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
-    [Parameter] public EventCallback OnLoginSuccess { get; set; }
+    [Parameter] 
+    public bool IsVisible { get; set; }
+    
+    [Parameter] 
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+    
+    [Parameter] 
+    public EventCallback OnLoginSuccess { get; set; }
 
-    [Inject] private IAuthService AuthService { get; set; } = default!;
-    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
-    [Inject] private IToastService ToastService { get; set; } = default!;
+    [Inject] 
+    private IAuthService AuthService { get; set; } = default!;
+    
+    [Inject] 
+    private NavigationManager NavigationManager { get; set; } = default!;
+    
+    [Inject] 
+    private IToastService ToastService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
