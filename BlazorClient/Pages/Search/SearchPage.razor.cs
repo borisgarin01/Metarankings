@@ -7,16 +7,20 @@ namespace BlazorClient.Pages.Search;
 
 public partial class SearchPage : ComponentBase
 {
-    private IEnumerable<Movie> movies;
-    private IEnumerable<Game> games;
+    private IEnumerable<Movie> movies = Enumerable.Empty<Movie>();
+    private IEnumerable<Game> games = Enumerable.Empty<Game>();
     private bool isSearching;
     private string? searchText;
+    private bool isInitialized;
 
     [Inject]
-    public NavigationManager NavigationManager { get; set; }
+    public NavigationManager NavigationManager { get; set; } = default!;
 
     [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; }
+    public GamesWebManager GamesWebManager { get; set; } = default!;
+
+    [Inject]
+    public MoviesWebManager MoviesWebManager { get; set; } = default!;
 
     [SupplyParameterFromQuery]
     public string? SearchText
@@ -52,16 +56,10 @@ public partial class SearchPage : ComponentBase
         }
     }
 
-    [Inject]
-    public GamesWebManager GamesWebManager { get; set; }
-
-    [Inject]
-    public MoviesWebManager MoviesWebManager { get; set; }
-
     public bool IsSearching
     {
         get => isSearching;
-        set
+        private set
         {
             isSearching = value;
             StateHasChanged();
@@ -70,73 +68,47 @@ public partial class SearchPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        // Если есть SearchText из URL - выполняем поиск
-        if (!string.IsNullOrWhiteSpace(SearchText))
+        isInitialized = true;
+        await PerformSearch();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (isInitialized)
         {
             await PerformSearch();
-        }
-        else
-        {
-            // Показываем пустые результаты или все элементы
-            Games = Enumerable.Empty<Game>();
-            Movies = Enumerable.Empty<Movie>();
         }
     }
 
     private async Task PerformSearch()
     {
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            Movies = Enumerable.Empty<Movie>();
+            Games = Enumerable.Empty<Game>();
+            return;
+        }
+
+        if (IsSearching)
+            return;
+
         IsSearching = true;
-
-        // Обновляем URL при поиске (НО без перезагрузки страницы)
-        string currentUri = NavigationManager.Uri;
-        var uriBuilder = new UriBuilder(currentUri);
-        var query = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
-
-        if (!string.IsNullOrWhiteSpace(SearchText))
-        {
-            query["SearchText"] = SearchText;
-        }
-        else
-        {
-            query.Remove("SearchText");
-        }
-
-        uriBuilder.Query = query.ToString();
-        string newUri = uriBuilder.Uri.PathAndQuery;
-
-        // Обновляем URL без перезагрузки страницы
-        if (NavigationManager.Uri != NavigationManager.BaseUri + newUri.TrimStart('/'))
-        {
-            NavigationManager.NavigateTo(newUri, false);
-        }
-
-        // Выполняем поиск
-        Task<IEnumerable<Movie>> moviesSearchingTask;
-        Task<IEnumerable<Game>> gamesSearchingTask;
-
-        if (!string.IsNullOrWhiteSpace(SearchText))
-        {
-            moviesSearchingTask = MoviesWebManager.SearchByName(SearchText);
-            gamesSearchingTask = GamesWebManager.SearchByName(SearchText);
-        }
-        else
-        {
-            moviesSearchingTask = MoviesWebManager.GetAllAsync();
-            gamesSearchingTask = GamesWebManager.GetAllAsync();
-        }
 
         try
         {
-            await Task.WhenAll(moviesSearchingTask, gamesSearchingTask);
-            Movies = moviesSearchingTask.Result ?? Enumerable.Empty<Movie>();
-            Games = gamesSearchingTask.Result ?? Enumerable.Empty<Game>();
+            Task<IEnumerable<Movie>> moviesTask = MoviesWebManager.SearchByName(SearchText);
+            Task<IEnumerable<Game>> gamesTask = GamesWebManager.SearchByName(SearchText);
+
+            await Task.WhenAll(moviesTask, gamesTask);
+
+            Movies = moviesTask.Result ?? Enumerable.Empty<Movie>();
+            Games = gamesTask.Result ?? Enumerable.Empty<Game>();
         }
         catch (Exception ex)
         {
-            // Обработка ошибок
+            Console.WriteLine($"Search error: {ex.Message}");
             Movies = Enumerable.Empty<Movie>();
             Games = Enumerable.Empty<Game>();
-            // Логирование ошибки
         }
         finally
         {
@@ -144,16 +116,14 @@ public partial class SearchPage : ComponentBase
         }
     }
 
-    private async void ClearSearch()
+    private async Task ClearSearch()
     {
         SearchText = string.Empty;
-        Games = Enumerable.Empty<Game>();
         Movies = Enumerable.Empty<Movie>();
+        Games = Enumerable.Empty<Game>();
 
-        // Очищаем URL
         NavigationManager.NavigateTo("/search", false);
 
-        // Необязательно: выполнить поиск для отображения всех элементов
-        // await PerformSearch();
+        await Task.Delay(100);
     }
 }
