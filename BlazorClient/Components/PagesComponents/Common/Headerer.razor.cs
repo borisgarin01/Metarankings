@@ -84,6 +84,8 @@ public partial class Headerer : ComponentBase
         }
     }
 
+    private void Logout() => NavigationManager.NavigateTo("/auth/logout");
+
     private void OpenLogin()
     {
         isLoginOpen = true;
