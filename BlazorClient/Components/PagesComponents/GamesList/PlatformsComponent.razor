@@ -1,6 +1,9 @@
-﻿<div class="post-meta">
-    @foreach (var platform in Platforms)
+﻿﻿<div class="post-meta">
+    @if (Platforms != null && Platforms.Any())
     {
-        <p itemprop="gamePlatform">@platform.Name</p>
+        @foreach (var platform in Platforms)
+        {
+            <p itemprop="gamePlatform">@platform.Name</p>
+        }
     }
 </div>

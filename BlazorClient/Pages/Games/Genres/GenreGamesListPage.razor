@@ -1,10 +1,12 @@
 ﻿@page "/games/genres/{GenreId:long}"
 
-@using Domain
-
 @if (Genre is null)
 {
     <p>Загружается...</p>
+}
+else if (!Genre.Games.Any())
+{
+    <p>В этом жанре пока нет игр.</p>
 }
 else
 {
@@ -21,8 +23,8 @@ else
                                                                         Platforms="@game.Platforms"
                                                                         Publishers="@game.Publishers"
                                                                         ReleaseDate="@game.ReleaseDate"
-                                                                        Score="0"
-                                                                        ScoresCount="0" />
+                                                                        Score="@game.UsersScore"
+                                                                        ScoresCount="@game.UsersReviewsCount" />
         }
     </div>
 }
