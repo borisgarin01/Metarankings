@@ -1,11 +1,19 @@
-﻿<div class="game-menu">
+﻿@{
+    int displayYear = Year ?? DateTime.Now.Year;
+}
+
+<div class="game-menu">
     <div class="platform-menu">
         <ul>
             <li>
-                <a class="bst" href="/games/best-games/?Year=@(Year - 1)">Лучшие игры @(Year - 1)</a>
+                <a class="bst" href="/games/best-games/?Year=@(displayYear - 1)">
+                    Лучшие игры @(displayYear - 1)
+                </a>
             </li>
             <li>
-                <a class="bst" href="/games/best-games/?Year=@Year">@Year</a>
+                <a class="bst" href="/games/best-games/?Year=@displayYear">
+                    @displayYear
+                </a>
             </li>
             <li>
                 <a class="mnew" href="/games/new-games/">Новые игры</a>

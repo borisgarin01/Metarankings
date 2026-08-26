@@ -3,5 +3,5 @@
 public partial class GameMenu : ComponentBase
 {
     [Parameter, EditorRequired]
-    public int Year { get; set; }
+    public int? Year { get; set; }
 }

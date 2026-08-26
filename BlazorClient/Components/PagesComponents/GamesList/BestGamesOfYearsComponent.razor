@@ -4,20 +4,27 @@
     <div class="filter-menu">
         @{
             int currentYear = DateTime.Today.Year;
-            int count = 9; // 9 лет после "Все"
-            int selectedYear = Year ?? currentYear;
-            bool showAllYears = !Year.HasValue; // Проверяем, выбран ли "Все"
+            int count = 9;
 
-            int startYear = selectedYear + 3;
+            // Явно проверяем, есть ли Year в URL
+            bool isAllYears = !Year.HasValue;
 
-            if (selectedYear > currentYear - 4)
+            // Вычисляем startYear только если выбран конкретный год
+            int startYear = currentYear;
+            if (Year.HasValue)
             {
-                startYear = currentYear;
-            }
+                int selectedYear = Year.Value;
+                startYear = selectedYear + 3;
 
-            if (startYear > currentYear)
-            {
-                startYear = currentYear;
+                if (selectedYear > currentYear - 4)
+                {
+                    startYear = currentYear;
+                }
+
+                if (startYear > currentYear)
+                {
+                    startYear = currentYear;
+                }
             }
         }
 
@@ -25,26 +32,19 @@
         @{
             string allYearsQueryParams = "";
 
-            // Сохраняем PlatformId если есть
             if (PlatformId.HasValue)
-            {
                 allYearsQueryParams += $"&PlatformId={PlatformId}";
-            }
 
-            // Сохраняем GenreId если есть
             if (GenreId.HasValue)
-            {
                 allYearsQueryParams += $"&GenreId={GenreId}";
-            }
 
-            // Убираем Year из параметров, чтобы показать все годы
             if (!string.IsNullOrEmpty(allYearsQueryParams))
-            {
-                allYearsQueryParams = "?" + allYearsQueryParams.TrimStart('&');
-            }
+                allYearsQueryParams = "?" + allYearsQueryParams.TrimStart('&') + "&Page=1";
+            else
+                allYearsQueryParams = "?Page=1";
         }
         <a href="/games/best-games/@allYearsQueryParams"
-           class="@(showAllYears ? "selected" : "")">
+           class="@(isAllYears ? "selected" : "")">
             Все
         </a>
 
@@ -52,23 +52,16 @@
         {
             int yearToShow = startYear - i;
 
-            // Строим URL
-            string queryParams = $"?Year={yearToShow}";
+            string queryParams = $"?Year={yearToShow}&Page=1";
 
-            // Сохраняем PlatformId если есть
             if (PlatformId.HasValue)
-            {
                 queryParams += $"&PlatformId={PlatformId}";
-            }
 
-            // Сохраняем GenreId если есть
             if (GenreId.HasValue)
-            {
                 queryParams += $"&GenreId={GenreId}";
-            }
 
             <a href="/games/best-games/@queryParams"
-               class="@(yearToShow == selectedYear ? "selected" : "")">
+               class="@(Year.HasValue && yearToShow == Year.Value ? "selected" : "")">
                 @yearToShow
             </a>
         }
