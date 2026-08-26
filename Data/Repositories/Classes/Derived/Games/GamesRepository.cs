@@ -79,6 +79,27 @@ RETURNING Id, GameId, DeveloperId;", new { GameId = insertedGame.Id, DeveloperId
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
+-- Статистика отзывов
+COALESCE((
+    SELECT AVG(Score)::float 
+    FROM GamesPlayersReviews 
+    WHERE GameId = g.Id
+), 0) AS UsersScore,
+COALESCE((
+    SELECT COUNT(*) 
+    FROM GamesPlayersReviews 
+    WHERE GameId = g.Id
+), 0) AS UsersReviewsCount,
+COALESCE((
+    SELECT AVG(Score)::float 
+    FROM GamesCriticsReviews 
+    WHERE GameId = g.Id
+), 0) AS CriticsScore,
+COALESCE((
+    SELECT COUNT(*) 
+    FROM GamesCriticsReviews 
+    WHERE GameId = g.Id
+), 0) AS CriticsReviewsCount,
 d.id, d.name, 
 p.id, p.name, 
 gen.id, gen.name, 
@@ -146,7 +167,7 @@ gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date
 
                 return gameEntry;
             }, new { offset, limit },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+            splitOn: "Id,Id,Id,Id,Id,Id,Id"
         );
 
         List<Game> result = gameDictionary.Values.ToList();
@@ -158,6 +179,10 @@ gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
+COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
+COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
+COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
 d.id, d.name, 
 p.id, p.name, 
 gen.id, gen.name, 
@@ -219,8 +244,9 @@ gc.Id, gc.Name, gc.Description
                     gameEntry.GameCollections.Add(gameCollection);
 
                 return gameEntry;
-            }, new { offset, limit },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+            },
+            new { offset, limit },
+            splitOn: "Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
         );
 
         List<Game> result = gameDictionary.Values.ToList();
@@ -254,12 +280,15 @@ WHERE NOT EXISTS (SELECT 1 FROM future_games);", new { Limit = limit });
         return games;
     }
 
-
     public async Task<IEnumerable<Game>> GetAllAsync()
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
+COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
+COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
+COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
 d.id, d.name, 
 p.id, p.name, 
 gen.id, gen.name, 
@@ -281,13 +310,13 @@ gc.Id, gc.Name, gc.Description
     LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
     LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId";
 
-        Dictionary<string, Game> gameDictionary = new Dictionary<string, Game>();
+        Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
         IEnumerable<Game> query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
             sql,
             (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
             {
-                if (!gameDictionary.TryGetValue(game.Name, out Game? gameEntry))
+                if (!gameDictionary.TryGetValue(game.Id, out Game? gameEntry))
                 {
                     gameEntry = game;
                     gameEntry.Developers = new List<Developer>();
@@ -296,7 +325,7 @@ gc.Id, gc.Name, gc.Description
                     gameEntry.Screenshots = new List<GameScreenshot>();
                     gameEntry.Publishers = new List<Publisher>();
                     gameEntry.GameCollections = new List<GamesCollection>();
-                    gameDictionary.Add(gameEntry.Name, gameEntry);
+                    gameDictionary.Add(gameEntry.Id, gameEntry);
                 }
 
                 if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
@@ -322,7 +351,7 @@ gc.Id, gc.Name, gc.Description
 
                 return gameEntry;
             },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id" // The columns where each new entity starts
+            splitOn: "Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
         );
 
         List<Game> result = gameDictionary.Values.ToList();
@@ -335,6 +364,10 @@ gc.Id, gc.Name, gc.Description
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
+COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
+COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
+COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
 d.id, d.name, 
 p.id, p.name, 
 gen.id, gen.name, 
@@ -364,8 +397,8 @@ LEFT JOIN GamesPlayersReviewsShifts gprs on gprs.GamePlayerReviewId=gpr.Id
 LEFT JOIN ApplicationUsers au on au.Id=gpr.UserId
 WHERE g.Id=@id";
 
-        Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>(); // Лучше использовать Id как ключ
-        Dictionary<long, GameReview> reviewDictionary = new Dictionary<long, GameReview>(); // Для отслеживания отзывов
+        Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
+        Dictionary<long, GameReview> reviewDictionary = new Dictionary<long, GameReview>();
 
         IEnumerable<Game> query = await connection.QueryAsync<Game, Developer, Publisher, Genre,
             Localization, Platform, GameScreenshot, GamesCollection, GameReview,
@@ -374,7 +407,6 @@ WHERE g.Id=@id";
             (game, developer, publisher, genre, localization, platform, screenshot,
              gameCollection, gameReview, gamePlayerReviewShift, applicationUser) =>
             {
-                // Получаем или создаем Game
                 if (!gameDictionary.TryGetValue(game.Id, out Game? gameEntry))
                 {
                     gameEntry = game;
@@ -388,51 +420,40 @@ WHERE g.Id=@id";
                     gameDictionary.Add(gameEntry.Id, gameEntry);
                 }
 
-                // Добавляем Developer
                 if (developer?.Id > 0 && !gameEntry.Developers.Any(d => d.Id == developer.Id))
                     gameEntry.Developers.Add(developer);
 
-                // Добавляем Publisher
                 if (publisher?.Id > 0 && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
                     gameEntry.Publishers.Add(publisher);
 
-                // Добавляем Genre
                 if (genre?.Id > 0 && !gameEntry.Genres.Any(g => g.Id == genre.Id))
                     gameEntry.Genres.Add(genre);
 
-                // Добавляем Localization
                 if (localization?.Id > 0 && gameEntry.Localization == null)
                     gameEntry.Localization = localization;
 
-                // Добавляем Platform
                 if (platform?.Id > 0 && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
                     gameEntry.Platforms.Add(platform);
 
-                // Добавляем Screenshot
                 if (screenshot?.Id > 0 && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
                     gameEntry.Screenshots.Add(screenshot);
 
-                // Добавляем GameCollection
                 if (gameCollection?.Id > 0 && !gameEntry.GameCollections.Any(gc => gc.Id == gameCollection.Id))
                     gameEntry.GameCollections.Add(gameCollection);
 
-                // ★★★ ИСПРАВЛЕННАЯ ЛОГИКА ДЛЯ REVIEW ★★★
                 if (gameReview?.Id > 0 && applicationUser?.Id > 0)
                 {
-                    // Проверяем, есть ли уже такой отзыв в коллекции
                     GameReview? existingReview = gameEntry.GamesPlayersReviews
                         .FirstOrDefault(r => r.Id == gameReview.Id);
 
                     if (existingReview == null)
                     {
-                        // Создаем новый отзыв с пользователем
                         GameReview newReview = gameReview with
                         {
                             ApplicationUser = applicationUser,
                             GamePlayerReviewShifts = new List<GamePlayerReviewShift>()
                         };
 
-                        // Добавляем сдвиг, если он есть
                         if (gamePlayerReviewShift?.Id > 0)
                         {
                             newReview.GamePlayerReviewShifts.Add(gamePlayerReviewShift);
@@ -443,7 +464,6 @@ WHERE g.Id=@id";
                     }
                     else
                     {
-                        // Добавляем сдвиг к существующему отзыву
                         if (gamePlayerReviewShift?.Id > 0 &&
                             !existingReview.GamePlayerReviewShifts.Any(s => s.Id == gamePlayerReviewShift.Id))
                         {
@@ -455,7 +475,7 @@ WHERE g.Id=@id";
                 return gameEntry;
             },
             new { id },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id,Id,Id,Id" // Укажите все split точки
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview, GamePlayerReviewShift
         );
 
         return gameDictionary.Values.FirstOrDefault();
@@ -498,9 +518,8 @@ WHERE Id=@id", new { id });
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
 
-        // 1. Сначала получаем ID игр, прошедших фильтрацию
         StringBuilder filterSql = new StringBuilder(@"
-    SELECT DISTINCT g.Id, g.Name  -- ДОБАВЛЯЕМ g.Name в SELECT
+    SELECT DISTINCT g.Id, g.Name
     FROM games g
     LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
     LEFT JOIN gamespublishers gpub ON gpub.gameid = g.id
@@ -511,7 +530,6 @@ WHERE Id=@id", new { id });
 
         DynamicParameters parameters = new DynamicParameters();
 
-        // Фильтры для отбора игр
         if (genresIds != null && genresIds.Length > 0)
         {
             filterSql.Append(" AND gg.genreid = ANY(@GenresIds)");
@@ -548,24 +566,24 @@ WHERE Id=@id", new { id });
             parameters.Add("LocalizationsIds", localizationsIds);
         }
 
-        // Пагинация применяется к ID
         filterSql.Append(" ORDER BY g.Name OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY");
         parameters.Add("Skip", skip);
         parameters.Add("Take", take);
 
-        // Получаем ID и Name игр (исправлено с QueryAsync<long> на QueryAsync<(long Id, string Name)>)
         var gameIdsWithNames = await connection.QueryAsync<(long Id, string Name)>(filterSql.ToString(), parameters);
 
         if (!gameIdsWithNames.Any())
             return Enumerable.Empty<Game>();
 
-        // Извлекаем только ID для второго запроса
         var gameIds = gameIdsWithNames.Select(x => x.Id).ToArray();
 
-        // 2. Теперь загружаем ПОЛНЫЕ данные по этим играм (ВСЕ платформы, жанры и т.д.)
         string dataSql = @"
     SELECT 
         g.Id, g.Name, g.Image, g.ReleaseDate, g.Description,
+        COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+        COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
+        COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
+        COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
         d.Id, d.Name,
         p.Id, p.Name,
         gen.Id, gen.Name,
@@ -633,7 +651,7 @@ WHERE Id=@id", new { id });
                 return gameEntry;
             },
             parameters,
-            splitOn: "Id,Id,Id,Id,Id,Id,Id"
+            splitOn: "Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
         );
 
         return gameDictionary.Values.ToList();
@@ -644,6 +662,10 @@ WHERE Id=@id", new { id });
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
+COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
+COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
+COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
 d.id, d.name, 
 p.id, p.name, 
 gen.id, gen.name, 
@@ -671,13 +693,13 @@ au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.Emai
 WHERE g.name ILIKE '%' || @name || '%'
         ORDER BY g.Id DESC;";
 
-        Dictionary<string, Game> gameDictionary = new Dictionary<string, Game>();
+        Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
         IEnumerable<Game> query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview, ApplicationUser, Game>(
             sql,
             (game, developer, publisher, genre, localization, platform, screenshot, gameCollection, gamePlayerReview, applicationUser) =>
             {
-                if (!gameDictionary.TryGetValue(game.Name, out Game? gameEntry))
+                if (!gameDictionary.TryGetValue(game.Id, out Game? gameEntry))
                 {
                     gameEntry = game;
                     gameEntry.Developers = new List<Developer>();
@@ -686,7 +708,7 @@ WHERE g.name ILIKE '%' || @name || '%'
                     gameEntry.Screenshots = new List<GameScreenshot>();
                     gameEntry.GamesPlayersReviews = new List<GameReview>();
                     gameEntry.Publishers = new List<Publisher>();
-                    gameDictionary.Add(gameEntry.Name, gameEntry);
+                    gameDictionary.Add(gameEntry.Id, gameEntry);
                 }
 
                 if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
@@ -720,7 +742,8 @@ WHERE g.name ILIKE '%' || @name || '%'
 
                 return gameEntry;
             },
-            new { name } // Parameter passed here
+            new { name },
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview
         );
 
         return gameDictionary.Values;

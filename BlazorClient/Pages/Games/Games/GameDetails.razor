@@ -27,7 +27,7 @@ else
                        Prefix="Games" />
 
 
-            <RatingComponent Score="@(Game.GamesPlayersReviews.Any() ? Game.GamesPlayersReviews.Average(g => g.Score) : 0)"
+            <RatingComponent Score="@Game.UsersScore"
                              ScoresCount="@Game.GamesPlayersReviews.Count" />
 
             <GameMetadata Developers="@Game.Developers"

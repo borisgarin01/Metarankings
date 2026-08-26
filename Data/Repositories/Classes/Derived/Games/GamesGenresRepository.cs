@@ -3,6 +3,7 @@ using Domain.Games;
 using Domain.RequestsModels.Games.Genres;
 
 namespace Data.Repositories.Classes.Derived.Games;
+
 public sealed class GamesGenresRepository : Repository, IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel>
 {
     public GamesGenresRepository(string connectionString) : base(connectionString)
@@ -76,20 +77,21 @@ Genres
         {
             var genres = await connection.QueryAsync<Genre, Game, Genre>(@"
 SELECT Genres.Id, Genres.Name, 
-	Games.Id, Games.Name, Games.Image, 
-	Games.LocalizationId, Games.ReleaseDate, 
-	Games.Description, Games.Trailer
-FROM 
-Genres 
-	left join GamesGenres 
-		on GamesGenres.GenreId=Genres.Id
-	left join Games
-		on Games.Id=GamesGenres.GameId
-WHERE Genres.Id=@id", (genre, game) =>
+       Games.Id, Games.Name, Games.Image, 
+       Games.LocalizationId, Games.ReleaseDate, 
+       Games.Description, Games.Trailer,
+       COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = Games.Id), 0) AS UsersScore,
+       COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = Games.Id), 0) AS UsersReviewsCount,
+       COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = Games.Id), 0) AS CriticsScore,
+       COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = Games.Id), 0) AS CriticsReviewsCount
+FROM Genres 
+LEFT JOIN GamesGenres ON GamesGenres.GenreId = Genres.Id
+LEFT JOIN Games ON Games.Id = GamesGenres.GameId
+WHERE Genres.Id = @Id", (genre, game) =>
             {
                 genre.Games.Add(game);
                 return genre;
-            }, new { id });
+            }, new { Id = id });
 
             var genresResult = genres
                             .GroupBy(d => d.Id)

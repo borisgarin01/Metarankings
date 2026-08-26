@@ -42,8 +42,12 @@ else
                             </div>
                             <div class="ratings-graph">
                                 <div class="graph">
-                                    <div class="small-score mark-@Math.Round(gamesCollectionItem.Game.GamesPlayersReviews.Any() ? gamesCollectionItem.Game.GamesPlayersReviews.Average(b => b.Score) : 0)">@(gamesCollectionItem.Game.GamesPlayersReviews.Any() ? Math.Round(gamesCollectionItem.Game.GamesPlayersReviews.Average(b => b.Score), 1) : 0)</div>
-                                    <div class="graph-body"><div style="width:@(gamesCollectionItem.Game.GamesPlayersReviews.Any() ? Math.Round(gamesCollectionItem.Game.GamesPlayersReviews.Average(b => b.Score), 1) * 10 : 0)%" class="rating-graph mark-@Math.Round(gamesCollectionItem.Game.GamesPlayersReviews.Any() ? gamesCollectionItem.Game.GamesPlayersReviews.Average(b => b.Score) : 0)"></div></div>
+                                    <div class="small-score mark-@Math.Round(gamesCollectionItem.Game.UsersScore)">@Math.Round(gamesCollectionItem.Game.UsersScore)</div>
+                                    <div class="graph-body">
+                                        <div style="width: @(Math.Round(gamesCollectionItem.Game.UsersScore, 1) * 10)%;"
+                                             class="rating-graph mark-@(Math.Round(gamesCollectionItem.Game.UsersScore, 0))">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </article>
@@ -53,14 +57,14 @@ else
                     <!-- Yandex.RTB R-A-201169-7 -->
                     <div id="yandex_rtb_R-A-201169-7"></div>
                     <script>
-                        window.yaContextCb.push(()=>{
-                          Ya.Context.AdvManager.render({
-                            renderTo: 'yandex_rtb_R-A-201169-7',
-                            blockId: 'R-A-201169-7'
-                          })
+                                        window.yaContextCb.push(() => {
+                                            Ya.Context.AdvManager.render({
+                                                renderTo: 'yandex_rtb_R-A-201169-7',
+                                                blockId: 'R-A-201169-7'
+                                            })
                         })</script>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-}
+    }

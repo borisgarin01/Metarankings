@@ -15,6 +15,18 @@ public sealed record Game
     [JsonPropertyName("image")]
     public required string Image { get; set; }
 
+    [JsonPropertyName("usersScore")]
+    public required float UsersScore { get; set; }
+
+    [JsonPropertyName("usersReviewsCount")]
+    public required int UsersReviewsCount { get; set; }
+
+    [JsonPropertyName("criticsScore")]
+    public required float CriticsScore { get; set; }
+
+    [JsonPropertyName("criticsReviewsCount")]
+    public required int CriticsReviewsCount { get; set; }
+
     [JsonPropertyName("publishers")]
     public required List<Publisher> Publishers { get; set; } = new();
 
