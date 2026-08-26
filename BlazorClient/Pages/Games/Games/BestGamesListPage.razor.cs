@@ -161,13 +161,15 @@ public partial class BestGamesListPage : ComponentBase
     {
         var parameters = new List<string>();
 
-        int targetYear = year ?? Year ?? DateTime.Today.Year;
+        // Используем переданный year, если есть, иначе Year из параметров запроса
+        int? targetYear = year ?? Year;
         long? targetGenre = genreId ?? GenreId;
         long? targetPlatform = platformId ?? PlatformId;
         int targetPage = page ?? currentPage;
 
-        if (targetYear > 0)
-            parameters.Add($"Year={targetYear}");
+        // Добавляем Year ТОЛЬКО если он есть
+        if (targetYear.HasValue)
+            parameters.Add($"Year={targetYear.Value}");
 
         if (targetGenre.HasValue)
             parameters.Add($"GenreId={targetGenre}");
