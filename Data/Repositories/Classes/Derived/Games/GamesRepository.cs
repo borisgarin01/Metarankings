@@ -85,7 +85,8 @@ gen.id, gen.name,
 l.id, l.name,
 plat.id, plat.name, 
 gs.Id, gs.GameId, gs.ImageUrl,
-gc.Id, gc.Name, gc.Description
+gc.Id, gc.Name, gc.Description,
+gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date
     FROM (select Id, Name, Image, ReleaseDate, Description, LocalizationId 
         from Games ORDER BY id asc
         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY) as g
@@ -100,13 +101,14 @@ gc.Id, gc.Name, gc.Description
     LEFT JOIN platforms plat ON plat.id = gplatf.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
     LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
-    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId";
+    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId
+    LEFT JOIN gamesPlayersReviews gpr on gpr.GameId = g.Id";
 
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
-        IEnumerable<Game> query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
+        IEnumerable<Game> query = await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview, Game>(
             sql,
-            (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
+            (game, developer, publisher, genre, localization, platform, screenshot, gameCollection, gameReview) =>
             {
                 if (!gameDictionary.TryGetValue(game.Id, out Game? gameEntry))
                 {
@@ -138,6 +140,9 @@ gc.Id, gc.Name, gc.Description
 
                 if (gameCollection is not null && !gameEntry.GameCollections.Any(b => b.Id == gameCollection.Id))
                     gameEntry.GameCollections.Add(gameCollection);
+
+                if (gameReview is not null && !gameEntry.GamesPlayersReviews.Any(gr => gr.Id == gameReview.Id))
+                    gameEntry.GamesPlayersReviews.Add(gameReview);
 
                 return gameEntry;
             }, new { offset, limit },
