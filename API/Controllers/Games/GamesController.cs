@@ -3,6 +3,7 @@ using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.RequestsModels;
 using Domain.RequestsModels.Games;
+using Domain.ResponsesModels;
 
 namespace API.Controllers.Games;
 
@@ -92,8 +93,19 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost("byParameters")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetByParametersAsync(GameFilterRequest filter)
+    public async Task<ActionResult<PagedResponse<Game>>> GetByParametersAsync(GameFilterRequest filter)
     {
+        // Получаем общее количество
+        int totalCount = await _gamesRepository.GetCountByParametersAsync(
+            filter.GenresIds,
+            filter.PlatformsIds,
+            filter.Years,
+            filter.DevelopersIds,
+            filter.PublishersIds,
+            filter.LocalizationIds
+        );
+
+        // Получаем элементы для текущей страницы
         IEnumerable<Game> games = await _gamesRepository.GetByParametersAsync(
             filter.GenresIds,
             filter.PlatformsIds,
@@ -105,7 +117,17 @@ public sealed class GamesController : ControllerBase
             filter.Take
         );
 
-        return Ok(games);
+        int page = (filter.Skip / filter.Take) + 1;
+
+        var response = new PagedResponse<Game>
+        {
+            Items = games,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = filter.Take
+        };
+
+        return Ok(response);
     }
 
     [HttpGet("search")]

@@ -725,4 +725,67 @@ WHERE g.name ILIKE '%' || @name || '%'
 
         return gameDictionary.Values;
     }
+
+    public async Task<int> GetCountByParametersAsync(
+    long[]? genresIds,
+    long[]? platformsIds,
+    int[]? years,
+    long[]? developersIds,
+    long[]? publishersIds,
+    long[]? localizationsIds)
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+
+        StringBuilder countSql = new StringBuilder(@"
+        SELECT COUNT(DISTINCT g.Id)
+        FROM games g
+        LEFT JOIN gamesdevelopers gd ON gd.gameid = g.id
+        LEFT JOIN gamespublishers gpub ON gpub.gameid = g.id
+        LEFT JOIN gamesgenres gg ON gg.gameid = g.id
+        LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+        WHERE 1=1
+    ");
+
+        DynamicParameters parameters = new DynamicParameters();
+
+        // Применяем те же фильтры, что и в GetByParametersAsync
+        if (genresIds != null && genresIds.Length > 0)
+        {
+            countSql.Append(" AND gg.genreid = ANY(@GenresIds)");
+            parameters.Add("GenresIds", genresIds);
+        }
+
+        if (platformsIds != null && platformsIds.Length > 0)
+        {
+            countSql.Append(" AND gplatf.platformid = ANY(@PlatformsIds)");
+            parameters.Add("PlatformsIds", platformsIds);
+        }
+
+        if (years != null && years.Length > 0)
+        {
+            countSql.Append(" AND EXTRACT(YEAR FROM g.ReleaseDate) = ANY(@Years)");
+            parameters.Add("Years", years);
+        }
+
+        if (developersIds != null && developersIds.Length > 0)
+        {
+            countSql.Append(" AND gd.developerid = ANY(@DevelopersIds)");
+            parameters.Add("DevelopersIds", developersIds);
+        }
+
+        if (publishersIds != null && publishersIds.Length > 0)
+        {
+            countSql.Append(" AND gpub.publisherid = ANY(@PublishersIds)");
+            parameters.Add("PublishersIds", publishersIds);
+        }
+
+        if (localizationsIds != null && localizationsIds.Length > 0)
+        {
+            countSql.Append(" AND g.localizationid = ANY(@LocalizationsIds)");
+            parameters.Add("LocalizationsIds", localizationsIds);
+        }
+
+        int totalCount = await connection.ExecuteScalarAsync<int>(countSql.ToString(), parameters);
+        return totalCount;
+    }
 }

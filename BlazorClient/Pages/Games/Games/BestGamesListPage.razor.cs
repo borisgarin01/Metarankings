@@ -1,7 +1,8 @@
 ﻿using Domain.Games;
-using Domain.RequestsModels;
+using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Games.Genres;
 using Domain.RequestsModels.Games.Platforms;
+using Domain.ResponsesModels;
 using WebManagers;
 
 namespace BlazorClient.Pages.Games.Games;
@@ -11,6 +12,10 @@ public partial class BestGamesListPage : ComponentBase
     private IEnumerable<Platform> platforms;
     private IEnumerable<Game> games;
     private IEnumerable<Genre> genres;
+    private PagedResponse<Game> pagedResponse;
+    private int currentPage = 1;
+    private const int PageSize = 10;
+    private bool isLoading = false;
 
     [SupplyParameterFromQuery]
     public int? Year { get; set; }
@@ -29,6 +34,9 @@ public partial class BestGamesListPage : ComponentBase
 
     [SupplyParameterFromQuery]
     public long? LocalizationId { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
 
     public IEnumerable<Game> Games
     {
@@ -60,6 +68,16 @@ public partial class BestGamesListPage : ComponentBase
         }
     }
 
+    public PagedResponse<Game> PagedResponse
+    {
+        get => pagedResponse;
+        set
+        {
+            pagedResponse = value;
+            StateHasChanged();
+        }
+    }
+
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
 
@@ -71,16 +89,17 @@ public partial class BestGamesListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
+        isLoading = true;
         try
         {
-            // Всегда делаем запрос, даже если нет параметров
+            currentPage = Page ?? 1;
+
             GameFilterRequest filter = new GameFilterRequest
             {
-                Skip = 0,
-                Take = 10
+                Skip = (currentPage - 1) * PageSize,
+                Take = PageSize
             };
 
-            // Добавляем параметры ТОЛЬКО если они есть
             if (GenreId.HasValue)
                 filter.GenresIds = new[] { GenreId.Value };
 
@@ -99,17 +118,18 @@ public partial class BestGamesListPage : ComponentBase
             if (LocalizationId.HasValue)
                 filter.LocalizationIds = new[] { LocalizationId.Value };
 
-            // Всегда отправляем запрос
             HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient")
                 .PostAsJsonAsync("/api/games/games/byParameters", filter);
 
             if (response.IsSuccessStatusCode)
             {
-                Games = await response.Content.ReadFromJsonAsync<IEnumerable<Game>>();
+                PagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<Game>>();
+                Games = PagedResponse?.Items ?? Enumerable.Empty<Game>();
             }
             else
             {
                 Games = Enumerable.Empty<Game>();
+                PagedResponse = null;
                 Console.WriteLine($"Failed to load games: {response.ReasonPhrase}");
             }
         }
@@ -117,6 +137,11 @@ public partial class BestGamesListPage : ComponentBase
         {
             Console.WriteLine($"Error loading games: {ex.Message}");
             Games = Enumerable.Empty<Game>();
+            PagedResponse = null;
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
@@ -130,5 +155,34 @@ public partial class BestGamesListPage : ComponentBase
             Platforms = platformsGettingTask.Result;
             Genres = gamesGenresGettingTask.Result;
         });
+    }
+
+    private string BuildQueryString(int? page = null, int? year = null, long? genreId = null, long? platformId = null)
+    {
+        var parameters = new List<string>();
+
+        int targetYear = year ?? Year ?? DateTime.Today.Year;
+        long? targetGenre = genreId ?? GenreId;
+        long? targetPlatform = platformId ?? PlatformId;
+        int targetPage = page ?? currentPage;
+
+        if (targetYear > 0)
+            parameters.Add($"Year={targetYear}");
+
+        if (targetGenre.HasValue)
+            parameters.Add($"GenreId={targetGenre}");
+
+        if (targetPlatform.HasValue)
+            parameters.Add($"PlatformId={targetPlatform}");
+
+        if (targetPage > 1)
+            parameters.Add($"Page={targetPage}");
+
+        return parameters.Any() ? $"?{string.Join("&", parameters)}" : "";
+    }
+
+    private string GetPageUrl(int page)
+    {
+        return $"/games/best-games{BuildQueryString(page)}";
     }
 }
