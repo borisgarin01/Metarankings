@@ -126,7 +126,9 @@
                         {
                             <div class="item">
                                 <a href="/games/details/@game.Id" title="Игра @game.Name"><img class="post-image" src="@game.Image" alt="@game.Name"></a>
-                                <div class="small-score mark-@Math.Round(game.GamesPlayersReviews.Any() ? Math.Round(game.GamesPlayersReviews.Average(mr => mr.Score)) : 0)"><span data-title="Рейтинг игры" class="tooltip">0</span></div>
+                                <div class="small-score mark-@(game.GamesPlayersReviews.Any() ? Math.Round(game.GamesPlayersReviews.Average(mr => mr.Score)) : 0)">
+                                    <span data-title="Рейтинг игры" class="tooltip">@(game.GamesPlayersReviews.Any() ? Math.Round(game.GamesPlayersReviews.Average(mr => mr.Score), 1) : 0)</span>
+                                </div>
                                 <span class="item-name"><a href="/games/details/@game.Id">@game.Name</a></span>
                                 <span class="item-meta">
                                     @for (int i = 0; i < game.Genres.Count - 1; i++)
