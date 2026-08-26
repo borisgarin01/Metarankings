@@ -4,8 +4,9 @@
     <div class="filter-menu">
         @{
             int currentYear = DateTime.Today.Year;
-            int count = 8;
+            int count = 9; // 9 лет после "Все"
             int selectedYear = Year ?? currentYear;
+            bool showAllYears = !Year.HasValue; // Проверяем, выбран ли "Все"
 
             int startYear = selectedYear + 3;
 
@@ -20,15 +21,39 @@
             }
         }
 
+        <!-- Ссылка "Все" -->
+        @{
+            string allYearsQueryParams = "";
+
+            // Сохраняем PlatformId если есть
+            if (PlatformId.HasValue)
+            {
+                allYearsQueryParams += $"&PlatformId={PlatformId}";
+            }
+
+            // Сохраняем GenreId если есть
+            if (GenreId.HasValue)
+            {
+                allYearsQueryParams += $"&GenreId={GenreId}";
+            }
+
+            // Убираем Year из параметров, чтобы показать все годы
+            if (!string.IsNullOrEmpty(allYearsQueryParams))
+            {
+                allYearsQueryParams = "?" + allYearsQueryParams.TrimStart('&');
+            }
+        }
+        <a href="/games/best-games/@allYearsQueryParams"
+           class="@(showAllYears ? "selected" : "")">
+            Все
+        </a>
+
         @for (int i = 0; i < count; i++)
         {
             int yearToShow = startYear - i;
 
             // Строим URL
-            string queryParams = "";
-
-            // Добавляем год
-            queryParams = $"?Year={yearToShow}";
+            string queryParams = $"?Year={yearToShow}";
 
             // Сохраняем PlatformId если есть
             if (PlatformId.HasValue)
