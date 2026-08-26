@@ -1,0 +1,38 @@
+﻿@page "/collections"
+
+@using Domain.Games.Collections
+@using Domain.Movies.Collections
+
+<div id="loop" class="news list">
+    @if (GamesCollections is null || MoviesCollections is null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        @foreach (GamesCollection item in GamesCollections)
+        {
+            <div class="post clear">
+                <a href="/games/collections/@item.Id" title="@item.Name" class="news-thumb">
+                    <img class="news-image" src="@item.ImageSource" alt="@item.Name">
+                </a>
+
+                <a class="news-title" href="/games/collections/@item.Id">@item.Name</a>
+                <div class="post-content">@item.Description</div>
+                <div class="rubrika"><a href="/meta/collections/films-games/">Контент</a></div>
+            </div>
+        }
+        @foreach (MoviesCollection item in MoviesCollections)
+        {
+            <div class="post clear">
+                <a href="/movies/collections/@item.Id" title="@item.Name" class="news-thumb">
+                    <img class="news-image" src="@item.ImageSource" alt="@item.Name">
+                </a>
+
+                <a class="news-title" href="/movies/collections/@item.Id">@item.Name</a>
+                <div class="post-content">@item.Description</div>
+                <div class="rubrika"><a href="/meta/collections/films-games/">Контент</a></div>
+            </div>
+        }
+    }
+</div>
