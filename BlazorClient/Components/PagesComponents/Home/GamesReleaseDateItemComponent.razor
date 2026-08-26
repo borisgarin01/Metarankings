@@ -1,18 +1,25 @@
-﻿@using Domain.Common
-<div class="item">
+﻿<div class="item">
     <a href="@Href" title="@Title"><img class="post-image" src="@ImageSource" alt="@ImageAlt"></a>
     <span class="item-name"><a href="@Href">@ItemName</a></span>
-    <span class="item-meta">
-        @foreach (Link platform in Platforms)
-        {
-            <a href="@platform.Url">@platform.Title</a>
-        }
-    </span>
-    <span class="item-meta">
-        @foreach (Link genre in Genres)
-        {
-            <a href="@genre.Url">@genre.Title</a>
-        }
-    </span>
+    @if (Platforms is not null && Platforms.Any())
+    {
+        <span class="item-meta">
+            @for (int i = 0; i < Platforms.Length - 1; i++)
+            {
+                <a href="@Platforms[i].Url">@Platforms[i].Title</a><text>, </text>
+            }
+            <a href="@Platforms[Platforms.Length - 1].Url">@Platforms[Platforms.Length - 1].Title</a>
+        </span>
+    }
+    @if (Genres is not null && Genres.Any())
+    {
+        <span class="item-meta">
+            @for (int i = 0; i < Genres.Length - 1; i++)
+            {
+                <a href="@Genres[i].Url">@Genres[i].Title</a><text>, </text>
+            }
+            <a href="@Genres[Genres.Length - 1].Url">@Genres[Genres.Length - 1].Title</a>
+        </span>
+    }
     <span class="item-meta">@ReleaseDate.ToString("dd MMMM yyyy")</span>
 </div>

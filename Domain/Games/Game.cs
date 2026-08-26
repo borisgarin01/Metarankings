@@ -50,5 +50,4 @@ public sealed record Game
 
     [JsonPropertyName("links")]
     public List<GamesCollection> GameCollections { get; set; } = new();
-
 }
