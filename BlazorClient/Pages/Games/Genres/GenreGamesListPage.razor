@@ -23,7 +23,7 @@ else
                                                                         Platforms="@game.Platforms"
                                                                         Publishers="@game.Publishers"
                                                                         ReleaseDate="@game.ReleaseDate"
-                                                                        Score="@game.UsersScore"
+                                                                        Score="@MathF.Round(game.UsersScore,1)"
                                                                         ScoresCount="@game.UsersReviewsCount" />
         }
     </div>

@@ -20,8 +20,8 @@ else
                                                                     Platforms="@game.Platforms"
                                                                     Publishers="@game.Publishers"
                                                                     ReleaseDate="@game.ReleaseDate"
-                                                                    Score="0"
-                                                                    ScoresCount="0" />
+                                                                    Score="@MathF.Round(game.UsersScore,1)"
+                                                                    ScoresCount="@game.UsersReviewsCount" />
     }
     @if (PageNumber > 1)
     {
