@@ -8,8 +8,8 @@
     <div class="trailer" data-video="/games/details/@Game.Id/#content-trailer"></div>
     <div class="ratings-graph">
         <div class="graph">
-            <div class="small-score mark-0">0</div>
-            <div class="graph-body"><div style="width:0%" class="rating-graph mark-0"></div></div>
+            <div class="small-score mark-@Math.Round(Game.UsersScore)">@Math.Round(Game.UsersScore, 1)</div>
+            <div class="graph-body"><div style="width:@(@Math.Round(Game.UsersScore, 1) * 10)%" class="rating-graph mark-@Math.Round(Game.UsersScore)"></div></div>
         </div>
     </div>
 </div>
