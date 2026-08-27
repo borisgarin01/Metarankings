@@ -32,25 +32,29 @@
                         <li class="nav-link">
                             <a href="/user-reviews/">Отзывы</a>
                         </li>
-                    </ul>
-                </div>
 
-                <!-- АВТОРИЗАЦИЯ - ИСПРАВЛЕНО -->
-                <div class="nav_login">
-                    <ul>
+                        <!-- ===== ПРОФИЛЬ В ШТОРКЕ (ТОЛЬКО ДЛЯ АВТОРИЗОВАННЫХ) ===== -->
                         <AuthorizeView>
                             <Authorized>
-                                <li class="nav-link">
-                                    <a href="/auth/account">
-                                        @context.User.FindFirstValue("UserName")
+                                <li class="nav-link nav-link-auth">
+                                    <a href="/auth/account" title="@context.User.FindFirstValue("UserName")">
+                                        @GetDisplayName(context.User.FindFirstValue("UserName"))
                                     </a>
                                 </li>
-                                <li>
+                                <li class="nav-link nav-link-auth">
                                     <span class="user-logout" title="Выйти" @onclick="Logout"
                                           style="cursor: pointer;">
                                     </span>
                                 </li>
                             </Authorized>
+                        </AuthorizeView>
+                    </ul>
+                </div>
+
+                <!-- ===== КНОПКА ВХОДА СВЕРХУ СПРАВА ===== -->
+                <div class="nav_login">
+                    <ul>
+                        <AuthorizeView>
                             <NotAuthorized>
                                 <li>
                                     <span class="user-login popauthor"
@@ -90,3 +94,12 @@
 
 <!-- Модалка логина -->
 <LoginModal @bind-IsVisible="isLoginOpen" OnLoginSuccess="OnLoginSuccessHandler" />
+
+@code {
+    private string GetDisplayName(string userName)
+    {
+        if (string.IsNullOrEmpty(userName)) return "Профиль";
+        if (userName.Length > 12) return userName.Substring(0, 10) + "...";
+        return userName;
+    }
+}
