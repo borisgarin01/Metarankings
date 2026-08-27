@@ -17,7 +17,7 @@ else
         <GameHeader Name="@Game.Name"
                     Description="@Game.Description"
                     Id="@Id"
-                    ReleaseYear=@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
+                    ReleaseYear="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
 
         <div class="post-content">
             <Thumbnail Name="@Game.Name"
@@ -25,7 +25,6 @@ else
                        ReleaseMonth="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Month)"
                        ImageSource="@Game.Image"
                        Prefix="Games" />
-
 
             <RatingComponent Score="@Game.UsersScore"
                              ScoresCount="@Game.GamesPlayersReviews.Count" />
@@ -42,7 +41,6 @@ else
             <SystemRequirements />
 
             <GameCollectionsComponent GameCollections="@Game.GameCollections" />
-
 
             <AdHorizontal AdId="R-A-201169-7" />
 
@@ -77,7 +75,9 @@ else
                         <Authorized>
                             @if (IsAbleToWriteComments)
                             {
-                                <YourScoreComponent GameId="@Game.Id" />
+                                <YourScoreComponent GameId="@Game.Id"
+                                                    GameScore="@Game.UsersScore"
+                                                    ScoresCount="@Game.UsersReviewsCount" />
                             }
                             <GoToChatComponent GameId="@Game.Id" />
                         </Authorized>

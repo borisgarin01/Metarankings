@@ -4433,12 +4433,14 @@ p#cancel-comment-reply {
 .textarea {
     border: 1px solid #ccc;
     border-radius: 1px;
-    height: 30px;
+    height: auto;
     margin: 10px 0;
     overflow: hidden;
-    padding: 5px;
+    padding: 10px; /* <-- НОРМАЛЬНЫЙ ПАДДИНГ */
     text-align: left;
     width: 95%;
+    min-height: 100px;
+    resize: vertical;
 }
 
 .base-index {
