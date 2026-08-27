@@ -8,5 +8,5 @@ public sealed record UpdateGamePlayerReviewModel
 
     [Range(0.0f, 10.0f, ErrorMessage = "Score should be between 0 and 10")]
     [JsonPropertyName("score")]
-    public double Score { get; set; }
+    public float Score { get; set; }
 }

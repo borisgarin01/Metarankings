@@ -6,45 +6,66 @@ namespace BlazorClient.Pages.Games.Games.Reviews;
 
 public partial class YourScoreComponent : ComponentBase
 {
-    private ClaimsPrincipal currentUser;
-
-    [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationState { get; set; }
-
     private YourScoreComponentModel YourScoreComponentModel { get; } = new();
 
     [Parameter, EditorRequired]
     public long GameId { get; set; }
 
-    [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; }
+    [Parameter]
+    public double GameScore { get; set; }
+
+    [Parameter]
+    public long ScoresCount { get; set; }
 
     [Inject]
-    public NavigationManager NavigationManager { get; set; }
+    public IHttpClientFactory HttpClientFactory { get; set; } = default!;
 
     [Inject]
-    public IToastService ToastService { get; set; }
+    public NavigationManager NavigationManager { get; set; } = default!;
 
-    protected override async Task OnParametersSetAsync()
+    [Inject]
+    public IToastService ToastService { get; set; } = default!;
+
+    private void SetScore(int score)
     {
-        if (AuthenticationState is not null)
-        {
-            AuthenticationState authState = await AuthenticationState;
-            currentUser = authState?.User;
-        }
+        YourScoreComponentModel.YourScore = score;
         StateHasChanged();
     }
 
     public async Task AddReviewAsync()
     {
-        AddGamePlayerReviewModel addGamePlayerReviewModel = new AddGamePlayerReviewModel(GameId, YourScoreComponentModel.Text, YourScoreComponentModel.YourScore);
-        HttpResponseMessage addingGamePlayerReviewHttpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync<AddGamePlayerReviewModel>("/api/Games/GamesGamersReviews", addGamePlayerReviewModel);
-        if (addingGamePlayerReviewHttpResponseMessage.IsSuccessStatusCode)
+        try
         {
-            ToastService.ShowSuccess("Обзор добавлен");
-            NavigationManager.NavigateTo($"/games/Details/{GameId}", true);
+            if (string.IsNullOrWhiteSpace(YourScoreComponentModel.Text))
+            {
+                ToastService.ShowError("Review text is required");
+                return;
+            }
+
+            var addGamePlayerReviewModel = new AddGamePlayerReviewModel(
+                GameId,
+                YourScoreComponentModel.Text,
+                YourScoreComponentModel.YourScore
+            );
+
+            var response = await HttpClientFactory
+                .CreateClient("AuthorizedClient")
+                .PostAsJsonAsync("/api/Games/GamesGamersReviews", addGamePlayerReviewModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowSuccess("Review added successfully!");
+                NavigationManager.NavigateTo($"/games/Details/{GameId}", true);
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError($"Failed to add review: {error}");
+            }
         }
-        else
-            ToastService.ShowError(await addingGamePlayerReviewHttpResponseMessage.Content.ReadAsStringAsync());
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Error: {ex.Message}");
+        }
     }
 }
