@@ -106,6 +106,10 @@ RETURNING Id;"
                 games.Id, games.Name, games.Image, 
                 games.releasedate, 
                 games.description, games.trailer,
+                COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = games.Id), 0) AS UsersScore,
+                COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = games.Id), 0) AS UsersReviewsCount,
+                COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = games.Id), 0) AS CriticsScore,
+                COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = games.Id), 0) AS CriticsReviewsCount,
                 platforms.id, platforms.name
             from developers
             left join gamesdevelopers
