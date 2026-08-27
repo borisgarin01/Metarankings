@@ -77,6 +77,10 @@ RETURNING Id;"
                 p.Id, p.Name,
                 g.Id, g.Name, g.Image, g.LocalizationId,
                 g.ReleaseDate, g.Description, g.Trailer,
+                COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+                COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
+                COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
+                COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
                 platf.Id, platf.Name
               FROM Publishers p
               LEFT JOIN GamesPublishers gp on gp.PublisherId = p.Id
