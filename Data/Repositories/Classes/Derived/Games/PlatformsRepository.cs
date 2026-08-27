@@ -97,20 +97,23 @@ RETURNING Id;"
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
         await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
-            SELECT 
-                p1.Id, p1.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId,
-                g.ReleaseDate, g.Description, g.Trailer,
-                p2.Id, p2.Name
-            FROM Platforms p1
-            LEFT JOIN GamesPlatforms gp ON gp.PlatformId = p1.Id
-            LEFT JOIN Games g ON g.Id = gp.GameId
-            LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
-            LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId
-            WHERE p1.Id = @id",
+        SELECT 
+            p1.Id, p1.Name,
+            g.Id, g.Name, g.Image, g.LocalizationId,
+            g.ReleaseDate, g.Description, g.Trailer,
+            COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+            COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
+            COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
+            COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
+            p2.Id, p2.Name
+        FROM Platforms p1
+        LEFT JOIN GamesPlatforms gp ON gp.PlatformId = p1.Id
+        LEFT JOIN Games g ON g.Id = gp.GameId
+        LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
+        LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId
+        WHERE p1.Id = @id",
             (platform, game, gamePlatform) =>
             {
-                // Get or create the platform
                 if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
                 {
                     platformEntry = platform;
@@ -120,21 +123,18 @@ RETURNING Id;"
 
                 if (game != null)
                 {
-                    // Get or create the game
                     if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
                     {
                         gameEntry = game;
                         gameEntry.Platforms = new List<Platform>();
                         gameDictionary.Add(gameEntry.Id, gameEntry);
 
-                        // Add game to platform if not already present
                         if (!platformEntry.Games.Any(g => g.Id == game.Id))
                         {
                             platformEntry.Games.Add(gameEntry);
                         }
                     }
 
-                    // Add platform to game if it exists and isn't already added
                     if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
                     {
                         gameEntry.Platforms.Add(gamePlatform);
@@ -144,7 +144,7 @@ RETURNING Id;"
                 return platformEntry;
             },
             new { id },
-            splitOn: "Id,Id"
+            splitOn: "Id,Id,Id"
         );
 
         return platformDictionary.Values.FirstOrDefault();
