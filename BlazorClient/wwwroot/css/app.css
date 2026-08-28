@@ -6143,3 +6143,10 @@ a.help {
         font-size: 16px;
     }
 }
+
+.post-content .comment_list ol,
+.comment_list ol {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
