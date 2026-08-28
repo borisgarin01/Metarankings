@@ -11,60 +11,81 @@
 
 else
 {
-    <div id="content" class="lcol">
-        <div class="news-text entry">
-            <div class="specials post single clear">
-                <div class="post-meta">
-                    <div class="breadcrumbs news-meta">
-                        <a href="/meta/collections/">Подборки</a> → <a href="/meta/collections/films-games/">Контент</a>
+
+    <div class="wrapper">
+        <div id="container" class="clear">
+            <div class="sidebar">
+
+                <div class="widget">
+                    <div class="widget-body">
+                        <div class="graph">
+                            <span>Рейтинг <a href="#critics">критиков</a></span>
+                            <div class="graph-body"><div class="rating-graph mark-8" style="width:83%"><span class="score-graph">8.3</span></div></div>
+                            <span>Рейтинг <a href="#users">игроков</a></span>
+                            <div class="graph-body"><div class="rating-graph mark-9" style="width:85%"><span class="score-graph">8.5</span></div></div>
+                            <div class="wait-stat">Ожидания: 2%</div>
+                            <div class="graph-body"><div class="rating-wait mark-0" style="width:2%"></div></div>
+                        </div>
                     </div>
-                    <h1><span>@GameCollection.Name</span></h1>
                 </div>
-                <div class="post-content">
-                    <div class="news-img">
-                        <img class="news-image" src="@GameCollection.ImageSource" alt="@GameCollection.Name">
-                    </div>
-                    <p>@GameCollection.Description</p>
-                </div>
-                <section id="loop" class="list clear best" itemscope="" itemtype="https://schema.org/ItemList">
-                    @foreach (GamesCollectionItem gamesCollectionItem in GameCollection.GamesCollectionItems)
-                    {
-                        <article class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
-                            <a href="/games/details/@gamesCollectionItem.Game.Id" class="thumb">
-                                <img class="post-image" src="@gamesCollectionItem.Game.Image" alt="@gamesCollectionItem.Game.Name">
-                            </a>
-                            <div itemprop="item" itemscope="" itemtype="https://schema.org/VideoGame">
-                                <link itemprop="url" href="/games/details/@gamesCollectionItem.Game.Id">
-                                <link itemprop="image" href="@gamesCollectionItem.Game.Image">
-                                <meta itemprop="dateCreated" content="@gamesCollectionItem.Game.ReleaseDate.Value.Year">
-                                <div itemprop="name"><a class="name" href="/games/details/@gamesCollectionItem.Game.Id">@gamesCollectionItem.Game.Name</a></div>
-                                <div class="post-meta">@gamesCollectionItem.Game.ReleaseDate.Value.ToString("dd MMMM yyyy")</div>
+            </div>
+            <div id="content" class="lcol">
+                <div class="news-text entry">
+                    <div class="specials post single clear">
+                        <div class="post-meta">
+                            <div class="breadcrumbs news-meta">
+                                <a href="/meta/collections/">Подборки</a> → <a href="/meta/collections/films-games/">Контент</a>
                             </div>
-                            <div class="ratings-graph">
-                                <div class="graph">
-                                    <div class="small-score mark-@Math.Round(gamesCollectionItem.Game.UsersScore)">@Math.Round(gamesCollectionItem.Game.UsersScore)</div>
-                                    <div class="graph-body">
-                                        <div style="width: @(Math.Round(gamesCollectionItem.Game.UsersScore, 1) * 10)%;"
-                                             class="rating-graph mark-@(Math.Round(gamesCollectionItem.Game.UsersScore, 0))">
+                            <h1><span>@GameCollection.Name</span></h1>
+                        </div>
+                        <div class="post-content">
+                            <div class="news-img">
+                                <img class="news-image" src="@GameCollection.ImageSource" alt="@GameCollection.Name">
+                            </div>
+                            <p>@GameCollection.Description</p>
+                        </div>
+                        <section id="loop" class="list clear best" itemscope="" itemtype="https://schema.org/ItemList">
+                            @foreach (GamesCollectionItem gamesCollectionItem in GameCollection.GamesCollectionItems)
+                            {
+                                <article class="post clear" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+                                    <a href="/games/details/@gamesCollectionItem.Game.Id" class="thumb">
+                                        <img class="post-image" src="@gamesCollectionItem.Game.Image" alt="@gamesCollectionItem.Game.Name">
+                                    </a>
+                                    <div itemprop="item" itemscope="" itemtype="https://schema.org/VideoGame">
+                                        <link itemprop="url" href="/games/details/@gamesCollectionItem.Game.Id">
+                                        <link itemprop="image" href="@gamesCollectionItem.Game.Image">
+                                        <meta itemprop="dateCreated" content="@gamesCollectionItem.Game.ReleaseDate.Value.Year">
+                                        <div itemprop="name"><a class="name" href="/games/details/@gamesCollectionItem.Game.Id">@gamesCollectionItem.Game.Name</a></div>
+                                        <div class="post-meta">@gamesCollectionItem.Game.ReleaseDate.Value.ToString("dd MMMM yyyy")</div>
+                                    </div>
+                                    <div class="ratings-graph">
+                                        <div class="graph">
+                                            <div class="small-score mark-@Math.Round(gamesCollectionItem.Game.UsersScore)">@Math.Round(gamesCollectionItem.Game.UsersScore)</div>
+                                            <div class="graph-body">
+                                                <div style="width: @(Math.Round(gamesCollectionItem.Game.UsersScore, 1) * 10)%;"
+                                                     class="rating-graph mark-@(Math.Round(gamesCollectionItem.Game.UsersScore, 0))">
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </article>
-                    }
-                </section>
-                <div class="ads-horizont hor-1">
-                    <!-- Yandex.RTB R-A-201169-7 -->
-                    <div id="yandex_rtb_R-A-201169-7"></div>
-                    <script>
-                                        window.yaContextCb.push(() => {
-                                            Ya.Context.AdvManager.render({
-                                                renderTo: 'yandex_rtb_R-A-201169-7',
-                                                blockId: 'R-A-201169-7'
-                                            })
-                        })</script>
+                                </article>
+                            }
+                        </section>
+                        <div class="ads-horizont hor-1">
+                            <!-- Yandex.RTB R-A-201169-7 -->
+                            <div id="yandex_rtb_R-A-201169-7"></div>
+                            <script>
+                                                        window.yaContextCb.push(() => {
+                                                            Ya.Context.AdvManager.render({
+                                                                renderTo: 'yandex_rtb_R-A-201169-7',
+                                                                blockId: 'R-A-201169-7'
+                                                            })
+                                                        })
+                            </script>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    }
+    </div>
+}
