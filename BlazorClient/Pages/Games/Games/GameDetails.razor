@@ -13,75 +13,106 @@
 }
 else
 {
-    <div class="post single clear game">
-        <GameHeader Name="@Game.Name"
-                    Description="@Game.Description"
-                    Id="@Id"
-                    ReleaseYear="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
 
-        <div class="post-content">
-            <Thumbnail Name="@Game.Name"
-                       ReleaseYear="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)"
-                       ReleaseMonth="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Month)"
-                       ImageSource="@Game.Image"
-                       Prefix="Games" />
-
-            <RatingComponent Score="@Game.UsersScore"
-                             ScoresCount="@Game.GamesPlayersReviews.Count" />
-
-            <GameMetadata Developers="@Game.Developers"
-                          Publishers="@Game.Publishers"
-                          Platforms="@Game.Platforms"
-                          Genres="@Game.Genres"
-                          Localization="@Game.Localization"
-                          ReleaseDate="@(Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now))" />
-
-            <Description TextContent="@Game.Description" />
-
-            <SystemRequirements />
-
-            <GameCollectionsComponent GameCollections="@Game.GameCollections" />
-
-            <AdHorizontal AdId="R-A-201169-7" />
-
-            <GameMedia Trailer="@Game.Trailer"
-                       Screenshots="@Game.Screenshots"
-                       Name="@Game.Name"
-                       Image="@Game.Image"
-                       ReleaseDate="@(Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now))"
-                       GameId="@Game.Id" />
-
-            <div class="user-reviews comments">
-                <div id="comments">
-                    <h1 id="users">Отзывы</h1>
-                    <span class="countnum">@Game.GamesPlayersReviews.Count</span>
-                    <div class="comment_list">
-                        <ol>
-                            @foreach (GameReview gameReview in Game.GamesPlayersReviews)
-                            {
-                                <GameReviewComponent Id="@gameReview.Id"
-                                                     Score="@gameReview.Score"
-                                                     UserName="@gameReview.ApplicationUser.UserName"
-                                                     PublishDate="@gameReview.Date"
-                                                     TextContent="@gameReview.TextContent"
-                                                     AuthorId="@gameReview.UserId"
-                                                     LikesCount="@gameReview.GamePlayerReviewShifts.Count(s=>s.Direction is true)"
-                                                     DislikesCount="@gameReview.GamePlayerReviewShifts.Count(s=>s.Direction is false)"
-                                                     OnUpdate="@RefreshGameData" />
-                            }
-                        </ol>
+    <div class="sidebar">
+        <div class="widget">
+            <div class="widget-body">
+                <div class="graph">
+                    <p class="rating-label">Рейтинг <a href="#critics">критиков</a></p>
+                    <div class="graph-body">
+                        <div class="rating-graph mark-@Math.Round(Game.CriticsScore)" style="width: @(Math.Round(Game.CriticsScore * 10))%;">
+                            <span class="score-graph">@Math.Round(Game.CriticsScore, 1)</span>
+                        </div>
                     </div>
-                    <AuthorizeView>
-                        <Authorized>
-                            @if (IsAbleToWriteComments)
-                            {
-                                <YourScoreComponent GameId="@Game.Id"
-                                                    GameScore="@Game.UsersScore"
-                                                    ScoresCount="@Game.UsersReviewsCount" />
-                            }
-                            <GoToChatComponent GameId="@Game.Id" />
-                        </Authorized>
-                    </AuthorizeView>
+
+                    <p class="rating-label">Рейтинг <a href="#users">игроков</a></p>
+                    <div class="graph-body">
+                        <div class="rating-graph mark-@Math.Round(Game.UsersScore)" style="width: @(Math.Round(Game.UsersScore * 10))%;">
+                            <span class="score-graph">@Math.Round(Game.UsersScore, 1)</span>
+                        </div>
+                    </div>
+
+                    <p class="rating-label">Ожидания: 2%</p>
+                    <div class="graph-body">
+                        <div class="rating-wait mark-0" style="width: 2%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="content" class="lcol">
+        <div class="entry" itemscope itemtype="http://schema.org/VideoGame">
+            <div class="post single clear game">
+                <GameHeader Name="@Game.Name"
+                            Description="@Game.Description"
+                            Id="@Id"
+                            ReleaseYear="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
+
+                <div class="post-content">
+                    <Thumbnail Name="@Game.Name"
+                               ReleaseYear="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)"
+                               ReleaseMonth="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Month)"
+                               ImageSource="@Game.Image"
+                               Prefix="Games" />
+
+                    <RatingComponent Score="@Game.UsersScore"
+                                     ScoresCount="@Game.GamesPlayersReviews.Count" />
+
+                    <GameMetadata Developers="@Game.Developers"
+                                  Publishers="@Game.Publishers"
+                                  Platforms="@Game.Platforms"
+                                  Genres="@Game.Genres"
+                                  Localization="@Game.Localization"
+                                  ReleaseDate="@(Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now))" />
+
+                    <Description TextContent="@Game.Description" />
+
+                    <SystemRequirements />
+
+                    <GameCollectionsComponent GameCollections="@Game.GameCollections" />
+
+                    <AdHorizontal AdId="R-A-201169-7" />
+
+                    <GameMedia Trailer="@Game.Trailer"
+                               Screenshots="@Game.Screenshots"
+                               Name="@Game.Name"
+                               Image="@Game.Image"
+                               ReleaseDate="@(Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now))"
+                               GameId="@Game.Id" />
+
+                    <div class="user-reviews comments">
+                        <div id="comments">
+                            <h1 id="users">Отзывы</h1>
+                            <span class="countnum">@Game.GamesPlayersReviews.Count</span>
+                            <div class="comment_list">
+                                <ol>
+                                    @foreach (GameReview gameReview in Game.GamesPlayersReviews)
+                                    {
+                                        <GameReviewComponent Id="@gameReview.Id"
+                                                             Score="@gameReview.Score"
+                                                             UserName="@gameReview.ApplicationUser.UserName"
+                                                             PublishDate="@gameReview.Date"
+                                                             TextContent="@gameReview.TextContent"
+                                                             AuthorId="@gameReview.UserId"
+                                                             LikesCount="@gameReview.GamePlayerReviewShifts.Count(s=>s.Direction is true)"
+                                                             DislikesCount="@gameReview.GamePlayerReviewShifts.Count(s=>s.Direction is false)"
+                                                             OnUpdate="@RefreshGameData" />
+                                    }
+                                </ol>
+                            </div>
+                            <AuthorizeView>
+                                <Authorized>
+                                    @if (IsAbleToWriteComments)
+                                    {
+                                        <YourScoreComponent GameId="@Game.Id"
+                                                            GameScore="@Game.UsersScore"
+                                                            ScoresCount="@Game.UsersReviewsCount" />
+                                    }
+                                    <GoToChatComponent GameId="@Game.Id" />
+                                </Authorized>
+                            </AuthorizeView>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
