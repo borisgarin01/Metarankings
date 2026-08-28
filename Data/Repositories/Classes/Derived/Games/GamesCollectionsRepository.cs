@@ -102,22 +102,26 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCo
 
         var gamesCollection = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GameReview, ApplicationUser, GamesCollection>(
             @"
-            SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
-                   gci.Id, gci.GameId, gci.GameCollectionId,
-                   g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer,
-                   COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS Score,
-                   COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS ScoresCount,
-                   gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
-                   au.Id, au.UserName, au.NormalizedUserName, au.EmailConfirmed, au.PasswordHash, 
-                   au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
-            FROM GamesCollections gc
-            LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
-            LEFT JOIN Games g ON g.Id = gci.GameId
-            LEFT JOIN GamesPlayersReviews gpr ON gpr.GameId = g.Id
-            LEFT JOIN ApplicationUsers au ON au.Id = gpr.UserId
-            WHERE gc.Id = @Id",
+        SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
+               gci.Id, gci.GameId, gci.GameCollectionId,
+               g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer,
+               COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS Score,
+               COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS ScoresCount,
+               gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
+               au.Id, au.UserName, au.NormalizedUserName, au.EmailConfirmed, au.PasswordHash, 
+               au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
+        FROM GamesCollections gc
+        LEFT JOIN GamesCollectionsItems gci ON gc.Id = gci.GameCollectionId
+        LEFT JOIN Games g ON g.Id = gci.GameId
+        LEFT JOIN GamesPlayersReviews gpr ON gpr.GameId = g.Id
+        LEFT JOIN ApplicationUsers au ON au.Id = gpr.UserId
+        WHERE gc.Id = @Id",
             (gameCollection, gameCollectionItem, game, gamePlayerReview, applicationUser) =>
             {
+                if (gameCollection is null)
+                    return null;
+
+                // Добавляем игру в коллекцию
                 if (game is not null && gameCollectionItem is not null)
                 {
                     if (!gameCollection.GamesCollectionItems.Any(g => g.GameId == game.Id))
@@ -128,17 +132,22 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCo
                         gameCollectionItem.GamesCollectionId = gameCollection.Id;
                         gameCollection.GamesCollectionItems.Add(gameCollectionItem);
                     }
+                }
 
-                    if (gamePlayerReview is not null && applicationUser is not null)
+                // Добавляем отзыв к игре
+                if (game is not null && gamePlayerReview is not null && applicationUser is not null)
+                {
+                    var existingGame = gameCollection.GamesCollectionItems
+                        .FirstOrDefault(g => g.GameId == game.Id)?.Game;
+
+                    if (existingGame is not null &&
+                        !existingGame.GamesPlayersReviews.Any(b => b.UserId == gamePlayerReview.UserId))
                     {
-                        if (!game.GamesPlayersReviews.Any(b => b.UserId == gamePlayerReview.UserId))
-                        {
-                            gamePlayerReview.Game = game;
-                            gamePlayerReview.GameId = game.Id;
-                            gamePlayerReview.ApplicationUser = applicationUser;
-                            gamePlayerReview.UserId = applicationUser.Id;
-                            game.GamesPlayersReviews.Add(gamePlayerReview);
-                        }
+                        gamePlayerReview.Game = existingGame;
+                        gamePlayerReview.GameId = existingGame.Id;
+                        gamePlayerReview.ApplicationUser = applicationUser;
+                        gamePlayerReview.UserId = applicationUser.Id;
+                        existingGame.GamesPlayersReviews.Add(gamePlayerReview);
                     }
                 }
 
@@ -147,7 +156,22 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCo
             new { Id = id },
             splitOn: "Id,Id,Id,Id");
 
-        return gamesCollection.DistinctBy(gc => gc.Id).SingleOrDefault();
+        // Группировка результатов
+        GamesCollection? result = gamesCollection
+            .Where(gc => gc is not null)
+            .GroupBy(gc => gc.Id)
+            .Select(g =>
+            {
+                GamesCollection groupedCollection = g.First();
+                groupedCollection.GamesCollectionItems = g
+                    .SelectMany(gc => gc.GamesCollectionItems)
+                    .DistinctBy(item => item.GameId)
+                    .ToList();
+                return groupedCollection;
+            })
+            .SingleOrDefault();
+
+        return result;
     }
 
     public async Task<IEnumerable<GamesCollection>> GetAsync(long offset, long limit)
