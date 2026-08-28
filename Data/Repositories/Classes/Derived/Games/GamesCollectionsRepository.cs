@@ -145,7 +145,7 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCo
                 return gameCollection;
             },
             new { Id = id },
-            splitOn: "Id");
+            splitOn: "Id,Id,Id,Id");
 
         return gamesCollection.DistinctBy(gc => gc.Id).SingleOrDefault();
     }
