@@ -16,17 +16,19 @@
     <div class="ratings-graph">
         <div class="graph-critic">
             <div class="graph">
-                <div class="small-score mark-9">9</div>
+                <div class="small-score mark-@Math.Round(Game.CriticsScore)">@Math.Round(Game.CriticsScore)</div>
                 Рейтинг критиков
-                <div class="graph-body"><div style="width:90%" class="rating-graph mark-9"></div></div>
+                <div class="graph-body">
+                    <div style="width:@(Math.Round(Game.CriticsScore, 1) * 10)%" class="rating-graph mark-@Math.Round(Game.CriticsScore)"></div>
+                </div>
             </div>
         </div>
         <div class="graph-critic">
             <div class="graph">
-                <div class="small-score mark-8">7.6</div>
+                <div class="small-score mark-@Math.Round(Game.UsersScore)">@Math.Round(Game.UsersScore, 1)</div>
                 Игроки
                 <div class="graph-body">
-                    <div class="rating-graph mark-8" style="width:76%"></div>
+                    <div class="rating-graph mark-@Math.Round(Game.UsersScore)" style="width:@(Math.Round(Game.UsersScore, 1) * 10)%"></div>
                 </div>
             </div>
         </div>
