@@ -105,8 +105,8 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCo
         SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
                gci.Id, gci.GameId, gci.GameCollectionId,
                g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer,
-               COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS Score,
-               COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS ScoresCount,
+               COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+               COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
                gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
                au.Id, au.UserName, au.NormalizedUserName, au.EmailConfirmed, au.PasswordHash, 
                au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
