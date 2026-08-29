@@ -53,17 +53,27 @@
                     </div>
                 </div>
 
-                <!-- Соцсети -->
+                <!-- Кнопка VK ID -->
+                <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee; text-align:center;">
+                    <div style="color:#999; font-size:12px; margin-bottom:12px;">или войдите через</div>
+
+                    <!-- Контейнер для VK ID кнопки -->
+                    <div id="VKIDSDKAuthButton" style="display:flex; justify-content:center; min-height:48px;">
+                        <div style="color:#999; font-size:13px; padding:12px;">⏳ Загрузка VK ID...</div>
+                    </div>
+                </div>
+
+                <!-- Другие соцсети -->
                 @if (ExternalLogins != null && ExternalLogins.Any())
                 {
-                    <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee; text-align:center;">
-                        <div style="color:#999; font-size:12px; margin-bottom:10px;">или</div>
+                    <div style="margin-top:12px; padding-top:12px; border-top:1px solid #eee; text-align:center;">
+                        <div style="color:#999; font-size:12px; margin-bottom:8px;">другие способы</div>
                         <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
                             @foreach (var login in ExternalLogins)
                             {
                                 <button type="button"
                                         @onclick="() => LoginExternal(login)"
-                                        style="padding:8px 16px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer; font-size:13px;">
+                                        style="padding:6px 14px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer; font-size:12px;">
                                     @login.DisplayName
                                 </button>
                             }
@@ -117,3 +127,115 @@
         </form>
     </div>
 }
+
+<!-- Загрузка VK ID SDK из локальной папки -->
+<script src="/js/vkidsdk.js"></script>
+<script>
+    // Инициализация VK ID при открытии попапа
+    function initVKID() {
+        const container = document.getElementById('VKIDSDKAuthButton');
+        if (!container) return;
+
+        // Проверяем загружен ли SDK
+        if (typeof VKIDSDK === 'undefined') {
+            console.error('❌ VKID SDK не загружен. Проверьте файл /js/vkidsdk.js');
+            container.innerHTML = `
+                    <div style="color:#d32f2f; font-size:13px;">
+                        ❌ Ошибка загрузки VK ID<br>
+                        <small style="color:#999;">Файл SDK не найден</small>
+                    </div>
+                `;
+            return;
+        }
+
+        try {
+            const VKID = window.VKIDSDK;
+
+            // Настройка приложения
+            VKID.Config.set({
+                app: 54582329,
+                redirectUrl: 'https://rankings-meta.ru/api/auth/vkid-callback',
+                scope: 'email phone'
+            });
+
+            // Очищаем контейнер
+            container.innerHTML = '';
+
+            // Создаем и рендерим кнопку
+            const oneTap = new VKID.OneTap();
+            oneTap.render({
+                container: container,
+                showAlternativeLogin: false
+            });
+
+            console.log('✅ VK ID кнопка отображена');
+        } catch (e) {
+            console.error('❌ Ошибка VK ID:', e);
+            container.innerHTML = `
+                    <div style="color:#d32f2f; font-size:13px;">
+                        ❌ Ошибка инициализации VK ID<br>
+                        <small style="color:#999;">${e.message || 'Неизвестная ошибка'}</small>
+                    </div>
+                `;
+        }
+    }
+
+    // Функция для проверки загрузки SDK
+    function waitForVKID(retries = 0) {
+        if (typeof VKIDSDK !== 'undefined' && VKIDSDK.Config) {
+            initVKID();
+            return true;
+        }
+
+        if (retries > 30) { // 3 секунды
+            const container = document.getElementById('VKIDSDKAuthButton');
+            if (container) {
+                container.innerHTML = `
+                        <div style="color:#d32f2f; font-size:13px;">
+                            ❌ Таймаут загрузки VK ID<br>
+                            <small style="color:#999;">Проверьте файл /js/vkidsdk.js</small>
+                        </div>
+                    `;
+            }
+            return false;
+        }
+
+        setTimeout(() => waitForVKID(retries + 1), 100);
+        return false;
+    }
+
+    // Запускаем инициализацию при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function () {
+        waitForVKID();
+    });
+
+    // Следим за открытием попапа
+    function observePopup() {
+        const targetNode = document.body;
+        const config = { attributes: true, subtree: true, attributeFilter: ['style'] };
+
+        const callback = function (mutationsList) {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    const popup = document.querySelector('.popup_block');
+                    if (popup && popup.style.display !== 'none') {
+                        // Попап открыт - инициализируем VK ID
+                        setTimeout(() => {
+                            waitForVKID();
+                        }, 100);
+                    }
+                }
+            }
+        };
+
+        const observer = new MutationObserver(callback);
+        observer.observe(targetNode, config);
+    }
+
+    // Запускаем наблюдение
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', observePopup);
+    } else {
+        observePopup();
+    }
+</script>
