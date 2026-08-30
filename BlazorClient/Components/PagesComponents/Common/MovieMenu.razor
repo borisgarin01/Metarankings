@@ -2,10 +2,10 @@
     <div class="platform-menu">
         <ul>
             <li>
-                <a class="bst" href="/best-movies/2024/">Лучшие фильмы 2024</a> <!--TODO: Customize-->
+                <a class="bst" href="/movies/best-movies/?Year=@(DateTime.Now.Year - 1)">Лучшие фильмы @(DateTime.Now.Year - 1)</a>
             </li>
             <li>
-                <a class="bst" href="/best-movies/2025/">2025</a> <!--TODO: Customize-->
+                <a class="bst" href="/movies/best-movies/?Year=@(DateTime.Now.Year)">@DateTime.Now.Year</a>
             </li>
             <li>
                 <a class="mnew" href="/new-movies/">Новые фильмы</a>

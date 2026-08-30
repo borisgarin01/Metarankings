@@ -1,6 +1,6 @@
-﻿using Domain.Games;
+﻿using Domain.Movies;
 
-namespace BlazorClient.Components.PagesComponents.Common;
+namespace BlazorClient.Components.PagesComponents.MovieDetails;
 
 public partial class GenresComponent : ComponentBase
 {

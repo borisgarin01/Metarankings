@@ -4,7 +4,7 @@ using Domain.RequestsModels.Movies.MoviesGenres;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 
-public sealed class MoviesGenresRepository : Repository, IRepository<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>
+public sealed class MoviesGenresRepository : Repository, IRepository<Genre, AddMovieGenreModel, UpdateMovieGenreModel>
 {
     public MoviesGenresRepository(string connectionString) : base(connectionString)
     {
@@ -30,34 +30,59 @@ RETURNING Id;", new { entity.Name });
         }
     }
 
-    public async Task<IEnumerable<MovieGenre>> GetAllAsync()
+    public async Task<IEnumerable<Genre>> GetAllAsync()
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesGenres = await connection.QueryAsync<MovieGenre>(@"SELECT Id, Name 
+            var moviesGenres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
 FROM MoviesGenres;");
 
             return moviesGenres;
         }
     }
 
-    public async Task<MovieGenre> GetAsync(long id)
+    public async Task<Genre> GetAsync(long id)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesGenres = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"SELECT Id, Name 
-FROM MoviesGenres
-WHERE Id=@id;", new { id });
+            var moviesGenres = await connection.QueryAsync<Genre, Movie,Genre>(@"
+SELECT MoviesGenres.Id, MoviesGenres.Name, 
+       Movies.Id, Movies.Name, Movies.OriginalName, Movies.ImageSource,
+       Movies.PremierDate, Movies.Description,
+       COALESCE((SELECT AVG(Score)::float FROM ViewersMoviesReviews WHERE MovieId = Movies.Id), 0) AS UsersScore,
+       COALESCE((SELECT COUNT(*) FROM ViewersMoviesReviews WHERE MovieId = Movies.Id), 0) AS UsersReviewsCount,
+       COALESCE((SELECT AVG(Score)::float FROM MoviesCriticsReviews WHERE MovieId = Movies.Id), 0) AS CriticsScore,
+       COALESCE((SELECT COUNT(*) FROM MoviesCriticsReviews WHERE MovieId = Movies.Id), 0) AS CriticsReviewsCount
+FROM MoviesGenres 
+LEFT JOIN MoviesMoviesGenres ON MoviesMoviesGenres.MovieGenreId = MoviesGenres.Id
+LEFT JOIN Movies ON Movies.Id = MoviesMoviesGenres.MovieId
+WHERE MoviesGenres.Id = @Id", (genre, movie) =>
+            {
+                genre.Movies.Add(movie);
+                return genre;
+            }, new { Id = id });
 
-            return moviesGenres;
+            var genresResult = moviesGenres
+                            .GroupBy(d => d.Id)
+                            .Select(g =>
+                            {
+                                Genre groupedGenre = g.First() with
+                                {
+                                    Movies = g.SelectMany(d => d.Movies).ToList()
+                                };
+
+                                return groupedGenre;
+                            });
+
+            return genresResult.FirstOrDefault();
         }
     }
 
-    public async Task<IEnumerable<MovieGenre>> GetAsync(long offset, long limit)
+    public async Task<IEnumerable<Genre>> GetAsync(long offset, long limit)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesGenres = await connection.QueryAsync<MovieGenre>(@"SELECT Id, Name 
+            var moviesGenres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
 FROM MoviesGenres
 OFFSET @offset
 LIMIT @limit;", new { offset, limit });
@@ -79,11 +104,11 @@ LIMIT @limit;", new { offset, limit });
         }
     }
 
-    public async Task<MovieGenre> UpdateAsync(UpdateMovieGenreModel movieGenre, long id)
+    public async Task<Genre> UpdateAsync(UpdateMovieGenreModel movieGenre, long id)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<MovieGenre>(@"UPDATE MoviesGenres 
+            var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE MoviesGenres 
 SET Name=@Name
 WHERE Id=@Id
 RETURNING Name, Id;", new

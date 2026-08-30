@@ -1,0 +1,19 @@
+﻿@using Domain.Movies
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<div class="post clear">
+    <a href="/movies/details/@Id" title="Фильм «@Name»" class="thumb"><img class="post-image" src="@Image" alt="@Name"></a>
+    <a class="name" href="/movies/details/@Id">@Name</a>
+    <div class="post-meta">
+        @foreach (Genre genre in Genres)
+        {
+            <p>@genre.Name</p>
+        }
+    </div>
+    <div class="post-meta">
+        <a href="/movies/details/@Id/#reviews" title="@Name - обзоры и рецензии">Обзоры критиков (@CriticsScoresCount)</a> <a href="/movies/details/@Id/#comments" title="@Name - отзывы">Отзывы зрителей (@ViewersScoresCount)</a>
+    </div>
+    <div class="post-content">@Description</div>
+    <div class="trailer" data-video="https://metarankings.ru/myatezh-2026/#content-trailer"></div>
+</div>

@@ -34,7 +34,7 @@ public partial class RemoveMoviePage : ComponentBase
         HttpResponseMessage httpResponseMessage = await MoviesWebManager.DeleteAsync(Id);
         if (httpResponseMessage.IsSuccessStatusCode)
         {
-            NavigationManager.NavigateTo("/admin/movies/movies/list-movies");
+            NavigationManager.NavigateTo("/admin/movies/list-movies");
         }
         else
         {

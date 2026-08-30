@@ -8,7 +8,7 @@ using Domain.RequestsModels.Movies.Movies;
 namespace API.Controllers.Movies;
 
 [ApiController]
-[Route("api/movies/[controller]")]
+[Route("api/[controller]")]
 public sealed class MoviesController : ControllerBase
 {
     private readonly IConfiguration _configuration;
@@ -64,15 +64,6 @@ public sealed class MoviesController : ControllerBase
         return Ok(movies);
     }
 
-    [HttpGet("images/{year:int}/{month:int}/{image}")]
-    public async Task<IActionResult> GetImage(int year, int month, string image)
-    {
-        byte[]? file = await System.IO.File.ReadAllBytesAsync($"{Directory.GetCurrentDirectory()}{Path.DirectorySeparatorChar}movies{Path.DirectorySeparatorChar}images{Path.DirectorySeparatorChar}{year}{Path.DirectorySeparatorChar}{month}{Path.DirectorySeparatorChar}{image}");
-        if (file is null)
-            return NotFound();
-        return File(file, "image/jpeg");
-    }
-
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<long>> RemoveAsync(long id)
@@ -98,7 +89,7 @@ public sealed class MoviesController : ControllerBase
         return Ok(await _moviesModelsRepository.GetByNameAsync(name));
     }
 
-    [HttpGet]
+    [HttpGet("search")]
     public async Task<ActionResult<IEnumerable<Movie>>> SearchByGenreId([FromQuery] long genreId)
     {
         return Ok(await _moviesModelsRepository.GetByGenreAsync(genreId));

@@ -17,20 +17,26 @@ public sealed record Movie
     [JsonPropertyName("imageSource")]
     public required string ImageSource { get; set; }
 
-    [JsonPropertyName("score")]
-    public float? Score { get; set; }
+    [JsonPropertyName("usersScore")]
+    public required float UsersScore { get; set; }
 
-    [JsonPropertyName("scoresCount")]
-    public long? ScoresCount { get; set; }
+    [JsonPropertyName("usersReviewsCount")]
+    public required int UsersReviewsCount { get; set; }
+
+    [JsonPropertyName("criticsScore")]
+    public required float CriticsScore { get; set; }
+
+    [JsonPropertyName("criticsReviewsCount")]
+    public required int CriticsReviewsCount { get; set; }
 
     [JsonPropertyName("premierDate")]
-    public DateTime? PremierDate { get; set; }
+    public DateOnly? PremierDate { get; set; }
 
     [JsonPropertyName("description")]
     public required string Description { get; set; }
 
     [JsonPropertyName("movieGenres")]
-    public List<MovieGenre> MovieGenres { get; set; } = new List<MovieGenre>();
+    public List<Genre> MovieGenres { get; set; } = new List<Genre>();
 
     [JsonPropertyName("moviesStudios")]
     public List<MovieStudio> MoviesStudios { get; set; } = new List<MovieStudio>();
@@ -39,5 +45,5 @@ public sealed record Movie
     public List<MovieDirector> MoviesDirectors { get; set; } = new List<MovieDirector>();
 
     [JsonPropertyName("movieReviews")]
-    public List<MovieReview> MovieReviews { get; set; } = new List<MovieReview>();
+    public List<MovieViewerReview> MovieReviews { get; set; } = new List<MovieViewerReview>();
 }

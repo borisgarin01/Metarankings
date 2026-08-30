@@ -15,15 +15,15 @@ public partial class Headerer : ComponentBase
     private bool isSticky = false;
     private string searchQuery = "";
     private ElementReference headerBottomRef;
-    private IEnumerable<MovieGenre>? moviesGenres;
+    private IEnumerable<Domain.Movies.Genre>? moviesGenres;
     private IEnumerable<Platform>? platforms;
 
     // ===== ПАРАМЕТРЫ =====
-    public IEnumerable<MovieGenre>? MoviesGenres { get; set; }
+    public IEnumerable<Domain.Movies.Genre>? MoviesGenres { get; set; }
 
     public IEnumerable<Platform>? Platforms { get; set; }
 
-    public IEnumerable<Genre>? GamesGenres { get; set; }
+    public IEnumerable<Domain.Games.Genre>? GamesGenres { get; set; }
 
     // ===== INJECT =====
     [Inject]
@@ -36,22 +36,22 @@ public partial class Headerer : ComponentBase
     private IJSRuntime JS { get; set; } = default!;
 
     [Inject]
-    public IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresWebManager { get; set; }
+    public IWebManager<Domain.Movies.Genre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresWebManager { get; set; }
 
     [Inject]
     public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> PlatformsWebManager { get; set; }
 
     [Inject]
-    public IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel> GamesGenresWebManager { get; set; }
+    public IWebManager<Domain.Games.Genre, AddGameGenreModel, UpdateGameGenreModel> GamesGenresWebManager { get; set; }
 
     // ===== ЖИЗНЕННЫЙ ЦИКЛ =====
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            Task<IEnumerable<MovieGenre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
+            Task<IEnumerable<Domain.Movies.Genre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
             Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetAllAsync();
-            Task<IEnumerable<Genre>> gamesGenresGettingTask = GamesGenresWebManager.GetAllAsync();
+            Task<IEnumerable<Domain.Games.Genre>> gamesGenresGettingTask = GamesGenresWebManager.GetAllAsync();
 
             await Task.WhenAll(moviesGenresGettingTask, platformsGettingTask, gamesGenresGettingTask)
                 .ContinueWith(b =>

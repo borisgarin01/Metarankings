@@ -10,7 +10,7 @@ public partial class AddMovieGenrePage : ComponentBase
     public string Name { get; set; }
 
     [Inject]
-    public IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresManager { get; set; }
+    public IWebManager<Genre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresManager { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }

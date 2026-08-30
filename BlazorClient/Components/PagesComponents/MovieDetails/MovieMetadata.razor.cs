@@ -9,11 +9,11 @@ public partial class MovieMetadata : ComponentBase
     public string OriginalName { get; set; }
 
     [Parameter, EditorRequired]
-    public IEnumerable<Genre> Genres { get; set; }
+    public IEnumerable<Domain.Movies.Genre> Genres { get; set; }
 
     [Parameter, EditorRequired]
     public IEnumerable<MovieStudio> MoviesStudios { get; set; }
 
     [Parameter, EditorRequired]
-    public DateTime PremierDate { get; set; }
+    public DateOnly PremierDate { get; set; }
 }

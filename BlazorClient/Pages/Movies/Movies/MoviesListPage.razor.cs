@@ -15,8 +15,8 @@ public partial class MoviesListPage : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         if (GenreId is null)
-            Movies = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Movie>>("/api/movies/movies");
+            Movies = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Movie>>("/api/movies");
         else
-            Movies = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Movie>>($"/api/movies/movies?genreId={GenreId}");
+            Movies = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Movie>>($"/api/movies?genreId={GenreId}");
     }
 }

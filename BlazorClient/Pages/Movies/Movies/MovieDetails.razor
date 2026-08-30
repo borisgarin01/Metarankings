@@ -2,6 +2,7 @@
 @using BlazorClient.Components.PagesComponents.Common;
 @using BlazorClient.Components.PagesComponents.MovieDetails;
 @using Domain.Games
+@using Domain.Movies
 
 <MovieMenu />
 
@@ -28,7 +29,7 @@ else
             <RatingComponent Score="@(Movie.MovieReviews.Any() ? Movie.MovieReviews.Average(g => g.Score) : 0)"
                              ScoresCount="@Movie.MovieReviews.Count" />
 
-            <MovieMetadata Genres="@Movie.MovieGenres.Select(g => new Genre { Id = g.Id, Name = g.Name })"
+            <MovieMetadata Genres="@Movie.MovieGenres"
                            OriginalName="@Movie.OriginalName"
                            MoviesStudios="@Movie.MoviesStudios"
                            PremierDate="@(Movie.PremierDate.HasValue?Movie.PremierDate.Value:default)" />

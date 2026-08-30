@@ -7,7 +7,6 @@ using Domain.Games.Collections;
 using Domain.Movies;
 using Domain.Movies.Collections;
 using Domain.RequestsModels.Games.Collections;
-using Domain.RequestsModels.Games.Developers;
 using Domain.RequestsModels.Games.Genres;
 using Domain.RequestsModels.Games.Localizations;
 using Domain.RequestsModels.Games.Platforms;
@@ -16,7 +15,6 @@ using Domain.RequestsModels.Movies.Collections;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Domain.RequestsModels.Movies.MoviesGenres;
 using Domain.RequestsModels.Movies.MoviesStudios;
-using Domain.Reviews;
 
 namespace API.IServiceCollectionExtensions;
 
@@ -28,7 +26,7 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IDevelopersRepository, DevelopersRepository>(instance => new DevelopersRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel>, GamesGenresRepository>(instance => new GamesGenresRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<Domain.Games.Genre, AddGameGenreModel, UpdateGameGenreModel>, GamesGenresRepository>(instance => new GamesGenresRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsRepository>(instance => new PlatformsRepository(metarankingsConnectionString));
 
@@ -44,7 +42,7 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsRepository>(instance => new MoviesDirectorsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresRepository>(instance => new MoviesGenresRepository(metarankingsConnectionString));
+        services.AddScoped<IRepository<Domain.Movies.Genre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresRepository>(instance => new MoviesGenresRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosRepository>(instance => new MoviesStudiosRepository(metarankingsConnectionString));
 

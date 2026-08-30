@@ -3,7 +3,7 @@
 <AuthorizeView Roles="Admin">
     <Authorized>
         <a href="/admin">К странице админа</a>
-        <EditForm method="post" OnValidSubmit="@AddMovieDirectorAsync" Context="myContext">
+        <EditForm method="post" Model="this" OnValidSubmit="@AddMovieDirectorAsync" Context="myContext">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <a href="/admin/movies/movies-directors/movies-directors-list" class="list-group-item link-dark">Режиссеры</a>

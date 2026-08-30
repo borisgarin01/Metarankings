@@ -15,5 +15,5 @@ public partial class MoviesDropdownComponent : ComponentBase
     private void HideMovies() => isMoviesOpen = false;
 
     [Parameter, EditorRequired]
-    public IEnumerable<MovieGenre> Genres { get; set; }
+    public IEnumerable<Genre> Genres { get; set; }
 }

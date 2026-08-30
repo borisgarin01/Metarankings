@@ -22,7 +22,7 @@ public sealed partial class AddMoviePage : ComponentBase
     public IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> MoviesDirectorsWebManager { get; set; }
 
     [Inject]
-    public IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresWebManager { get; set; }
+    public IWebManager<Genre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresWebManager { get; set; }
 
     [Inject]
     public IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel> MoviesStudiosWebManager { get; set; }
@@ -37,11 +37,11 @@ public sealed partial class AddMoviePage : ComponentBase
     public NavigationManager NavigationManager { get; set; }
 
     public IEnumerable<MovieDirector> MoviesDirectorsToSelectFrom { get; set; }
-    public IEnumerable<MovieGenre> MoviesGenresToSelectFrom { get; set; }
+    public IEnumerable<Genre> MoviesGenresToSelectFrom { get; set; }
     public IEnumerable<MovieStudio> MoviesStudiosToSelectFrom { get; set; }
 
     public List<MovieDirector> SelectedMoviesDirectors { get; set; } = new List<MovieDirector>();
-    public List<MovieGenre> SelectedGenres { get; set; } = new List<MovieGenre>();
+    public List<Genre> SelectedMoviesGenres { get; set; } = new List<Genre>();
     public List<MovieStudio> SelectedMoviesStudios { get; set; } = new List<MovieStudio>();
 
     [EditorRequired]
@@ -57,16 +57,16 @@ public sealed partial class AddMoviePage : ComponentBase
     [EditorRequired]
     public DateTime? PremierDate { get; set; }
 
-    public IEnumerable<long> SelectedMoviesDirectorsIds { get; private set; }
-    public IEnumerable<long> SelectedMoviesGenresIds { get; private set; }
-    public IEnumerable<long> SelectedMoviesStudiosIds { get; private set; }
+    public List<long> SelectedMoviesDirectorsIds { get; private set; } = new List<long>();
+    public List<long> SelectedMoviesGenresIds { get; private set; } = new List<long>();
+    public List<long> SelectedMoviesStudiosIds { get; private set; } = new List<long>();
 
     public IBrowserFile ImageToUpload { get; private set; }
 
     protected override async Task OnInitializedAsync()
     {
         Task<IEnumerable<MovieDirector>> moviesDirectorsGetttingTask = MoviesDirectorsWebManager.GetAllAsync();
-        Task<IEnumerable<MovieGenre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
+        Task<IEnumerable<Genre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
         Task<IEnumerable<MovieStudio>> moviesStudiosGettingTask = MoviesStudiosWebManager.GetAllAsync();
 
         await Task.WhenAll(moviesDirectorsGetttingTask, moviesGenresGettingTask, moviesStudiosGettingTask).ContinueWith(a =>
@@ -166,7 +166,7 @@ public sealed partial class AddMoviePage : ComponentBase
 
                     if (addingMovieResponseMessage.IsSuccessStatusCode)
                     {
-                        NavigationManager.NavigateTo("/movies/movies/movies-list");
+                        NavigationManager.NavigateTo("/admin/movies/list-movies");
                     }
                     else
                     {

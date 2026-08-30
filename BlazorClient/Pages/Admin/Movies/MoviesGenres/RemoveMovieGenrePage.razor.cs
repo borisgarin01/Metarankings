@@ -10,13 +10,13 @@ public partial class RemoveMovieGenrePage : ComponentBase
     [Parameter]
     public long Id { get; set; }
 
-    public MovieGenre MovieGenre { get; private set; }
+    public Genre MovieGenre { get; private set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
     [Inject]
-    public IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresWebManager { get; private set; }
+    public IWebManager<Genre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresWebManager { get; private set; }
 
     [Inject]
     public IToastService ToastService { get; private set; }

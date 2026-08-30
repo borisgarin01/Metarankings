@@ -15,6 +15,6 @@ public partial class MovieDetails : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Movie = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Movie>($"/api/Movies/Movies/{Id}");
+        Movie = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Movie>($"/api/movies/{Id}");
     }
 }

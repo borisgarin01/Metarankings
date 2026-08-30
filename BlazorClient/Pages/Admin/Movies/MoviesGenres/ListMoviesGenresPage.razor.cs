@@ -1,4 +1,4 @@
-﻿using Domain.Games;
+﻿using Domain.Movies;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesGenres;
 

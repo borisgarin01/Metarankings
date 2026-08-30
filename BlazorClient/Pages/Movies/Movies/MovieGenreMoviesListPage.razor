@@ -1,7 +1,28 @@
-﻿@page "/movies/genres/{Id:long}"
+﻿@page "/movies/genres/{GenreId:long}"
+@using BlazorClient.Components.PagesComponents.MoviesList
 
-<h3>Фильмы жанра с Id - @Id</h3>
+@if (Genre is null)
+{
+    <p>Загружается...</p>
+}
+else if (!Genre.Movies.Any())
+{
+    <p>В этом жанре пока нет фильмов.</p>
+}
+else
+{
+    <div id="loop" class="list clear">
+        @foreach (var movie in Genre.Movies)
+        {
+            <MoviePost CriticsScoresCount="@movie.CriticsReviewsCount"
+                       Id="@movie.Id"
+                       Description="@movie.Description"
+                       Genres="@movie.MovieGenres"
+                       Image="@movie.ImageSource"
+                       Name="@movie.Name"
+                       ReleaseDate="@movie.PremierDate"
+                       ViewersScoresCount="@movie.UsersReviewsCount" />
 
-@code {
-
+        }
+    </div>
 }

@@ -14,7 +14,7 @@ public static class MoviesWebManagersRegistrator
     public static IServiceCollection AddMoviesWebManagers(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddSingleton<IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsWebManager>()
-            .AddSingleton<IWebManager<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>()
+            .AddSingleton<IWebManager<Genre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>()
             .AddSingleton<IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosWebManager>()
             .AddSingleton<MoviesWebManager>()
             .AddSingleton<IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>, MoviesCollectionsWebManager>()

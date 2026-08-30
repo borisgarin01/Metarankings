@@ -11,11 +11,11 @@ public partial class Home : ComponentBase
     private IEnumerable<Game> games;
     private IEnumerable<GameReview> gamesReviews;
     private IEnumerable<Movie> movies;
-    private IEnumerable<MovieReview> moviesReviews;
+    private IEnumerable<MovieViewerReview> moviesReviews;
     private IEnumerable<CollectionsItemComponent> collectionsItemsComponents;
     private IEnumerable<SoonAtCinemasItemComponent> soonAtCinemasItemComponents;
     private IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemComponents;
-    private IEnumerable<MovieGenre> moviesGenres;
+    private IEnumerable<Domain.Movies.Genre> moviesGenres;
 
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
@@ -40,7 +40,7 @@ public partial class Home : ComponentBase
         }
     }
 
-    public IEnumerable<MovieGenre> MoviesGenres
+    public IEnumerable<Domain.Movies.Genre> MoviesGenres
     {
         get => moviesGenres;
         set
@@ -60,7 +60,7 @@ public partial class Home : ComponentBase
         }
     }
 
-    public IEnumerable<MovieReview> MoviesReviews
+    public IEnumerable<MovieViewerReview> MoviesReviews
     {
         get => moviesReviews;
         private set
@@ -124,12 +124,12 @@ public partial class Home : ComponentBase
         // Fetch data based on the current PageSize and PageNumber
         Task<IEnumerable<Game>?> gamesGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/First/{PageNumber}/{PageSize}");
         Task<IEnumerable<GameReview>?> gamesGamersReviewsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<GameReview>>($"/api/Games/GamesGamersReviews/{GamesGamersReviewsOffset}/{GamesGamersReviewsLimit}");
-        Task<IEnumerable<Movie>?> moviesGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/Movies/Movies/{PageNumber}/{PageSize}");
-        Task<IEnumerable<MovieReview>?> moviesViewersReviewsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<MovieReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}");
+        Task<IEnumerable<Movie>?> moviesGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/movies/{PageNumber}/{PageSize}");
+        Task<IEnumerable<MovieViewerReview>?> moviesViewersReviewsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<MovieViewerReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}");
         Task<IEnumerable<CollectionsItemComponent>> collectionsItemsComponents = httpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>($"/api/home/collections/{PageNumber}/{PageSize}");
         Task<IEnumerable<SoonAtCinemasItemComponent>> soonAtCinemasItemComponents = httpClient.GetFromJsonAsync<IEnumerable<SoonAtCinemasItemComponent>>($"/api/home/soon-at-cinemas");
         Task<IEnumerable<GamesReleaseDateItemViewModel>> gamesReleaseDateItemComponents = httpClient.GetFromJsonAsync<IEnumerable<GamesReleaseDateItemViewModel>>($"/api/home/games-release-dates/{PageNumber}/{PageSize}");
-        Task<IEnumerable<MovieGenre>> moviesGenresGettingTask = httpClient.GetFromJsonAsync<IEnumerable<MovieGenre>>($"/api/home/games-release-dates/{PageNumber}/{PageSize}");
+        Task<IEnumerable<Domain.Movies.Genre>> moviesGenresGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Domain.Movies.Genre>>($"/api/home/games-release-dates/{PageNumber}/{PageSize}");
 
         // Wait for ALL tasks to complete
         await Task.WhenAll(

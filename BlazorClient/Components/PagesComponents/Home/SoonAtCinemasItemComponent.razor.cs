@@ -21,7 +21,7 @@ public partial class SoonAtCinemasItemComponent : ComponentBase
     public string OriginalName { get; set; }
 
     [Parameter, EditorRequired]
-    public DateTime ReleaseDate { get; set; }
+    public DateOnly ReleaseDate { get; set; }
 
     [Parameter, EditorRequired]
     public Link[] Genres { get; set; } = new Link[]

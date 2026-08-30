@@ -1,9 +1,10 @@
-﻿@page "/admin/movies/movies/add-movie"
+﻿@page "/admin/movies/add-movie"
+@using BlazorClient.Components.PagesComponents.Common
 @using Domain.Movies
 
 <h3>Add movie page</h3>
 
-<a href="/admin/movies/movies/list-movies" class="list-group-item link-dark">Фильмы</a>
+<a href="/admin/movies/list-movies" class="list-group-item link-dark">Фильмы</a>
 
 <AuthorizeView Roles="Admin">
     <Authorized>
@@ -39,45 +40,54 @@
                 <p>
                     <label>
                         Enter description:
-                        <InputTextArea @bind="@Description" />
+                        <InputTextArea @bind-Value="@Description" />
                         <ValidationMessage For="() => Description" />
                     </label>
                 </p>
                 <p>
-                    <label>
-                        Select movie director:
-                        <InputSelect @bind-Value="SelectedMoviesDirectors" multiple>
-                            @foreach (MovieDirector movieDirector in MoviesDirectorsToSelectFrom)
-                            {
-                                <option value="@movieDirector.Id.ToString()">@movieDirector.Name</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => SelectedMoviesDirectors" />
-                    </label>
+                    <label>Select movie director:</label>
+                    @{
+                        var directorSelector = (MovieDirector d) => d.Id;
+                        var directorDisplay = (MovieDirector d) => d.Name;
+                    }
+                    <MultiSelect TItem="MovieDirector"
+                                 TId="long"
+                                 Items="MoviesDirectorsToSelectFrom.ToList()"
+                                 @bind-SelectedIds="SelectedMoviesDirectorsIds"
+                                 IdSelector="directorSelector"
+                                 DisplaySelector="directorDisplay"
+                                 Placeholder="Select directors..."
+                                 LabelPlural="director" />
                 </p>
                 <p>
-                    <label>
-                        Select movie genre:
-                        <InputSelect @bind-Value="SelectedMoviesDirectors" multiple>
-                            @foreach (MovieGenre movieGenre in MoviesGenresToSelectFrom)
-                            {
-                                <option value="@movieGenre.Id.ToString()">@movieGenre.Name</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => SelectedMoviesDirectors" />
-                    </label>
+                    <label>Select movie genre:</label>
+                    @{
+                        var movieGenreSelector = (Genre mg) => mg.Id;
+                        var movieGenreDisplay = (Genre mg) => mg.Name;
+                    }
+                    <MultiSelect TItem="Genre"
+                                 TId="long"
+                                 Items="MoviesGenresToSelectFrom.ToList()"
+                                 @bind-SelectedIds="SelectedMoviesGenresIds"
+                                 IdSelector="movieGenreSelector"
+                                 DisplaySelector="movieGenreDisplay"
+                                 Placeholder="Select genres..." />
+                    <ValidationMessage For="() => SelectedMoviesGenres" />
                 </p>
                 <p>
-                    <label>
-                        Select movie studio:
-                        <InputSelect @bind-Value="SelectedMoviesStudios" multiple>
-                            @foreach (MovieStudio movieStudio in MoviesStudiosToSelectFrom)
-                            {
-                                <option value="@movieStudio.Id.ToString()">@movieStudio.Name</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => SelectedMoviesStudios" />
-                    </label>
+                    <label>Select movie studio:</label>
+                    @{
+                        var movieStudioSelector = (MovieStudio ms) => ms.Id;
+                        var movieStudioDisplay = (MovieStudio ms) => ms.Name;
+                    }
+                    <MultiSelect TItem="MovieStudio"
+                                 TId="long"
+                                 Items="MoviesStudiosToSelectFrom.ToList()"
+                                 @bind-SelectedIds="SelectedMoviesStudiosIds"
+                                 IdSelector="movieStudioSelector"
+                                 DisplaySelector="movieStudioDisplay"
+                                 Placeholder="Select studios..." />
+                    <ValidationMessage For="() => SelectedMoviesStudios" />
                 </p>
                 <p>
                     <label>
@@ -86,7 +96,7 @@
                         <ValidationMessage For="() => ImageToUpload" />
                     </label>
                     <div class="image-container">
-                        <img class="post-image" src="@ImageSource" alt="Изображение на странице игры для загрузки игры" title="Игра @Name" itemprop="image">
+                        <img class="post-image" src="@ImageSource" alt="Изображение на странице игры для загрузки фильма" title="Фильм @Name" itemprop="image">
                     </div>
                 </p>
                 <input type="submit" value="Submit" />

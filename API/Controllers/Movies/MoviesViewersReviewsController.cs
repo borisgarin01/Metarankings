@@ -31,7 +31,7 @@ public sealed class MoviesViewersReviewsController : ControllerBase
     {
         long userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-        MovieReview movieViewerReviewToCheckExistance = await _moviesViewersReviewsRepository.GetUserReviewForMovieAsync(userId, addMovieViewerReviewModel.MovieId);
+        MovieViewerReview movieViewerReviewToCheckExistance = await _moviesViewersReviewsRepository.GetUserReviewForMovieAsync(userId, addMovieViewerReviewModel.MovieId);
 
         if (movieViewerReviewToCheckExistance is not null)
             return BadRequest($"У пользователя {userId} уже есть отзыв на фильм {addMovieViewerReviewModel.MovieId}");
@@ -49,16 +49,16 @@ public sealed class MoviesViewersReviewsController : ControllerBase
     }
 
     [HttpGet("{offset:long}/{limit:long}")]
-    public async Task<ActionResult<IEnumerable<MovieReview>>> GetReviewsAsync(long offset, long limit)
+    public async Task<ActionResult<IEnumerable<MovieViewerReview>>> GetReviewsAsync(long offset, long limit)
     {
-        IEnumerable<MovieReview> movieReviews = await _moviesViewersReviewsRepository.GetAsync(offset, limit);
+        IEnumerable<MovieViewerReview> movieReviews = await _moviesViewersReviewsRepository.GetAsync(offset, limit);
         return Ok(movieReviews);
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<MovieReview>> GetReview(long id)
+    public async Task<ActionResult<MovieViewerReview>> GetReview(long id)
     {
-        MovieReview movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
+        MovieViewerReview movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
         if (movieReview is null)
             return NotFound();
         return Ok(movieReview);
@@ -66,9 +66,9 @@ public sealed class MoviesViewersReviewsController : ControllerBase
 
     [HttpPut("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<MovieReview>> UpdateReview(long id, UpdateMovieViewerReviewWithUserIdAndDateModel updateMovieViewerReviewWithUserIdAndDateModel)
+    public async Task<ActionResult<MovieViewerReview>> UpdateReview(long id, UpdateMovieViewerReviewWithUserIdAndDateModel updateMovieViewerReviewWithUserIdAndDateModel)
     {
-        MovieReview movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
+        MovieViewerReview movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
         if (movieReview is null)
             return NotFound();
 
@@ -78,7 +78,7 @@ public sealed class MoviesViewersReviewsController : ControllerBase
         else
             try
             {
-                MovieReview updatedMovieReview = await _moviesViewersReviewsRepository.UpdateAsync(updateMovieViewerReviewWithUserIdAndDateModel, id);
+                MovieViewerReview updatedMovieReview = await _moviesViewersReviewsRepository.UpdateAsync(updateMovieViewerReviewWithUserIdAndDateModel, id);
                 return Ok(updatedMovieReview);
             }
             catch (Exception ex)
@@ -90,9 +90,9 @@ public sealed class MoviesViewersReviewsController : ControllerBase
 
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<MovieReview>> RemoveReview(long id)
+    public async Task<ActionResult<MovieViewerReview>> RemoveReview(long id)
     {
-        MovieReview movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
+        MovieViewerReview movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
         if (movieReview is null)
             return NotFound();
 

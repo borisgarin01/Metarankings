@@ -1,7 +1,7 @@
 ﻿@using Domain.Movies
 
 <li @onmouseenter="ShowMovies" @onmouseleave="HideMovies">
-    <span><a href="/best-movies/">Фильмы</a></span>
+    <span><a href="/movies/best-movies/">Фильмы</a></span>
     <div class="movie-drop @(moviesDropdownClass)">
         <a href="/new-movies/">Новинки</a>
         <a href="/release-date/">Дата выхода</a>
@@ -10,9 +10,9 @@
         <a href="/movies/best-movies/?Year=@DateTime.Now.Year">Фильмы @DateTime.Now.Year</a>
         @if (Genres is not null)
         {
-            foreach (MovieGenre moviesGenre in Genres)
+            foreach (Genre moviesGenre in Genres)
             {
-                <a href="/movies/movies-list?genreId=@moviesGenre.Id">@moviesGenre.Name</a>
+                <a href="/movies/best-movies?genreId=@moviesGenre.Id">@moviesGenre.Name</a>
             }
         }
     </div>

@@ -3,7 +3,7 @@ using IdentityLibrary.DTOs;
 
 namespace Domain.Reviews;
 
-public sealed record MovieReview
+public sealed record MovieViewerReview
 {
     [JsonPropertyName("id")]
     public long Id { get; init; }

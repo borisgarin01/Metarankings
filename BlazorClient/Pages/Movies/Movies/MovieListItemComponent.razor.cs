@@ -22,7 +22,7 @@ public partial class MovieListItemComponent : ComponentBase
     public string ImageAlt { get; set; }
 
     [Parameter, EditorRequired]
-    public DateTime ReleaseDate { get; set; }
+    public DateOnly ReleaseDate { get; set; }
 
     [Parameter, EditorRequired]
     public string Description { get; set; }

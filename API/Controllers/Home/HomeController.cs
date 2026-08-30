@@ -74,7 +74,7 @@ public sealed class HomeController : ControllerBase
             Href = $"/movies/{m.Id}",
             ImageAlt = m.Name,
             Title = m.Name,
-            ReleaseDate = m.PremierDate.HasValue ? m.PremierDate.Value : DateTime.Today,
+            ReleaseDate = m.PremierDate.HasValue ? m.PremierDate.Value : DateOnly.FromDateTime(DateTime.Today),
             OriginalName = m.OriginalName,
             ImageSource = m.ImageSource,
             Genres = m.MovieGenres.Select(b => new Link(b.Name, $"movies/{b.Id}")).ToArray()
@@ -84,7 +84,7 @@ public sealed class HomeController : ControllerBase
     [HttpGet("movies-reviews")]
     public async Task<ActionResult<IEnumerable<MovieReviewListViewModel>>> GetMoviesReviews()
     {
-        IEnumerable<MovieReview> moviesReviews = await _moviesViewersReviewsRepository.GetByTimespanAsync(DateTime.Today.AddDays(-30), DateTime.Today);
+        IEnumerable<MovieViewerReview> moviesReviews = await _moviesViewersReviewsRepository.GetByTimespanAsync(DateTime.Today.AddDays(-30), DateTime.Today);
 
         return Ok(moviesReviews.Select(b => new MovieReviewListViewModel(b.Id, b.Movie.Name)));
     }

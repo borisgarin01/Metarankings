@@ -6,17 +6,17 @@ namespace API.Controllers.Movies;
 
 [ApiController]
 [Route("api/movies/[controller]")]
-public class MoviesGenresController : ControllerBase
+public class GenresController : ControllerBase
 {
-    private readonly IRepository<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> _moviesGenresRepository;
+    private readonly IRepository<Genre, AddMovieGenreModel, UpdateMovieGenreModel> _moviesGenresRepository;
 
-    public MoviesGenresController(IRepository<MovieGenre, AddMovieGenreModel, UpdateMovieGenreModel> moviesGenresRepository)
+    public GenresController(IRepository<Genre, AddMovieGenreModel, UpdateMovieGenreModel> moviesGenresRepository)
     {
         _moviesGenresRepository = moviesGenresRepository;
     }
 
     [HttpGet]
-    public async Task<ActionResult<MovieGenre>> GetAllAsync()
+    public async Task<ActionResult<Genre>> GetAllAsync()
     {
         try
         {
@@ -30,16 +30,16 @@ public class MoviesGenresController : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<MovieGenre>> GetAsync(long id)
+    public async Task<ActionResult<Genre>> GetAsync(long id)
     {
         try
         {
-            var movieDirector = await _moviesGenresRepository.GetAsync(id);
-            if (movieDirector is null)
+            Genre? movieGenre = await _moviesGenresRepository.GetAsync(id);
+            if (movieGenre is null)
             {
                 return NotFound();
             }
-            return Ok(movieDirector);
+            return Ok(movieGenre);
         }
         catch (Exception ex)
         {
@@ -49,7 +49,7 @@ public class MoviesGenresController : ControllerBase
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<MovieGenre>> AddAsync(AddMovieGenreModel addMovieGenreModel)
+    public async Task<ActionResult<Genre>> AddAsync(AddMovieGenreModel addMovieGenreModel)
     {
         if (ModelState.IsValid)
         {
@@ -72,11 +72,11 @@ public class MoviesGenresController : ControllerBase
 
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<MovieGenre>> DeleteAsync(long id)
+    public async Task<ActionResult<Genre>> DeleteAsync(long id)
     {
         try
         {
-            MovieGenre movieGenre = await _moviesGenresRepository.GetAsync(id);
+            Genre movieGenre = await _moviesGenresRepository.GetAsync(id);
 
             if (movieGenre is null)
                 return NotFound();

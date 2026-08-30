@@ -33,11 +33,11 @@ RETURNING Id;",
         }
     }
 
-    public async Task<IEnumerable<MovieReview>> GetByTimespanAsync(DateTime dateFrom, DateTime dateTo)
+    public async Task<IEnumerable<MovieViewerReview>> GetByTimespanAsync(DateTime dateFrom, DateTime dateTo)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesReviewsForTimespan = await connection.QueryAsync<MovieReview, Movie, ApplicationUser, MovieReview>(@"
+            var moviesReviewsForTimespan = await connection.QueryAsync<MovieViewerReview, Movie, ApplicationUser, MovieViewerReview>(@"
 SELECT 
     vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
     m.Id, m.Name, m.OriginalName, m.Image, m.PremierDate, m.Description,
@@ -62,11 +62,11 @@ on vmr.ViewerId=au.Id;", (movieReview, movie, applicationUser) =>
     }
 
 
-    public async Task<MovieReview> GetUserReviewForMovieAsync(long userId, long movieId)
+    public async Task<MovieViewerReview> GetUserReviewForMovieAsync(long userId, long movieId)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesReviewsForTimespan = await connection.QueryAsync<MovieReview, Movie, ApplicationUser, MovieReview>(@"
+            var moviesReviewsForTimespan = await connection.QueryAsync<MovieViewerReview, Movie, ApplicationUser, MovieViewerReview>(@"
 SELECT vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
     m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description,
     au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
@@ -93,16 +93,16 @@ WHERE ViewerId=@userId and MovieId=@movieId;", (movieReview, movie, applicationU
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<MovieReview>> GetAllAsync()
+    public Task<IEnumerable<MovieViewerReview>> GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    public async Task<MovieReview> GetAsync(long id)
+    public async Task<MovieViewerReview> GetAsync(long id)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesReviewsForTimespan = await connection.QueryAsync<MovieReview, Movie, ApplicationUser, MovieReview>(@"
+            var moviesReviewsForTimespan = await connection.QueryAsync<MovieViewerReview, Movie, ApplicationUser, MovieViewerReview>(@"
 SELECT vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
     m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description,
     au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
@@ -124,11 +124,11 @@ WHERE vmr.Id=@id;", (movieReview, movie, applicationUser) =>
         }
     }
 
-    public async Task<IEnumerable<MovieReview>> GetAsync(long offset, long limit)
+    public async Task<IEnumerable<MovieViewerReview>> GetAsync(long offset, long limit)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            var moviesReviewsForTimespan = await connection.QueryAsync<MovieReview, Movie, ApplicationUser, MovieReview>(@"
+            var moviesReviewsForTimespan = await connection.QueryAsync<MovieViewerReview, Movie, ApplicationUser, MovieViewerReview>(@"
 SELECT vmr.Id, vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
     m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description,
     au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
@@ -162,7 +162,7 @@ OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", (movieReview, movie, applicati
         throw new NotImplementedException();
     }
 
-    public Task<MovieReview> UpdateAsync(UpdateMovieViewerReviewWithUserIdAndDateModel entity, long id)
+    public Task<MovieViewerReview> UpdateAsync(UpdateMovieViewerReviewWithUserIdAndDateModel entity, long id)
     {
         throw new NotImplementedException();
     }

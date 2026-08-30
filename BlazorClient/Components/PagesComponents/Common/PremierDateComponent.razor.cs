@@ -3,5 +3,5 @@
 public partial class PremierDateComponent : ComponentBase
 {
     [Parameter, EditorRequired]
-    public DateTime PremierDate { get; set; }
+    public DateOnly PremierDate { get; set; }
 }

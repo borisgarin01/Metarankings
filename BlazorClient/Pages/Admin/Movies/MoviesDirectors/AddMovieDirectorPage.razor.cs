@@ -21,7 +21,7 @@ public partial class AddMovieDirectorPage : ComponentBase
         HttpResponseMessage httpResponseMessage = await MoviesDirectorsManager.AddAsync(new AddMovieDirectorModel(Name));
 
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
-            NavigationManager.NavigateTo("/movies/movies-directors/movies-directors-list");
+            NavigationManager.NavigateTo("/admin/movies/movies-directors/movies-directors-list");
         else
             if (httpResponseMessage is not null)
             ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
