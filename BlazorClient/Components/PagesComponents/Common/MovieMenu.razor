@@ -1,20 +1,24 @@
-﻿<div class="movie-menu">
-    <div class="platform-menu">
+﻿@{
+    int displayYear = Year ?? DateTime.Now.Year;
+}
+
+<div class="movie-menu">
+    <div class="genre-menu">
         <ul>
             <li>
-                <a class="bst" href="/movies/best-movies/?Year=@(DateTime.Now.Year - 1)">Лучшие фильмы @(DateTime.Now.Year - 1)</a>
+                <a class="bst" href="/movies/best-movies/?Year=@(displayYear - 1)">Лучшие фильмы @(displayYear - 1)</a>
             </li>
             <li>
-                <a class="bst" href="/movies/best-movies/?Year=@(DateTime.Now.Year)">@DateTime.Now.Year</a>
+                <a class="bst" href="/movies/best-movies/?Year=@(displayYear)">@displayYear</a>
             </li>
             <li>
-                <a class="mnew" href="/new-movies/">Новые фильмы</a>
+                <a class="mnew" href="/movies/new-movies/">Новые фильмы</a>
             </li>
             <li>
-                <a href="/release-date/">Дата выхода фильмов</a>
+                <a href="/movies/release-date/">Дата выхода фильмов</a>
             </li>
             <li>
-                <a href="/most-waiting-movies/">Самые ожидаемые фильмы</a>
+                <a href="/movies/most-waiting-movies/">Самые ожидаемые фильмы</a>
             </li>
         </ul>
     </div>
