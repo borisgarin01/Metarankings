@@ -1,40 +1,68 @@
 ﻿@page "/movies/details/{Id:long}"
 @using BlazorClient.Components.PagesComponents.Common;
 @using BlazorClient.Components.PagesComponents.MovieDetails;
-@using Domain.Games
 @using Domain.Movies
 
-<MovieMenu />
+<MovieMenu Year="@((Movie.PremierDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
 
 @if (Movie is null)
 {
     <LoadingIndicator />
 }
 else
-{
-    <div class="post single clear movie">
-        <MovieHeader Description="@Movie.Description"
-                     Id="@Id"
-                     ReleaseYear="@Movie.PremierDate.Value.Year"
-                     Name="@Movie.Name" />
+{ 
+    <div class="sidebar">
+        <div class="widget">
+            <div class="widget-body">
+                <div class="graph">
+                    <p class="rating-label">Рейтинг <a href="#critics">критиков</a></p>
+                    <div class="graph-body">
+                        <div class="rating-graph mark-@Math.Round(Movie.CriticsScore)" style="width: @(Math.Round(Movie.CriticsScore * 10))%;">
+                            <span class="score-graph">@Math.Round(Movie.CriticsScore, 1)</span>
+                        </div>
+                    </div>
 
-        <div class="post-content">
+                    <p class="rating-label">Рейтинг <a href="#users">игроков</a></p>
+                    <div class="graph-body">
+                        <div class="rating-graph mark-@Math.Round(Movie.UsersScore)" style="width: @(Math.Round(Movie.UsersScore * 10))%;">
+                            <span class="score-graph">@Math.Round(Movie.UsersScore, 1)</span>
+                        </div>
+                    </div>
 
-            <Thumbnail Name="@Movie.Name"
-                       ReleaseYear="@Movie.PremierDate.Value.Year"
-                       ReleaseMonth="@Movie.PremierDate.Value.Month"
-                       ImageSource="@Movie.ImageSource"
-                       Prefix="Movies" />
+                    <p class="rating-label">Ожидания: 2%</p>
+                    <div class="graph-body">
+                        <div class="rating-wait mark-0" style="width: 2%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="content" class="lcol">
+        <div class="entry" itemscope itemtype="http://schema.org/Movie">
+            <div class="post single clear movie">
+                <MovieHeader Description="@Movie.Description"
+                    Id="@Id"
+                    ReleaseYear="@Movie.PremierDate.Value.Year"
+                    Name="@Movie.Name" />
 
-            <RatingComponent Score="@(Movie.MovieReviews.Any() ? Movie.MovieReviews.Average(g => g.Score) : 0)"
-                             ScoresCount="@Movie.MovieReviews.Count" />
+                <div class="post-content">
+                    <Thumbnail Name="@Movie.Name"
+                        ReleaseYear="@Movie.PremierDate.Value.Year"
+                        ReleaseMonth="@Movie.PremierDate.Value.Month"
+                        ImageSource="@Movie.ImageSource"
+                        Prefix="Movies" />
 
-            <MovieMetadata Genres="@Movie.MovieGenres"
-                           OriginalName="@Movie.OriginalName"
-                           MoviesStudios="@Movie.MoviesStudios"
-                           PremierDate="@(Movie.PremierDate.HasValue?Movie.PremierDate.Value:default)" />
+                    <RatingComponent Score="@(Movie.MovieReviews.Any() ? Movie.MovieReviews.Average(g => g.Score) : 0)"
+                        ScoresCount="@Movie.MovieReviews.Count" />
 
-            <Description TextContent="@Movie.Description" />
+                    <MovieMetadata Genres="@Movie.MovieGenres"
+                        OriginalName="@Movie.OriginalName"
+                        MoviesStudios="@Movie.MoviesStudios"
+                        PremierDate="@(Movie.PremierDate.HasValue ? Movie.PremierDate.Value:default)" />
+
+                    <Description TextContent="@Movie.Description" />
+                </div>
+            </div>
         </div>
     </div>
 }
