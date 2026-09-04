@@ -1,0 +1,67 @@
+﻿/* ========== СЛАЙД ========== */
+.carousel-item {
+    position: relative;
+    display: none;
+    float: left;
+    width: 100%;
+    margin-right: -100%;
+    backface-visibility: hidden;
+    transition: transform 0.6s ease-in-out;
+}
+
+    /* ========== АКТИВНЫЙ СЛАЙД ========== */
+    .carousel-item.active {
+        display: block;
+    }
+
+    /* ========== ИЗОБРАЖЕНИЯ В СЛАЙДЕ ========== */
+    .carousel-item img {
+        display: block;
+        width: 100%;
+    }
+
+/* ========== КОНТЕНТ В СЛАЙДЕ ========== */
+.carousel-item-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    padding: 20px;
+}
+
+/* ========== ПОДПИСЬ ========== */
+.carousel-caption {
+    position: absolute;
+    right: 15%;
+    bottom: 1.25rem;
+    left: 15%;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+    color: #fff;
+    text-align: center;
+}
+
+/* ========== АНИМАЦИИ ========== */
+.carousel-item-next:not(.carousel-item-start),
+.active.carousel-item-end {
+    transform: translateX(100%);
+}
+
+.carousel-item-prev:not(.carousel-item-end),
+.active.carousel-item-start {
+    transform: translateX(-100%);
+}
+
+/* ========== АДАПТИВНОСТЬ ========== */
+@media (max-width: 768px) {
+    .carousel-item-content {
+        min-height: 200px;
+        padding: 10px;
+    }
+
+    .carousel-caption {
+        right: 10%;
+        left: 10%;
+        font-size: 14px;
+    }
+}

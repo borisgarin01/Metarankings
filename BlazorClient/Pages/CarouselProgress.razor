@@ -1,0 +1,11 @@
+﻿<div class="carousel-progress"
+     style="height: @Height; background-color: @TrackColor;">
+    <div class="carousel-progress-bar"
+         role="progressbar"
+         style="width: @(Width)%;
+        height: 100%;
+        background-color: @BarColor;
+        transition: @(IsPaused ? "none" : $"width {Duration}ms linear");
+        border-radius: @BorderRadius;">
+    </div>
+</div>
