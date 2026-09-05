@@ -50,6 +50,8 @@ internal class Program
 
         builder.Services.AddScoped<IModalService, ModalService>();
 
+        builder.Services.AddWMBSC();
+
         builder.Services.AddScoped<JwtAuthenticationStateProvider>();
         builder.Services.AddScoped<AuthenticationStateProvider>(
             provider => provider.GetRequiredService<JwtAuthenticationStateProvider>());

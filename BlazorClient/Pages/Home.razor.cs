@@ -3,6 +3,7 @@ using Domain.Games;
 using Domain.Movies;
 using Domain.Reviews;
 using ViewModels;
+using WMBlazorSlickCarousel.WMBSC;
 
 namespace BlazorClient.Pages;
 
@@ -16,6 +17,8 @@ public partial class Home : ComponentBase
     private IEnumerable<SoonAtCinemasItemComponent> soonAtCinemasItemComponents;
     private IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemComponents;
     private IEnumerable<Domain.Movies.Genre> moviesGenres;
+    private WMBSCInitialSettings configurations;
+    private BlazorSlickCarousel theCarousel;
 
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
@@ -114,6 +117,15 @@ public partial class Home : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        configurations = new WMBSCInitialSettings
+        {
+            arrows = true,          // Показывать стрелки
+            dots = true,            // Показывать точки навигации
+            slidesToShow = 5,       // <- ОТОБРАЖАТЬ 5 ИЗОБРАЖЕНИЯ В РАЗВОРОТЕ
+            slidesToScroll = 5,     // Пролистывать по 5 изображения за раз
+            infinite = false
+        };
+
         if (PageNumber < 1)
             PageNumber = 1;
         if (PageSize < 1)
