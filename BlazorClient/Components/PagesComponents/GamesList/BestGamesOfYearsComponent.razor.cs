@@ -10,4 +10,7 @@ public partial class BestGamesOfYearsComponent : ComponentBase
 
     [CascadingParameter(Name = "GenreId")]
     public long? GenreId { get; set; }
+
+    [CascadingParameter(Name = "LocalizationId")]
+    public long? LocalizationId { get; set; }
 }

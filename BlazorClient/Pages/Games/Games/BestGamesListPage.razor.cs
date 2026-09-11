@@ -157,7 +157,7 @@ public partial class BestGamesListPage : ComponentBase
         });
     }
 
-    private string BuildQueryString(int? page = null, int? year = null, long? genreId = null, long? platformId = null)
+    private string BuildQueryString(int? page = null, int? year = null, long? genreId = null, long? platformId = null, long? localizationId = null)
     {
         var parameters = new List<string>();
 
@@ -165,6 +165,7 @@ public partial class BestGamesListPage : ComponentBase
         int? targetYear = year ?? Year;
         long? targetGenre = genreId ?? GenreId;
         long? targetPlatform = platformId ?? PlatformId;
+        long? targetLocalization = localizationId ?? LocalizationId;
         int targetPage = page ?? currentPage;
 
         // Добавляем Year ТОЛЬКО если он есть
@@ -176,6 +177,9 @@ public partial class BestGamesListPage : ComponentBase
 
         if (targetPlatform.HasValue)
             parameters.Add($"PlatformId={targetPlatform}");
+
+        if (targetLocalization.HasValue)
+            parameters.Add($"LocalizationId={targetLocalization}");
 
         if (targetPage > 1)
             parameters.Add($"Page={targetPage}");

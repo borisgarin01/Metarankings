@@ -15,6 +15,9 @@ public partial class BestGamesOfYearByGenresComponent : ComponentBase
     [CascadingParameter(Name = "PlatformId")]
     public long? PlatformId { get; set; }
 
+    [SupplyParameterFromQuery]
+    public long? LocalizationId { get; set; }
+
     private IEnumerable<Genre> Genres { get; set; } = new List<Genre>();
 
     [Inject]
@@ -31,6 +34,7 @@ public partial class BestGamesOfYearByGenresComponent : ComponentBase
 
         if (Year.HasValue) parameters.Add($"Year={Year}");
         if (PlatformId.HasValue) parameters.Add($"PlatformId={PlatformId}");
+        if (LocalizationId.HasValue) parameters.Add($"LocalizationId={LocalizationId}");
         if (genreId.HasValue) parameters.Add($"GenreId={genreId}");
 
         return parameters.Any() ? $"/games/best-games/?{string.Join("&", parameters)}" : "/games/best-games/";

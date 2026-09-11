@@ -14,30 +14,31 @@
 </div>
 
 <div id="filter">
-    <CascadingValue Name="Year" Value="Year">
-        <BestGamesOfYearsComponent />
-
-        @if (Platforms is not null)
-        {
-            <CascadingValue Name="PlatformId" Value="PlatformId">
-                <CascadingValue Name="GenreId" Value="GenreId">
-                    <CascadingValue Name="Platforms" Value="Platforms">
-                        <BestGamesOfYearByPlatformsComponent />
+    <CascadingValue Name="LocalizationId" Value="LocalizationId">
+        <CascadingValue Name="Year" Value="Year">
+            <BestGamesOfYearsComponent />
+            @if (Platforms is not null)
+            {
+                <CascadingValue Name="PlatformId" Value="PlatformId">
+                    <CascadingValue Name="GenreId" Value="GenreId">
+                        <CascadingValue Name="Platforms" Value="Platforms">
+                            <BestGamesOfYearByPlatformsComponent />
+                        </CascadingValue>
                     </CascadingValue>
                 </CascadingValue>
-            </CascadingValue>
-        }
+            }
 
-        @if (Genres is not null)
-        {
-            <CascadingValue Name="PlatformId" Value="PlatformId">
-                <CascadingValue Name="GenreId" Value="GenreId">
-                    <CascadingValue Name="Genres" Value="Genres">
-                        <BestGamesOfYearByGenresComponent />
+            @if (Genres is not null)
+            {
+                <CascadingValue Name="PlatformId" Value="PlatformId">
+                    <CascadingValue Name="GenreId" Value="GenreId">
+                        <CascadingValue Name="Genres" Value="Genres">
+                            <BestGamesOfYearByGenresComponent />
+                        </CascadingValue>
                     </CascadingValue>
                 </CascadingValue>
-            </CascadingValue>
-        }
+            }
+        </CascadingValue>
     </CascadingValue>
 </div>
 
