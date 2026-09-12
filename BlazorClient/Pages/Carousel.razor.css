@@ -1,217 +1,146 @@
-﻿/* ========== КОНТЕЙНЕР КАРУСЕЛИ ========== */
-.carousel-container {
-    position: relative;
-    width: 100%;
+﻿.mr-carousel {
+    background: #fff;
+    height: 210px;
     overflow: hidden;
-}
-
-/* ========== ОСНОВНОЙ КОНТЕЙНЕР ========== */
-.carousel {
     position: relative;
-    width: 100%;
+    margin-bottom: 20px;
+    width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* ========== ВНУТРЕННИЙ КОНТЕЙНЕР СЛАЙДОВ ========== */
-.carousel-inner {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-}
+    .mr-carousel .carousel-inner,
+    .mr-carousel .carousel-item {
+        height: 210px;
+    }
 
-/* ========== ОТДЕЛЬНЫЙ СЛАЙД ========== */
-.carousel-item {
-    position: relative;
-    display: none;
-    float: left;
-    width: 100%;
-    margin-right: -100%;
-    backface-visibility: hidden;
-    transition: transform 0.6s ease-in-out;
-}
+    .mr-carousel .post {
+        display: flex;
+        height: 210px;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
 
-    .carousel-item.active {
+    .mr-carousel .featured-image {
+        background-position: center center;
+        background-size: cover;
         display: block;
+        height: 200px;
+        position: relative;
+        margin: 10px 2px 0 2px;
+        overflow: hidden;
+        border-radius: 4px;
+        width: 162px;
+        flex: 0 0 162px;
+        box-sizing: border-box;
     }
 
-/* ========== КНОПКИ НАВИГАЦИИ ========== */
-.carousel-control-prev,
-.carousel-control-next {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 15%;
-    padding: 0;
-    color: #fff;
-    text-align: center;
-    background: none;
-    border: 0;
-    opacity: 0.5;
-    transition: opacity 0.15s ease;
-    cursor: pointer;
-}
-
-.carousel-control-prev {
-    left: 0;
-}
-
-.carousel-control-next {
-    right: 0;
-}
-
-    .carousel-control-prev:hover,
-    .carousel-control-next:hover {
-        opacity: 0.9;
-    }
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    background-repeat: no-repeat;
-    background-position: 50%;
-    background-size: 100% 100%;
-}
-
-.carousel-control-prev-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
-}
-
-.carousel-control-next-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-}
-
-/* ========== ИНДИКАТОРЫ ========== */
-.carousel-indicators {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    padding: 0;
-    margin-right: 15%;
-    margin-bottom: 1rem;
-    margin-left: 15%;
-    list-style: none;
-}
-
-    .carousel-indicators button {
-        box-sizing: content-box;
-        flex: 0 1 auto;
-        width: 30px;
-        height: 3px;
-        padding: 0;
-        margin-right: 3px;
-        margin-left: 3px;
-        text-indent: -999px;
-        cursor: pointer;
-        background-color: #fff;
-        background-clip: padding-box;
-        border: 0;
-        border-top: 10px solid transparent;
-        border-bottom: 10px solid transparent;
-        opacity: 0.5;
-        transition: opacity 0.6s ease;
-    }
-
-        .carousel-indicators button.active {
-            opacity: 1;
+        .mr-carousel .featured-image img.post-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
-        .carousel-indicators button:hover {
+        .mr-carousel .featured-image:hover img.post-image {
             opacity: 0.8;
         }
 
-/* ========== ИНФОРМАЦИЯ О СЛАЙДЕ ========== */
-.carousel-info {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    z-index: 5;
-    background: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    user-select: none;
-}
-
-/* ========== ПОДПИСЬ К СЛАЙДУ ========== */
-.carousel-caption {
-    position: absolute;
-    right: 15%;
-    bottom: 1.25rem;
-    left: 15%;
-    padding-top: 1.25rem;
-    padding-bottom: 1.25rem;
-    color: #fff;
-    text-align: center;
-}
-
-/* ========== АНИМАЦИИ ПРИ ПЕРЕКЛЮЧЕНИИ ========== */
-.carousel-item-next,
-.carousel-item-prev,
-.carousel-item.active {
-    display: block;
-}
-
-    .carousel-item-next:not(.carousel-item-start),
-    .active.carousel-item-end {
-        transform: translateX(100%);
+    .mr-carousel .small-score {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        color: #000;
+        background: #d9d9d9;
+        font-size: 18px;
+        width: 42px;
+        height: 28px;
+        line-height: 28px;
+        text-align: center;
+        border-radius: 2px;
+        font-family: "Lucida Grande", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
     }
 
-    .carousel-item-prev:not(.carousel-item-end),
-    .active.carousel-item-start {
-        transform: translateX(-100%);
+        .mr-carousel .small-score.mark-10,
+        .mr-carousel .small-score.mark-9 {
+            background: #9ad77f;
+            color: #005000;
+        }
+
+        .mr-carousel .small-score.mark-8 {
+            background: #a0d787;
+            color: #005000;
+        }
+
+        .mr-carousel .small-score.mark-7,
+        .mr-carousel .small-score.mark-6,
+        .mr-carousel .small-score.mark-5 {
+            background: #efda65;
+            color: #796700;
+        }
+
+        .mr-carousel .small-score.mark-4,
+        .mr-carousel .small-score.mark-3,
+        .mr-carousel .small-score.mark-2,
+        .mr-carousel .small-score.mark-1 {
+            background: #ed8e7f;
+            color: #a00000;
+        }
+
+        .mr-carousel .small-score.mark-0 {
+            background: #c9c9c9;
+        }
+
+    .mr-carousel .featured-image span {
+        display: block;
+        background: linear-gradient(to bottom, rgba(67, 67, 66, 0) 0, rgba(67, 67, 66, .7) 34%, rgba(67, 67, 66, .88) 100%);
+        bottom: 0;
+        left: 0;
+        right: 0;
+        color: #fff;
+        font-size: 13px;
+        padding: 12px 6px;
+        position: absolute;
+        text-align: center;
+        width: 100%;
+        text-shadow: 0 1px 3px #000;
+        line-height: 1.2;
+        box-sizing: border-box;
+        max-height: 100%;
+        overflow: hidden;
     }
 
-.carousel-fade .carousel-item {
-    opacity: 0;
-    transition-property: opacity;
-    transform: none;
-}
+    .mr-carousel a {
+        text-decoration: none;
+        color: inherit;
+    }
 
-    .carousel-fade .carousel-item.active {
+    .mr-carousel .carousel-indicators [data-bs-target] {
+        background: #555;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: none;
+        opacity: 0.4;
+    }
+
+    .mr-carousel .carousel-indicators .active {
+        background: #555;
         opacity: 1;
     }
 
-.carousel-fade .carousel-item-next.carousel-item-start,
-.carousel-fade .carousel-item-prev.carousel-item-end {
-    opacity: 1;
-}
-
-.carousel-fade .active.carousel-item-start,
-.carousel-fade .active.carousel-item-end {
-    opacity: 0;
-}
-
-/* ========== АДАПТИВНОСТЬ ========== */
-@media (max-width: 768px) {
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 10%;
+    .mr-carousel .carousel-control-prev,
+    .mr-carousel .carousel-control-next {
+        width: 32px;
+        opacity: 0.4;
+        height: 53px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
     }
 
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-
-    .carousel-indicators button {
-        width: 20px;
-        height: 2px;
-    }
-
-    .carousel-caption {
-        right: 10%;
-        left: 10%;
-        font-size: 14px;
-    }
-}
+        .mr-carousel .carousel-control-prev:hover,
+        .mr-carousel .carousel-control-next:hover {
+            opacity: 1;
+        }

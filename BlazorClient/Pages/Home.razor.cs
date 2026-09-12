@@ -1,4 +1,5 @@
 ﻿using BlazorClient.Components.PagesComponents.Home;
+using BlazorClient.Models;
 using Domain.Games;
 using Domain.Movies;
 using Domain.Reviews;
@@ -16,6 +17,8 @@ public partial class Home : ComponentBase
     private IEnumerable<SoonAtCinemasItemComponent> soonAtCinemasItemComponents;
     private IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemComponents;
     private IEnumerable<Domain.Movies.Genre> moviesGenres;
+    private List<List<SlideItem>> SlideshowGroups { get; set; } = new();
+
 
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
@@ -152,5 +155,26 @@ public partial class Home : ComponentBase
         SoonAtCinemasItemComponents = soonAtCinemasItemComponents.Result;
         GamesReleaseDateItemComponents = gamesReleaseDateItemComponents.Result;
         MoviesGenres = moviesGenresGettingTask.Result;
+
+        SlideshowGroups = new()
+    {
+        (Movies ?? Enumerable.Empty<Movie>())
+            .Take(6)
+            .Select(m => new SlideItem {
+                Url   = $"/movies/details/{m.Id}",
+                Title = m.Name,
+                Image = m.ImageSource,
+                Score = m.UsersScore.ToString("0.0") ?? "0"
+            }).ToList(),
+
+        (Games ?? Enumerable.Empty<Game>())
+            .Take(6)
+            .Select(g => new SlideItem {
+                Url   = $"/games/details/{g.Id}",
+                Title = g.Name,
+                Image = g.Image,
+                Score = g.UsersScore.ToString("0.0") ?? "0"
+            }).ToList()
+    };
     }
 }

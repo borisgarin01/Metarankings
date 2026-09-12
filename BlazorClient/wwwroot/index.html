@@ -27,19 +27,87 @@
 
     <!-- ВАЖНО! Базовый URL для Blazor -->
     <base href="/" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css" />
+
+    <!-- Свои стили -->
     <link rel="stylesheet" href="/css/app.css" />
+
+    <!-- Scoped CSS от Blazor (генерируется автоматически) -->
+    <link href="BlazorClient.styles.css" rel="stylesheet" />
 </head>
 
 <body>
-    <!-- КОРНЕВОЙ ЭЛЕМЕНТ BLAZOR -->
-    <div id="app">
-        <!-- СЮДА ПОДКЛЮЧАЕТСЯ App.razor (который содержит Routes) -->
-    </div>
+    <div id="app">Loading...</div>
 
-    <!-- Подключаем Blazor -->
-    <script src="/_framework/blazor.webassembly.js"></script>
+    <!-- ============================================================
+         1. Bootstrap JS (bundle включает Popper). ТОЛЬКО ОДИН РАЗ!
+            Уберите любой второй <script> с bootstrap.bundle.min.js
+            или с CDN, иначе window.bootstrap перезапишется.
+         ============================================================ -->
     <script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ============================================================
+         2. JS-функции для карусели. Объявлены ДО blazor.webassembly.js,
+            чтобы Blazor успел их найти при первом рендере компонента.
+         ============================================================ -->
+    <script>
+        window.startCarousel = function (id, interval, dotNetRef) {
+            const el = document.getElementById(id);
+            if (!el || !window.bootstrap) return;
+
+            // Уничтожаем старый экземпляр, если был
+            const old = bootstrap.Carousel.getInstance(el);
+            if (old) old.dispose();
+
+            // Снимаем старый обработчик события
+            if (el._carouselHandler) {
+                el.removeEventListener('slide.bs.carousel', el._carouselHandler);
+                el._carouselHandler = null;
+            }
+
+            const c = new bootstrap.Carousel(el, {
+                interval: interval || 7000,
+                ride: 'carousel',
+                wrap: true,
+                pause: 'hover'
+            });
+
+            // Уведомляем Blazor о смене слайда
+            if (dotNetRef) {
+                el._carouselHandler = function (e) {
+                    dotNetRef.invokeMethodAsync('OnSlideChangedFromJs', e.to);
+                };
+                el.addEventListener('slide.bs.carousel', el._carouselHandler);
+            }
+
+            c.cycle();
+        };
+
+        window.stopCarousel = function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            const c = window.bootstrap && bootstrap.Carousel.getInstance(el);
+            if (c) c.dispose();
+
+            if (el._carouselHandler) {
+                el.removeEventListener('slide.bs.carousel', el._carouselHandler);
+                el._carouselHandler = null;
+            }
+        };
+    </script>
+
+    <!-- ============================================================
+         3. Ваши скрипты
+         ============================================================ -->
     <script src="/js/header.js"></script>
+
+    <!-- ============================================================
+         4. Blazor WASM. Идёт ПОСЛЕ всего, что ему нужно.
+         ============================================================ -->
+    <script src="/_framework/blazor.webassembly.js"></script>
 </body>
 
 </html>

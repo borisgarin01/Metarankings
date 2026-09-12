@@ -1,6 +1,5 @@
-﻿@using BlazorClient.Components.PagesComponents.Home
+﻿@namespace BlazorClient.Pages
 
-<div class="carousel-item @(IsActive ? "active" : "")" 
-     data-index="@Index">
+<div class="carousel-item @(IsActive ? "active" : "")">
     @ChildContent
 </div>

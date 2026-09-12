@@ -1,6 +1,8 @@
-﻿namespace BlazorClient.Pages;
+﻿using Microsoft.AspNetCore.Components;
 
-public partial class CarouselItem : ComponentBase
+namespace BlazorClient.Pages;
+
+public partial class CarouselItem : ComponentBase, IDisposable
 {
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public bool IsActive { get; set; }
@@ -9,11 +11,15 @@ public partial class CarouselItem : ComponentBase
     [Parameter] public string? ImageAlt { get; set; }
 
     [CascadingParameter]
-    private Carousel? ParentCarousel { get; set; }
+    private BlazorClient.Pages.Carousel? ParentCarousel { get; set; }
 
     protected override void OnInitialized()
     {
-        // Добавляем себя в родительскую карусель
         ParentCarousel?.AddItem(this);
+    }
+
+    public void Dispose()
+    {
+        ParentCarousel?.RemoveItem(this);
     }
 }

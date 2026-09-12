@@ -1,82 +1,34 @@
-﻿<div class="carousel-container @ContainerClass"
-     @onmouseenter="PauseAutoplay"
-     @onmouseleave="ResumeAutoplay"
-     @onfocus="PauseAutoplay"
-     @onblur="ResumeAutoplay">
+﻿@namespace BlazorClient.Pages
 
-    <div id="@CarouselId"
-         class="carousel slide @AdditionalClass"
-         data-bs-ride="@(Autoplay ? "carousel" : "false")">
-
-        <!-- Индикаторы -->
-        @if (ShowIndicators)
-        {
-            <div class="carousel-indicators">
-                @for (int i = 0; i < _items.Count; i++)
-                {
-                    <button type="button"
-                            data-bs-target="#@CarouselId"
-                            data-bs-slide-to="@i"
-                            class="@(i == CurrentIndex ? "active" : "")"
-                            @onclick="() => GoToSlide(i)"
-                            aria-label="Slide @(i + 1)">
-                    </button>
-                }
-            </div>
-        }
-
-        <!-- Слайды -->
-        <div class="carousel-inner">
-            @foreach (var item in _items)
+<div id="@carouselId" class="carousel slide mr-carousel @AdditionalClass">
+    @if (ShowIndicators && _items.Count > 1)
+    {
+        <div class="carousel-indicators">
+            @for (int i = 0; i < _items.Count; i++)
             {
-                <div class="carousel-item @(item.IsActive ? "active" : "")">
-                    @item.ChildContent
-
-                    @if (!string.IsNullOrEmpty(item.Caption))
-                    {
-                        <div class="carousel-caption d-none d-md-block">
-                            @item.Caption
-                        </div>
-                    }
-                </div>
+                var idx = i;
+                <button type="button"
+                        data-bs-target="#@carouselId"
+                        data-bs-slide-to="@idx"
+                        class="@(idx == 0 ? "active" : "")"
+                        aria-label="Слайд @(idx + 1)"></button>
             }
         </div>
+    }
 
-        <!-- Кнопки навигации -->
-        @if (ShowControls)
-        {
-            <button class="carousel-control-prev" type="button"
-                    @onclick="GoToPrevious"
-                    @onclick:stopPropagation="true"
-                    aria-label="Previous">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-
-            <button class="carousel-control-next" type="button"
-                    @onclick="GoToNext"
-                    @onclick:stopPropagation="true"
-                    aria-label="Next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        }
-
-        <!-- Прогресс-бар -->
-        @if (ShowProgress)
-        {
-            <CarouselProgress Width="@ProgressWidth"
-                              Duration="@Interval"
-                              IsPaused="@IsPaused"
-                              Position="@ProgressPosition" />
-        }
+    <div class="carousel-inner">
+        @ChildContent
     </div>
 
-    <!-- Информация о слайде -->
-    @if (ShowSlideInfo)
+    @if (ShowControls && _items.Count > 1)
     {
-        <div class="carousel-info">
-            <span>@(CurrentIndex + 1) / @_items.Count</span>
-        </div>
+        <button class="carousel-control-prev" type="button"
+                data-bs-target="#@carouselId" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button"
+                data-bs-target="#@carouselId" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
     }
 </div>
