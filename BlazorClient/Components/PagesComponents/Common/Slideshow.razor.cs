@@ -87,18 +87,6 @@ public partial class Slideshow : ComponentBase, IAsyncDisposable
         _ = RunTimerAsync(_cts.Token);
     }
 
-    private Task Next()
-    {
-        if (_groups.Count < 2) return Task.CompletedTask;
-        return GoTo((CurrentIndex + 1) % _groups.Count);
-    }
-
-    private Task Prev()
-    {
-        if (_groups.Count < 2) return Task.CompletedTask;
-        return GoTo((CurrentIndex - 1 + _groups.Count) % _groups.Count);
-    }
-
     public ValueTask DisposeAsync()
     {
         _cts?.Cancel();
