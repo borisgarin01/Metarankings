@@ -6164,3 +6164,18 @@ a.help {
         height: 100px;
     }
 }
+/* Карусель — лента */
+.slideshow-track {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    transition: transform .6s ease-in-out !important;
+}
+
+    .slideshow-track > .slide {
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        float: none !important;
+    }

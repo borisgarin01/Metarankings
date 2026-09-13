@@ -1,0 +1,50 @@
+﻿<div class="slideshow-wrap">
+
+    @* ─── ПЕЙДЖЕР ─── *@
+    @if (ShowPager && _groups.Count > 1)
+    {
+        <div class="pager">
+            Лучшие в прошлом месяце
+            @for (int i = 0; i < _groups.Count; i++)
+            {
+                var idx = i;
+                <span class="@(idx == CurrentIndex ? "cycle-pager-active" : "")"
+                      @onclick="() => GoTo(idx)">@_groups[idx].PagerTitle</span>
+            }
+        </div>
+    }
+
+    @* ─── ЛЕНТА ─── *@
+    <div class="slideshow">
+        <div class="slideshow-track"
+             style="transform: translateX(-@(CurrentIndex * 100)%)">
+            @foreach (var group in _groups)
+            {
+                <div class="slide clear">
+                    <div class="post">
+                        @foreach (var item in group.Items)
+                        {
+                            <a href="@item.Url" title="@item.Title">
+                                <div class="featured-image">
+                                    <img class="post-image" src="@item.Image" alt="@item.Title" />
+                                    <div class="small-score mark-@GetMarkClass(item.Score)">@item.Score</div>
+                                    <span>@item.Title</span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* ─── СТРЕЛКИ ─── *@
+    @if (ShowArrows && _groups.Count > 1)
+    {
+        <button type="button" class="slideshow-arrow slideshow-arrow-prev"
+                @onclick="Prev" aria-label="Предыдущий слайд"></button>
+        <button type="button" class="slideshow-arrow slideshow-arrow-next"
+                @onclick="Next" aria-label="Следующий слайд"></button>
+    }
+
+</div>

@@ -1,4 +1,5 @@
 ﻿using BlazorClient.Components.PagesComponents.Home;
+using BlazorClient.Models;
 using Domain.Games;
 using Domain.Movies;
 using Domain.Reviews;
@@ -100,6 +101,8 @@ public partial class Home : ComponentBase
         }
     }
 
+    public List<SlideGroup> SlideGroups { get; private set; } = new();
+
     [Parameter]
     public int PageSize { get; set; } = 5; // Default value
 
@@ -152,5 +155,13 @@ public partial class Home : ComponentBase
         SoonAtCinemasItemComponents = soonAtCinemasItemComponents.Result;
         GamesReleaseDateItemComponents = gamesReleaseDateItemComponents.Result;
         MoviesGenres = moviesGenresGettingTask.Result;
+        SlideGroups = new List<SlideGroup>
+{
+    new SlideGroup("Фильмы",(Movies ?? Enumerable.Empty<Movie>())
+            .Take(6)
+            .Select(m => new SlideItem($"/movies/details/{m.Id}",m.Name,m.ImageSource,m.UsersScore))),
+    new SlideGroup("Игры",(Games ?? Enumerable.Empty<Game>())
+            .Take(6)
+            .Select(g => new SlideItem($"/games/details/{g.Id}", g.Name, g.Image, g.UsersScore))) };
     }
 }
