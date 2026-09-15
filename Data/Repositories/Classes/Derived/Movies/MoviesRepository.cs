@@ -445,15 +445,110 @@ md.id, md.name
         return moviesDictionary.Values;
     }
 
+    public async Task<IEnumerable<Movie>> GetByParametersAsync(long[]? genresIds, long[]? moviesStudiosIds, int[]? years, int skip, int take)
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+
+        string sql = @"SELECT
+m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
+mg.Id, mg.Name,
+ms.Id, ms.Name,
+md.Id, md.Name
+FROM (
+    SELECT DISTINCT m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description
+    FROM Movies m
+    LEFT JOIN MoviesMoviesGenres mmg ON mmg.MovieId = m.Id
+    LEFT JOIN MoviesMoviesStudios mms ON mms.MovieId = m.Id
+    WHERE 1=1
+        AND (@GenresIds IS NULL OR mmg.MovieGenreId = ANY(@GenresIds))
+        AND (@MoviesStudiosIds IS NULL OR mms.MovieStudioId = ANY(@MoviesStudiosIds))
+        AND (@Years IS NULL OR EXTRACT(YEAR FROM m.PremierDate) = ANY(@Years))
+    ORDER BY m.Id DESC
+    OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY
+) AS m
+LEFT JOIN MoviesMoviesGenres mmg ON mmg.MovieId = m.Id
+LEFT JOIN MoviesGenres mg ON mg.Id = mmg.MovieGenreId
+LEFT JOIN MoviesMoviesStudios mms ON mms.MovieId = m.Id
+LEFT JOIN MoviesStudios ms ON ms.Id = mms.MovieStudioId
+LEFT JOIN MoviesMoviesDirectors mmd ON mmd.MovieId = m.Id
+LEFT JOIN MoviesDirectors md ON md.Id = mmd.MovieDirectorId
+ORDER BY m.Id DESC;";
+
+        Dictionary<long, Movie> moviesDictionary = new Dictionary<long, Movie>();
+
+        IEnumerable<Movie> query = await connection.QueryAsync(
+            sql,
+            (Movie movie, Domain.Movies.Genre movieGenre, MovieStudio movieStudio, MovieDirector movieDirector) =>
+            {
+                if (!moviesDictionary.TryGetValue(movie.Id, out Movie? movieEntry))
+                {
+                    movieEntry = movie;
+                    movieEntry.MovieGenres = new List<Domain.Movies.Genre>();
+                    movieEntry.MoviesStudios = new List<MovieStudio>();
+                    movieEntry.MoviesDirectors = new List<MovieDirector>();
+                    moviesDictionary.Add(movieEntry.Id, movieEntry);
+                }
+
+                if (movieGenre is not null && !movieEntry.MovieGenres.Any(g => g.Id == movieGenre.Id))
+                    movieEntry.MovieGenres.Add(movieGenre);
+
+                if (movieStudio is not null && !movieEntry.MoviesStudios.Any(s => s.Id == movieStudio.Id))
+                    movieEntry.MoviesStudios.Add(movieStudio);
+
+                if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(d => d.Id == movieDirector.Id))
+                    movieEntry.MoviesDirectors.Add(movieDirector);
+
+                return movieEntry;
+            },
+            new
+            {
+                GenresIds = genresIds is { Length: > 0 } ? genresIds : null,
+                MoviesStudiosIds = moviesStudiosIds is { Length: > 0 } ? moviesStudiosIds : null,
+                Years = years is { Length: > 0 } ? years : null,
+                Skip = skip,
+                Take = take
+            },
+            splitOn: "Id,Id,Id,Id"
+        );
+
+        return moviesDictionary.Values.ToList();
+    }
+
+    public async Task<int> GetCountByParametersAsync(long[]? genresIds, long[]? moviesStudiosIds, int[]? years)
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+
+        string sql = @"SELECT COUNT(DISTINCT m.Id)
+FROM Movies m
+LEFT JOIN MoviesMoviesGenres mmg ON mmg.MovieId = m.Id
+LEFT JOIN MoviesMoviesStudios mms ON mms.MovieId = m.Id
+WHERE 1=1
+    AND (@GenresIds IS NULL OR mmg.MovieGenreId = ANY(@GenresIds))
+    AND (@MoviesStudiosIds IS NULL OR mms.MovieStudioId = ANY(@MoviesStudiosIds))
+    AND (@Years IS NULL OR EXTRACT(YEAR FROM m.PremierDate) = ANY(@Years));";
+
+        int count = await connection.ExecuteScalarAsync<int>(
+            sql,
+            new
+            {
+                GenresIds = genresIds is { Length: > 0 } ? genresIds : null,
+                MoviesStudiosIds = moviesStudiosIds is { Length: > 0 } ? moviesStudiosIds : null,
+                Years = years is { Length: > 0 } ? years : null
+            });
+
+        return count;
+    }
+
     public async Task RemoveAsync(long id)
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
         await connection.ExecuteAsync("DELETE FROM Movies WHERE Id=@Id", new { Id = id });
     }
 
-    public Task RemoveRangeAsync(IEnumerable<long> ids)
+    public async Task RemoveRangeAsync(IEnumerable<long> ids)
     {
-        throw new NotImplementedException();
+        foreach (var id in ids)
+            await RemoveAsync(id);
     }
 
     public Task<Movie> UpdateAsync(UpdateMovieModel entity, long id)
