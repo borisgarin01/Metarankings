@@ -109,32 +109,17 @@ internal class Program
             vkOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:VkId:AuthUri"];
             vkOptions.TokenEndpoint = builder.Configuration["AuthSettings:VkId:TokenUri"];
             vkOptions.CallbackPath = builder.Configuration["AuthSettings:VkId:CallbackPath"];
-            vkOptions.Scope.Add("vkid.personal_info");
 
-            vkOptions.Events.OnCreatingTicket = context =>
-            {
-                var logger = context.HttpContext.RequestServices
-                    .GetRequiredService<ILogger<Program>>();
-
-                logger.LogInformation("OnCreatingTicket");
-
-                return Task.CompletedTask;
-            };
-
-            vkOptions.Events.OnRemoteFailure = context =>
-            {
-                var logger = context.HttpContext.RequestServices
-                    .GetRequiredService<ILogger<Program>>();
-
-                logger.LogError(context.Failure, "VK ID OnRemoteFailure");
-
-                // Важно: обработать ответ, иначе ASP.NET Core может попытаться
-                // отдать стандартную страницу ошибки или снова редиректнуть
-                context.HandleResponse();
-                context.Response.Redirect("/login?error=vkid");
-
-                return Task.CompletedTask;
-            };
+            vkOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+        })
+        .AddVkontakte(vkontakteOptions =>
+        {
+            vkontakteOptions.SignInScheme = "Cookies";
+            vkontakteOptions.ClientId = builder.Configuration["AuthSettings:Vkontakte:ClientId"];
+            vkontakteOptions.ClientSecret = builder.Configuration["AuthSettings:Vkontakte:ClientSecret"];
+            vkontakteOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:Vkontakte:AuthUri"];
+            vkontakteOptions.TokenEndpoint = builder.Configuration["AuthSettings:Vkontakte:TokenUri"];
+            vkontakteOptions.CallbackPath = builder.Configuration["AuthSettings:Vkontakte:CallbackPath"];
         })
         .AddYandex(yandexOptions =>
         {
@@ -213,7 +198,10 @@ internal class Program
 
         WebApplication app = builder.Build();
 
-        _ = app.UseForwardedHeaders();
+        _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
 
         if (app.Environment.IsDevelopment())
         {
