@@ -3,7 +3,10 @@ using Data.Repositories.Classes.Derived.Games;
 using Data.Repositories.Classes.Derived.Movies;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
+using Domain.RequestsModels.Games;
+using Domain.RequestsModels.Movies;
 using Domain.RequestsModels.Movies.Movies;
+using Domain.ResponsesModels;
 
 namespace API.Controllers.Movies;
 
@@ -89,9 +92,27 @@ public sealed class MoviesController : ControllerBase
         return Ok(await _moviesModelsRepository.GetByNameAsync(name));
     }
 
-    [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<Movie>>> SearchByGenreId([FromQuery] long genreId)
+    [HttpPost("byParameters")]
+    public async Task<IActionResult> GetByParameters([FromBody] MovieFilterRequest filter)
     {
-        return Ok(await _moviesModelsRepository.GetByGenreAsync(genreId));
+        var movies = await _moviesModelsRepository.GetByParametersAsync(
+            filter.GenresIds,
+            filter.MoviesStudiosIds,
+            filter.Years,
+            filter.Skip,
+            filter.Take);
+
+        int totalCount = await _moviesModelsRepository.GetCountByParametersAsync(
+            filter.GenresIds,
+            filter.MoviesStudiosIds,
+            filter.Years);
+
+        return Ok(new PagedResponse<Movie>
+        {
+            Items = movies,
+            TotalCount = totalCount,
+            Page = (filter.Skip / filter.Take) + 1,
+            PageSize = filter.Take
+        });
     }
 }
