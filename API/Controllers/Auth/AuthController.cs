@@ -7,7 +7,7 @@ using IdentityLibrary.Services.Classes;
 using IdentityLibrary.Services.Interfaces;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Settings;
@@ -453,156 +453,6 @@ public sealed class AuthController : ControllerBase
             _logger.LogError(ex, $"Ошибка при добавлении пароля: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
             return StatusCode(500, $"Ошибка при добавлении пароля: {ex.Message}");
         }
-
-    }
-
-    [HttpGet("login-google")]
-    public async Task<ActionResult> LoginViaGoogle()
-    {
-        try
-        {
-            string redirectUrl = Url.Action(nameof(GoogleCallback), "Auth", null, Request.Scheme);
-            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
-            _logger.LogInformation("AllowRefresh: {AllowRefresh}", properties.AllowRefresh);
-            _logger.LogInformation("ExpiresUtc: {ExpiresUtc}", properties.ExpiresUtc);
-            _logger.LogInformation("IsPersistent: {IsPersistent}", properties.IsPersistent);
-            _logger.LogInformation("IssuedUtc: {IssuedUtc}", properties.IssuedUtc);
-            _logger.LogInformation("RedirectUri: {RedirectUri}", properties.RedirectUri);
-            _logger.LogInformation("Items: {Items}", string.Join(", ", properties.Items.Select(kvp => $"{kvp.Key}: {kvp.Value}")));
-            return Challenge(properties, "Google");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка при попытке входа через Google: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            return StatusCode(500, $"Ошибка при попытке входа через Google: {ex.Message}");
-        }
-    }
-
-    [HttpGet("google-callback")]
-    public async Task<ActionResult> GoogleCallback()
-    {
-        try
-        {
-            _logger.LogInformation("google-callback");
-
-            AuthenticateResult result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-
-            if (!result.Succeeded || result.Principal is null)
-            {
-                _logger.LogWarning("Google authentication failed");
-                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=google_auth_failed");
-            }
-
-            // Извлекаем данные
-            string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
-            string? googleUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string? phoneNumber = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
-            string? name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
-
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(googleUserId))
-            {
-                _logger.LogError("Email or GoogleUserId is null");
-                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_required_data");
-            }
-
-            _logger.LogInformation("Processing Google login for email: {Email}, GoogleUserId: {GoogleUserId}", email, googleUserId);
-
-            // ✅ ВЫЗЫВАЕМ УНИВЕРСАЛЬНЫЙ МЕТОД
-            AuthResponseDto tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
-                provider: "Google",
-                providerKey: googleUserId,
-                email: email,
-                name: name,
-                phoneNumber: phoneNumber
-            );
-
-            if (tokenResponse.IsAuthSuccessful)
-            {
-                return Redirect($"{Request.Scheme}://{Request.Host}/auth/google-callback?Token={tokenResponse.AccessToken}");
-            }
-
-            return Redirect($"{Request.Scheme}://{Request.Host}/login?error=ОШИБКА");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Error in Google callback: {ex.Message}");
-            return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
-        }
-    }
-
-    [HttpGet("login-github")]
-    public async Task<ActionResult> LoginViaGithub()
-    {
-        try
-        {
-            string redirectUrl = Url.Action(nameof(GithubCallback), "Auth", null, Request.Scheme);
-            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("GitHub", redirectUrl);
-            _logger.LogInformation("AllowRefresh: {AllowRefresh}", properties.AllowRefresh);
-            _logger.LogInformation("ExpiresUtc: {ExpiresUtc}", properties.ExpiresUtc);
-            _logger.LogInformation("IsPersistent: {IsPersistent}", properties.IsPersistent);
-            _logger.LogInformation("IssuedUtc: {IssuedUtc}", properties.IssuedUtc);
-            _logger.LogInformation("RedirectUri: {RedirectUri}", properties.RedirectUri);
-            _logger.LogInformation("Items: {Items}", string.Join(", ", properties.Items.Select(kvp => $"{kvp.Key}: {kvp.Value}")));
-            return Challenge(properties, "GitHub");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка при попытке входа через GitHub: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            return StatusCode(500, $"Ошибка при попытке входа через GitHub: {ex.Message}");
-        }
-    }
-
-    [HttpGet("github-callback")]
-    public async Task<ActionResult> GithubCallback()
-    {
-        try
-        {
-            _logger.LogInformation("github-callback");
-
-            // Используем "cookie" (с маленькой буквы) - ту, что только что создали
-            AuthenticateResult result = await HttpContext.AuthenticateAsync("cookie");
-
-            if (!result.Succeeded || result.Principal is null)
-            {
-                _logger.LogWarning("GitHub authentication failed");
-                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=github_auth_failed");
-            }
-
-            // Извлекаем данные
-            string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
-            string? githubUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string? phoneNumber = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
-            string? name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
-
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(githubUserId))
-            {
-                _logger.LogError("Email or GithubUserId is null");
-                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_required_data");
-            }
-
-            _logger.LogInformation("Processing Github login for email: {Email}, GithubUserId: {GithubUserId}", email, githubUserId);
-
-            // ✅ ВЫЗЫВАЕМ УНИВЕРСАЛЬНЫЙ МЕТОД
-            AuthResponseDto tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
-                provider: "GitHub",
-                providerKey: githubUserId,
-                email: email,
-                name: name,
-                phoneNumber: phoneNumber
-            );
-
-            if (tokenResponse.IsAuthSuccessful)
-            {
-                return Redirect($"{Request.Scheme}://{Request.Host}/auth/github-callback?Token={tokenResponse.AccessToken}");
-            }
-
-            return Redirect($"{Request.Scheme}://{Request.Host}/login?error=Ошибка");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Error in GitHub callback: {ex.Message}");
-            return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
-        }
     }
 
     [HttpGet("login-vkid")]
@@ -629,7 +479,7 @@ public sealed class AuthController : ControllerBase
         {
             _logger.LogInformation("vkid-callback");
 
-            AuthenticateResult result = await HttpContext.AuthenticateAsync("cookie");
+            AuthenticateResult result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             if (!result.Succeeded || result.Principal is null)
             {

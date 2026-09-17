@@ -76,35 +76,10 @@ internal class Program
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = tokenValidationParameters;
             options.SaveToken = true;
-        }).AddGoogle(googleOptions =>
-        {
-            googleOptions.ClientId = builder.Configuration["AuthSettings:Google:ClientId"];
-            googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
-        }).AddGitHub(githubOptions =>
-        {
-            githubOptions.SignInScheme = "Cookies";
-            githubOptions.ClientId = builder.Configuration["AuthSettings:GitHub:ClientId"];
-            githubOptions.ClientSecret = builder.Configuration["AuthSettings:GitHub:ClientSecret"];
-            githubOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:GitHub:AuthUri"];
-            githubOptions.TokenEndpoint = builder.Configuration["AuthSettings:GitHub:TokenUri"];
-            githubOptions.CallbackPath = builder.Configuration["AuthSettings:GitHub:CallbackPath"];
-            // Добавь маппинг полей из GitHub
-            githubOptions.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-            githubOptions.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
-            githubOptions.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-        }).
-        AddMailRu(mailRuAuthenticationOptions =>
-        {
-            mailRuAuthenticationOptions.SignInScheme = "Cookies";
-            mailRuAuthenticationOptions.ClientId = builder.Configuration["AuthSettings:MailRu:ClientId"];
-            mailRuAuthenticationOptions.ClientSecret = builder.Configuration["AuthSettings:MailRu:ClientSecret"];
-            mailRuAuthenticationOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:MailRu:AuthUri"];
-            mailRuAuthenticationOptions.TokenEndpoint = builder.Configuration["AuthSettings:MailRu:TokenUri"];
-            mailRuAuthenticationOptions.CallbackPath = builder.Configuration["AuthSettings:MailRu:CallbackPath"];
         }).
         AddVkId(vkOptions =>
         {
-            vkOptions.SignInScheme = "Cookies";
+            vkOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             vkOptions.ClientId = builder.Configuration["AuthSettings:VkId:ClientId"];
             vkOptions.ClientSecret = builder.Configuration["AuthSettings:VkId:ClientSecret"];
             vkOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:VkId:AuthUri"];
@@ -112,24 +87,6 @@ internal class Program
             vkOptions.CallbackPath = builder.Configuration["AuthSettings:VkId:CallbackPath"];
             vkOptions.CorrelationCookie.SameSite = SameSiteMode.None;
             vkOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-        })
-        .AddVkontakte(vkontakteOptions =>
-        {
-            vkontakteOptions.SignInScheme = "Cookies";
-            vkontakteOptions.ClientId = builder.Configuration["AuthSettings:Vkontakte:ClientId"];
-            vkontakteOptions.ClientSecret = builder.Configuration["AuthSettings:Vkontakte:ClientSecret"];
-            vkontakteOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:Vkontakte:AuthUri"];
-            vkontakteOptions.TokenEndpoint = builder.Configuration["AuthSettings:Vkontakte:TokenUri"];
-            vkontakteOptions.CallbackPath = builder.Configuration["AuthSettings:Vkontakte:CallbackPath"];
-        })
-        .AddYandex(yandexOptions =>
-        {
-            yandexOptions.SignInScheme = "Cookies";
-            yandexOptions.ClientId = builder.Configuration["AuthSettings:Yandex:ClientId"];
-            yandexOptions.ClientSecret = builder.Configuration["AuthSettings:Yandex:ClientSecret"];
-            yandexOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:Yandex:AuthUri"];
-            yandexOptions.TokenEndpoint = builder.Configuration["AuthSettings:Yandex:TokenUri"];
-            yandexOptions.CallbackPath = builder.Configuration["AuthSettings:Yandex:CallbackPath"];
         })
         .AddCookie()
         .AddCookie("cookie");
