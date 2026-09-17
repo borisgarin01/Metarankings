@@ -9,4 +9,17 @@ public interface IMoviesRepository : IRepository<Movie, AddMovieModel, UpdateMov
     public Task<IEnumerable<Movie>> GetAsync(DateTime dateFrom, DateTime dateTo);
     Task<IEnumerable<Movie>> GetByNameAsync(string name);
     Task<IEnumerable<Movie>> GetByGenreAsync(long genreId);
+    Task<IEnumerable<Movie>> GetByParametersAsync(
+        long[]? genresIds,
+        long[]? moviesStudiosIds,
+        int[]? years,
+        int skip,
+        int take
+    );
+
+    Task<int> GetCountByParametersAsync(
+        long[]? genresIds,
+        long[]? moviesStudiosIds,
+        int[]? years
+    );
 }
