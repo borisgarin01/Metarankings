@@ -56,8 +56,9 @@ internal class Program
 
         _ = builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
-            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            // Known networks for Docker
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor
+                                     | ForwardedHeaders.XForwardedProto
+                                     | ForwardedHeaders.XForwardedHost;
             options.KnownNetworks.Clear();
             options.KnownProxies.Clear();
         });
@@ -109,7 +110,7 @@ internal class Program
             vkOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:VkId:AuthUri"];
             vkOptions.TokenEndpoint = builder.Configuration["AuthSettings:VkId:TokenUri"];
             vkOptions.CallbackPath = builder.Configuration["AuthSettings:VkId:CallbackPath"];
-
+            vkOptions.CorrelationCookie.SameSite = SameSiteMode.None;
             vkOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         })
         .AddVkontakte(vkontakteOptions =>
@@ -198,9 +199,18 @@ internal class Program
 
         WebApplication app = builder.Build();
 
-        _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
+        app.Use(async (ctx, next) =>
         {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            Console.WriteLine($"Scheme={ctx.Request.Scheme} Host={ctx.Request.Host} XFP={ctx.Request.Headers["X-Forwarded-Proto"]}");
+            await next();
+        });
+
+        app.UseForwardedHeaders();
+
+        app.Use(async (ctx, next) =>
+        {
+            Console.WriteLine($"[AFTER FWD] Scheme={ctx.Request.Scheme} Host={ctx.Request.Host}");
+            await next();
         });
 
         if (app.Environment.IsDevelopment())
