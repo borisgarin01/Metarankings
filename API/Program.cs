@@ -88,6 +88,10 @@ internal class Program
             vkOptions.CorrelationCookie.SameSite = SameSiteMode.None;
             vkOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
 
+            vkOptions.Scope.Add("vkid.personal_info");
+            vkOptions.Scope.Add("email");
+            vkOptions.Scope.Add("phone");
+
             vkOptions.Events.OnCreatingTicket = context =>
             {
                 var logger = context.HttpContext.RequestServices
