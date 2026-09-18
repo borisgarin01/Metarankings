@@ -76,7 +76,7 @@ public sealed class AuthTokenGenerator : IAuthTokenGenerator
             .Replace('/', '_');
     }
 
-    public async Task<string?> ExchangeVkCodeForUserIdAsync(string code, string codeVerifier, string scheme, string host)
+    public async Task<string?> ExchangeVkCodeForUserIdAsync(string code, string codeVerifier, string scheme, string host, string deviceId)
     {
         using var http = new HttpClient();
 
@@ -86,7 +86,8 @@ public sealed class AuthTokenGenerator : IAuthTokenGenerator
             ["code"] = code,
             ["client_id"] = _authSettingsOptionsMonitor.CurrentValue.VkId.ClientId,
             ["code_verifier"] = codeVerifier,
-            ["redirect_uri"] = $"{scheme}://{host}/api/auth/vkid-link-callback"
+            ["device_id"] = deviceId,  // ← добавить
+            ["redirect_uri"] = $"{scheme}://{host}/signin-vkid"
         });
 
         HttpResponseMessage response = await http.PostAsync("https://id.vk.ru/oauth2/auth", content);

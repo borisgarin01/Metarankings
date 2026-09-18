@@ -496,18 +496,25 @@ public sealed class AuthController : ControllerBase
             return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
         }
     }
-
     [HttpGet("vkid-link-callback")]
     public async Task<ActionResult> VKIDLinkCallback(
     [FromQuery] string code,
-    [FromQuery] string state)
+    [FromQuery] string state,
+    [FromQuery(Name = "device_id")] string deviceId)
     {
         try
         {
+            // 1. Валидация входных параметров
             if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(state))
                 return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=missing_params");
 
-            // Читаем cookie
+            if (string.IsNullOrWhiteSpace(deviceId))
+            {
+                _logger.LogWarning("device_id is missing");
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=missing_device_id");
+            }
+
+            // 2. Читаем cookie с userId и codeVerifier
             if (!Request.Cookies.TryGetValue($"vkid_link_{state}", out string? cookieValue) ||
                 string.IsNullOrWhiteSpace(cookieValue))
             {
@@ -515,14 +522,15 @@ public sealed class AuthController : ControllerBase
                 return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=invalid_state");
             }
 
-            // Удаляем cookie — она одноразовая
+            // 3. Удаляем cookie — она одноразовая
             Response.Cookies.Delete($"vkid_link_{state}", new CookieOptions
             {
-                Path = "/api/auth",
+                Path = "/",
                 Secure = true,
                 SameSite = SameSiteMode.None
             });
 
+            // 4. Парсим cookie
             string[] parts = cookieValue.Split('|');
             if (parts.Length != 2)
             {
@@ -533,16 +541,23 @@ public sealed class AuthController : ControllerBase
             string userId = parts[0];
             string codeVerifier = parts[1];
 
+            // 5. Находим пользователя
             ApplicationUser? currentUser = await _usersManager.FindByIdAsync(userId);
             if (currentUser is null)
+            {
+                _logger.LogError("User {UserId} not found", userId);
                 return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=user_not_found");
+            }
 
-            // Обмениваем code на user_id VK
-            string? vkUserId = await _authTokenGenerator.ExchangeVkCodeForUserIdAsync(code, codeVerifier, Request.Scheme, Request.Host.Value);
+            // 6. Обмениваем code на user_id VK
+            string? vkUserId = await _authTokenGenerator.ExchangeVkCodeForUserIdAsync(code, codeVerifier, Request.Scheme, Request.Host.Host, deviceId);
             if (string.IsNullOrEmpty(vkUserId))
+            {
+                _logger.LogError("VK code exchange failed");
                 return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=vk_exchange_failed");
+            }
 
-            // Проверяем, не привязан ли уже
+            // 7. Проверяем, не привязан ли VK ID к другому аккаунту
             ApplicationUser? existingVkUser = await _usersManager.FindByLoginAsync("VK ID", vkUserId);
             if (existingVkUser is not null && existingVkUser.Id != currentUser.Id)
             {
@@ -552,7 +567,7 @@ public sealed class AuthController : ControllerBase
                 return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=vkid_already_linked");
             }
 
-            // Привязываем
+            // 8. Привязываем VK ID к текущему пользователю
             IdentityResult addLoginResult = await _usersManager.AddLoginAsync(
                 currentUser,
                 new UserLoginInfo("VK ID", vkUserId, "VK ID"));
@@ -564,6 +579,7 @@ public sealed class AuthController : ControllerBase
                 return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error={WebUtility.UrlEncode(errors)}");
             }
 
+            // 9. Успех
             _logger.LogInformation("VK ID {VkUserId} linked to user {UserId}", vkUserId, currentUser.Id);
             return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?success=vkid_linked");
         }

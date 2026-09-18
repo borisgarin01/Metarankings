@@ -8,5 +8,5 @@ public interface IAuthTokenGenerator
     string GenerateRefreshToken();
     string GenerateCodeVerifier();
     string GenerateCodeChallenge(string verifier);
-    Task<string?> ExchangeVkCodeForUserIdAsync(string code, string codeVerifier, string scheme, string host);
+    Task<string?> ExchangeVkCodeForUserIdAsync(string code, string codeVerifier, string scheme, string host, string deviceId);
 }
