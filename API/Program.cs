@@ -76,8 +76,8 @@ internal class Program
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = tokenValidationParameters;
             options.SaveToken = true;
-        }).
-        AddVkId(vkOptions =>
+        })
+        .AddVkId(vkOptions =>
         {
             vkOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             vkOptions.ClientId = builder.Configuration["AuthSettings:VkId:ClientId"];
@@ -87,6 +87,29 @@ internal class Program
             vkOptions.CallbackPath = builder.Configuration["AuthSettings:VkId:CallbackPath"];
             vkOptions.CorrelationCookie.SameSite = SameSiteMode.None;
             vkOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+
+            vkOptions.Events.OnCreatingTicket = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("VkId");
+
+                logger.LogInformation("=== VK ID claims ===");
+                foreach (var claim in context.Principal?.Claims ?? Enumerable.Empty<Claim>())
+                {
+                    logger.LogInformation("Claim: {Type} = {Value}", claim.Type, claim.Value);
+                }
+
+                logger.LogInformation("=== VK ID tokens ===");
+                logger.LogInformation("AccessToken: {Token}", context.AccessToken);
+                logger.LogInformation("RefreshToken: {Token}", context.RefreshToken);
+                logger.LogInformation("ExpiresAt: {Expires}", context.ExpiresIn);
+
+                logger.LogInformation("VK response: {Json}", context.Response.ToString());
+                logger.LogInformation("VK token response: {Json}", context.TokenResponse.ToString());
+
+                return Task.CompletedTask;
+            };
         })
         .AddCookie()
         .AddCookie("cookie");
