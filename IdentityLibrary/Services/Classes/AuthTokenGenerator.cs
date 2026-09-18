@@ -84,7 +84,7 @@ public sealed class AuthTokenGenerator : IAuthTokenGenerator
         {
             ["grant_type"] = "authorization_code",
             ["code"] = code,
-            ["client_id"] = _authSettingsOptionsMonitor.CurrentValue.Vk.ClientId,
+            ["client_id"] = _authSettingsOptionsMonitor.CurrentValue.VkId.ClientId,
             ["code_verifier"] = codeVerifier,
             ["redirect_uri"] = $"{scheme}://{host}/api/auth/vkid-link-callback"
         });

@@ -20,5 +20,5 @@ public sealed record AuthSettings
     public int AccessTokenLifetimeMinutes { get; set; }
     public int RefreshTokenLifetimeDays { get; set; }
     public Telegram Telegram { get; set; }
-    public VkId Vk { get; set; }
+    public VkId VkId { get; set; }
 }

@@ -348,7 +348,7 @@ public sealed class AuthController : ControllerBase
             });
 
         string redirectUri = $"{Request.Scheme}://{Request.Host}/api/auth/vkid-link-callback";
-        string clientId = _authSettingsOptionsMonitor.CurrentValue.Vk.ClientId;
+        string clientId = _authSettingsOptionsMonitor.CurrentValue.VkId.ClientId;
 
         string authUrl =
             $"https://id.vk.ru/authorize?response_type=code" +
