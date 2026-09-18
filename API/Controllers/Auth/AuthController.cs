@@ -456,19 +456,21 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpGet("login-vkid")]
-    public async Task<ActionResult> LoginVKID()
+    public IActionResult LoginVKID()
     {
         try
         {
-            string redirectUrl = Url.Action(nameof(VKIDCallback), "Auth", null, Request.Scheme);
-            AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties("VK IDVK ID", redirectUrl);
+            // Правильное имя схемы — "VK ID"
+            AuthenticationProperties properties = _signInManager
+                .ConfigureExternalAuthenticationProperties("VK ID", Url.Action(nameof(VKIDCallback), "Auth"));
+
             _logger.LogInformation("VK ID login initiated");
             return Challenge(properties, "VK ID");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Ошибка при попытке входа через VK ID: {ex.Message}");
-            return StatusCode(500, $"Ошибка при попытке входа через VK ID: {ex.Message}");
+            _logger.LogError(ex, "Ошибка при попытке входа через VK ID");
+            return StatusCode(500, $"Ошибка: {ex.Message}");
         }
     }
 
@@ -479,7 +481,8 @@ public sealed class AuthController : ControllerBase
         {
             _logger.LogInformation("vkid-callback");
 
-            AuthenticateResult result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            AuthenticateResult result = await HttpContext.AuthenticateAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme);
 
             if (!result.Succeeded || result.Principal is null)
             {
@@ -487,49 +490,54 @@ public sealed class AuthController : ControllerBase
                 return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkid_auth_failed");
             }
 
-            // Извлекаем данные
+            foreach (Claim claim in result.Principal.Claims)
+                _logger.LogInformation("Type - {Type}, Value - {Value}", claim.Type, claim.Value);
+
+            // Извлекаем данные по правильным типам claims
             string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
-            string? vkUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string? phoneNumber = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
-            string? name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
+            string? phone = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
 
-            if (string.IsNullOrEmpty(vkUserId))
-            {
-                _logger.LogError("VK UserId is null");
-                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_vk_id");
-            }
+            _logger.LogInformation(
+                "VK ID: Email={Email}, Phone={Phone}",
+                email, phone);
 
-            _logger.LogInformation("Processing VK ID login for email: {Email}, VKUserId: {VKUserId}", email, vkUserId);
-
+            // ProcessExternalLoginAsync уже создаёт/находит пользователя и генерирует токены
             AuthResponseDto tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
                 provider: "VK ID",
-                providerKey: vkUserId,
-                email: email ?? "", // VK может не дать email, если пользователь скрыл
-                name: name,
-                phoneNumber: phoneNumber
+                providerKey: phone,
+                email: email ?? "",
+                name: phone,
+                phoneNumber: phone
             );
 
-            if (tokenResponse.IsAuthSuccessful)
+            if (!tokenResponse.IsAuthSuccessful)
             {
-                // ВАЖНО: VK может не дать email, нужно обработать этот кейс
-                if (string.IsNullOrEmpty(email))
-                {
-                    // Если email нет - редиректим на страницу где пользователь введет email сам
-                    return Redirect($"{Request.Scheme}://{Request.Host}/auth/complete-profile?token={tokenResponse.AccessToken}&provider=vkid");
-                }
-
-                return Redirect($"{Request.Scheme}://{Request.Host}/auth/vkid-callback?Token={tokenResponse.AccessToken}");
+                _logger.LogWarning("VK ID ProcessExternalLogin failed");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkid_auth_failed");
             }
 
-            return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkid_auth_failed");
+            // Если email нет — на страницу завершения профиля
+            if (string.IsNullOrEmpty(email))
+            {
+                return Redirect(
+                    $"{Request.Scheme}://{Request.Host}/auth/complete-profile" +
+                    $"?token={Uri.EscapeDataString(tokenResponse.AccessToken)}" +
+                    $"&refresh={Uri.EscapeDataString(tokenResponse.RefreshToken)}" +
+                    $"&provider=vkid");
+            }
+
+            // Email есть — сразу логиним
+            return Redirect(
+                $"{Request.Scheme}://{Request.Host}/auth/vkid-callback" +
+                $"?Token={Uri.EscapeDataString(tokenResponse.AccessToken)}" +
+                $"&RefreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken)}");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error in VK ID callback: {ex.Message}");
+            _logger.LogError(ex, "Error in VK ID callback");
             return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
         }
     }
-
 
     [HttpGet("current-user")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

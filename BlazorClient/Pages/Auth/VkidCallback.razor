@@ -1,0 +1,20 @@
+﻿@page "/auth/vkid-callback"
+
+<PageTitle>Вход через VK ID</PageTitle>
+
+<div class="auth-callback-container">
+    @if (_isProcessing)
+    {
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Обработка входа...</span>
+        </div>
+        <p>Завершаем вход через VK ID...</p>
+    }
+    else if (!string.IsNullOrEmpty(_error))
+    {
+        <div class="alert alert-danger">
+            <strong>Ошибка входа:</strong> @_error
+        </div>
+        <button class="btn btn-primary" @onclick="GoToLogin">Вернуться на страницу входа</button>
+    }
+</div>
