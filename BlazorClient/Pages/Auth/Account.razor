@@ -1,12 +1,15 @@
 ﻿@page "/auth/account"
+@using IdentityLibrary.Models
 
 <AuthorizeView>
     <Authorized>
-        <h3>Входить по двухфакторке?</h3>
+        <h3>Аккаунт</h3>
 
+        <h4>Двухфакторная аутентификация</h4>
         <h3>@(TwoFactorEnabled ? "2FA включена" : "2FA отключена")</h3>
         <InputCheckbox @bind-Value="ApplicationUser.TwoFactorEnabled" />
 
+        <h4>Смена пароля</h4>
         <h3>Current password</h3>
         <InputText type="password" @bind-Value="CurrentPassword" class="form-control" />
 
@@ -17,6 +20,23 @@
         <InputText type="password" @bind-Value="NewPasswordConfirm" class="form-control" />
 
         <button class="btn btn-primary" @onclick="ChangePassword">Сменить пароль</button>
+
+        <hr />
+
+        <h4>Привязка аккаунтов</h4>
+        <p>Привяжите VK ID к вашему аккаунту, чтобы входить через VK.</p>
+        <button class="btn btn-primary" @onclick="LinkVKID" disabled="@_isLinking">
+            @(_isLinking ? "Привязка..." : "Привязать VK ID")
+        </button>
+
+        @if (!string.IsNullOrEmpty(_linkError))
+        {
+            <div class="alert alert-danger mt-2">@_linkError</div>
+        }
+        @if (!string.IsNullOrEmpty(_linkSuccess))
+        {
+            <div class="alert alert-success mt-2">@_linkSuccess</div>
+        }
     </Authorized>
     <NotAuthorized>
         Вы не авторизованы для доступа к этой странице

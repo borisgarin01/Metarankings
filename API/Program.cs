@@ -51,6 +51,7 @@ internal class Program
         _ = builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 
         _ = builder.Services.AddLogging();
+
         _ = builder.Logging.ClearProviders();
         _ = builder.Logging.AddConsole();
 
@@ -66,7 +67,7 @@ internal class Program
         _ = builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
             options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
@@ -161,11 +162,17 @@ internal class Program
 
         _ = builder.Services.AddCors(options =>
         {
-            options.AddPolicy("AllowBlazorFrontend", builder =>
+            options.AddPolicy("AllowBlazorFrontend", policy =>
             {
-                _ = builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader();
+                policy.WithOrigins(
+                        "https://rankings-meta.ru",
+                        "https://www.rankings-meta.ru",
+                        "http://localhost:5000",
+                        "https://localhost:5001")
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials()
+                      .WithExposedHeaders("Location");  // ← для 302
             });
         });
 
@@ -211,7 +218,7 @@ internal class Program
         _ = app.UseStaticFiles();
 
         _ = app.UseRouting();
-
+        _ = app.UseCors("AllowBlazorFrontend");
         _ = app.UseAuthentication();
         _ = app.UseAuthorization();
 
@@ -245,9 +252,6 @@ internal class Program
             // that all resources will be disposed.
             UpdateDatabase(scope.ServiceProvider);
         }
-
-        // Use CORS middleware
-        _ = app.UseCors("AllowBlazorFrontend");
 
         app.Run();
     }

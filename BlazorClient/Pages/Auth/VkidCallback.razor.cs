@@ -8,14 +8,17 @@ public partial class VkidCallback : ComponentBase
     [SupplyParameterFromQuery(Name = "Token")]
     public string? Token { get; set; }
 
-    [Inject]
-    public IToastService ToastService { get; set; }
+    [SupplyParameterFromQuery(Name = "RefreshToken")]
+    public string? RefreshToken { get; set; }
 
     [Inject]
-    public IAuthService AuthService { get; set; }
+    public IToastService ToastService { get; set; } = default!;
 
     [Inject]
-    public NavigationManager NavigationManager { get; set; }
+    public IAuthService AuthService { get; set; } = default!;
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
 
     private bool _isProcessing = true;
     private string? _error;
@@ -34,18 +37,18 @@ public partial class VkidCallback : ComponentBase
             // 1. Сохраняем access token
             await AuthService.StoreAccessTokenAsync(Token);
 
-            // 2. Настраиваем HttpClient
+            // 2. Сохраняем refresh token, если он есть
+            if (!string.IsNullOrWhiteSpace(RefreshToken))
+            {
+                await AuthService.StoreRefreshTokenAsync(RefreshToken);
+            }
+
+            // 3. Настраиваем HttpClient
             AuthService.AddDefaultRequestHeaderBearer(Token);
-
-            // 3. Опционально: получаем refresh token через отдельный запрос
-            // (если бэкенд возвращает его отдельно — см. ниже)
-
-            // 4. Опционально: загружаем данные пользователя
-            // await AuthService.LoadCurrentUserAsync();
 
             ToastService.ShowSuccess("Вы успешно вошли через VK ID");
 
-            // 5. Редирект на главную
+            // 4. Редирект на главную
             NavigationManager.NavigateTo("/", forceLoad: true);
         }
         catch (Exception ex)

@@ -1,6 +1,9 @@
 ﻿using API.Auth;
 using IdentityLibrary.DTOs;
+using Microsoft.Extensions.Logging;
 using Settings;
+using System.Net.Http;
+using Telegram.Bot.Requests.Abstractions;
 
 namespace IdentityLibrary.Services.Classes;
 
@@ -8,11 +11,13 @@ public sealed class AuthTokenGenerator : IAuthTokenGenerator
 {
     private readonly UserManager<ApplicationUser> _usersManager;
     private readonly IOptionsMonitor<AuthSettings> _authSettingsOptionsMonitor;
+    private ILogger<AuthTokenGenerator> _logger;
 
-    public AuthTokenGenerator(UserManager<ApplicationUser> usersManager, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor)
+    public AuthTokenGenerator(UserManager<ApplicationUser> usersManager, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, ILogger<AuthTokenGenerator> logger)
     {
         _usersManager = usersManager;
         _authSettingsOptionsMonitor = authSettingsOptionsMonitor;
+        _logger = logger;
     }
 
     public async Task<string> GenerateAccessToken(ApplicationUser user)
@@ -48,5 +53,61 @@ public sealed class AuthTokenGenerator : IAuthTokenGenerator
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
+    }
+
+    public string GenerateCodeVerifier()
+    {
+        // 43-128 символов, base64url
+        byte[] bytes = new byte[32];
+        System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
+        return Convert.ToBase64String(bytes)
+            .TrimEnd('=')
+            .Replace('+', '-')
+            .Replace('/', '_');
+    }
+
+    public string GenerateCodeChallenge(string verifier)
+    {
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        byte[] challengeBytes = sha256.ComputeHash(System.Text.Encoding.ASCII.GetBytes(verifier));
+        return Convert.ToBase64String(challengeBytes)
+            .TrimEnd('=')
+            .Replace('+', '-')
+            .Replace('/', '_');
+    }
+
+    public async Task<string?> ExchangeVkCodeForUserIdAsync(string code, string codeVerifier, string scheme, string host)
+    {
+        using var http = new HttpClient();
+
+        var content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["grant_type"] = "authorization_code",
+            ["code"] = code,
+            ["client_id"] = _authSettingsOptionsMonitor.CurrentValue.Vk.ClientId,
+            ["code_verifier"] = codeVerifier,
+            ["redirect_uri"] = $"{scheme}://{host}/api/auth/vkid-link-callback"
+        });
+
+        HttpResponseMessage response = await http.PostAsync("https://id.vk.ru/oauth2/auth", content);
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("VK token exchange failed: {Status}", response.StatusCode);
+            return null;
+        }
+
+        string json = await response.Content.ReadAsStringAsync();
+        _logger.LogInformation("VK token exchange response: {Json}", json);
+
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+
+        if (doc.RootElement.TryGetProperty("user_id", out var userIdProp))
+        {
+            return userIdProp.ValueKind == System.Text.Json.JsonValueKind.String
+                ? userIdProp.GetString()
+                : userIdProp.GetInt64().ToString();
+        }
+
+        return null;
     }
 }

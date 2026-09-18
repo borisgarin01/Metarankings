@@ -8,10 +8,12 @@ using IdentityLibrary.Services.Interfaces;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Settings;
 using System.Net;
+using System.Net.Http;
 
 namespace API.Controllers.Auth;
 
@@ -33,7 +35,19 @@ public sealed class AuthController : ControllerBase
     private readonly IOptionsMonitor<TokenValidationParameters> _tokenValidationParameters;
     private readonly IOptionsMonitor<EmailSettings> _emailSettings;
 
-    public AuthController(IConfiguration configuration, UserManager<ApplicationUser> usersManager, IPasswordHasher<ApplicationUser> passwordHasher, ILogger<AuthController> logger, IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor, IOptionsMonitor<EmailSettings> emailSettings, IOptionsMonitor<TokenValidationParameters> tokenValidationParameters, SignInManager<ApplicationUser> signInManager, AuthTokenGenerator authTokenGenerator, TwoFactorAuthEmailProcessor twoFactorAuthEmailProcessor, ITokensService tokenService, IRefreshTokensRepository refreshTokensRepo)
+    public AuthController(
+        IConfiguration configuration,
+        UserManager<ApplicationUser> usersManager,
+        IPasswordHasher<ApplicationUser> passwordHasher,
+        ILogger<AuthController> logger,
+        IOptionsMonitor<AuthSettings> authSettingsOptionsMonitor,
+        IOptionsMonitor<EmailSettings> emailSettings,
+        IOptionsMonitor<TokenValidationParameters> tokenValidationParameters,
+        SignInManager<ApplicationUser> signInManager,
+        AuthTokenGenerator authTokenGenerator,
+        TwoFactorAuthEmailProcessor twoFactorAuthEmailProcessor,
+        ITokensService tokenService,
+        IRefreshTokensRepository refreshTokensRepo)
     {
         _configuration = configuration;
         _usersManager = usersManager;
@@ -49,34 +63,49 @@ public sealed class AuthController : ControllerBase
         _refreshTokensRepo = refreshTokensRepo;
     }
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [HttpPost("addExternalLogin")]
-    public async Task<ActionResult> AddExternalLogin()
+    // ============================================================
+    // HELPERS
+    // ============================================================
+
+    private async Task<AuthResponseDto> IssueTokensAsync(ApplicationUser user)
     {
-        try
-        {
-            ApplicationUser? authUser = await _usersManager.FindByIdAsync(HttpContext.User.Claims.Single(b => b.Type == ClaimTypes.NameIdentifier).Value);
-            if (authUser is null)
-                return NotFound();
+        await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
 
-            IdentityResult identityResult = await _usersManager.AddLoginAsync(authUser, new UserLoginInfo("Google", authUser.Email, "Google"));
+        string accessToken = await _authTokenGenerator.GenerateAccessToken(user);
+        string refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
 
-            if (identityResult.Succeeded)
-                return Ok(identityResult);
-            return BadRequest(identityResult);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        var refreshToken = new IdentityLibrary.DTOs.RefreshToken(
+            0,
+            Convert.ToInt64(user.Id),
+            refreshTokenValue,
+            false,
+            DateTime.UtcNow);
+        await _refreshTokensRepo.CreateAsync(refreshToken);
+
+        return new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue);
     }
+
+    private string? GetCurrentUserId()
+    {
+        return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    }
+
+    // ============================================================
+    // EXTERNAL PROVIDERS
+    // ============================================================
 
     [HttpGet("external-providers")]
-    public async Task<ActionResult<IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme>>> GetExternalProviders()
+    public async Task<ActionResult<IEnumerable<Domain.Auth.AuthenticationScheme>>> GetExternalProviders()
     {
-        IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalProviders = await _signInManager.GetExternalAuthenticationSchemesAsync();
+        IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalProviders =
+            await _signInManager.GetExternalAuthenticationSchemesAsync();
+
         return Ok(externalProviders.Select(ep => new Domain.Auth.AuthenticationScheme(ep.Name, ep.DisplayName)));
     }
+
+    // ============================================================
+    // CLASSIC LOGIN / REGISTER
+    // ============================================================
 
     [HttpPost("login")]
     public async Task<ActionResult> Login(LoginModel loginModel)
@@ -88,12 +117,10 @@ public sealed class AuthController : ControllerBase
             return BadRequest("Email и пароль должны быть указаны");
 
         ApplicationUser? user = await _usersManager.FindByEmailAsync(loginModel.UserEmail);
-
         if (user is null)
             return NotFound("Пользователь не зарегистрирован");
 
         bool isValidPassword = await _usersManager.CheckPasswordAsync(user, loginModel.Password);
-
         if (!isValidPassword)
             return BadRequest("Неверный пароль");
 
@@ -101,153 +128,38 @@ public sealed class AuthController : ControllerBase
         {
             string token = await _usersManager.GenerateTwoFactorTokenAsync(user, "Email");
             _logger.LogInformation("2FA code for {Email}: {Code}", user.Email, token);
-
             return Ok(new AuthResponseDto(false, true, "2FA required", string.Empty, string.Empty));
         }
 
-        await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
-
-        string accessToken = await _authTokenGenerator.GenerateAccessToken(user);
-        string refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
-
-        IdentityLibrary.DTOs.RefreshToken refreshToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), refreshTokenValue, false, DateTime.UtcNow);
-        await _refreshTokensRepo.CreateAsync(refreshToken);
-
-        return Ok(new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue));
+        AuthResponseDto response = await IssueTokensAsync(user);
+        return Ok(response);
     }
 
     [HttpPost("ConfirmLoginViaEmail")]
     public async Task<ActionResult> ConfirmLoginViaEmail(ConfirmLoginModel model)
     {
         if (string.IsNullOrWhiteSpace(model.UserId) || string.IsNullOrWhiteSpace(model.TwoFactorToken))
-        {
-            _logger.LogError("User ID and token are required");
             return BadRequest("User ID and token are required");
-        }
 
         ApplicationUser? user = await _usersManager.FindByIdAsync(model.UserId);
-
         if (user is null)
-        {
-            _logger.LogError("User with ID {UserId} not found", model.UserId);
             return NotFound();
-        }
 
         bool isValidTwoFactorToken = await _usersManager.VerifyTwoFactorTokenAsync(user, "Email", model.TwoFactorToken);
-
         if (!isValidTwoFactorToken)
-        {
-            _logger.LogWarning("Invalid 2FA token for user {UserId}", user.Id);
             return BadRequest("Invalid 2FA token");
-        }
 
-        await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
-
-        string accessToken = await _authTokenGenerator.GenerateAccessToken(user);
-        string refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
-
-        IdentityLibrary.DTOs.RefreshToken refreshToken = new IdentityLibrary.DTOs.RefreshToken(0, Convert.ToInt64(user.Id), refreshTokenValue, false, DateTime.UtcNow);
-        await _refreshTokensRepo.CreateAsync(refreshToken);
-
-        return Ok(new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue));
-    }
-
-    [HttpPost("logout")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult> Logout()
-    {
-        try
-        {
-            Claim? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim is null)
-                return Unauthorized();
-
-            ApplicationUser? user = await _usersManager.FindByIdAsync(userIdClaim.Value);
-            if (user is null)
-                return NotFound();
-
-            await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
-
-            return Ok("Logged out successfully");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during logout");
-            return StatusCode(500, ex.Message);
-        }
-    }
-
-    [HttpPost("refresh-token")]
-    public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
-    {
-        if (string.IsNullOrEmpty(request.RefreshToken))
-            return BadRequest("Refresh token is required");
-
-        try
-        {
-            IdentityLibrary.DTOs.RefreshToken? storedToken = await _refreshTokensRepo.GetByValueAsync(request.RefreshToken);
-
-            if (storedToken is null)
-            {
-                _logger.LogWarning("Invalid refresh token");
-                return BadRequest("Invalid refresh token");
-            }
-
-            // ✅ ПРОВЕРЯЕМ СРОК ГОДНОСТИ
-            var refreshTokenLifetime = _authSettingsOptionsMonitor.CurrentValue.RefreshTokenLifetimeDays;
-            if (storedToken.CreatedAt.AddDays(refreshTokenLifetime) < DateTime.UtcNow)
-            {
-                _logger.LogWarning("Refresh token expired for user {UserId}", storedToken.UserId);
-                await _refreshTokensRepo.RevokeAsync(storedToken.Id);
-                return BadRequest("Refresh token expired");
-            }
-
-            // ✅ ПРОВЕРЯЕМ, НЕ ОТОЗВАН ЛИ ТОКЕН
-            if (storedToken.IsRevoked)
-            {
-                _logger.LogWarning("Refresh token is revoked for user {UserId}", storedToken.UserId);
-                return BadRequest("Refresh token is revoked");
-            }
-
-            ApplicationUser? user = await _usersManager.FindByIdAsync(storedToken.UserId.ToString());
-            if (user is null)
-            {
-                _logger.LogWarning("User not found for refresh token");
-                return BadRequest("User not found");
-            }
-
-            // Отзываем старый токен
-            await _refreshTokensRepo.RevokeAsync(storedToken.Id);
-
-            // Создаем новые токены
-            string newAccessToken = await _authTokenGenerator.GenerateAccessToken(user);
-            string newRefreshToken = _authTokenGenerator.GenerateRefreshToken();
-
-            IdentityLibrary.DTOs.RefreshToken newToken = new(
-                0,
-                Convert.ToInt64(user.Id),
-                newRefreshToken,
-                false,
-                DateTime.UtcNow
-            );
-            await _refreshTokensRepo.CreateAsync(newToken);
-
-            return Ok(new AuthResponseDto(true, false, string.Empty, newAccessToken, newRefreshToken));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error refreshing token");
-            return StatusCode(500, "Internal server error during token refresh");
-        }
+        AuthResponseDto response = await IssueTokensAsync(user);
+        return Ok(response);
     }
 
     [HttpPost("register")]
     public async Task<ActionResult<string>> Register(RegisterModel registerModel)
     {
         ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
-
         if (userToCheckExistance is not null)
             return BadRequest($"Пользователь с {registerModel.UserEmail} уже существует");
+
         IQueryable<ApplicationUser> registeredUsers = _usersManager.Users;
         userToCheckExistance = registeredUsers.FirstOrDefault(b => b.NormalizedUserName == registerModel.UserName.ToUpperInvariant());
         if (userToCheckExistance is not null)
@@ -274,108 +186,34 @@ public sealed class AuthController : ControllerBase
 
         IdentityResult userCreationResult = await _usersManager.CreateAsync(user);
 
-        if (userCreationResult.Succeeded)
+        if (!userCreationResult.Succeeded)
+            return StatusCode(500, "User creation error");
+
+        // Admin role
+        if (string.Equals(registerModel.UserEmail, _authSettingsOptionsMonitor.CurrentValue.AdminEmail)
+            && string.Equals(registerModel.Password, _authSettingsOptionsMonitor.CurrentValue.AdminPassword))
         {
-            if (string.Equals(registerModel.UserEmail, _authSettingsOptionsMonitor.CurrentValue.AdminEmail) && string.Equals(registerModel.Password, _authSettingsOptionsMonitor.CurrentValue.AdminPassword))
+            ApplicationUser? userToBindToAdminRole = await _usersManager.FindByEmailAsync(user.Email);
+            IdentityResult addingToAdminRoleIdentityResult = await _usersManager.AddToRoleAsync(userToBindToAdminRole, "Admin");
+            if (!addingToAdminRoleIdentityResult.Succeeded)
             {
-                ApplicationUser? userToBindToAdminRole = await _usersManager.FindByEmailAsync(user.Email);
-                IdentityResult addingToAdminRoleIdentityResult = await _usersManager.AddToRoleAsync(userToBindToAdminRole, "Admin");
-                if (!addingToAdminRoleIdentityResult.Succeeded)
-                {
-                    _logger.LogError($"Ошибка добавления к роли администратора. {string.Join(", ", addingToAdminRoleIdentityResult.Errors.Select(b => $"{b.Code}, {b.Description}"))}");
-                }
+                _logger.LogError(
+                    $"Ошибка добавления к роли администратора. {string.Join(", ", addingToAdminRoleIdentityResult.Errors.Select(b => $"{b.Code}, {b.Description}"))}");
             }
-
-            user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
-
-            string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
-            string? callbackUrl = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-
-            MimeMessage emailMessage = new();
-
-            emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
-            emailMessage.To.Add(new MailboxAddress("", user.Email));
-            emailMessage.Subject = "Confirm email";
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
-            {
-                Text = $"Confirm email: go to email confirmation <a href=\"{callbackUrl}\">link</a> to confirm your email"
-            };
-
-            using (SmtpClient client = new())
-            {
-                await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
-                await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
-                _ = await client.SendAsync(emailMessage);
-
-                await client.DisconnectAsync(true);
-            }
-
-            return Ok("Email verification has been set");
         }
 
-        return StatusCode(500, "User creation error");
-    }
+        user = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
 
-
-
-    [HttpGet("ConfirmEmail")]
-    public async Task<IActionResult> ConfirmEmail(string userId, string code)
-    {
-        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
-            return BadRequest("UserId and code are required");
-
-        // URL decode the code if needed
-        code = WebUtility.UrlDecode(code);
-
-        ApplicationUser? user = await _usersManager.FindByIdAsync(userId);
-        if (user is null)
-            return NotFound("User not found");
-
-        IdentityResult emailConfirmationResult = await _usersManager.ConfirmEmailAsync(user, code);
-
-        if (!emailConfirmationResult.Succeeded)
-            return StatusCode(StatusCodes.Status400BadRequest, userId);
-
-        return Ok($"Email {user.Email} подтверждён.");
-    }
-
-    [HttpPost("assignToAdmin")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult> AssignToAdmin(string humanToAssignToAdminEmail)
-    {
-        ApplicationUser? humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
-
-        if (humanToAssignToAdmin is null)
-            return NotFound("Human to assign to admin not found");
-
-        else
-        {
-            IdentityResult identityResult = await _usersManager.AddToRoleAsync(humanToAssignToAdmin, "Admin");
-            if (identityResult is null)
-                return NotFound();
-            if (!identityResult.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, identityResult);
-            return Ok(identityResult);
-        }
-    }
-
-    [HttpPost("resetPassword")]
-    public async Task<ActionResult> ResetPassword(Domain.Auth.ResetPasswordModel resetPasswordModel)
-    {
-        ApplicationUser user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
-        if (user is null)
-            return NotFound();
-
-        string resetPasswordToken = await _usersManager.GeneratePasswordResetTokenAsync(user);
+        string code = WebUtility.UrlEncode(await _usersManager.GenerateEmailConfirmationTokenAsync(user));
+        string? callbackUrl = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
         MimeMessage emailMessage = new();
-
         emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
         emailMessage.To.Add(new MailboxAddress("", user.Email));
-        emailMessage.Subject = "Reset password";
+        emailMessage.Subject = "Confirm email";
         emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
         {
-            Text = $"Reset password token - {resetPasswordToken}"
+            Text = $"Confirm email: go to email confirmation <a href=\"{callbackUrl}\">link</a> to confirm your email"
         };
 
         using (SmtpClient client = new())
@@ -383,86 +221,164 @@ public sealed class AuthController : ControllerBase
             await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
             await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
             _ = await client.SendAsync(emailMessage);
-
             await client.DisconnectAsync(true);
         }
 
-        return Ok($"Email with reset password token has been send to {resetPasswordModel.Email}");
+        return Ok("Email verification has been set");
     }
 
-    [HttpPost("resetPasswordConfirm")]
-    public async Task<ActionResult> ResetPasswordConfirm(Domain.Auth.ResetPasswordConfirmModel resetPasswordModel)
+    [HttpGet("ConfirmEmail")]
+    public async Task<IActionResult> ConfirmEmail(string userId, string code)
     {
-        ApplicationUser user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
+        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
+            return BadRequest("UserId and code are required");
+
+        code = WebUtility.UrlDecode(code);
+
+        ApplicationUser? user = await _usersManager.FindByIdAsync(userId);
         if (user is null)
-            return NotFound();
-        IdentityResult passwordResettingResult = await _usersManager.ResetPasswordAsync(user, resetPasswordModel.ResetPasswordToken, resetPasswordModel.NewPassword);
-        if (passwordResettingResult.Succeeded)
-            return Ok("Password has been changed successfully");
-        return StatusCode(StatusCodes.Status500InternalServerError);
+            return NotFound("User not found");
+
+        IdentityResult emailConfirmationResult = await _usersManager.ConfirmEmailAsync(user, code);
+        if (!emailConfirmationResult.Succeeded)
+            return StatusCode(StatusCodes.Status400BadRequest, userId);
+
+        return Ok($"Email {user.Email} подтверждён.");
     }
 
-    [HttpPost("setTwoFactorEnabled")]
+    [HttpPost("logout")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult> SetTwoFactorEnabled(Domain.Auth.SetTwoFactorEnabledModel setTwoFactorEnabledModel)
+    public async Task<ActionResult> Logout()
     {
-        Claim? userId = User.FindFirst(ClaimTypes.NameIdentifier);
-        ApplicationUser applicationUser = await _usersManager.FindByIdAsync(userId.Value);
-        if (applicationUser is null)
-            return NotFound();
-        IdentityResult settingTwoFactorEnabledResult = await _usersManager.SetTwoFactorEnabledAsync(applicationUser, setTwoFactorEnabledModel.TwoFactorEnabled);
-        if (settingTwoFactorEnabledResult.Succeeded)
-            return Ok("Two factor enabled fact has been changed successfully");
-        return StatusCode(StatusCodes.Status500InternalServerError);
-    }
-
-    [HttpPost("addPassword/{password}")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult> AddPasswordAsync(string password)
-    {
-        _logger.LogInformation("addPassword");
-
         try
         {
-            string emailClaimValue = User.Claims.SingleOrDefault(b => b.Type == ClaimTypes.Email)?.Value;
+            string? userId = GetCurrentUserId();
+            if (userId is null)
+                return Unauthorized();
 
-            if (string.IsNullOrWhiteSpace(emailClaimValue))
-            {
-                _logger.LogWarning("Email claim not found in user claims");
-                return BadRequest("Email claim not found");
-            }
-
-            ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(emailClaimValue);
-
-            if (userToCheckExistance is null)
-            {
-                _logger.LogWarning("userToCheckExistance is null");
+            ApplicationUser? user = await _usersManager.FindByIdAsync(userId);
+            if (user is null)
                 return NotFound();
-            }
-            if (string.IsNullOrWhiteSpace(userToCheckExistance.PasswordHash))
-            {
-                _ = await _usersManager.AddPasswordAsync(userToCheckExistance, password);
 
-                return Ok();
-            }
-
-            return BadRequest("Password is already set for this user");
+            await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
+            return Ok("Logged out successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Ошибка при добавлении пароля: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            return StatusCode(500, $"Ошибка при добавлении пароля: {ex.Message}");
+            _logger.LogError(ex, "Error during logout");
+            return StatusCode(500, ex.Message);
         }
     }
+
+    [HttpPost("refresh-token")]
+    public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    {
+        if (string.IsNullOrEmpty(request.RefreshToken))
+            return BadRequest("Refresh token is required");
+
+        try
+        {
+            IdentityLibrary.DTOs.RefreshToken? storedToken = await _refreshTokensRepo.GetByValueAsync(request.RefreshToken);
+            if (storedToken is null)
+            {
+                _logger.LogWarning("Invalid refresh token");
+                return BadRequest("Invalid refresh token");
+            }
+
+            var refreshTokenLifetime = _authSettingsOptionsMonitor.CurrentValue.RefreshTokenLifetimeDays;
+            if (storedToken.CreatedAt.AddDays(refreshTokenLifetime) < DateTime.UtcNow)
+            {
+                _logger.LogWarning("Refresh token expired for user {UserId}", storedToken.UserId);
+                await _refreshTokensRepo.RevokeAsync(storedToken.Id);
+                return BadRequest("Refresh token expired");
+            }
+
+            if (storedToken.IsRevoked)
+            {
+                _logger.LogWarning("Refresh token is revoked for user {UserId}", storedToken.UserId);
+                return BadRequest("Refresh token is revoked");
+            }
+
+            ApplicationUser? user = await _usersManager.FindByIdAsync(storedToken.UserId.ToString());
+            if (user is null)
+            {
+                _logger.LogWarning("User not found for refresh token");
+                return BadRequest("User not found");
+            }
+
+            await _refreshTokensRepo.RevokeAsync(storedToken.Id);
+
+            AuthResponseDto response = await IssueTokensAsync(user);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error refreshing token");
+            return StatusCode(500, "Internal server error during token refresh");
+        }
+    }
+
+    // ============================================================
+    // VK ID — SCENARIO 2: LINK (user must be logged in)
+    // ============================================================
+
+    [HttpPost("link-vkid")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public IActionResult LinkVKID()
+    {
+        string? userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        string state = Guid.NewGuid().ToString("N");
+        string codeVerifier = _authTokenGenerator.GenerateCodeVerifier();
+        string codeChallenge = _authTokenGenerator.GenerateCodeChallenge(codeVerifier);
+
+        // Сохраняем userId + codeVerifier в HttpOnly cookie
+        Response.Cookies.Append(
+            $"vkid_link_{state}",
+            $"{userId}|{codeVerifier}",
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,  // нужно для cross-site redirect от VK
+                Expires = DateTimeOffset.UtcNow.AddMinutes(10),
+                Path = "/api/auth"
+            });
+
+        string redirectUri = $"{Request.Scheme}://{Request.Host}/api/auth/vkid-link-callback";
+        string clientId = _authSettingsOptionsMonitor.CurrentValue.Vk.ClientId;
+
+        string authUrl =
+            $"https://id.vk.ru/authorize?response_type=code" +
+            $"&client_id={clientId}" +
+            $"&scope=vkid.personal_info" +
+            $"&redirect_uri={Uri.EscapeDataString(redirectUri)}" +
+            $"&state={state}" +
+            $"&code_challenge={codeChallenge}" +
+            $"&code_challenge_method=S256";
+
+        _logger.LogInformation("VK ID link initiated for user {UserId}", userId);
+
+        return Ok(new { url = authUrl });
+    }
+
+    // ============================================================
+    // VK ID — SCENARIO 3: LOGIN
+    // ============================================================
 
     [HttpGet("login-vkid")]
     public IActionResult LoginVKID()
     {
         try
         {
-            // Правильное имя схемы — "VK ID"
             AuthenticationProperties properties = _signInManager
-                .ConfigureExternalAuthenticationProperties("VK ID", Url.Action(nameof(VKIDCallback), "Auth"));
+                .ConfigureExternalAuthenticationProperties(
+                    "VK ID",
+                    Url.Action(nameof(VKIDCallback), "Auth"));
+
+            properties.Items["flow"] = "login";
 
             _logger.LogInformation("VK ID login initiated");
             return Challenge(properties, "VK ID");
@@ -473,6 +389,10 @@ public sealed class AuthController : ControllerBase
             return StatusCode(500, $"Ошибка: {ex.Message}");
         }
     }
+
+    // ============================================================
+    // VK ID — COMMON CALLBACK
+    // ============================================================
 
     [HttpGet("vkid-callback")]
     public async Task<ActionResult> VKIDCallback()
@@ -490,67 +410,85 @@ public sealed class AuthController : ControllerBase
                 return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkid_auth_failed");
             }
 
-            // Логируем все claims для отладки
             foreach (Claim claim in result.Principal.Claims)
                 _logger.LogInformation("Claim: {Type} = {Value}", claim.Type, claim.Value);
 
-            // Извлекаем данные по правильным типам claims
-            string? nameIdentifier = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string? givenName = result.Principal.FindFirst(ClaimTypes.GivenName)?.Value;
-            string? surname = result.Principal.FindFirst(ClaimTypes.Surname)?.Value;
-            string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
-            string? phone = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
-            string? gender = result.Principal.FindFirst(ClaimTypes.Gender)?.Value;
-            string? dateOfBirth = result.Principal.FindFirst(ClaimTypes.DateOfBirth)?.Value;
+            string flow = result.Properties?.Items["flow"] ?? "login";
+            _logger.LogInformation("VK ID flow: {Flow}", flow);
 
-            string fullName = $"{givenName} {surname}".Trim();
-
-            _logger.LogInformation(
-                "VK ID: Id={VkId}, Name={Name}, Email={Email}, Phone={Phone}",
-                nameIdentifier, fullName, email, phone);
-
-            if (string.IsNullOrEmpty(nameIdentifier))
+            string? vkUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(vkUserId))
             {
                 _logger.LogError("VK UserId is null");
                 return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_vk_id");
             }
 
-            // ProcessExternalLoginAsync создаёт/находит пользователя и генерирует токены
-            AuthResponseDto tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
-                provider: "VK ID",
-                providerKey: nameIdentifier,
-                email: email,               // может быть null — это нормально
-                name: fullName,             // ← fullName, а не phone
-                phoneNumber: phone
-            );
+            string? givenName = result.Principal.FindFirst(ClaimTypes.GivenName)?.Value;
+            string? surname = result.Principal.FindFirst(ClaimTypes.Surname)?.Value;
+            string fullName = $"{givenName} {surname}".Trim();
 
-            if (!tokenResponse.IsAuthSuccessful)
+            // ============================================================
+            // SCENARIO 2: LINK VK TO CURRENT USER
+            // ============================================================
+            if (flow == "link")
             {
-                _logger.LogWarning("VK ID ProcessExternalLogin failed: {Error}", tokenResponse.ErrorMessage);
-                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkid_auth_failed");
+                string? linkUserId = result.Properties?.Items["linkUserId"];
+                if (string.IsNullOrEmpty(linkUserId))
+                {
+                    _logger.LogError("linkUserId not found in properties");
+                    return Redirect($"{Request.Scheme}://{Request.Host}/profile?error=missing_user_id");
+                }
+
+                ApplicationUser? currentUser = await _usersManager.FindByIdAsync(linkUserId);
+                if (currentUser is null)
+                {
+                    _logger.LogError("User {UserId} not found for linking", linkUserId);
+                    return Redirect($"{Request.Scheme}://{Request.Host}/profile?error=user_not_found");
+                }
+
+                ApplicationUser? existingVkUser = await _usersManager.FindByLoginAsync("VK ID", vkUserId);
+                if (existingVkUser is not null && existingVkUser.Id != currentUser.Id)
+                {
+                    _logger.LogWarning(
+                        "VK ID {VkUserId} already linked to user {ExistingUserId}",
+                        vkUserId, existingVkUser.Id);
+                    return Redirect($"{Request.Scheme}://{Request.Host}/profile?error=vkid_already_linked");
+                }
+
+                IdentityResult addLoginResult = await _usersManager.AddLoginAsync(
+                    currentUser,
+                    new UserLoginInfo("VK ID", vkUserId, "VK ID"));
+
+                if (!addLoginResult.Succeeded)
+                {
+                    var errors = string.Join(", ", addLoginResult.Errors.Select(e => e.Description));
+                    _logger.LogError("Failed to link VK ID: {Errors}", errors);
+                    return Redirect($"{Request.Scheme}://{Request.Host}/profile?error={WebUtility.UrlEncode(errors)}");
+                }
+
+                _logger.LogInformation("VK ID {VkUserId} linked to user {UserId}", vkUserId, currentUser.Id);
+                return Redirect($"{Request.Scheme}://{Request.Host}/profile?success=vkid_linked");
             }
 
-            if (string.IsNullOrWhiteSpace(tokenResponse.AccessToken))
+            // ============================================================
+            // SCENARIO 1 & 3: LOGIN
+            // ============================================================
+            ApplicationUser? user = await _usersManager.FindByLoginAsync("VK ID", vkUserId);
+
+            // SCENARIO 1: VK ID not linked to any account
+            if (user is null)
             {
-                _logger.LogError("VK ID: AccessToken is empty");
-                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_access_token");
+                _logger.LogWarning("VK ID {VkUserId} is not linked to any account", vkUserId);
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkid_not_linked");
             }
 
-            // Если email нет — на страницу завершения профиля
-            if (string.IsNullOrEmpty(email))
-            {
-                return Redirect(
-                    $"{Request.Scheme}://{Request.Host}/auth/complete-profile" +
-                    $"?token={Uri.EscapeDataString(tokenResponse.AccessToken)}" +
-                    $"&refresh={Uri.EscapeDataString(tokenResponse.RefreshToken ?? "")}" +
-                    $"&provider=vkid");
-            }
+            // SCENARIO 3: VK ID linked — login
+            AuthResponseDto response = await IssueTokensAsync(user);
 
-            // Email есть — сразу логиним
             return Redirect(
                 $"{Request.Scheme}://{Request.Host}/auth/vkid-callback" +
-                $"?Token={Uri.EscapeDataString(tokenResponse.AccessToken)}" +
-                $"&RefreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken ?? "")}");
+                $"?Token={Uri.EscapeDataString(response.AccessToken)}" +
+                $"&RefreshToken={Uri.EscapeDataString(response.RefreshToken ?? "")}");
         }
         catch (Exception ex)
         {
@@ -559,22 +497,99 @@ public sealed class AuthController : ControllerBase
         }
     }
 
+    [HttpGet("vkid-link-callback")]
+    public async Task<ActionResult> VKIDLinkCallback(
+    [FromQuery] string code,
+    [FromQuery] string state)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(state))
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=missing_params");
+
+            // Читаем cookie
+            if (!Request.Cookies.TryGetValue($"vkid_link_{state}", out string? cookieValue) ||
+                string.IsNullOrWhiteSpace(cookieValue))
+            {
+                _logger.LogWarning("Invalid or expired state: {State}", state);
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=invalid_state");
+            }
+
+            // Удаляем cookie — она одноразовая
+            Response.Cookies.Delete($"vkid_link_{state}", new CookieOptions
+            {
+                Path = "/api/auth",
+                Secure = true,
+                SameSite = SameSiteMode.None
+            });
+
+            string[] parts = cookieValue.Split('|');
+            if (parts.Length != 2)
+            {
+                _logger.LogError("Invalid cookie format for state {State}", state);
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=invalid_state");
+            }
+
+            string userId = parts[0];
+            string codeVerifier = parts[1];
+
+            ApplicationUser? currentUser = await _usersManager.FindByIdAsync(userId);
+            if (currentUser is null)
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=user_not_found");
+
+            // Обмениваем code на user_id VK
+            string? vkUserId = await _authTokenGenerator.ExchangeVkCodeForUserIdAsync(code, codeVerifier, Request.Scheme, Request.Host.Value);
+            if (string.IsNullOrEmpty(vkUserId))
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=vk_exchange_failed");
+
+            // Проверяем, не привязан ли уже
+            ApplicationUser? existingVkUser = await _usersManager.FindByLoginAsync("VK ID", vkUserId);
+            if (existingVkUser is not null && existingVkUser.Id != currentUser.Id)
+            {
+                _logger.LogWarning(
+                    "VK ID {VkUserId} already linked to user {ExistingUserId}",
+                    vkUserId, existingVkUser.Id);
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=vkid_already_linked");
+            }
+
+            // Привязываем
+            IdentityResult addLoginResult = await _usersManager.AddLoginAsync(
+                currentUser,
+                new UserLoginInfo("VK ID", vkUserId, "VK ID"));
+
+            if (!addLoginResult.Succeeded)
+            {
+                var errors = string.Join(", ", addLoginResult.Errors.Select(e => e.Description));
+                _logger.LogError("Failed to link VK ID: {Errors}", errors);
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error={WebUtility.UrlEncode(errors)}");
+            }
+
+            _logger.LogInformation("VK ID {VkUserId} linked to user {UserId}", vkUserId, currentUser.Id);
+            return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?success=vkid_linked");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in VK ID link callback");
+            return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error={WebUtility.UrlEncode(ex.Message)}");
+        }
+    }
+
+    // ============================================================
+    // PROFILE / USER MANAGEMENT
+    // ============================================================
+
     [HttpGet("current-user")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<ApplicationUser>> GetCurrentUserAsync()
     {
-        string? emailClaimValue = User.Claims.SingleOrDefault(b => b.Type == ClaimTypes.Email)?.Value;
-        if (string.IsNullOrWhiteSpace(emailClaimValue))
-        {
-            _logger.LogWarning("Email claim not found in user claims");
-            return null;
-        }
-        ApplicationUser? user = await _usersManager.FindByEmailAsync(emailClaimValue);
+        string? userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        ApplicationUser? user = await _usersManager.FindByIdAsync(userId);
         if (user is null)
-        {
-            _logger.LogWarning("User with email {Email} not found", emailClaimValue);
             return NotFound();
-        }
+
         return Ok(user);
     }
 
@@ -582,27 +597,23 @@ public sealed class AuthController : ControllerBase
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult> ChangePassword(ChangePasswordModel changePasswordModel)
     {
-        string? emailClaimValue = User.Claims.SingleOrDefault(b => b.Type == ClaimTypes.Email)?.Value;
-        if (string.IsNullOrWhiteSpace(emailClaimValue))
-        {
-            _logger.LogWarning("Email claim not found in user claims");
-            return BadRequest("Email claim not found");
-        }
-        ApplicationUser? user = await _usersManager.FindByEmailAsync(emailClaimValue);
+        string? userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        ApplicationUser? user = await _usersManager.FindByIdAsync(userId);
         if (user is null)
-        {
-            _logger.LogWarning("User with email {Email} not found", emailClaimValue);
             return NotFound();
-        }
 
         if (!string.IsNullOrWhiteSpace(user.PasswordHash))
         {
             bool isValidPassword = await _usersManager.CheckPasswordAsync(user, changePasswordModel.CurrentPassword);
-
             if (!isValidPassword)
                 return BadRequest("Current password is incorrect");
 
-            IdentityResult changePasswordResult = await _usersManager.ChangePasswordAsync(user, changePasswordModel.CurrentPassword, changePasswordModel.NewPassword);
+            IdentityResult changePasswordResult = await _usersManager.ChangePasswordAsync(
+                user, changePasswordModel.CurrentPassword, changePasswordModel.NewPassword);
+
             if (changePasswordResult.Succeeded)
                 return Ok("Password has been changed successfully");
 
@@ -616,5 +627,152 @@ public sealed class AuthController : ControllerBase
 
             return StatusCode(StatusCodes.Status500InternalServerError, addPasswordResult);
         }
+    }
+
+    [HttpPost("addPassword/{password}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult> AddPasswordAsync(string password)
+    {
+        _logger.LogInformation("addPassword");
+
+        try
+        {
+            string? userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            ApplicationUser? user = await _usersManager.FindByIdAsync(userId);
+            if (user is null)
+                return NotFound();
+
+            if (string.IsNullOrWhiteSpace(user.PasswordHash))
+            {
+                await _usersManager.AddPasswordAsync(user, password);
+                return Ok();
+            }
+
+            return BadRequest("Password is already set for this user");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при добавлении пароля: {ex.Message}");
+            return StatusCode(500, $"Ошибка при добавлении пароля: {ex.Message}");
+        }
+    }
+
+    [HttpPost("setTwoFactorEnabled")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult> SetTwoFactorEnabled(Domain.Auth.SetTwoFactorEnabledModel setTwoFactorEnabledModel)
+    {
+        string? userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        ApplicationUser? applicationUser = await _usersManager.FindByIdAsync(userId);
+        if (applicationUser is null)
+            return NotFound();
+
+        IdentityResult settingTwoFactorEnabledResult = await _usersManager.SetTwoFactorEnabledAsync(
+            applicationUser, setTwoFactorEnabledModel.TwoFactorEnabled);
+
+        if (settingTwoFactorEnabledResult.Succeeded)
+            return Ok("Two factor enabled fact has been changed successfully");
+
+        return StatusCode(StatusCodes.Status500InternalServerError);
+    }
+
+    [HttpPost("assignToAdmin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
+    public async Task<ActionResult> AssignToAdmin(string humanToAssignToAdminEmail)
+    {
+        ApplicationUser? humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
+        if (humanToAssignToAdmin is null)
+            return NotFound("Human to assign to admin not found");
+
+        IdentityResult identityResult = await _usersManager.AddToRoleAsync(humanToAssignToAdmin, "Admin");
+        if (identityResult is null)
+            return NotFound();
+        if (!identityResult.Succeeded)
+            return StatusCode(StatusCodes.Status500InternalServerError, identityResult);
+
+        return Ok(identityResult);
+    }
+
+    [HttpPost("addExternalLogin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult> AddExternalLogin()
+    {
+        try
+        {
+            string? userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            ApplicationUser? authUser = await _usersManager.FindByIdAsync(userId);
+            if (authUser is null)
+                return NotFound();
+
+            IdentityResult identityResult = await _usersManager.AddLoginAsync(
+                authUser,
+                new UserLoginInfo("Google", authUser.Email, "Google"));
+
+            if (identityResult.Succeeded)
+                return Ok(identityResult);
+
+            return BadRequest(identityResult);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    // ============================================================
+    // PASSWORD RESET
+    // ============================================================
+
+    [HttpPost("resetPassword")]
+    public async Task<ActionResult> ResetPassword(Domain.Auth.ResetPasswordModel resetPasswordModel)
+    {
+        ApplicationUser? user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
+        if (user is null)
+            return NotFound();
+
+        string resetPasswordToken = await _usersManager.GeneratePasswordResetTokenAsync(user);
+
+        MimeMessage emailMessage = new();
+        emailMessage.From.Add(new MailboxAddress(_emailSettings.CurrentValue.Sender.Name, _emailSettings.CurrentValue.Sender.Email));
+        emailMessage.To.Add(new MailboxAddress("", user.Email));
+        emailMessage.Subject = "Reset password";
+        emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+        {
+            Text = $"Reset password token - {resetPasswordToken}"
+        };
+
+        using (SmtpClient client = new())
+        {
+            await client.ConnectAsync(_emailSettings.CurrentValue.Host, _emailSettings.CurrentValue.Port, _emailSettings.CurrentValue.UseSsl);
+            await client.AuthenticateAsync(_emailSettings.CurrentValue.UserName, _emailSettings.CurrentValue.Password);
+            _ = await client.SendAsync(emailMessage);
+            await client.DisconnectAsync(true);
+        }
+
+        return Ok($"Email with reset password token has been send to {resetPasswordModel.Email}");
+    }
+
+    [HttpPost("resetPasswordConfirm")]
+    public async Task<ActionResult> ResetPasswordConfirm(Domain.Auth.ResetPasswordConfirmModel resetPasswordModel)
+    {
+        ApplicationUser? user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
+        if (user is null)
+            return NotFound();
+
+        IdentityResult passwordResettingResult = await _usersManager.ResetPasswordAsync(
+            user, resetPasswordModel.ResetPasswordToken, resetPasswordModel.NewPassword);
+
+        if (passwordResettingResult.Succeeded)
+            return Ok("Password has been changed successfully");
+
+        return StatusCode(StatusCodes.Status500InternalServerError);
     }
 }
