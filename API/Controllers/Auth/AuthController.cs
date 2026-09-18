@@ -490,30 +490,50 @@ public sealed class AuthController : ControllerBase
                 return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkid_auth_failed");
             }
 
+            // Логируем все claims для отладки
             foreach (Claim claim in result.Principal.Claims)
-                _logger.LogInformation("Type - {Type}, Value - {Value}", claim.Type, claim.Value);
+                _logger.LogInformation("Claim: {Type} = {Value}", claim.Type, claim.Value);
 
             // Извлекаем данные по правильным типам claims
+            string? nameIdentifier = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string? givenName = result.Principal.FindFirst(ClaimTypes.GivenName)?.Value;
+            string? surname = result.Principal.FindFirst(ClaimTypes.Surname)?.Value;
             string? email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
             string? phone = result.Principal.FindFirst(ClaimTypes.MobilePhone)?.Value;
+            string? gender = result.Principal.FindFirst(ClaimTypes.Gender)?.Value;
+            string? dateOfBirth = result.Principal.FindFirst(ClaimTypes.DateOfBirth)?.Value;
+
+            string fullName = $"{givenName} {surname}".Trim();
 
             _logger.LogInformation(
-                "VK ID: Email={Email}, Phone={Phone}",
-                email, phone);
+                "VK ID: Id={VkId}, Name={Name}, Email={Email}, Phone={Phone}",
+                nameIdentifier, fullName, email, phone);
 
-            // ProcessExternalLoginAsync уже создаёт/находит пользователя и генерирует токены
+            if (string.IsNullOrEmpty(nameIdentifier))
+            {
+                _logger.LogError("VK UserId is null");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_vk_id");
+            }
+
+            // ProcessExternalLoginAsync создаёт/находит пользователя и генерирует токены
             AuthResponseDto tokenResponse = await _twoFactorAuthEmailProcessor.ProcessExternalLoginAsync(
                 provider: "VK ID",
-                providerKey: phone,
-                email: email ?? "",
-                name: phone,
+                providerKey: nameIdentifier,
+                email: email,               // может быть null — это нормально
+                name: fullName,             // ← fullName, а не phone
                 phoneNumber: phone
             );
 
             if (!tokenResponse.IsAuthSuccessful)
             {
-                _logger.LogWarning("VK ID ProcessExternalLogin failed");
+                _logger.LogWarning("VK ID ProcessExternalLogin failed: {Error}", tokenResponse.ErrorMessage);
                 return Redirect($"{Request.Scheme}://{Request.Host}/login?error=vkid_auth_failed");
+            }
+
+            if (string.IsNullOrWhiteSpace(tokenResponse.AccessToken))
+            {
+                _logger.LogError("VK ID: AccessToken is empty");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_access_token");
             }
 
             // Если email нет — на страницу завершения профиля
@@ -522,7 +542,7 @@ public sealed class AuthController : ControllerBase
                 return Redirect(
                     $"{Request.Scheme}://{Request.Host}/auth/complete-profile" +
                     $"?token={Uri.EscapeDataString(tokenResponse.AccessToken)}" +
-                    $"&refresh={Uri.EscapeDataString(tokenResponse.RefreshToken)}" +
+                    $"&refresh={Uri.EscapeDataString(tokenResponse.RefreshToken ?? "")}" +
                     $"&provider=vkid");
             }
 
@@ -530,7 +550,7 @@ public sealed class AuthController : ControllerBase
             return Redirect(
                 $"{Request.Scheme}://{Request.Host}/auth/vkid-callback" +
                 $"?Token={Uri.EscapeDataString(tokenResponse.AccessToken)}" +
-                $"&RefreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken)}");
+                $"&RefreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken ?? "")}");
         }
         catch (Exception ex)
         {
