@@ -92,6 +92,9 @@ internal class Program
             vkOptions.Scope.Add("email");
             vkOptions.Scope.Add("phone");
 
+            vkOptions.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+            vkOptions.ClaimActions.MapJsonKey(ClaimTypes.MobilePhone, "phone");
+
             vkOptions.Events.OnCreatingTicket = context =>
             {
                 var logger = context.HttpContext.RequestServices
