@@ -1,18 +1,22 @@
 ﻿@page "/admin/games/collections/{Id:long}/add-games"
 @using Domain.Games
+
 <h3>AddCollectionItemPage</h3>
 
 <AuthorizeView Policy="Admin">
     <Authorized>
         <EditForm OnValidSubmit="@AddGameCollectionItemAsync" Model="this" Context="myContext">
             <div>
+                <InputText @bind-Value="SearchTerm" placeholder="Поиск игры..." />
+
                 <InputSelect @bind-Value="SelectedGameId">
-                    <option value="-1" selected>None</option>
-                    @foreach (Game game in GamesToSelectFrom)
+                    <option value="-1">None</option>
+                    @foreach (Game game in filteredGames)
                     {
-                        <option value="@game.Id.ToString()">@game.Name</option>
+                        <option value="@game.Id">@game.Name</option>
                     }
                 </InputSelect>
+
                 <input type="submit" value="Add" />
             </div>
         </EditForm>
