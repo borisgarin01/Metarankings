@@ -513,4 +513,21 @@ public class AuthService : IAuthService
             return null;
         }
     }
+
+    public async Task<LinkVkidResponse> StartVkidLinkAsync()
+    {
+        HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsync("/api/auth/link-vkid", null);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            throw new UnauthorizedAccessException("Необходимо войти в систему");
+
+        response.EnsureSuccessStatusCode();
+
+        LinkVkidResponse? result = await response.Content.ReadFromJsonAsync<LinkVkidResponse>();
+
+        if (result is null || string.IsNullOrWhiteSpace(result.Url))
+            throw new InvalidOperationException("Сервер не вернул URL авторизации VK");
+
+        return result;
+    }
 }

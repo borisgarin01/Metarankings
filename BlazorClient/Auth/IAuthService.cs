@@ -1,6 +1,7 @@
 ﻿using Domain.Auth;
 using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
+using static BlazorClient.Pages.Auth.Account;
 
 namespace BlazorClient.Auth;
 
@@ -30,4 +31,5 @@ public interface IAuthService
     Task<HttpResponseMessage> SendResetPasswordConfirmMessage(ResetPasswordConfirmModel resetPasswordModel);
     Task<HttpResponseMessage> SendChangePasswordMessageAsync(ChangePasswordModel changePasswordModel);
     Task<HttpResponseMessage> SendTwoFactorEnabledMessage(SetTwoFactorEnabledModel setTwoFactorEnabledModel);
+    Task<LinkVkidResponse> StartVkidLinkAsync();
 }

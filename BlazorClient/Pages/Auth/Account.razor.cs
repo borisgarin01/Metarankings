@@ -13,6 +13,9 @@ public partial class Account : ComponentBase
     private string newPassword;
     private string? currentPassword;
     private bool isInitializing = true;
+    private bool _isLinking = false;
+    private string? _linkError;
+    private string? _linkSuccess;
 
     public bool TwoFactorEnabled
     {
@@ -70,8 +73,13 @@ public partial class Account : ComponentBase
     [Inject]
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
+    [SupplyParameterFromQuery(Name = "success")]
+    public string? SuccessParam { get; set; }
+
+    [SupplyParameterFromQuery(Name = "error")]
+    public string? ErrorParam { get; set; }
+
     private ApplicationUser applicationUser;
-    private string newPasswordConfirm;
 
     public ApplicationUser ApplicationUser
     {
@@ -86,6 +94,7 @@ public partial class Account : ComponentBase
         }
     }
 
+    private string newPasswordConfirm;
     public string NewPasswordConfirm
     {
         get => newPasswordConfirm;
@@ -160,6 +169,58 @@ public partial class Account : ComponentBase
         catch (Exception ex)
         {
             ToastService.ShowError($"Ошибка: {ex.Message}{ex.StackTrace}");
+        }
+    }
+
+    [Inject]
+    public HttpClient Http { get; set; } = default!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SuccessParam == "vkid_linked")
+        {
+            _linkSuccess = "VK ID успешно привязан к вашему аккаунту.";
+        }
+        else if (!string.IsNullOrEmpty(ErrorParam))
+        {
+            _linkError = ErrorParam switch
+            {
+                "vkid_already_linked" => "Этот VK ID уже привязан к другому аккаунту.",
+                "invalid_state" => "Ссылка устарела. Попробуйте снова.",
+                "missing_params" => "VK вернул некорректный ответ.",
+                "user_not_found" => "Пользователь не найден.",
+                "vk_exchange_failed" => "Не удалось обменять код VK. Попробуйте снова.",
+                _ => $"Ошибка: {ErrorParam}"
+            };
+        }
+
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task LinkVKID()
+    {
+        try
+        {
+            _isLinking = true;
+            _linkError = null;
+            _linkSuccess = null;
+            StateHasChanged();
+
+            LinkVkidResponse result = await AuthService.StartVkidLinkAsync();
+            NavigationManager.NavigateTo(result.Url, forceLoad: true);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            _linkError = "Необходимо войти в систему.";
+        }
+        catch (Exception ex)
+        {
+            _linkError = $"Ошибка: {ex.Message}";
+        }
+        finally
+        {
+            _isLinking = false;
+            StateHasChanged();
         }
     }
 }

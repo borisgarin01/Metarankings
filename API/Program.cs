@@ -51,13 +51,15 @@ internal class Program
         _ = builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 
         _ = builder.Services.AddLogging();
+
         _ = builder.Logging.ClearProviders();
         _ = builder.Logging.AddConsole();
 
         _ = builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
-            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            // Known networks for Docker
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor
+                                     | ForwardedHeaders.XForwardedProto
+                                     | ForwardedHeaders.XForwardedHost;
             options.KnownNetworks.Clear();
             options.KnownProxies.Clear();
         });
@@ -65,7 +67,7 @@ internal class Program
         _ = builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //if you dont use Jwt i think you can just delete this line
             options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
@@ -75,60 +77,47 @@ internal class Program
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = tokenValidationParameters;
             options.SaveToken = true;
-        }).AddGoogle(googleOptions =>
+        })
+        .AddVkId(vkOptions =>
         {
-            googleOptions.ClientId = builder.Configuration["AuthSettings:Google:ClientId"];
-            googleOptions.ClientSecret = builder.Configuration["AuthSettings:Google:ClientSecret"];
-        }).AddGitHub(githubOptions =>
-        {
-            githubOptions.SignInScheme = "Cookies";
-            githubOptions.ClientId = builder.Configuration["AuthSettings:GitHub:ClientId"];
-            githubOptions.ClientSecret = builder.Configuration["AuthSettings:GitHub:ClientSecret"];
-            githubOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:GitHub:AuthUri"];
-            githubOptions.TokenEndpoint = builder.Configuration["AuthSettings:GitHub:TokenUri"];
-            githubOptions.CallbackPath = builder.Configuration["AuthSettings:GitHub:CallbackPath"];
-            // Добавь маппинг полей из GitHub
-            githubOptions.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-            githubOptions.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
-            githubOptions.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-        }).
-        AddMailRu(mailRuAuthenticationOptions =>
-        {
-            mailRuAuthenticationOptions.SignInScheme = "Cookies";
-            mailRuAuthenticationOptions.ClientId = builder.Configuration["AuthSettings:MailRu:ClientId"];
-            mailRuAuthenticationOptions.ClientSecret = builder.Configuration["AuthSettings:MailRu:ClientSecret"];
-            mailRuAuthenticationOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:MailRu:AuthUri"];
-            mailRuAuthenticationOptions.TokenEndpoint = builder.Configuration["AuthSettings:MailRu:TokenUri"];
-            mailRuAuthenticationOptions.CallbackPath = builder.Configuration["AuthSettings:MailRu:CallbackPath"];
-        }).
-        AddVkId(vkOptions =>
-        {
-            vkOptions.SignInScheme = "Cookies";
+            vkOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             vkOptions.ClientId = builder.Configuration["AuthSettings:VkId:ClientId"];
             vkOptions.ClientSecret = builder.Configuration["AuthSettings:VkId:ClientSecret"];
             vkOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:VkId:AuthUri"];
             vkOptions.TokenEndpoint = builder.Configuration["AuthSettings:VkId:TokenUri"];
             vkOptions.CallbackPath = builder.Configuration["AuthSettings:VkId:CallbackPath"];
-
+            vkOptions.CorrelationCookie.SameSite = SameSiteMode.None;
             vkOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-        })
-        .AddVkontakte(vkontakteOptions =>
-        {
-            vkontakteOptions.SignInScheme = "Cookies";
-            vkontakteOptions.ClientId = builder.Configuration["AuthSettings:Vkontakte:ClientId"];
-            vkontakteOptions.ClientSecret = builder.Configuration["AuthSettings:Vkontakte:ClientSecret"];
-            vkontakteOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:Vkontakte:AuthUri"];
-            vkontakteOptions.TokenEndpoint = builder.Configuration["AuthSettings:Vkontakte:TokenUri"];
-            vkontakteOptions.CallbackPath = builder.Configuration["AuthSettings:Vkontakte:CallbackPath"];
-        })
-        .AddYandex(yandexOptions =>
-        {
-            yandexOptions.SignInScheme = "Cookies";
-            yandexOptions.ClientId = builder.Configuration["AuthSettings:Yandex:ClientId"];
-            yandexOptions.ClientSecret = builder.Configuration["AuthSettings:Yandex:ClientSecret"];
-            yandexOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:Yandex:AuthUri"];
-            yandexOptions.TokenEndpoint = builder.Configuration["AuthSettings:Yandex:TokenUri"];
-            yandexOptions.CallbackPath = builder.Configuration["AuthSettings:Yandex:CallbackPath"];
+
+            vkOptions.Scope.Add("vkid.personal_info");
+            vkOptions.Scope.Add("email");
+            vkOptions.Scope.Add("phone");
+
+            vkOptions.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+            vkOptions.ClaimActions.MapJsonKey(ClaimTypes.MobilePhone, "phone");
+
+            vkOptions.Events.OnCreatingTicket = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("VkId");
+
+                logger.LogInformation("=== VK ID claims ===");
+                foreach (var claim in context.Principal?.Claims ?? Enumerable.Empty<Claim>())
+                {
+                    logger.LogInformation("Claim: {Type} = {Value}", claim.Type, claim.Value);
+                }
+
+                logger.LogInformation("=== VK ID tokens ===");
+                logger.LogInformation("AccessToken: {Token}", context.AccessToken);
+                logger.LogInformation("RefreshToken: {Token}", context.RefreshToken);
+                logger.LogInformation("ExpiresAt: {Expires}", context.ExpiresIn);
+
+                logger.LogInformation("VK response: {Json}", context.Response.ToString());
+                logger.LogInformation("VK token response: {Json}", context.TokenResponse.ToString());
+
+                return Task.CompletedTask;
+            };
         })
         .AddCookie()
         .AddCookie("cookie");
@@ -173,11 +162,17 @@ internal class Program
 
         _ = builder.Services.AddCors(options =>
         {
-            options.AddPolicy("AllowBlazorFrontend", builder =>
+            options.AddPolicy("AllowBlazorFrontend", policy =>
             {
-                _ = builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader();
+                policy.WithOrigins(
+                        "https://rankings-meta.ru",
+                        "https://www.rankings-meta.ru",
+                        "http://localhost:5000",
+                        "https://localhost:5001")
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials()
+                      .WithExposedHeaders("Location");  // ← для 302
             });
         });
 
@@ -198,9 +193,18 @@ internal class Program
 
         WebApplication app = builder.Build();
 
-        _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
+        app.Use(async (ctx, next) =>
         {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            Console.WriteLine($"Scheme={ctx.Request.Scheme} Host={ctx.Request.Host} XFP={ctx.Request.Headers["X-Forwarded-Proto"]}");
+            await next();
+        });
+
+        app.UseForwardedHeaders();
+
+        app.Use(async (ctx, next) =>
+        {
+            Console.WriteLine($"[AFTER FWD] Scheme={ctx.Request.Scheme} Host={ctx.Request.Host}");
+            await next();
         });
 
         if (app.Environment.IsDevelopment())
@@ -214,7 +218,7 @@ internal class Program
         _ = app.UseStaticFiles();
 
         _ = app.UseRouting();
-
+        _ = app.UseCors("AllowBlazorFrontend");
         _ = app.UseAuthentication();
         _ = app.UseAuthorization();
 
@@ -248,9 +252,6 @@ internal class Program
             // that all resources will be disposed.
             UpdateDatabase(scope.ServiceProvider);
         }
-
-        // Use CORS middleware
-        _ = app.UseCors("AllowBlazorFrontend");
 
         app.Run();
     }

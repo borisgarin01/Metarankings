@@ -523,9 +523,9 @@ FROM Movies m
 LEFT JOIN MoviesMoviesGenres mmg ON mmg.MovieId = m.Id
 LEFT JOIN MoviesMoviesStudios mms ON mms.MovieId = m.Id
 WHERE 1=1
-    AND (@GenresIds IS NULL OR mmg.MovieGenreId = ANY(@GenresIds))
-    AND (@MoviesStudiosIds IS NULL OR mms.MovieStudioId = ANY(@MoviesStudiosIds))
-    AND (@Years IS NULL OR EXTRACT(YEAR FROM m.PremierDate) = ANY(@Years));";
+    AND (@GenresIds::bigint[] IS NULL OR mmg.MovieGenreId = ANY(@GenresIds))
+    AND (@MoviesStudiosIds::bigint[] IS NULL OR mms.MovieStudioId = ANY(@MoviesStudiosIds))
+    AND (@Years::int[] IS NULL OR EXTRACT(YEAR FROM m.PremierDate) = ANY(@Years));";
 
         int count = await connection.ExecuteScalarAsync<int>(
             sql,
