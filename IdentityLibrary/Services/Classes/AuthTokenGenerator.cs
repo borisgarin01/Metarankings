@@ -111,4 +111,71 @@ public sealed class AuthTokenGenerator : IAuthTokenGenerator
 
         return null;
     }
+    public async Task<string?> ExchangeYandexCodeForUserIdAsync(string code, string codeVerifier, string scheme, string host, string deviceId)
+    {
+        using var http = new HttpClient();
+
+        // Yandex token endpoint
+        var tokenUrl = "https://oauth.yandex.ru/token";
+
+        // Build the request content
+        var content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["grant_type"] = "authorization_code",
+            ["code"] = code,
+            ["client_id"] = _authSettingsOptionsMonitor.CurrentValue.YandexId.ClientId,
+            ["code_verifier"] = codeVerifier,
+            // Ensure this matches exactly what is registered in your Yandex App settings
+            // and what is used to generate the initial auth URL in the controller.
+            ["redirect_uri"] = $"{scheme}://{host}/api/auth/yandexid-link-callback"
+        });
+
+        // Yandex uses Basic Auth for confidential clients.
+        // This sends 'client_id:client_secret' in the Authorization header.
+        var clientSecret = _authSettingsOptionsMonitor.CurrentValue.YandexId.ClientSecret;
+        var authHeader = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{_authSettingsOptionsMonitor.CurrentValue.YandexId.ClientId}:{clientSecret}"));
+        http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authHeader);
+
+        HttpResponseMessage response = await http.PostAsync(tokenUrl, content);
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            _logger.LogError("Yandex token exchange failed: {Status}, Body: {Body}", response.StatusCode, errorBody);
+            return null;
+        }
+
+        string json = await response.Content.ReadAsStringAsync();
+        _logger.LogInformation("Yandex token exchange response: {Json}", json);
+
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+
+        // The token response usually contains 'access_token'.
+        // We need to use it to get the user's unique ID.
+        if (doc.RootElement.TryGetProperty("access_token", out var accessTokenProp))
+        {
+            var accessToken = accessTokenProp.GetString();
+
+            // Now call the user info endpoint
+            using var userInfoHttp = new HttpClient();
+            userInfoHttp.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("OAuth", accessToken);
+
+            var userInfoResponse = await userInfoHttp.GetAsync("https://login.yandex.ru/info?format=json");
+            if (!userInfoResponse.IsSuccessStatusCode)
+            {
+                _logger.LogError("Yandex user info request failed: {Status}", userInfoResponse.StatusCode);
+                return null;
+            }
+
+            var userJson = await userInfoResponse.Content.ReadAsStringAsync();
+            using var userDoc = System.Text.Json.JsonDocument.Parse(userJson);
+
+            // The unique user identifier is in the 'id' field.
+            if (userDoc.RootElement.TryGetProperty("id", out var userIdProp))
+            {
+                return userIdProp.GetString();
+            }
+        }
+
+        return null;
+    }
 }
