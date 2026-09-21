@@ -21,4 +21,5 @@ public sealed record AuthSettings
     public int RefreshTokenLifetimeDays { get; set; }
     public Telegram Telegram { get; set; }
     public VkId VkId { get; set; }
+    public YandexId YandexId { get; set; }
 }

@@ -591,6 +591,231 @@ public sealed class AuthController : ControllerBase
     }
 
     // ============================================================
+    // Yandex — SCENARIO 3: LOGIN
+    // ============================================================
+
+    [HttpGet("login-yandex")]
+    public IActionResult LoginYandexID()
+    {
+        try
+        {
+            AuthenticationProperties properties = _signInManager
+                .ConfigureExternalAuthenticationProperties(
+                    "Yandex",
+                    Url.Action(nameof(YandexIDCallback), "Auth"));
+
+            properties.Items["flow"] = "login";
+
+            _logger.LogInformation("Yandex login initiated");
+            return Challenge(properties, "Yandex");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при попытке входа через Yandex");
+            return StatusCode(500, $"Ошибка: {ex.Message}");
+        }
+    }
+
+    // ============================================================
+    // Yandex — COMMON CALLBACK
+    // ============================================================
+
+    [HttpGet("yandexid-callback")]
+    public async Task<ActionResult> YandexIDCallback()
+    {
+        try
+        {
+            _logger.LogInformation("yandexid-callback");
+
+            AuthenticateResult result = await HttpContext.AuthenticateAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme);
+
+            if (!result.Succeeded || result.Principal is null)
+            {
+                _logger.LogWarning("Yandex authentication failed");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=yandexid_auth_failed");
+            }
+
+            foreach (Claim claim in result.Principal.Claims)
+                _logger.LogInformation("Claim: {Type} = {Value}", claim.Type, claim.Value);
+
+            string flow = result.Properties?.Items["flow"] ?? "login";
+            _logger.LogInformation("Yandex flow: {Flow}", flow);
+
+            string? yandexUserId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(yandexUserId))
+            {
+                _logger.LogError("Yandex UserId is null");
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=missing_yandex_id");
+            }
+
+            string? givenName = result.Principal.FindFirst(ClaimTypes.GivenName)?.Value;
+            string? surname = result.Principal.FindFirst(ClaimTypes.Surname)?.Value;
+            string fullName = $"{givenName} {surname}".Trim();
+
+            // ============================================================
+            // SCENARIO 2: LINK VK TO CURRENT USER
+            // ============================================================
+            if (flow == "link")
+            {
+                string? linkUserId = result.Properties?.Items["linkUserId"];
+                if (string.IsNullOrEmpty(linkUserId))
+                {
+                    _logger.LogError("linkUserId not found in properties");
+                    return Redirect($"{Request.Scheme}://{Request.Host}/profile?error=missing_user_id");
+                }
+
+                ApplicationUser? currentUser = await _usersManager.FindByIdAsync(linkUserId);
+                if (currentUser is null)
+                {
+                    _logger.LogError("User {UserId} not found for linking", linkUserId);
+                    return Redirect($"{Request.Scheme}://{Request.Host}/profile?error=user_not_found");
+                }
+
+                ApplicationUser? existingYandexUser = await _usersManager.FindByLoginAsync("Yandex", yandexUserId);
+                if (existingYandexUser is not null && existingYandexUser.Id != currentUser.Id)
+                {
+                    _logger.LogWarning(
+                        "Yandex {YandexUserId} already linked to user {ExistingUserId}",
+                        yandexUserId, existingYandexUser.Id);
+                    return Redirect($"{Request.Scheme}://{Request.Host}/profile?error=yandexid_already_linked");
+                }
+
+                IdentityResult addLoginResult = await _usersManager.AddLoginAsync(
+                    currentUser,
+                    new UserLoginInfo("Yandex", yandexUserId, "Yandex"));
+
+                if (!addLoginResult.Succeeded)
+                {
+                    var errors = string.Join(", ", addLoginResult.Errors.Select(e => e.Description));
+                    _logger.LogError("Failed to link Yandex: {Errors}", errors);
+                    return Redirect($"{Request.Scheme}://{Request.Host}/profile?error={WebUtility.UrlEncode(errors)}");
+                }
+
+                _logger.LogInformation("Yandex {YandexUserId} linked to user {UserId}", yandexUserId, currentUser.Id);
+                return Redirect($"{Request.Scheme}://{Request.Host}/profile?success=yandexid_linked");
+            }
+
+            // ============================================================
+            // SCENARIO 1 & 3: LOGIN
+            // ============================================================
+            ApplicationUser? user = await _usersManager.FindByLoginAsync("Yandex", yandexUserId);
+
+            // SCENARIO 1: VK ID not linked to any account
+            if (user is null)
+            {
+                _logger.LogWarning("Yandex {YandexUserId} is not linked to any account", yandexUserId);
+                return Redirect($"{Request.Scheme}://{Request.Host}/login?error=yandexid_not_linked");
+            }
+
+            // SCENARIO 3: VK ID linked — login
+            AuthResponseDto response = await IssueTokensAsync(user);
+
+            return Redirect(
+                $"{Request.Scheme}://{Request.Host}/auth/yandexid-callback" +
+                $"?Token={Uri.EscapeDataString(response.AccessToken)}" +
+                $"&RefreshToken={Uri.EscapeDataString(response.RefreshToken ?? "")}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Yandex callback");
+            return Redirect($"{Request.Scheme}://{Request.Host}/login?error={WebUtility.UrlEncode(ex.Message)}");
+        }
+    }
+
+    [HttpGet("yandexid-link-callback")]
+    public async Task<ActionResult> YandexIDLinkCallback(
+    [FromQuery] string code,
+    [FromQuery] string state,
+    [FromQuery(Name = "device_id")] string deviceId)
+    {
+        try
+        {
+            // 1. Валидация входных параметров
+            if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(state))
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=missing_params");
+
+            if (string.IsNullOrWhiteSpace(deviceId))
+            {
+                _logger.LogWarning("device_id is missing");
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=missing_device_id");
+            }
+
+            // 2. Читаем cookie с userId и codeVerifier
+            if (!Request.Cookies.TryGetValue($"yandexid_link_{state}", out string? cookieValue) ||
+                string.IsNullOrWhiteSpace(cookieValue))
+            {
+                _logger.LogWarning("Invalid or expired state: {State}", state);
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=invalid_state");
+            }
+
+            // 3. Удаляем cookie — она одноразовая
+            Response.Cookies.Delete($"yandexid_link_{state}", new CookieOptions
+            {
+                Path = "/",
+                Secure = true,
+                SameSite = SameSiteMode.None
+            });
+
+            // 4. Парсим cookie
+            string[] parts = cookieValue.Split('|');
+            if (parts.Length != 2)
+            {
+                _logger.LogError("Invalid cookie format for state {State}", state);
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=invalid_state");
+            }
+
+            string userId = parts[0];
+            string codeVerifier = parts[1];
+
+            // Find user from cookie
+            ApplicationUser? currentUser = await _usersManager.FindByIdAsync(userId);
+            if (currentUser is null)
+            {
+                _logger.LogError("User {UserId} not found", userId);
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=user_not_found");
+            }
+
+            // Exchange code for Yandex User ID
+            string? yandexUserId = await _authTokenGenerator.ExchangeYandexCodeForUserIdAsync(code, codeVerifier, Request.Scheme, Request.Host.Host, deviceId);
+            if (string.IsNullOrEmpty(yandexUserId))
+            {
+                _logger.LogError("Yandex code exchange failed");
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=yandex_exchange_failed");
+            }
+
+            // Check if this Yandex is already linked to a different user
+            ApplicationUser? existingYandexUser = await _usersManager.FindByLoginAsync("Yandex", yandexUserId);
+            if (existingYandexUser is not null && existingYandexUser.Id != currentUser.Id)
+            {
+                _logger.LogWarning("Yandex {YandexUserId} already linked to user {ExistingUserId}", yandexUserId, existingYandexUser.Id);
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=yandexid_already_linked");
+            }
+
+            // Link the Yandex to the current user
+            IdentityResult addLoginResult = await _usersManager.AddLoginAsync(
+                currentUser,
+                new UserLoginInfo("Yandex", yandexUserId, "Yandex"));
+
+            if (!addLoginResult.Succeeded)
+            {
+                var errors = string.Join(", ", addLoginResult.Errors.Select(e => e.Description));
+                _logger.LogError("Failed to link Yandex: {Errors}", errors);
+                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error={WebUtility.UrlEncode(errors)}");
+            }
+
+            // Success
+            _logger.LogInformation("Yandex {YandexUserId} linked to user {UserId}", yandexUserId, currentUser.Id);
+            return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?success=yandexid_linked");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Yandex link callback");
+            return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error={WebUtility.UrlEncode(ex.Message)}");
+        }
+    }
+
+    // ============================================================
     // PROFILE / USER MANAGEMENT
     // ============================================================
 

@@ -119,6 +119,48 @@ internal class Program
                 return Task.CompletedTask;
             };
         })
+        .AddYandex(yandexOptions =>
+        {
+            yandexOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            yandexOptions.ClientId = builder.Configuration["AuthSettings:YandexId:ClientId"];
+            yandexOptions.ClientSecret = builder.Configuration["AuthSettings:YandexId:ClientSecret"];
+            yandexOptions.AuthorizationEndpoint = builder.Configuration["AuthSettings:YandexId:AuthUri"];
+            yandexOptions.TokenEndpoint = builder.Configuration["AuthSettings:YandexId:TokenUri"];
+            yandexOptions.CallbackPath = builder.Configuration["AuthSettings:YandexId:CallbackPath"];
+            yandexOptions.CorrelationCookie.SameSite = SameSiteMode.None;
+            yandexOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+
+            yandexOptions.Scope.Add("login:default_phone");
+            yandexOptions.Scope.Add("login:info");
+            yandexOptions.Scope.Add("login:email");
+            yandexOptions.Scope.Add("login:avatar");
+
+            yandexOptions.ClaimActions.MapJsonKey(ClaimTypes.Email, "login:email");
+            yandexOptions.ClaimActions.MapJsonKey(ClaimTypes.MobilePhone, "login:default_phone");
+
+            yandexOptions.Events.OnCreatingTicket = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("Yandex");
+
+                logger.LogInformation("=== Yandex claims ===");
+                foreach (var claim in context.Principal?.Claims ?? Enumerable.Empty<Claim>())
+                {
+                    logger.LogInformation("Claim: {Type} = {Value}", claim.Type, claim.Value);
+                }
+
+                logger.LogInformation("=== Yandex tokens ===");
+                logger.LogInformation("AccessToken: {Token}", context.AccessToken);
+                logger.LogInformation("RefreshToken: {Token}", context.RefreshToken);
+                logger.LogInformation("ExpiresAt: {Expires}", context.ExpiresIn);
+
+                logger.LogInformation("Yandex response: {Json}", context.Response.ToString());
+                logger.LogInformation("Yandex token response: {Json}", context.TokenResponse.ToString());
+
+                return Task.CompletedTask;
+            };
+        })
         .AddCookie()
         .AddCookie("cookie");
 
