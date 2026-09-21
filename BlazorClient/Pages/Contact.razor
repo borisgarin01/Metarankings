@@ -1,0 +1,34 @@
+﻿@page "/contact"
+
+<div class="wrapper">
+    <div class="movie-menu">
+        <div class="genre-menu">
+            <ul>
+                <li>
+                    <a class="bst" href="/movies/best-movies/?Year=@(DateTime.Now.Year - 1)">Лучшие фильмы @(DateTime.Now.Year - 1)</a>
+                </li>
+                <li>
+                    <a href="/movies/most-waiting-movies/">Самые ожидаемые фильмы</a>
+                </li>
+                <li>
+                    <a class="bst" href="/games/best-games/?Year=@(DateTime.Now.Year - 1)">Лучшие игры @(DateTime.Now.Year - 1)</a>
+                </li>
+                <li>
+                    <a href="/games/most-waiting-games/">Самые ожидаемые игры</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="content" class="lcol">
+        <div class="entry">
+            <div class="post-579 page type-page status-publish hentry single clear" id="post_579">
+                <div class="post-meta">
+                    <h1>Связь</h1>
+                </div>
+                <div class="post-content">
+                    <p>По всем вопросам пишите на <a href="mailto:mail@metarankings.ru" rel="nofollow">mail@metarankings.ru</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
