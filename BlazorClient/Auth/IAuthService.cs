@@ -31,5 +31,6 @@ public interface IAuthService
     Task<HttpResponseMessage> SendResetPasswordConfirmMessage(ResetPasswordConfirmModel resetPasswordModel);
     Task<HttpResponseMessage> SendChangePasswordMessageAsync(ChangePasswordModel changePasswordModel);
     Task<HttpResponseMessage> SendTwoFactorEnabledMessage(SetTwoFactorEnabledModel setTwoFactorEnabledModel);
-    Task<LinkVkidResponse> StartVkidLinkAsync();
+    Task<LinkAccountIdResponse> StartVkIdLinkAsync();
+    Task<LinkAccountIdResponse> StartYandexIdLinkAsync();
 }

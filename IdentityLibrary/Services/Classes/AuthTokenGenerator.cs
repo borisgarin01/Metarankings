@@ -111,7 +111,7 @@ public sealed class AuthTokenGenerator : IAuthTokenGenerator
 
         return null;
     }
-    public async Task<string?> ExchangeYandexCodeForUserIdAsync(string code, string codeVerifier, string scheme, string host, string deviceId)
+    public async Task<string?> ExchangeYandexCodeForUserIdAsync(string code, string codeVerifier, string scheme, string host)
     {
         using var http = new HttpClient();
 
@@ -125,8 +125,6 @@ public sealed class AuthTokenGenerator : IAuthTokenGenerator
             ["code"] = code,
             ["client_id"] = _authSettingsOptionsMonitor.CurrentValue.YandexId.ClientId,
             ["code_verifier"] = codeVerifier,
-            // Ensure this matches exactly what is registered in your Yandex App settings
-            // and what is used to generate the initial auth URL in the controller.
             ["redirect_uri"] = $"{scheme}://{host}/api/auth/yandexid-link-callback"
         });
 

@@ -29,6 +29,11 @@
             @(_isLinking ? "Привязка..." : "Привязать VK ID")
         </button>
 
+        <p>Привяжите Yandex ID к вашему аккаунту, чтобы входить через Yandex.</p>
+        <button class="btn btn-primary" @onclick="LinkYandexID" disabled="@_isLinking">
+            @(_isLinking ? "Привязка..." : "Привязать Yandex ID")
+        </button>
+
         @if (!string.IsNullOrEmpty(_linkError))
         {
             <div class="alert alert-danger mt-2">@_linkError</div>

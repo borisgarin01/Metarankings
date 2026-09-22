@@ -723,23 +723,64 @@ public sealed class AuthController : ControllerBase
         }
     }
 
+    // ============================================================
+    // VK ID — SCENARIO 2: LINK (user must be logged in)
+    // ============================================================
+
+    [HttpPost("link-yandexid")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public IActionResult LinkYandexID()
+    {
+        string? userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        string state = Guid.NewGuid().ToString("N");
+        string codeVerifier = _authTokenGenerator.GenerateCodeVerifier();
+        string codeChallenge = _authTokenGenerator.GenerateCodeChallenge(codeVerifier);
+
+        // Сохраняем userId + codeVerifier в HttpOnly cookie
+        Response.Cookies.Append(
+            $"yandexid_link_{state}",
+            $"{userId}|{codeVerifier}",
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,  // нужно для cross-site redirect от VK
+                Expires = DateTimeOffset.UtcNow.AddMinutes(10),
+                Path = "/api/auth"
+            });
+
+        string redirectUri = $"{Request.Scheme}://{Request.Host}/api/auth/yandexid-link-callback";
+        string clientId = _authSettingsOptionsMonitor.CurrentValue.YandexId.ClientId;
+
+        string scope = "login:info login:email login:avatar login:default_phone";
+
+        string authUrl =
+            $"https://oauth.yandex.ru/authorize?response_type=code" +
+            $"&client_id={clientId}" +
+            $"&scope={Uri.EscapeDataString(scope)}" +
+            $"&redirect_uri={Uri.EscapeDataString(redirectUri)}" +
+            $"&state={state}" +
+            $"&code_challenge={codeChallenge}" +
+            $"&code_challenge_method=S256";
+
+        _logger.LogInformation("Yandex ID link initiated for user {UserId}", userId);
+
+        return Ok(new { url = authUrl });
+    }
+
     [HttpGet("yandexid-link-callback")]
     public async Task<ActionResult> YandexIDLinkCallback(
     [FromQuery] string code,
-    [FromQuery] string state,
-    [FromQuery(Name = "device_id")] string deviceId)
+    [FromQuery] string state)
     {
         try
         {
             // 1. Валидация входных параметров
             if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(state))
                 return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=missing_params");
-
-            if (string.IsNullOrWhiteSpace(deviceId))
-            {
-                _logger.LogWarning("device_id is missing");
-                return Redirect($"{Request.Scheme}://{Request.Host}/auth/account?error=missing_device_id");
-            }
 
             // 2. Читаем cookie с userId и codeVerifier
             if (!Request.Cookies.TryGetValue($"yandexid_link_{state}", out string? cookieValue) ||
@@ -777,7 +818,7 @@ public sealed class AuthController : ControllerBase
             }
 
             // Exchange code for Yandex User ID
-            string? yandexUserId = await _authTokenGenerator.ExchangeYandexCodeForUserIdAsync(code, codeVerifier, Request.Scheme, Request.Host.Host, deviceId);
+            string? yandexUserId = await _authTokenGenerator.ExchangeYandexCodeForUserIdAsync(code, codeVerifier, Request.Scheme, Request.Host.Host);
             if (string.IsNullOrEmpty(yandexUserId))
             {
                 _logger.LogError("Yandex code exchange failed");

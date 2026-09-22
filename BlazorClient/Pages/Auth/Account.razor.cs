@@ -206,7 +206,34 @@ public partial class Account : ComponentBase
             _linkSuccess = null;
             StateHasChanged();
 
-            LinkVkidResponse result = await AuthService.StartVkidLinkAsync();
+            LinkAccountIdResponse result = await AuthService.StartVkIdLinkAsync();
+            NavigationManager.NavigateTo(result.Url, forceLoad: true);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            _linkError = "Необходимо войти в систему.";
+        }
+        catch (Exception ex)
+        {
+            _linkError = $"Ошибка: {ex.Message}";
+        }
+        finally
+        {
+            _isLinking = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LinkYandexID()
+    {
+        try
+        {
+            _isLinking = true;
+            _linkError = null;
+            _linkSuccess = null;
+            StateHasChanged();
+
+            LinkAccountIdResponse result = await AuthService.StartYandexIdLinkAsync();
             NavigationManager.NavigateTo(result.Url, forceLoad: true);
         }
         catch (UnauthorizedAccessException)
