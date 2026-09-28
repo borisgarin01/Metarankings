@@ -514,7 +514,7 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<LinkVkidResponse> StartVkidLinkAsync()
+    public async Task<LinkAccountIdResponse> StartVkIdLinkAsync                 ()
     {
         HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsync("/api/auth/link-vkid", null);
 
@@ -523,7 +523,24 @@ public class AuthService : IAuthService
 
         response.EnsureSuccessStatusCode();
 
-        LinkVkidResponse? result = await response.Content.ReadFromJsonAsync<LinkVkidResponse>();
+        LinkAccountIdResponse? result = await response.Content.ReadFromJsonAsync<LinkAccountIdResponse>();
+
+        if (result is null || string.IsNullOrWhiteSpace(result.Url))
+            throw new InvalidOperationException("Сервер не вернул URL авторизации VK");
+
+        return result;
+    }
+
+    public async Task<LinkAccountIdResponse> StartYandexIdLinkAsync()
+    {
+        HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsync("/api/auth/link-yandexid", null);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            throw new UnauthorizedAccessException("Необходимо войти в систему");
+
+        response.EnsureSuccessStatusCode();
+
+        LinkAccountIdResponse? result = await response.Content.ReadFromJsonAsync<LinkAccountIdResponse>();
 
         if (result is null || string.IsNullOrWhiteSpace(result.Url))
             throw new InvalidOperationException("Сервер не вернул URL авторизации VK");

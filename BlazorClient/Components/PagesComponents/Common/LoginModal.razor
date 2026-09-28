@@ -61,9 +61,38 @@
                         <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
                             @foreach (var login in ExternalLogins)
                             {
+                                var name = login.DisplayName ?? "";
+                                var isVk = name.Contains("VK", StringComparison.OrdinalIgnoreCase)
+                                            || name.Contains("ВКонтакте", StringComparison.OrdinalIgnoreCase);
+                                var isYandex = name.Contains("Yandex", StringComparison.OrdinalIgnoreCase)
+                                            || name.Contains("Яндекс", StringComparison.OrdinalIgnoreCase);
+
+                                // VK ID: голубой круг + белая "VK"
+                                var vkIcon = "data:image/svg+xml;utf8," +
+                                    "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'>" +
+                                    "<rect width='24' height='24' rx='12' fill='%230077FF'/>" +
+                                    "<path d='M12.7 16.2c-4.3 0-6.9-3-7-7.9h2.2c.1 3.6 1.7 5.1 2.9 5.4V8.3h2.1v3.1c1.2-.1 2.4-1.4 2.8-3.1h2.1c-.3 1.9-1.5 3.2-2.4 3.8 1 .4 2.3 1.6 2.8 3.6h-2.3c-.4-1.3-1.4-2.3-2.7-2.4v2.4h-.5z' fill='white'/>" +
+                                    "</svg>";
+
+                                // Yandex: красный круг + белая "Я"
+                                var yaIcon = "data:image/svg+xml;utf8," +
+                                    "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'>" +
+                                    "<rect width='24' height='24' rx='12' fill='%23FC3F1D'/>" +
+                                    "<path d='M12.33 16.24c.70 1.54.93 2.07.93 3.91v2.45h-2.50v-4.12L6.03 8.20h2.61l3.68 8.04zm3.08-8.04l-3.06 6.96h2.55l3.07-6.96h-2.56z' fill='white'/>" +
+                                    "</svg>";
+
+                                var icon = isVk ? vkIcon : (isYandex ? yaIcon : null);
+                                var iconStyle = icon != null
+                                    ? $"background-image:url(\"{icon}\"); background-repeat:no-repeat; background-position:12px center; background-size:22px 22px; padding-left:42px;"
+                                    : "padding-left:16px;";
+
                                 <button type="button"
                                         @onclick="() => LoginExternal(login)"
-                                        style="padding:8px 16px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer; font-size:13px;">
+                                        style="padding-top:8px; padding-right:16px; padding-bottom:8px;
+                                    border:1px solid #ddd; border-radius:4px;
+                                    background-color:#fff; cursor:pointer; font-size:13px;
+                                    display:inline-flex; align-items:center;
+                                    @iconStyle">
                                     @login.DisplayName
                                 </button>
                             }

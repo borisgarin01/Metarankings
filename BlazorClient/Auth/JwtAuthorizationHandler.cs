@@ -55,7 +55,7 @@ public class JwtAuthorizationHandler : DelegatingHandler
                     request.Headers.Authorization = null;
                     var unauthorizedResponse = await base.SendAsync(request, cancellationToken);
 
-                    if (unauthorizedResponse.StatusCode == HttpStatusCode.Unauthorized)
+                    if (unauthorizedResponse.StatusCode == HttpStatusCode.Unauthorized || unauthorizedResponse.StatusCode == HttpStatusCode.BadRequest)
                     {
                         await _authService.LogoutAsync();
                     }
