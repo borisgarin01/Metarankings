@@ -1,0 +1,576 @@
+﻿@page "/games/most-waiting-games"
+@using BlazorClient.Components.PagesComponents.Common
+
+<div class="wrapper">
+<GameMenu Year="@DateTime.Now.AddYears(1).Year"/>
+<div id="container" class="clear">
+<div class="sidebar">
+</div>
+<div id="content" class="lcol">
+<div class="content-title">
+<h1>Самые ожидаемые игры</h1>
+</div>
+<div id="filter">
+<div class="filter-nav">
+<div class="filter-name">Платформа</div>
+<div class="filter-menu">
+<a class="selected" href="/most-waiting-games/">Все</a>
+<a href="/most-waiting-games/?platform=pc">PC</a> 
+<a href="/most-waiting-games/?platform=ps5">PS5</a> 
+<a href="/most-waiting-games/?platform=xboxx">Xbox Series X</a> 
+<a href="/most-waiting-games/?platform=ps4">PS4</a> 
+<a href="/most-waiting-games/?platform=xboxone">Xbox One</a> 
+<a href="/most-waiting-games/?platform=switch">Switch</a> 
+</div>
+</div>
+<div class="filter-nav">
+<div class="filter-name">Жанр</div>
+<div class="filter-menu">
+<a class="selected" href="/most-waiting-games/">Все</a> 
+<a href="/most-waiting-games/?genre=ekshen">Экшены</a> 
+<a href="/most-waiting-games/?genre=shuter">Шутеры</a> 
+<a href="/most-waiting-games/?genre=rpg">RPG</a> 
+<a href="/most-waiting-games/?genre=priklyuchenie">Приключения</a> 
+<a href="/most-waiting-games/?genre=gonki">Гонки</a> 
+<a href="/most-waiting-games/?genre=xorror">Хорроры</a> 
+<a href="/most-waiting-games/?genre=strategiya">Стратегии</a> 
+<a href="/most-waiting-games/?genre=mmo">ММО</a> 
+<a href="/most-waiting-games/?genre=arkada">Аркады</a> 
+<a href="/most-waiting-games/?genre=platformer">Платформеры</a> 
+<a href="/most-waiting-games/?genre=sport">Спорт</a> 
+<a href="/most-waiting-games/?genre=fajting">Файтинги</a> 
+<a href="/most-waiting-games/?genre=taktika">Тактика</a> 
+<a href="/most-waiting-games/?genre=simulyator">Симуляторы</a> 
+<a href="/most-waiting-games/?genre=golovolomka">Головоломки</a> 
+<a href="/most-waiting-games/?genre=yaponskoe-rpg">JRPG</a> 
+</div>
+</div>
+</div>
+<section id="loop" class="list clear best game">
+ 
+<article class="post clear game">
+<a href="/grand-theft-auto-6/" class="thumb"><img class="post-image" src="/images/uploads/2023/12/grand-theft-auto-6-boxcover-art-100x140.jpg" alt="Grand Theft Auto 6"></a>
+<div class="best-prod">
+<div class="counter">1</div>
+</div>
+<a class="name" href="/grand-theft-auto-6/">Grand Theft Auto 6</a>
+<div class="post-meta">19 ноября 2026</div> 
+<div class="post-meta">В шестой части культовой серии вы отправитесь в масштабный штат под названием Леонида, который раскинулся на просторах неонового Вайс-Сити. Это самый большой, самый правдоподобный мир за всю историю культовой серии...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'22987','like')">+ <span>972</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'22987','dislike')">- <span>85</span></span></span> Ожидания: 91%</div>
+<div class="trailer" data-video="/grand-theft-auto-6/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/vedmak-4/" class="thumb"><img class="post-image" src="/images/uploads/2026/12/vedmak-4-boxart-cover-100x140.jpg" alt="Ведьмак 4"></a>
+<div class="best-prod">
+<div class="counter">2</div>
+</div>
+<a class="name" href="/vedmak-4/">Ведьмак 4</a>
+<div class="post-meta">1 декабря 2026</div> 
+<div class="post-meta">Это перезапуск знаменитой серии, которая будет состоять из 3-х частей. 4 часть расскажет совершенно новую историю школы Рыси без Геральта из Ривии, а разработка ведется на графическом движке нового поколения...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'24000','like')">+ <span>265</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'24000','dislike')">- <span>23</span></span></span> Ожидания: 91%</div>
+<div class="trailer" data-video="/vedmak-4/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/metro-4/" class="thumb"><img class="post-image" src="/images/uploads/2024/06/metro-4-boart-cover-100x140.jpg" alt="Metro 4"></a>
+<div class="best-prod">
+<div class="counter">3</div>
+</div>
+<a class="name" href="/metro-4/">Metro 4</a>
+<div class="post-meta">1 декабря 2027</div> 
+<div class="post-meta">Продолжение успешной серии, которая переносит в мрачный постапокалипсис, где выжившие люди сражаются за ресурсы и свою жизнь в подземках Московского метрополитена. Вас ждут исследования подземелий, станций, радиационной поверхности и темных...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'24046','like')">+ <span>438</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'24046','dislike')">- <span>51</span></span></span> Ожидания: 88%</div>
+</article>
+ 
+<article class="post clear game">
+<a href="/half-life-3/" class="thumb"><img class="post-image" src="/images/uploads/2026/12/half-life-3-boxart-cover-100x140.jpg" alt="Half-Life 3"></a>
+<div class="best-prod">
+<div class="counter">4</div>
+</div>
+<a class="name" href="/half-life-3/">Half-Life 3</a>
+<div class="post-meta">1 декабря 2026</div> 
+<div class="post-meta">Игра-мечта многих поклонников жанра шутеры. Это один из самых долгожданных проектов уже не одного поколения геймеров. Это легенда Гейба Ньюэлла, которая зависла в неопределенном статусе и пока неизвестно, выйдет ли...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'23998','like')">+ <span>142</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'23998','dislike')">- <span>19</span></span></span> Ожидания: 87%</div>
+<div class="trailer" data-video="/half-life-3/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/tomb-raider-legacy-of-atlantis/" class="thumb"><img class="post-image" src="/images/uploads/2026/12/tomb-raider-legacy-of-atlantis-boxart-cover-100x140.jpg" alt="Tomb Raider: Legacy of Atlantis"></a>
+<div class="best-prod">
+<div class="counter">5</div>
+</div>
+<a class="name" href="/tomb-raider-legacy-of-atlantis/">Tomb Raider: Legacy of Atlantis</a>
+<div class="post-meta">1 декабря 2026</div> 
+<div class="post-meta">Tomb Raider: Legacy of Atlantis – это масштабный ремейк самой первой части о Ларе Крофт, которая вышла в 1996 году. Неважно, играли вы раньше в или нет, обновленная версия предложит...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'28798','like')">+ <span>19</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'28798','dislike')">- <span>4</span></span></span> Ожидания: 79%</div>
+<div class="trailer" data-video="/tomb-raider-legacy-of-atlantis/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/intergalactic-the-heretic-prophet/" class="thumb"><img class="post-image" src="/images/uploads/2025/12/intergalactic-the-heretic-prophet-boxart-cover-100x140.jpg" alt="Intergalactic: The Heretic Prophet"></a>
+<div class="best-prod">
+<div class="counter">6</div>
+</div>
+<a class="name" href="/intergalactic-the-heretic-prophet/">Intergalactic: The Heretic Prophet</a>
+<div class="post-meta">1 декабря 2026</div> 
+<div class="post-meta">Вы берете на себя роль Джорданы А. Мун, беспощадной охотницей за головами, и отправиться на Семпирию — таинственную планету, изолированную от остальной галактики на протяжении столетий. Все предыдущие экспедиции исчезли...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25289','like')">+ <span>53</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25289','dislike')">- <span>12</span></span></span> Ожидания: 77%</div>
+<div class="trailer" data-video="/intergalactic-the-heretic-prophet/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/the-expanse-osiris-reborn/" class="thumb"><img class="post-image" src="/images/uploads/2025/07/the-expanse-osiris-reborn-boxart-cover-100x140.jpg" alt="The Expanse: Osiris Reborn"></a>
+<div class="best-prod">
+<div class="counter">7</div>
+</div>
+<a class="name" href="/the-expanse-osiris-reborn/">The Expanse: Osiris Reborn</a>
+<div class="post-meta">1 декабря 2026</div> 
+<div class="post-meta">Это научно-фантастическая Action-RPG от третьего лица, погружающая игрока в жестокий и беспощадный мир вселенной под названием The Expanse. Вы – не избранный герой, а обычный наёмник, случайно оказавшийся в эпицентре...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26464','like')">+ <span>4</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26464','dislike')">- <span>1</span></span></span> Ожидания: 75%</div>
+<div class="trailer" data-video="/the-expanse-osiris-reborn/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/the-elder-scrolls-6/" class="thumb"><img class="post-image" src="/images/uploads/the-elder-scrolls-6-cover-art-100x140.jpg" alt="The Elder Scrolls VI"></a>
+<div class="best-prod">
+<div class="counter">8</div>
+</div>
+<a class="name" href="/the-elder-scrolls-6/">The Elder Scrolls VI</a>
+<div class="post-meta">1 декабря 2026</div> 
+<div class="post-meta">Шестая по счету игра в популярной ролевой серии, события которой, вероятно, будут развиваться в&nbsp; западном Тамриэль, провинции Хай Рок или Хаммерфелле. Больше информации, к сожалению, нет…</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'12935','like')">+ <span>1103</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'12935','dislike')">- <span>290</span></span></span> Ожидания: 74%</div>
+<div class="trailer" data-video="/the-elder-scrolls-6/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/ontos/" class="thumb"><img class="post-image" src="/images/uploads/2026/01/ontos-boxart-cover-100x140.jpg" alt="ONTOS"></a>
+<div class="best-prod">
+<div class="counter">9</div>
+</div>
+<a class="name" href="/ontos/">ONTOS</a>
+<div class="post-meta">1 декабря 2026</div> 
+<div class="post-meta">Новый проект от создателей SOMA. Это пугающий научно-фантастический квест, где трудно понять, что реально, а что нет. Главная героиня по имени Адити Амани, едет в лунный отель «Самсара», раньше бывший...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'28864','like')">+ <span>7</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'28864','dislike')">- <span>2</span></span></span> Ожидания: 71%</div>
+<div class="trailer" data-video="/ontos/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/titan-quest-2/" class="thumb"><img class="post-image" src="/images/uploads/2025/12/titan-quest-2-boxart-cover-100x140.jpg" alt="Titan Quest 2"></a>
+<div class="best-prod">
+<div class="counter">10</div>
+</div>
+<a class="name" href="/titan-quest-2/">Titan Quest 2</a>
+<div class="post-meta">1 декабря 2026</div> 
+<div class="post-meta">Вторая часть знаменитого эпика погрузит вас в мир мифов и древнегреческих чудовищ. Вас ждет захватывающее приключение, полное опасностей и разнообразных чудес на протяжении долгих часов одиночной кампании. Вы побываете на...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'24375','like')">+ <span>95</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'24375','dislike')">- <span>35</span></span></span> Ожидания: 63%</div>
+<div class="trailer" data-video="/titan-quest-2/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/turok-origins/" class="thumb"><img class="post-image" src="/images/uploads/2024/12/turok-origins-boxart-cover-100x140.jpg" alt="Turok Origins"></a>
+<div class="best-prod">
+<div class="counter">11</div>
+</div>
+<a class="name" href="/turok-origins/">Turok Origins</a>
+<div class="post-meta">Перезапуск старейшей серии. Воплотитесь в легендарного воина Турока и сразитесь с неистовыми динозаврами и жуткими пришельцами, стремящимися к уничтожению всего человечества. Нейтрализуйте врагов с помощью разнообразных орудий и сверхъестественных умений....</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25295','like')">+ <span>42</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25295','dislike')">- <span>16</span></span></span> 62%</div>
+<div class="trailer" data-video="/turok-origins/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/fable/" class="thumb"><img class="post-image" src="/images/uploads/2024/12/fable-boxart-cover-100x140.jpg" alt="Fable"></a>
+<div class="best-prod">
+<div class="counter">12</div>
+</div>
+<a class="name" href="/fable/">Fable</a>
+<div class="post-meta">Это перезапуск легендарной ролевой серии игр, в котором вы сможете стать настоящим героем в сказочной стране Альбион. Ваш выбор будет иметь огромное значение в условиях надвигающейся темной угрозы и мира,...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'21505','like')">+ <span>162</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'21505','dislike')">- <span>71</span></span></span> 56%</div>
+<div class="trailer" data-video="/fable/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/game-phantom-blade-zero/" class="thumb"><img class="post-image" src="/images/uploads/2023/05/phantom-blade-zero-boxart-cover-100x140.jpg" alt="Phantom Blade Zero"></a>
+<div class="best-prod">
+<div class="counter">13</div>
+</div>
+<a class="name" href="/game-phantom-blade-zero/">Phantom Blade Zero</a>
+<div class="post-meta">Вы станете элитным ассасином по имени Соул, работающим на мощную организацию Орден. Но герой обвиняется в убийстве патриарха Ордена и объявляется в розыск. После получения тяжелых ранений, Соул находит таинственного...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'21296','like')">+ <span>105</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'21296','dislike')">- <span>63</span></span></span> 40%</div>
+<div class="trailer" data-video="/game-phantom-blade-zero/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/control-resonant/" class="thumb"><img class="post-image" src="/images/uploads/2026/12/control-resonant-boxart-cover-100x140.jpg" alt="Control Resonant"></a>
+<div class="best-prod">
+<div class="counter">14</div>
+</div>
+<a class="name" href="/control-resonant/">Control Resonant</a>
+<div class="post-meta">Control Resonant — это долгожданное продолжение Control 2019 года, в котором вас ждет захватывающий экшн в искаженном Манхэттене, который вот-вот будет уничтожен паранормальными явлениями. Играя за Дилана Фейдена, вам предстоит...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'28801','like')">+ <span>9</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'28801','dislike')">- <span>6</span></span></span> 33%</div>
+<div class="trailer" data-video="/control-resonant/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/the-wolf-among-us-2/" class="thumb"><img class="post-image" src="/images/uploads/2022/02/the-wolf-among-us-2-boxart-cover-100x140.jpg" alt="The Wolf Among Us 2"></a>
+<div class="best-prod">
+<div class="counter">15</div>
+</div>
+<a class="name" href="/the-wolf-among-us-2/">The Wolf Among Us 2</a>
+<div class="post-meta">Это продолжение успешного проекта, основанного на популярном комиксе под названием Fables Билла Уиллингема. События&nbsp;The Wolf Among Us 2 развиваются спустя полгода после оригинальной части. Бигби больше не шериф, он встречает...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'16816','like')">+ <span>127</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'16816','dislike')">- <span>92</span></span></span> 28%</div>
+<div class="trailer" data-video="/the-wolf-among-us-2/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/beyond-good-evil-2/" class="thumb"><img class="post-image" src="/images/uploads/Beyond-Good-Evil-2-boxart-cover-100x140.jpg" alt="Beyond Good &amp; Evil 2"></a>
+<div class="best-prod">
+<div class="counter">16</div>
+</div>
+<a class="name" href="/beyond-good-evil-2/">Beyond Good &amp; Evil 2</a>
+<div class="post-meta">Долгожданное продолжение культовой игры от знаменитого французского геймдизайнера Мишеля Анселя (создатель Rayman), которое покорило мир в далеком уже 2003 году. Beyond Good &amp; Evil 2 обещает стать очень масштабным приключение...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'11439','like')">+ <span>328</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'11439','dislike')">- <span>243</span></span></span> 26%</div>
+<div class="trailer" data-video="/beyond-good-evil-2/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/prince-of-persia-the-sands-of-time-remake/" class="thumb"><img class="post-image" src="/images/uploads/2021/01/prince-of-persia-the-sands-of-time-remake-boxart-cover-100x140.jpg" alt="Prince of Persia: The Sands of Time Remake"></a>
+<div class="best-prod">
+<div class="counter">17</div>
+</div>
+<a class="name" href="/prince-of-persia-the-sands-of-time-remake/">Prince of Persia: The Sands of Time Remake</a>
+<div class="post-meta">Это полноценный ремейк легендарной части 2003 года, который перенесет вас в знаменитый сюжет о Принце Персии, который наполнен загадками и интригами. Вы должны будете спасти королевство от коварного визиря, в...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'13470','like')">+ <span>364</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'13470','dislike')">- <span>268</span></span></span> 26%</div>
+<div class="trailer" data-video="/prince-of-persia-the-sands-of-time-remake/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/tomb-raider-catalyst/" class="thumb"><img class="post-image" src="/images/uploads/2027/12/tomb-raider-catalyst-boxart-cover-100x140.jpg" alt="Tomb Raider: Catalyst"></a>
+<div class="best-prod">
+<div class="counter">18</div>
+</div>
+<a class="name" href="/tomb-raider-catalyst/">Tomb Raider: Catalyst</a>
+<div class="post-meta">Tomb Raider: Catalyst — новая игра в культовой приключенческой серии. Лару все также ждут сложные платформы под землей, соединенные дикой природой. Она будет исследовать джунгли, взбираться на горы и изучать...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'28803','like')">+ <span>4</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'28803','dislike')">- <span>3</span></span></span> 25%</div>
+<div class="trailer" data-video="/tomb-raider-catalyst/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/judas-game/" class="thumb"><img class="post-image" src="/images/uploads/2022/12/judas-boxart-cover-100x140.jpg" alt="Judas"></a>
+<div class="best-prod">
+<div class="counter">19</div>
+</div>
+<a class="name" href="/judas-game/">Judas</a>
+<div class="post-meta">Сюжетный проект Кена Левина, известного по таким проектам прошлого, как&nbsp;System Shock 2, BioShock, а также BioShock Infinite. Это шутер с ролевыми элементами и видом от первого лица, который отправит вас...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'20252','like')">+ <span>75</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'20252','dislike')">- <span>69</span></span></span> 8%</div>
+<div class="trailer" data-video="/judas-game/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/ballad-of-antara/" class="thumb"><img class="post-image" src="/images/uploads/2024/06/ballad-of-antara-boxart-cover-100x140.jpg" alt="Ballad of Antara"></a>
+<div class="best-prod">
+<div class="counter">20</div>
+</div>
+<a class="name" href="/ballad-of-antara/">Ballad of Antara</a>
+<div class="post-meta">Проект с несколькими игровыми персонажами, обладающих способностью перемещаться между обычным и потусторонним миром, где опасность таится за каждым углом. Ищите истину внутри и восстановите сущности мира.. Каждый из «эмиссаров» обладает...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'23995','like')">+ <span>20</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'23995','dislike')">- <span>19</span></span></span> 5%</div>
+<div class="trailer" data-video="/ballad-of-antara/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/greedfall-2-the-dying-world/" class="thumb"><img class="post-image" src="/images/uploads/2024/05/greedfall-2-the-dying-world-boxart-cover-100x140.jpg" alt="GreedFall 2: The Dying World"></a>
+<div class="best-prod">
+<div class="counter">21</div>
+</div>
+<a class="name" href="/greedfall-2-the-dying-world/">GreedFall 2: The Dying World</a>
+<div class="post-meta">В игре GreedFall 2: The Dying World вас вновь ждет уникальный мир, чтобы получить еще более глубокий ролевой опыт. Вырвавшись с родного острова, вы должны обрести настоящую свободу. Исследуйте старый...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'23865','like')">+ <span>26</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'23865','dislike')">- <span>25</span></span></span> 4%</div>
+<div class="trailer" data-video="/greedfall-2-the-dying-world/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/blackfrost-the-long-dark-2/" class="thumb"><img class="post-image" src="/images/uploads/2025/12/blackfrost-the-long-dark-2-boxart-cover-100x140.jpg" alt="BLACKFROST: The Long Dark 2"></a>
+<div class="best-prod">
+<div class="counter">22</div>
+</div>
+<a class="name" href="/blackfrost-the-long-dark-2/">BLACKFROST: The Long Dark 2</a>
+<div class="post-meta">Продолжение нашумевшей серии игр. Это эволюция песочницы выживания, в которой усовершенствованы все аспекты оригинала и добавлен кооперативный режим. Создана командой Hinterland — теми же разработчиками, что и оригинальная первая часть....</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25332','like')">+ <span>5</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25332','dislike')">- <span>5</span></span></span> 2%</div>
+<div class="trailer" data-video="/blackfrost-the-long-dark-2/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/horizon-hunters-gathering/" class="thumb"><img class="post-image" src="/images/uploads/2026/02/horizon-hunters-gathering-boxart-cover-100x140.jpg" alt="Horizon Hunters Gathering"></a>
+<div class="best-prod">
+<div class="counter">23</div>
+</div>
+<a class="name" href="/horizon-hunters-gathering/">Horizon Hunters Gathering</a>
+<div class="post-meta">В кооперативной приключенческой игре Horizon Hunters Gathering вас ждёт битва за выживание в компании до двух союзников. Вы должны объединиться в отряд бесстрашных Охотников, чтобы бросить вызов свирепым машинам. Ключ...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'29058','like')">+ <span>2</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'29058','dislike')">- <span>2</span></span></span> 2%</div>
+<div class="trailer" data-video="/horizon-hunters-gathering/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/tides-of-annihilation/" class="thumb"><img class="post-image" src="/images/uploads/2025/02/tides-of-annihilation-boxart-cover-100x140.jpg" alt="Tides of Annihilation"></a>
+<div class="best-prod">
+<div class="counter">24</div>
+</div>
+<a class="name" href="/tides-of-annihilation/">Tides of Annihilation</a>
+<div class="post-meta">Это уникальное сочетание фэнтезийного сеттинга, вдохновленного артуровскими легендами, и динамичного экшена. В разрушенном современном Лондоне, ставшем полем битвы с иномирными захватчиками, вам предстоит играть за Гвендолин. Ее сила – призыв...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25853','like')">+ <span>5</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25853','dislike')">- <span>0</span></span></span> 2%</div>
+<div class="trailer" data-video="/tides-of-annihilation/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/the-duskbloods/" class="thumb"><img class="post-image" src="/images/uploads/2025/04/the-duskbloods-boxart-cover-100x140.jpg" alt="The Duskbloods"></a>
+<div class="best-prod">
+<div class="counter">25</div>
+</div>
+<a class="name" href="/the-duskbloods/">The Duskbloods</a>
+<div class="post-meta">Очередной проект от знаменитой японской студии FromSoftware, которая подарила миру Elden Ring, Bloodborne, а также серию Souls. Это PvPvE-экшен с возможностью игры до 8 человек, которые должны биться с друг...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26013','like')">+ <span>4</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26013','dislike')">- <span>0</span></span></span> 2%</div>
+<div class="trailer" data-video="/the-duskbloods/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/mudang-two-hearts/" class="thumb"><img class="post-image" src="/images/uploads/2025/06/mudang-two-hearts-boxart-cover-100x140.jpg" alt="MUDANG: Two Hearts"></a>
+<div class="best-prod">
+<div class="counter">26</div>
+</div>
+<a class="name" href="/mudang-two-hearts/">MUDANG: Two Hearts</a>
+<div class="post-meta">Кинематографическая экшен-игра с видом от третьего лица, где сочетаются скрытность, захватывающие перестрелки и хорошая история на фоне политического беспорядка в Корее. В MUDANG: Two Hearts вас встретит интересный сюжет, в...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26324','like')">+ <span>2</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26324','dislike')">- <span>0</span></span></span> 2%</div>
+<div class="trailer" data-video="/mudang-two-hearts/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/bloodstained-the-scarlet-engagement/" class="thumb"><img class="post-image" src="/images/uploads/2026/12/bloodstained-the-scarlet-engagement-boxart-cover-100x140.jpg" alt="Bloodstained: The Scarlet Engagement"></a>
+<div class="best-prod">
+<div class="counter">27</div>
+</div>
+<a class="name" href="/bloodstained-the-scarlet-engagement/">Bloodstained: The Scarlet Engagement</a>
+<div class="post-meta">В этой игре вас ждут новые мрачные тайны мира Bloodstained — это место, где тьма нависает над средневековой Англией и готическая атмосфера с 2,5D-графикой погружает вас в времена проклятия. Вас...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26275','like')">+ <span>3</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26275','dislike')">- <span>0</span></span></span> 2%</div>
+<div class="trailer" data-video="/bloodstained-the-scarlet-engagement/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/omega-redux/" class="thumb"><img class="post-image" src="/images/uploads/2025/11/omega-redux-boxart-cover-100x140.jpg" alt="Omega Redux"></a>
+<div class="best-prod">
+<div class="counter">28</div>
+</div>
+<a class="name" href="/omega-redux/">Omega Redux</a>
+<div class="post-meta">OMEGA REDUX – это экшн-игра с эпизодической структурой, где вы оказываетесь в самом центре глобальной катастрофы. Каждый эпизод – это отдельное приключение в гибнущем мире, имеющем свои уникальные особенности. Играя...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'28530','like')">+ <span>1</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'28530','dislike')">- <span>1</span></span></span> 2%</div>
+<div class="trailer" data-video="/omega-redux/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/blood-message/" class="thumb"><img class="post-image" src="/images/uploads/2026/12/blood-message-boxart-cover-100x140.jpg" alt="Blood Message"></a>
+<div class="best-prod">
+<div class="counter">29</div>
+</div>
+<a class="name" href="/blood-message/">Blood Message</a>
+<div class="post-meta">События переносят в 848 год нашей эры, на закате величия Танской империи — эпохи, когда могущество династии уже пошатнулось, но её культурное и политическое наследие ещё определяло судьбы миллионов. В...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26318','like')">+ <span>6</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26318','dislike')">- <span>0</span></span></span> 2%</div>
+<div class="trailer" data-video="/blood-message/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/system-shock-3/" class="thumb"><img class="post-image" src="/images/uploads/system-shock-3-boxart-cover-100x140.jpg" alt="System Shock 3"></a>
+<div class="best-prod">
+<div class="counter">30</div>
+</div>
+<a class="name" href="/system-shock-3/">System Shock 3</a>
+<div class="post-meta">Продолжение легендарной серии Уоррена Спектора в жанре ролевой шутер от первого лица. Вы отправитесь в знакомую атмосферу, где искусственный интеллект Шодан вновь бросит вам вызов. Вас ждет обширный игровой мир...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'11835','like')">+ <span>158</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'11835','dislike')">- <span>158</span></span></span> 2%</div>
+<div class="trailer" data-video="/system-shock-3/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/den-of-wolves/" class="thumb"><img class="post-image" src="/images/uploads/2025/12/den-of-wolves-boxart-cover-100x140.jpg" alt="Den of Wolves"></a>
+<div class="best-prod">
+<div class="counter">31</div>
+</div>
+<a class="name" href="/den-of-wolves/">Den of Wolves</a>
+<div class="post-meta">Динамичный кооперативный шутер с видом от первого лица от создателей PAYDAY: The Heist, PAYDAY 2 и GTFO. В этом высокотехнологичном боевике вам предстоит выполнять рискованные контракты для враждующих корпораций Мидуэй-Сити....</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25340','like')">+ <span>3</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25340','dislike')">- <span>7</span></span></span> 1%</div>
+<div class="trailer" data-video="/den-of-wolves/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/plan-8/" class="thumb"><img class="post-image" src="/images/uploads/plan-8-box-art-cover-100x140.jpg" alt="PLAN 8"></a>
+<div class="best-prod">
+<div class="counter">32</div>
+</div>
+<a class="name" href="/plan-8/">PLAN 8</a>
+<div class="post-meta">Проекта в жанре MMO с открытым миром и использованием экзоскелетов от создателей Black Desert Online. Вас ждет неповторимый мир, мистическая история, реалистичная графика нового поколения и экшн с использованием уникальных...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'12597','like')">+ <span>62</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'12597','dislike')">- <span>88</span></span></span> 1%</div>
+<div class="trailer" data-video="/plan-8/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/deep-down/" class="thumb"><img class="post-image" src="/images/uploads/Deep-Downcover-100x140.png" alt="Deep Down"></a>
+<div class="best-prod">
+<div class="counter">33</div>
+</div>
+<a class="name" href="/deep-down/">Deep Down</a>
+<div class="post-meta">Deep Down — это ролевая ММО-РПГ игра, действия которой развиваются в завораживающим фэнтезийном мире драконов и невероятных существ. Deep Down обещает пощекотать нервы даже самым закаленным искателям приключений благодаря невероятной...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'2329','like')">+ <span>231</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'2329','dislike')">- <span>377</span></span></span> 1%</div>
+<div class="trailer" data-video="/deep-down/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/gods-trigger/" class="thumb"><img class="post-image" src="/images/uploads/Gods-Trigger-boxart-cover-100x140.jpg" alt="God’s Trigger"></a>
+<div class="best-prod">
+<div class="counter">34</div>
+</div>
+<a class="name" href="/gods-trigger/">God’s Trigger</a>
+<div class="post-meta">Зрелищный изометрический экшен, который рассказывает о Гарри и Джуди — они последняя надежда человечества остановить четырех всадников Апокалипсиса. Гарри — ангел, Джуди — демон, но это не мешает им крошить...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'10575','like')">+ <span>31</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'10575','dislike')">- <span>105</span></span></span> 1%</div>
+<div class="trailer" data-video="/gods-trigger/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/human-element/" class="thumb"><img class="post-image" src="/images/uploads/Human-Element-boxart-cover-100x140.jpg" alt="Human Element"></a>
+<div class="best-prod">
+<div class="counter">35</div>
+</div>
+<a class="name" href="/human-element/">Human Element</a>
+<div class="post-meta">Спустя 35 лет после начала зомби-апокалипсиса, вам предлагают создать своего уникального персонажа, найти команду и отправиться на поиски драгоценных ресурсов, которые помогут построить собственную оборонительную крепость, которая будет защищать вас...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'4602','like')">+ <span>109</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'4602','dislike')">- <span>229</span></span></span> 1%</div>
+<div class="trailer" data-video="/human-element/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/thick-as-thieves/" class="thumb"><img class="post-image" src="/images/uploads/2025/12/thick-as-thieves-boxart-cover-100x140.jpg" alt="Thick As Thieves"></a>
+<div class="best-prod">
+<div class="counter">36</div>
+</div>
+<a class="name" href="/thick-as-thieves/">Thick As Thieves</a>
+<div class="post-meta">Thick As Thieves — это многопользовательская PvPvE-стелс игра с видом от первого лица, где в загадочном мегаполисе 1910-х годов магия и индустриальная революция сплелись в смертельный клубок интриг. Здесь выживает...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25326','like')">+ <span>6</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'25326','dislike')">- <span>17</span></span></span> 1%</div>
+<div class="trailer" data-video="/thick-as-thieves/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/clockwork-revolution/" class="thumb"><img class="post-image" src="/images/uploads/2024/12/clockwork-revolution-box-art-cover-100x140.jpg" alt="Clockwork Revolution"></a>
+<div class="best-prod">
+<div class="counter">37</div>
+</div>
+<a class="name" href="/clockwork-revolution/">Clockwork Revolution</a>
+<div class="post-meta">Вы путешествуете в прошлое благодаря невероятному изобретению и обнаруживаете, что ваш город, паровой мегаполис Авалон, был создан путем изменения исторических событий. Ваши действия и решения в ключевых моментах будут иметь...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'21496','like')">+ <span>41</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'21496','dislike')">- <span>46</span></span></span> 1%</div>
+<div class="trailer" data-video="/clockwork-revolution/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/star-citizen/" class="thumb"><img class="post-image" src="/images/uploads/Star-Citizen-boxart-cover-100x140.jpg" alt="Star Citizen"></a>
+<div class="best-prod">
+<div class="counter">38</div>
+</div>
+<a class="name" href="/star-citizen/">Star Citizen</a>
+<div class="post-meta">Космический симулятор нового поколения, который предлагает игрокам массу различных занятий в космическом пространстве. В Star Citizen человечество достигло дальнего космоса, заселив множество планет в пределах нашей галактики. Но оно не...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'9786','like')">+ <span>128</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'9786','dislike')">- <span>231</span></span></span> 1%</div>
+<div class="trailer" data-video="/star-citizen/#content-trailer"></div>
+</article>
+ 
+<article class="post clear game">
+<a href="/synduality/" class="thumb"><img class="post-image" src="/images/uploads/2022/09/synduality-boxart-cover-100x140.jpg" alt="Synduality"></a>
+<div class="best-prod">
+<div class="counter">39</div>
+</div>
+<a class="name" href="/synduality/">Synduality</a>
+<div class="post-meta">Научно-фантастический шутер с видом от третьего лица, действия которого развиваются в антиутопическом будущем, где ядовитый дождь и монстры разрушаю планету. При помощи искусственного интеллекта вы должны вернуть человечеству утраченные земли...</div>
+<div class="wait"><span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'19493','like')">+ <span>44</span></span></span> <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'19493','dislike')">- <span>53</span></span></span> 1%</div>
+<div class="trailer" data-video="/synduality/#content-trailer"></div>
+</article>
+</section>
+<div class="pagination">
+</div>
+<div class="news-module">
+<div class="news-item">
+<a href="/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/" title="Sony объявила системные требования God of War Ragnarök для PC"><img class="news-thumb" src="/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg" alt="Sony объявила системные требования God of War Ragnarök для PC">
+<span class="news-title">God of War Ragnarök выходит на PC 19 сентября 2024 года! Чтобы подготовиться к путешествию по Девяти Царствам, ознакомьтесь с системными требованиями. PC-версия поддерживает технологии...</span>
+</a>
+</div>
+<div class="news-item">
+<a href="/activision-predstavila-kinematograficheskij-trejler-zombi-rezhima-call-of-duty-black-ops-6/" title="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6"><img class="news-thumb" src="/images/uploads/2024/08/kinematograficheskij-trejler-zombi-rezhima-v-call-of-duty-black-ops-6-445x250.jpg" alt="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6">
+<span class="news-title">Activision представила кинематографический трейлер зомби-режима шутера Call of Duty: Black Ops 6, который выходит 25 октября 2024 года на PC, а также Xbox Series X|S...</span>
+</a>
+</div>
+<div class="news-item">
+<a href="/nintendo-pokazala-metroid-prime-4-beyond-dlya-switch/" title="Nintendo показала Metroid Prime 4: Beyond для Switch"><img class="news-thumb" src="/images/uploads/2024/06/metroid-prime-4-beyond-445x250.jpg" alt="Nintendo показала Metroid Prime 4: Beyond для Switch">
+<span class="news-title">Компания Nintendo показала геймплейный трейлер экшен-приключения Metroid Prime 4: Beyond для своей гибридной игровой консоли Switch, которое выйдет в 2025 году. В трейлере можно видеть...</span>
+</a>
+</div>
+<div class="news-item">
+<a href="/konami-pokazala-2-minutnyj-gejmplejnyj-rolik-remejka-metal-gear-solid-delta-snake-eater/" title="Konami показала 2-минутный геймплейный ролик ремейка Metal Gear Solid Delta: Snake Eater"><img class="news-thumb" src="/images/uploads/2024/06/metal-gear-solid-delta-snake-eater-445x250.jpg" alt="Konami показала 2-минутный геймплейный ролик ремейка Metal Gear Solid Delta: Snake Eater">
+<span class="news-title">Компания Konami показала&nbsp;2-минутный геймплейный ролик ремейка Metal Gear Solid Δ: Snake Eater, который готовится к выходу на PlayStation 5, Xbox Series X|S и PC. Вам...</span>
+</a>
+</div>
+<div class="news-item">
+<a href="/anonsirovan-doom-the-dark-ages-predystoriya-sobytij-doom-2016/" title="Анонсирован DOOM: The Dark Ages — предыстория событий DOOM 2016"><img class="news-thumb" src="/images/uploads/2024/06/doom-the-dark-ages-445x250.jpg" alt="Анонсирован DOOM: The Dark Ages — предыстория событий DOOM 2016">
+<span class="news-title">На Xbox Games Showcase 2024 состоялся анонс шутера DOOM: The Dark Ages, который поведает что предвещало событиям DOOM 2016. Это сюжетный однопользовательский шутер, разрабатываемый на...</span>
+</a>
+</div>
+<div class="news-item">
+<a href="/anonsirovan-gears-of-war-e-day-dlya-xbox-series-xs-i-pk/" title="Анонсирован Gears of War: E-Day для Xbox Series X|S и ПК"><img class="news-thumb" src="/images/uploads/2024/06/gears-of-war-e-day-445x250.jpg" alt="Анонсирован Gears of War: E-Day для Xbox Series X|S и ПК">
+<span class="news-title">На Xbox Games Showcase 2024 состоялся анонс экшена Gears of War: E-Day, который готовится к выходу на Xbox Series X|S и ПК. Gears of War:...</span>
+</a>
+</div>
+<div class="news-item">
+<a href="/microsoft-pokazali-gejmplej-perfect-dark/" title="Microsoft показали геймплей перезапуска Perfect Dark"><img class="news-thumb" src="/images/uploads/2024/06/perfect-dark-445x250.jpg" alt="Microsoft показали геймплей перезапуска Perfect Dark">
+<span class="news-title">На Xbox Games Showcase 2024 состоялась дебютная демонстрация геймплея амбициозного перезапуска Perfect Dark от студии The Initiative. Perfect Dark отправит в недалекое будущее, когда на...</span>
+</a>
+</div>
+<div class="news-item">
+<a href="/god-of-war-ragnarok-poyavitsya-na-pk-v-sentyabre-2024/" title="God Of War Ragnarok появится на ПК в сентябре 2024"><img class="news-thumb" src="/images/uploads/2024/05/god-of-war-ragnarok-445x250.jpg" alt="God Of War Ragnarok появится на ПК в сентябре 2024">
+<span class="news-title">Компания Sony официально анонссировала PC-порт God Of War Ragnarok, который появится на этой игровой платформе этой осенью, 19 сентября 2024 года. ПК-версия God of War...</span>
+</a>
+</div>
+</div>
+</div>
+<div class="sidebar rcol" style="height: 9725px;">
+<div class="widget last-reviews">
+<div class="widget-body">
+<div id="yandex_rtb_R-A-201169-26" data-fbd5ff2bae=""><div class="af352ffb4 h13ce8d74" data-container="outer"><style type="text/css">.h13ce8d74{opacity:!important;visibility:visible!important;white-space:normal!important}.h13ce8d74,.h13ce8d74 yatag{display:block!important;font-family:inherit!important;font-weight:inherit!important}.h13ce8d74,.h13ce8d74,.h13ce8d74 a,.h13ce8d74 b,.h13ce8d74 em,.h13ce8d74 iframe,.h13ce8d74 img,.h13ce8d74 table,.h13ce8d74 tbody,.h13ce8d74 td,.h13ce8d74 tr,.h13ce8d74 yatag{-webkit-box-sizing:content-box!important;box-sizing:content-box!important;color:inherit!important;font-size:inherit!important;-webkit-hyphens:manual!important;hyphens:manual!important;-webkit-transition:none!important;transition:none!important}.h13ce8d74,.h13ce8d74 a,.h13ce8d74 b,.h13ce8d74 em,.h13ce8d74 iframe,.h13ce8d74 img,.h13ce8d74 table,.h13ce8d74 tbody,.h13ce8d74 td,.h13ce8d74 tr{background:none!important;border:none!important;border-collapse:collapse!important;border-radius:0!important;border-spacing:0!important;clear:none!important;float:none!important;-webkit-font-feature-settings:normal!important;font-feature-settings:normal!important;font-variant:normal!important;font-weight:inherit!important;letter-spacing:normal!important;line-height:normal!important;margin:0!important;max-height:none!important;max-width:none!important;min-height:0!important;min-width:0!important;outline:none!important;padding:0!important;position:static!important;text-align:left!important;-webkit-text-decoration:none!important;text-decoration:none!important;text-indent:0!important;text-transform:none!important;vertical-align:baseline!important;visibility:inherit!important;word-spacing:normal!important}.h13ce8d74,.h13ce8d74 a,.h13ce8d74 b,.h13ce8d74 em,.h13ce8d74 img,.h13ce8d74 table,.h13ce8d74 tbody,.h13ce8d74 td,.h13ce8d74 tr{height:auto!important}.h13ce8d74 table{display:table!important;empty-cells:hide!important;table-layout:fixed!important}.h13ce8d74 table,.h13ce8d74 td{font-size:100%!important}.h13ce8d74 td{display:table-cell!important;vertical-align:middle!important}.h13ce8d74{height:auto!important;overflow:visible!important;width:auto!important}.h13ce8d74 .n2ea63db9{display:-webkit-box!important;display:-ms-flexbox!important;display:flex!important;margin:auto!important;position:relative!important;-webkit-box-pack:center!important;-ms-flex-pack:center!important;justify-content:center!important;-webkit-box-align:center!important;-ms-flex-align:center!important;align-items:center!important;-webkit-box-sizing:border-box!important;box-sizing:border-box!important;overflow:hidden!important}.h13ce8d74 .w64383300{border-radius:6px!important}.h13ce8d74 .qe7028163{border-radius:12px!important;overflow:hidden!important}.h13ce8d74 .fd3902116{background-color:!important}.h13ce8d74 .fd3902116,.h13ce8d74 .t431218b4{bottom:0!important;display:none!important;left:0!important;right:0!important;top:0!important;z-index:1!important}.h13ce8d74 .cfe630031,.h13ce8d74 .fd3902116,.h13ce8d74 .t431218b4{height:100%!important;position:absolute!important;width:100%!important}.h13ce8d74 .cfe630031{pointer-events:none!important}.h13ce8d74 .ufe3b4b2{height:auto!important;width:auto!important}.h13ce8d74 .ve2a55e7e{height:600px!important;position:relative!important;width:240px!important;z-index:2!important}.h13ce8d74 .sd1adffa6{border-radius:4px!important;height:-webkit-fit-content!important;height:-moz-fit-content!important;height:fit-content!important;overflow:hidden!important;width:-webkit-fit-content!important;width:-moz-fit-content!important;width:fit-content!important}.h13ce8d74 .gb521d289{height:600px!important;left:0!important;position:relative!important;top:0!important;-webkit-transform:!important;transform:!important;-webkit-transform-origin:0 0!important;transform-origin:0 0!important;width:240px!important}.h13ce8d74 .gb521d289 iframe{height:100%!important;left:0!important;position:absolute!important;top:0!important;width:100%!important}.h13ce8d74 .ae7c02ad7{left:4px!important}.h13ce8d74 .ae7c02ad7,.h13ce8d74 .wf87c4e16{position:absolute!important;top:4px!important}.h13ce8d74 .wf87c4e16{right:4px!important;z-index:10!important}.h13ce8d74 .dcfc5d2d6{right:0!important;z-index:20!important}.h13ce8d74 .dcfc5d2d6,.h13ce8d74 .qde39e2ce{position:absolute!important;top:0!important;width:100%!important}.h13ce8d74 .qde39e2ce{height:100%!important;left:0!important;z-index:21!important}.h13ce8d74 .c8580fb3c{background:#fff!important;border:1px solid #e5e5e5!important;border-bottom-right-radius:3px!important;color:#000!important;cursor:pointer!important;font-size:11px!important;height:16px!important;left:0!important;line-height:16px!important;padding:0 4px!important;position:absolute!important;-webkit-text-decoration:none!important;text-decoration:none!important;top:0!important;z-index:10!important}.h13ce8d74 .va3137999{max-height:100%!important;max-width:100%!important}.h13ce8d74 .va3137999 .fd3902116,.h13ce8d74 .va3137999 .t431218b4{display:block!important}.h13ce8d74 .va3137999 .t431218b4{-webkit-filter:blur(10px) saturate(0) contrast(400%)!important;filter:blur(10px) saturate(0) contrast(400%)!important}.h13ce8d74 .va3137999 .fd3902116{background-color:rgba(38,38,38,.9)!important}.h13ce8d74 .j5809073c{bottom:20px!important;display:-webkit-box!important;display:-ms-flexbox!important;display:flex!important;left:16px!important;position:absolute!important;right:16px!important;z-index:3!important}.h13ce8d74 .n387d2d2f{border-radius:8px!important;font-size:16px!important;font-weight:700!important;height:48px!important;line-height:48px!important;text-align:center!important;-ms-flex-item-align:stretch!important;align-self:stretch!important;min-width:0!important;padding:0 20px!important;white-space:nowrap!important}.h13ce8d74 .dbef2fb14{background:-webkit-gradient(linear,left top,left bottom,from(#efefef),to(#e5e5e5))!important;background:linear-gradient(180deg,#efefef,#e5e5e5)!important;margin-right:8px!important;-webkit-box-flex:2!important;-ms-flex:2 1!important;flex:2 1!important}.h13ce8d74 .he98400ca{background:-webkit-gradient(linear,left top,right top,color-stop(-40%,#f60),color-stop(20%,rgba(255,102,0,0))),-webkit-gradient(linear,right top,left top,color-stop(-40%,#f60),color-stop(20%,rgba(255,102,0,0))),-webkit-gradient(linear,left bottom,left top,color-stop(-80%,#f60),color-stop(80%,#fd0))!important;background:linear-gradient(90deg,#f60 -40%,rgba(255,102,0,0) 20%),linear-gradient(270deg,#f60 -40%,rgba(255,102,0,0) 20%),linear-gradient(0deg,#f60 -80%,#fd0 80%)!important;-webkit-box-flex:3!important;-ms-flex:3 1!important;flex:3 1!important}.h13ce8d74 .s3d451520{display:inline-block!important;margin-left:8px!important}.h13ce8d74 .c9f61b023{bottom:0!important;left:0!important;position:absolute!important;right:0!important;top:0!important;z-index:4!important}.h13ce8d74 .j9e412289{display:block!important;height:1px!important;left:-1000px!important;position:absolute!important;top:-1000px!important;width:1px!important}.h13ce8d74 .ca563206a{margin:0 2px!important}.h13ce8d74 .j51085a3c{cursor:default!important}.h13ce8d74 .v6492726{color:inherit!important;pointer-events:auto!important;-webkit-text-decoration:none!important;text-decoration:none!important}.h13ce8d74 .ab773285c{display:-webkit-box!important;display:-ms-flexbox!important;display:flex!important;-webkit-box-align:center!important;-ms-flex-align:center!important;align-items:center!important;background:var(--label-bg-color)!important;border-radius:16px!important;-webkit-box-sizing:border-box!important;box-sizing:border-box!important;color:var(--secondary-color)!important;cursor:pointer!important;font-family:YS Text Variable,Helvetica,Arial,sans-serif!important;font-size:8px!important;height:12px!important;letter-spacing:.125em!important;line-height:normal!important;padding:0 4px!important;pointer-events:none!important;-webkit-text-decoration:none!important;text-decoration:none!important;text-transform:uppercase!important;-webkit-transition:color .5s ease-in-out!important;transition:color .5s ease-in-out!important;white-space:nowrap!important;z-index:10!important}.h13ce8d74 .ab773285c.s5dc692fb{pointer-events:auto!important}.h13ce8d74 .ab773285c.g172a7b3f{border-radius:4px!important;font-weight:500!important;height:14px!important;letter-spacing:.8px!important;padding:2px 4px!important}.h13ce8d74 .ab773285c.uf0bfb31e{padding:0 1px 0 4px!important}.h13ce8d74 .ab773285c.uf0bfb31e.g172a7b3f{padding:0 2px 0 4px!important}.h13ce8d74 .ab773285c.lee11d3af.uf0bfb31e{padding:0 4px 0 1px!important}.h13ce8d74 .ab773285c.lee11d3af.uf0bfb31e.g172a7b3f{padding:0 4px 0 2px!important}.h13ce8d74 .ab773285c.qf65be64a,.h13ce8d74 .ab773285c.lee11d3af.qf65be64a{padding:0!important}.h13ce8d74 .ab773285c>a{color:inherit!important;-webkit-text-decoration:none!important;text-decoration:none!important}.h13ce8d74 .ab773285c.kb9c0713c,.h13ce8d74 .ab773285c.bdfbee400{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:none!important;bottom:0!important;font-size:7px!important;height:auto!important;left:auto!important;opacity:.8!important;padding:0!important;right:0!important;text-shadow:none!important;top:auto!important}.h13ce8d74 .ab773285c.ba8660bfa{background:none!important}.h13ce8d74 .ab773285c.y2036fe2c{max-width:calc(100% - 42px)!important}.h13ce8d74 .ab773285c:empty{display:none!important}.h13ce8d74 .ab773285c.g9bf9d2ca{padding:0!important}.h13ce8d74 [data-essence-font] .ab773285c{font-family:inherit!important}.pcc7f219c{--secondary-color: rgba(87, 92, 102, 0.8); --label-bg-color: rgba(255, 255, 255, 0.8);}</style><div class="j9e412289"></div><div class="n2ea63db9 ufe3b4b2"><div class="ve2a55e7e"><div id="ya_partner_R-A-201169-26-yandex_rtb_R-A-201169-26" class="gb521d289"><div><template shadowrootmode="closed"><div class="y1f727eda" id="id7747971790602006593">
+          <div class="i72e7e8fb"></div>
+          <style>
+              :host {
+                  all: initial !important;
+                  font-family: inherit !important;
+                  
+              width: 100% !important;
+              height: 100% !important;
+          
+                  
+              }
+              .y1f727eda {
+                  
+        position: relative;
+        max-width: 100%;
+    
+              }
+              .i72e7e8fb {
+                  display: table;
+                  table-layout: fixed;
+                  width: 100%;
+                  height: 0;
+                  visibility: hidden;
+              }
+          </style>
+          <div data-wrapper="" class="rdb652217 g3873e2d6 qf0123e38"><div data-close="" data-new-adtune="true" data-sticky-adtune="false" style="--tertiary-color: #575c66;" data-kebab="" class="xbdf76f10 jeb949fd9 gf0d66a01 w69a1dc1a mf133bf95 da68bfa12"><div style="--secondary-color: #575c66; --label-bg-color: #ffffff;" class="n73d665bc b4e428054"></div><div class="r4c4758f2"><svg width="16" height="4" viewBox="0 0 16 4" fill="white" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1.5"></circle><circle cx="8" cy="2" r="1.5"></circle><circle cx="14" cy="2" r="1.5"></circle></svg></div></div><a href="https://yandex.ru/an/count/XEeejI_zOoVX2Las1UKc04f8P153KAZnMVqr1YVfvzHGD0a15GgzLd70esePrJfxyeQKe16NDPx3mcsLs90GMLzSGQaEqMns4zkV21u740xUhnjW5c2R11e15m7c05ouMXB9cC57Qka1W8SRenOVD3HLZlxSs9wcc2Ei4NAocBG10XQ6ES0uG0VJMTSB06l93j9eZSZ8BpeMhGML5JM7YfW2qhOm8IhBNVrOhlmTHuZ6617v0zA6laeKQ50YHBAeDxHa19ZrVXEcX9bJzd9TlTpMYJRF9-WO0qRGf0Wo53bq0_qIKgB71MRG7uaDnH8AEXwH-Rxlsy2jeKiSKBxWcWlETf3XjXQSxI336PTmMAULDcl0d6j1NYSJNH94JDbPXYvn0WJj9CETI0b2caklyujeQMJZSXvnldzr8oo93kRvwv9ViawifAqfUKx_N4RnmMM63fP0MbO9j5xWFk0o9EXoPBxTRZSOOB-aDXVVK0mkefXUUdAq0RuAUX1erxpYLBxVnE9Kljz4Fqr7RhaMMK9MguRRhQXNeSyTj2Ecj09WI2OcbDZIYBP2icJISNJbJze4GSTFcRUqhAr6Mriw5fGcSRP0wO-piQK_hlOb_N4rB-cFgodJ7rTBfZ-krYNzSJKkwOyhsQG_hboJ_hXIJVhZoZJfZolHf3-I52i_vi0fqYKhnPewm-FW2oUcfSK5HUP4Xml8OTk0QzwGOaM75IfGH5dmyG4OsEW0Q6lAa3HcofGi7OC_0LviFBIrBLqfEFOKR9rdpYWXXPI-a9IwJY9eND0e6KyhRTQ0GJ0cDoOMvaUmbHlB4kT7O3po3nmJeBdHikVEKYo7WIwS0IDQah0oO5ik6AFCCFFW98a6KaILvG3tDx3MURktj_DL3-RulTCpBUyrKMLxtgq7zVwsAl8h7UyrKUtjFHYZUFzM-wRoyJMGrzzMHNwbyl4ra7xtcgWETmf2NCz_UhtN_0tiRzy-30fvjrMHNs_VFWmAQTrU4zMsPT-tdTcsj_FLtMkYgfDrymllTZBSstaFvyMmxEhcUIVBRM_dgrtJxLuJ-njOwoiBmpFylgtSs_bAsxbFgCRkZltfTM_TRrslUy7RpecyNX2u_eItpNlX5NPvKpkFltMVs-FnEJ2lMldSldSVRUS-eUh6imxUpUpyld9B3w5-lhmgB2kr8PQAaegZEB2wLcfcWLGXZS8L2m8a7XmeuSJ8wWUgJg-7IZeXnQfShy10icH20flGcoR-qzhJdFCfUPez-QWKDM5YJaq7JidSs9mpFvoEIKv-13z3Do3yiEi6DNbfpoOifrdJrzbqFCsQkcBNVLzTA-zULfxVMDx5C6tdAnwiMlcSIgNjVDrlUm-gxYvcOpdMpMqRop3hohITgxfT3B_o_CAj_CgxUNRVkANjV2ZZjlMwgBQs1wetYluDLHhUQw8QkwoxOz-MTdj3eQfpPzXjOzUTPnbsuTbbvxv8jxsXK9LpuctJLRRQty1QN_aRtslUhcbshmCc_3WEqyatYQPcfKNtJgoXt2e6TX84UBYd1QYqHslXmfKP1v0fHMWTzARa06vZyIFut2fqZAVyi-yFinNRR40CGwk1Lt3LGHq7YQ0JUifG-Bk_kxF0DHMJZxImGQoutbPQqXCnk70ACM1FkkmRyjXq3kPJAyUG21ctXEpfTlu7~2?media-test-tag=2251799813688227" target="_blank" data-image-anchor="" class="r7713789f"><img src="https://avatars.mds.yandex.net/get-canvas/20999732/2a000001a0a585a8b8b04d2b4a4272626d5e/cropSource" title="" alt="" class="w33812091 h908fe150 d15404518"></a><div class="c1db28313 m7ac143d2 t3862ed49"><video data-name="video-slot" muted="" playsinline="" webkit-playsinline="" pip="false" class="k60e4fe2a" preload="auto" src="https://strm.yandex.ru/vh-canvas-converted/vod-content/6516133630149830535/7756b9cc-844b-4995-9b50-9b0746cff986/webm/VP9_256_144_200.webm?vsid=4ec279e94c19b733a5158150aac808c9eb5004523275xVASx6891x1790601823" style="cursor: pointer;"></video><div data-name="skin-slot" class="v472098c4"><div><div class="KlPILS3hc" style="visibility: visible;"><template shadowrootmode="open"><div style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; cursor: pointer;"></div></template><style type="text/css">.KlPILS3hc{-webkit-animation:none 0s ease 0s 1 normal none running;animation:none 0s ease 0s 1 normal none running;-webkit-backface-visibility:visible;backface-visibility:visible;background:transparent none repeat 0 0/auto auto padding-box border-box scroll;border:medium none currentcolor;border-collapse:separate;-o-border-image:none;border-image:none;border-radius:0;border-spacing:0;bottom:auto;-webkit-box-shadow:none;box-shadow:none;-webkit-box-sizing:content-box;box-sizing:content-box;caption-side:top;clear:none;clip:auto;color:#000;-webkit-columns:auto;-moz-columns:auto;columns:auto;-webkit-column-count:auto;-moz-column-count:auto;column-count:auto;-webkit-column-fill:balance;-moz-column-fill:balance;column-fill:balance;-webkit-column-gap:normal;-moz-column-gap:normal;column-gap:normal;-webkit-column-rule:medium none currentcolor;-moz-column-rule:medium none currentcolor;column-rule:medium none currentcolor;-webkit-column-span:1;-moz-column-span:1;column-span:1;-webkit-column-width:auto;-moz-column-width:auto;column-width:auto;content:normal;counter-increment:none;counter-reset:none;cursor:auto;display:inline;empty-cells:show;float:none;font-family:serif;font-size:medium;font-stretch:normal;font-style:normal;font-variant:normal;font-weight:400;height:auto;-webkit-hyphens:none;hyphens:none;left:auto;letter-spacing:normal;line-height:normal;list-style:disc none outside;margin:0;max-height:none;max-width:none;min-height:0;min-width:0;opacity:1;orphans:2;outline:medium none currentcolor;overflow:visible;overflow-x:visible;overflow-y:visible;padding:0;page-break-after:auto;page-break-before:auto;page-break-inside:auto;all:initial;display:block;height:100%;left:0;overflow:hidden;-webkit-perspective:none;perspective:none;-webkit-perspective-origin:50% 50%;perspective-origin:50% 50%;pointer-events:auto;position:static;position:absolute;right:auto;-moz-tab-size:8;-o-tab-size:8;tab-size:8;table-layout:auto;text-align:left;-moz-text-align-last:auto;text-align-last:auto;-webkit-text-decoration:none;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;top:auto;top:0;-webkit-transform:none;transform:none;-webkit-transform-origin:50% 50% 0;transform-origin:50% 50% 0;-webkit-transform-style:flat;transform-style:flat;-webkit-transition:none 0s ease 0s;transition:none 0s ease 0s;vertical-align:baseline;visibility:visible;visibility:hidden;white-space:normal;widows:2;width:auto;width:100%;word-spacing:normal;z-index:auto;z-index:0}</style></div></div><div class="NoQ6zr"><template shadowrootmode="open"><div><div class="jLMNBI8NxG notranslate ODMWK OsL eLl57ZbUPa" translate="no" style="--skin-font-size: 0.8em; --skin-skip-button-font-size: 11.200000000000001px; --skin-bottom-controls-safe-height: 10%;"><div class="toOOn"></div><div class="Malr77pRj5"><div class="mEOS6"></div></div><div class="FtG"></div></div><style type="text/css">.Hyuzj{bottom:0;left:0;pointer-events:auto;position:absolute;right:0;top:0}</style><style type="text/css">.K5eUdvIsZ{height:100%;opacity:0}.bTfYwZI{opacity:1}.N6OROFTY{height:-webkit-calc(100% - var(--ctat-margin-top) - var(--ctat-margin-bottom));height:calc(100% - var(--ctat-margin-top) - var(--ctat-margin-bottom));margin-left:var(--ctat-horizontal-margin);margin-right:var(--ctat-horizontal-margin);margin-top:var(--ctat-margin-top);position:relative;z-index:0}.Cm3WW,.N6OROFTY,.b95xgZA0{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center}.Cm3WW,.b95xgZA0{bottom:0;color:#fff;font-family:YS Text Variable, YS Text, Arial, sans-serif;font-weight:600;left:0;position:absolute;right:0;text-shadow:0 0 16px rgba(0,0,0,.05),0 0 8px rgba(0,0,0,.05),0 4px 4px rgba(0,0,0,.05),0 2px 2px rgba(0,0,0,.05),0 1px 1px rgba(0,0,0,.05);top:0;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.bTfYwZI .b95xgZA0 .DXO9ZyL{--ctat-animation-delay-line:-webkit-calc(var(--ctat-animation-title-part-duration) * 3 * var(--stw-text-line-index));--ctat-animation-delay-line:calc(var(--ctat-animation-title-part-duration) * 3 * var(--stw-text-line-index));--ctat-animation-delay-third:-webkit-calc(var(--ctat-animation-title-part-duration) * var(--stw-text-char-inside-line-third));--ctat-animation-delay-third:calc(var(--ctat-animation-title-part-duration) * var(--stw-text-char-inside-line-third));--ctat-animation-overlap-char:-webkit-calc(var(--ctat-animation-delay-third) + var(--ctat-animation-delay-line));--ctat-animation-overlap-char:calc(var(--ctat-animation-delay-third) + var(--ctat-animation-delay-line));-webkit-animation-delay:-webkit-calc(((-1 * (var(--ctat-animation-current-time))) + var(--ctat-animation-overlap-char) + var(--ctat-animation-title-animation-show-delay)));animation-delay:calc(((-1 * (var(--ctat-animation-current-time))) + var(--ctat-animation-overlap-char) + var(--ctat-animation-title-animation-show-delay)));-webkit-animation-duration:var(--ctat-animation-title-part-duration);animation-duration:var(--ctat-animation-title-part-duration);-webkit-animation-fill-mode:both;animation-fill-mode:both;-webkit-animation-name:fz0;animation-name:fz0;-webkit-animation-play-state:var(--ctat-animation-playing-state);animation-play-state:var(--ctat-animation-playing-state);-webkit-animation-timing-function:ease-in-out;animation-timing-function:ease-in-out}@@-webkit-keyframes fz0{0%{opacity:0;-webkit-transform:translateY(100%);transform:translateY(100%)}to{opacity:1;-webkit-transform:translateY(0);transform:translateY(0)}}@@keyframes fz0{0%{opacity:0;-webkit-transform:translateY(100%);transform:translateY(100%)}to{opacity:1;-webkit-transform:translateY(0);transform:translateY(0)}}.Cm3WW .KRohlp24,.b95xgZA0 .KRohlp24{overflow:clip;pointer-events:auto}.bTfYwZI .b95xgZA0 .KRohlp24{--ctat-animation-title-animation-enlarge-current-line-delay:-webkit-calc(var(--ctat-animation-title-animation-enlargement-delay) + (var(--ctat-animation-title-animation-enlargement-duration) + var(--ctat-animation-title-enlargement-next-line-delay)) * var(--stw-text-line-index));--ctat-animation-title-animation-enlarge-current-line-delay:calc(var(--ctat-animation-title-animation-enlargement-delay) + (var(--ctat-animation-title-animation-enlargement-duration) + var(--ctat-animation-title-enlargement-next-line-delay)) * var(--stw-text-line-index));--ctat-animation-title-animation-hide-current-line-delay:-webkit-calc(var(--ctat-animation-title-animation-hide-delay) + var(--ctat-animation-title-animation-hide-duration) * var(--stw-text-line-index));--ctat-animation-title-animation-hide-current-line-delay:calc(var(--ctat-animation-title-animation-hide-delay) + var(--ctat-animation-title-animation-hide-duration) * var(--stw-text-line-index));-webkit-animation-delay:-webkit-calc(-1 * (var(--ctat-animation-current-time)) + var(--ctat-animation-title-animation-enlarge-current-line-delay)),-webkit-calc(-1 * (var(--ctat-animation-current-time)) + var(--ctat-animation-title-animation-hide-current-line-delay));animation-delay:calc(-1 * (var(--ctat-animation-current-time)) + var(--ctat-animation-title-animation-enlarge-current-line-delay)),calc(-1 * (var(--ctat-animation-current-time)) + var(--ctat-animation-title-animation-hide-current-line-delay));-webkit-animation-duration:var(--ctat-animation-title-animation-enlargement-duration),var(--ctat-animation-title-animation-hide-duration);animation-duration:var(--ctat-animation-title-animation-enlargement-duration),var(--ctat-animation-title-animation-hide-duration);-webkit-animation-fill-mode:both,forwards;animation-fill-mode:both,forwards;-webkit-animation-name:nFINysm,vd1k6T;animation-name:nFINysm,vd1k6T;-webkit-animation-play-state:var(--ctat-animation-playing-state),var(--ctat-animation-playing-state);animation-play-state:var(--ctat-animation-playing-state),var(--ctat-animation-playing-state);-webkit-animation-timing-function:cubic-bezier(.35,0,.65,1),ease-in-out;animation-timing-function:cubic-bezier(.35,0,.65,1),ease-in-out}@@-webkit-keyframes nFINysm{0%{-webkit-transform:scale(1) translateY(0);transform:scale(1) translateY(0)}to{-webkit-transform:scale(1.1) translateY(0);transform:scale(1.1) translateY(0)}}@@keyframes nFINysm{0%{-webkit-transform:scale(1) translateY(0);transform:scale(1) translateY(0)}to{-webkit-transform:scale(1.1) translateY(0);transform:scale(1.1) translateY(0)}}@@-webkit-keyframes vd1k6T{0%{opacity:1;-webkit-transform:scale(1.1) translateY(0);transform:scale(1.1) translateY(0)}99%{opacity:0;-webkit-transform:scale(1.1) translateY(100%);transform:scale(1.1) translateY(100%)}to{opacity:0;-webkit-transform:scale(1.1) translateY(9999px);transform:scale(1.1) translateY(9999px)}}@@keyframes vd1k6T{0%{opacity:1;-webkit-transform:scale(1.1) translateY(0);transform:scale(1.1) translateY(0)}99%{opacity:0;-webkit-transform:scale(1.1) translateY(100%);transform:scale(1.1) translateY(100%)}to{opacity:0;-webkit-transform:scale(1.1) translateY(9999px);transform:scale(1.1) translateY(9999px)}}.bTfYwZI .Cm3WW .KRohlp24{--ctat-animation-body-animation-show-current-line-delay:-webkit-calc(var(--ctat-animation-body-animation-show-delay) + (var(--ctat-animation-body-animation-show-duration) * 0.5 + var(--ctat-animation-body-animation-show-line-delay)) * var(--stw-text-line-index));--ctat-animation-body-animation-show-current-line-delay:calc(var(--ctat-animation-body-animation-show-delay) + (var(--ctat-animation-body-animation-show-duration) * 0.5 + var(--ctat-animation-body-animation-show-line-delay)) * var(--stw-text-line-index));--ctat-animation-body-animation-enlargement-current-line-delay:-webkit-calc(var(--ctat-animation-body-animation-enlargement-delay) + var(--ctat-animation-body-animation-show-duration) * var(--stw-text-line-index));--ctat-animation-body-animation-enlargement-current-line-delay:calc(var(--ctat-animation-body-animation-enlargement-delay) + var(--ctat-animation-body-animation-show-duration) * var(--stw-text-line-index));-webkit-animation-delay:-webkit-calc(-1 * (var(--ctat-animation-current-time)) + var(--ctat-animation-body-animation-show-current-line-delay)),-webkit-calc(-1 * (var(--ctat-animation-current-time)) + var(--ctat-animation-body-animation-enlargement-current-line-delay));animation-delay:calc(-1 * (var(--ctat-animation-current-time)) + var(--ctat-animation-body-animation-show-current-line-delay)),calc(-1 * (var(--ctat-animation-current-time)) + var(--ctat-animation-body-animation-enlargement-current-line-delay));-webkit-animation-duration:var(--ctat-animation-body-animation-show-duration),var(--ctat-animation-body-animation-enlargement-duration);animation-duration:var(--ctat-animation-body-animation-show-duration),var(--ctat-animation-body-animation-enlargement-duration);-webkit-animation-fill-mode:both,none;animation-fill-mode:both,none;-webkit-animation-name:HUZ,lqj3lsm;animation-name:HUZ,lqj3lsm;-webkit-animation-play-state:var(--ctat-animation-playing-state),var(--ctat-animation-playing-state);animation-play-state:var(--ctat-animation-playing-state),var(--ctat-animation-playing-state);-webkit-animation-timing-function:ease-in-out,ease-in-out;animation-timing-function:ease-in-out,ease-in-out}.bTfYwZI .Cm3WW{-webkit-animation-delay:-webkit-calc(-1 * (var(--ctat-animation-current-time)) + var(--ctat-animation-body-animation-show-delay));animation-delay:calc(-1 * (var(--ctat-animation-current-time)) + var(--ctat-animation-body-animation-show-delay));-webkit-animation-duration:.1s;animation-duration:.1s;-webkit-animation-fill-mode:both;animation-fill-mode:both;-webkit-animation-name:ykhn;animation-name:ykhn;-webkit-animation-timing-function:linear;animation-timing-function:linear;z-index:0}.bTfYwZI .b95xgZA0{z-index:1}@@-webkit-keyframes ykhn{0%{z-index:0}to{z-index:1}}@@keyframes ykhn{0%{z-index:0}to{z-index:1}}@@-webkit-keyframes HUZ{0%{opacity:0;-webkit-transform:translateY(9999px);transform:translateY(9999px)}1%{opacity:0;-webkit-transform:translateY(100%);transform:translateY(100%)}to{opacity:1;-webkit-transform:translateY(0);transform:translateY(0)}}@@keyframes HUZ{0%{opacity:0;-webkit-transform:translateY(9999px);transform:translateY(9999px)}1%{opacity:0;-webkit-transform:translateY(100%);transform:translateY(100%)}to{opacity:1;-webkit-transform:translateY(0);transform:translateY(0)}}@@-webkit-keyframes lqj3lsm{0%{letter-spacing:normal;-webkit-transform:scale(1);transform:scale(1)}33%{letter-spacing:.1em;-webkit-transform:scale(1.1);transform:scale(1.1)}to{letter-spacing:normal;-webkit-transform:scale(1);transform:scale(1)}}@@keyframes lqj3lsm{0%{letter-spacing:normal;-webkit-transform:scale(1);transform:scale(1)}33%{letter-spacing:.1em;-webkit-transform:scale(1.1);transform:scale(1.1)}to{letter-spacing:normal;-webkit-transform:scale(1);transform:scale(1)}}.A2pMF{background-color:rgba(0,0,0,.1);height:100%;left:0;position:absolute;top:0;width:100%}</style><style type="text/css">.pD6s6AIbb{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;left:50%;position:absolute;top:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%)}.vUtJ5RBH{-webkit-backdrop-filter:blur(1px);backdrop-filter:blur(1px);background-color:rgba(0,0,0,.2);bottom:0;display:grid;left:0;position:absolute;right:0;top:0;-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;-webkit-filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));justify-items:center;place-items:center;pointer-events:auto}.vUtJ5RBH svg{fill:#fff;height:43px;width:40px}.hR9oUy{bottom:0;left:0;pointer-events:auto;position:absolute;right:0;top:0}</style><style type="text/css">.VxDlf{--size:-webkit-calc(28px * var(--responsive-multiplier));--size:calc(28px * var(--responsive-multiplier));cursor:pointer;-webkit-flex-shrink:0;height:var(--size);padding:4px;pointer-events:auto;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;width:var(--size);-ms-flex-negative:0;flex-shrink:0}</style><style type="text/css">.zU0{margin:4px 0 0 auto;min-width:0}.i3utz{margin-right:7px;margin-top:8px}.MNuoG0g5{--forward-bg-color:hsla(0,0%,100%,.1);display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;background:-webkit-gradient(linear,left top,left bottom,from(hsla(0,0%,100%,.1)),to(hsla(0,0%,100%,.1))),rgba(35,37,38,.1);background:-webkit-linear-gradient(hsla(0,0%,100%,.1),hsla(0,0%,100%,.1)),rgba(35,37,38,.1);background:linear-gradient(hsla(0,0%,100%,.1),hsla(0,0%,100%,.1)),rgba(35,37,38,.1);background:-webkit-gradient(linear,left top,left bottom,from(var(--forward-bg-color)),to(var(--forward-bg-color))),rgba(35,37,38,.1);background:-webkit-linear-gradient(var(--forward-bg-color),var(--forward-bg-color)),rgba(35,37,38,.1);background:linear-gradient(var(--forward-bg-color),var(--forward-bg-color)),rgba(35,37,38,.1);border-radius:12px;font-size:12px;height:24px;line-height:24px;margin-left:4px;padding:0 8px;text-shadow:0 0 2px rgba(0,0,0,.75);-webkit-transition:100ms background-color ease-in;transition:100ms background-color ease-in}.MNuoG0g5:hover{background:-webkit-gradient(linear,left top,left bottom,from(var(--forward-bg-color)),to(var(--forward-bg-color))),rgba(35,37,38,.4);background:-webkit-linear-gradient(var(--forward-bg-color),var(--forward-bg-color)),rgba(35,37,38,.4);background:linear-gradient(var(--forward-bg-color),var(--forward-bg-color)),rgba(35,37,38,.4)}.owPTP{border-radius:50%;display:inline-block;height:16px;margin:0 6px 0 -2px;width:16px}.ruyZzsEAh{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}</style><style type="text/css">.mEOS6{--responsive-multiplier:1;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex}.POfGu5u{margin-left:6px;margin-top:15px}.a5J8Vxl1PZ svg{fill:#f2f2f2;-webkit-filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));opacity:1}.IHEbzHQRk svg{position:relative;top:-2px}</style><style type="text/css">.CbIb{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;position:relative;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-flow:column nowrap;-ms-flex-flow:column nowrap;flex-flow:column nowrap;height:100%;overflow:visible;width:100%;z-index:0;-webkit-box-pack:end;-webkit-justify-content:flex-end;-ms-flex-pack:end;justify-content:flex-end}.CbIb:before{background-image:-webkit-gradient(linear,left top,left bottom,from(transparent),color-stop(6.67%,rgba(0,0,0,.004)),color-stop(13.33%,rgba(0,0,0,.018)),color-stop(20%,rgba(0,0,0,.04)),color-stop(26.67%,rgba(0,0,0,.073)),color-stop(33.33%,rgba(0,0,0,.115)),color-stop(40%,rgba(0,0,0,.165)),color-stop(46.67%,rgba(0,0,0,.221)),color-stop(53.33%,rgba(0,0,0,.278)),color-stop(60%,rgba(0,0,0,.334)),color-stop(66.67%,rgba(0,0,0,.384)),color-stop(73.33%,rgba(0,0,0,.426)),color-stop(80%,rgba(0,0,0,.459)),color-stop(86.67%,rgba(0,0,0,.482)),color-stop(93.33%,rgba(0,0,0,.495)),to(rgba(0,0,0,.5)));background-image:-webkit-linear-gradient(top,transparent,rgba(0,0,0,.004) 6.67%,rgba(0,0,0,.018) 13.33%,rgba(0,0,0,.04) 20%,rgba(0,0,0,.073) 26.67%,rgba(0,0,0,.115) 33.33%,rgba(0,0,0,.165) 40%,rgba(0,0,0,.221) 46.67%,rgba(0,0,0,.278) 53.33%,rgba(0,0,0,.334) 60%,rgba(0,0,0,.384) 66.67%,rgba(0,0,0,.426) 73.33%,rgba(0,0,0,.459) 80%,rgba(0,0,0,.482) 86.67%,rgba(0,0,0,.495) 93.33%,rgba(0,0,0,.5));background-image:linear-gradient(180deg,transparent,rgba(0,0,0,.004) 6.67%,rgba(0,0,0,.018) 13.33%,rgba(0,0,0,.04) 20%,rgba(0,0,0,.073) 26.67%,rgba(0,0,0,.115) 33.33%,rgba(0,0,0,.165) 40%,rgba(0,0,0,.221) 46.67%,rgba(0,0,0,.278) 53.33%,rgba(0,0,0,.334) 60%,rgba(0,0,0,.384) 66.67%,rgba(0,0,0,.426) 73.33%,rgba(0,0,0,.459) 80%,rgba(0,0,0,.482) 86.67%,rgba(0,0,0,.495) 93.33%,rgba(0,0,0,.5));bottom:0;content:"";left:0;opacity:.65;position:absolute;right:0;top:0;z-index:-1}.v2UVshC:before{content:none}.LZA5PKFbq.CbIb:before{top:30px}.uEFRk{opacity:1;-webkit-transition:none;transition:none}.LZA5PKFbq .uEFRk{-webkit-box-ordinal-group:0;-webkit-order:-1;-ms-flex-order:-1;opacity:.01;order:-1;-webkit-transition:opacity .3s ease-in-out,-webkit-box-ordinal-group 0s .3s,-webkit-order 0s .3s;transition:opacity .3s ease-in-out,-webkit-box-ordinal-group 0s .3s,-webkit-order 0s .3s;transition:opacity .3s ease-in-out,order 0s .3s;transition:opacity .3s ease-in-out,order 0s .3s,-webkit-box-ordinal-group 0s .3s,-webkit-order 0s .3s,-ms-flex-order 0s .3s}.yu1KZk{margin:0 16px;-webkit-transition:none;transition:none}.LZA5PKFbq .yu1KZk,.FsVOukR .yu1KZk{margin:0;-webkit-transition:margin 0s .3s;transition:margin 0s .3s}.CbIb .F57ul{height:35px;padding-right:2px;width:35px}.jJexwrnj{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;-webkit-box-align:end;-webkit-align-items:flex-end;-ms-flex-align:end;align-items:flex-end}</style><style type="text/css">.k1Nnaq5X4x{}</style><style type="text/css">.jLMNBI8NxG{bottom:0;color:#fff;display:grid;font-family:YS Text Variable, YS Text, Arial, sans-serif;font-size:var(--skin-font-size);grid-template-columns:auto auto 1fr auto 35px;grid-template-rows:auto 1fr auto auto auto;height:100%;left:0;position:absolute;right:0;top:0;width:100%}.eLl57ZbUPa{grid-template-rows:auto 1fr auto auto var(--skin-bottom-controls-safe-height)}.Malr77pRj5{grid-column:1/5;grid-row:1;position:relative}.FCFgLf{grid-column:1/-1;grid-row:3;overflow:hidden}.pfoTh{margin-bottom:.3em}.zbQQd{grid-area:none;margin:0}.uXKbawy{align-self:flex-end;font-size:var(--skin-skip-button-font-size);grid-column:4/6;grid-row:4;padding-right:6px}.gr2LxdE{visibility:hidden}.MVm{opacity:.5}.nqdXz2{grid-column:1/6;padding-left:6px}.OsL .FRf1{padding-bottom:0;padding-top:0}.OsL .todB36{height:32px}.z5VWKe7c0{grid-column:1/6;grid-row:2/4;min-height:0;min-width:0;padding:10px 36px;position:relative}.vQA6Qo{pointer-events:auto}.ODMWK .z5VWKe7c0,.KGzfe6SHlD .z5VWKe7c0,.KGzfe6SHlD.ODMWK .z5VWKe7c0{grid-column:1/6;grid-row:2/4;padding:10px 20px}.Qm7SNnu{grid-column:1;grid-row:4;margin-bottom:4px;min-width:0;padding-left:16px;position:relative}.h7S6Ei{grid-column:3}.Eti4ez{grid-column:1/6;padding-right:6px}.OsL .Qm7SNnu{-webkit-align-self:flex-end;margin-bottom:0;padding-left:6px;-ms-flex-item-align:end;align-self:flex-end}.OsL .TyWoU7g{margin-left:4px;margin-right:4px;max-width:-webkit-calc(100% - 8px);max-width:calc(100% - 8px)}.FtG{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;grid-column:1/6;grid-row:5}.toOOn{bottom:2px;left:0;position:absolute;right:0}.U42LhehUl{background:-webkit-gradient(linear,left top,left bottom,from(transparent),color-stop(6.67%,rgba(0,0,0,.01)),color-stop(13.33%,rgba(0,0,0,.03)),color-stop(20%,rgba(0,0,0,.07)),color-stop(26.67%,rgba(0,0,0,.12)),color-stop(33.33%,rgba(0,0,0,.19)),color-stop(40%,rgba(0,0,0,.27)),color-stop(46.67%,rgba(0,0,0,.35)),color-stop(53.33%,rgba(0,0,0,.45)),color-stop(60%,rgba(0,0,0,.53)),color-stop(66.67%,rgba(0,0,0,.61)),color-stop(73.33%,rgba(0,0,0,.68)),color-stop(80%,rgba(0,0,0,.73)),color-stop(86.67%,rgba(0,0,0,.77)),color-stop(93.33%,rgba(0,0,0,.79)),to(rgba(0,0,0,.8)));background:-webkit-linear-gradient(top,transparent,rgba(0,0,0,.01) 6.67%,rgba(0,0,0,.03) 13.33%,rgba(0,0,0,.07) 20%,rgba(0,0,0,.12) 26.67%,rgba(0,0,0,.19) 33.33%,rgba(0,0,0,.27) 40%,rgba(0,0,0,.35) 46.67%,rgba(0,0,0,.45) 53.33%,rgba(0,0,0,.53) 60%,rgba(0,0,0,.61) 66.67%,rgba(0,0,0,.68) 73.33%,rgba(0,0,0,.73) 80%,rgba(0,0,0,.77) 86.67%,rgba(0,0,0,.79) 93.33%,rgba(0,0,0,.8));background:linear-gradient(180deg,transparent,rgba(0,0,0,.01) 6.67%,rgba(0,0,0,.03) 13.33%,rgba(0,0,0,.07) 20%,rgba(0,0,0,.12) 26.67%,rgba(0,0,0,.19) 33.33%,rgba(0,0,0,.27) 40%,rgba(0,0,0,.35) 46.67%,rgba(0,0,0,.45) 53.33%,rgba(0,0,0,.53) 60%,rgba(0,0,0,.61) 66.67%,rgba(0,0,0,.68) 73.33%,rgba(0,0,0,.73) 80%,rgba(0,0,0,.77) 86.67%,rgba(0,0,0,.79) 93.33%,rgba(0,0,0,.8));bottom:0;height:236px;left:0;position:absolute;right:0}.RnstR{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;grid-column:1/6;grid-row:4;overflow:hidden;padding:0 16px 8px;position:relative;-webkit-box-align:end;-webkit-align-items:flex-end;-ms-flex-align:end;align-items:flex-end;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;gap:12px;justify-content:space-between}.msQFITf{-webkit-box-flex:0;-webkit-flex-grow:0;-ms-flex-positive:0;flex-grow:0;-webkit-flex-shrink:1;-ms-flex-negative:1;flex-shrink:1;max-width:min(35.7em,100%);overflow:hidden}.B4m{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-align:end;-webkit-align-items:flex-end;-ms-flex-align:end;align-items:flex-end;-webkit-box-flex:1;-webkit-flex:1 0 0;-ms-flex:1 0 0px;flex:1 0 0;height:100%;max-width:-webkit-fit-content;max-width:-moz-fit-content;max-width:fit-content;min-width:4em}.o6CQ1c,.eO5at14n{grid-row:4/6;padding-bottom:60px}.o6CQ1c{padding-bottom:65px}.A2pMF .K5eUdvIsZ{overflow:hidden}</style></div></template><style type="text/css">.NoQ6zr{-webkit-animation:none 0s ease 0s 1 normal none running;animation:none 0s ease 0s 1 normal none running;-webkit-backface-visibility:visible;backface-visibility:visible;background:transparent none repeat 0 0/auto auto padding-box border-box scroll;border:medium none currentcolor;border-collapse:separate;-o-border-image:none;border-image:none;border-radius:0;border-spacing:0;bottom:auto;-webkit-box-shadow:none;box-shadow:none;-webkit-box-sizing:content-box;box-sizing:content-box;caption-side:top;clear:none;clip:auto;color:#000;-webkit-columns:auto;-moz-columns:auto;columns:auto;-webkit-column-count:auto;-moz-column-count:auto;column-count:auto;-webkit-column-fill:balance;-moz-column-fill:balance;column-fill:balance;-webkit-column-gap:normal;-moz-column-gap:normal;column-gap:normal;-webkit-column-rule:medium none currentcolor;-moz-column-rule:medium none currentcolor;column-rule:medium none currentcolor;-webkit-column-span:1;-moz-column-span:1;column-span:1;-webkit-column-width:auto;-moz-column-width:auto;column-width:auto;content:normal;counter-increment:none;counter-reset:none;cursor:auto;display:inline;empty-cells:show;float:none;font-family:serif;font-size:medium;font-stretch:normal;font-style:normal;font-variant:normal;font-weight:400;height:auto;-webkit-hyphens:none;hyphens:none;left:auto;letter-spacing:normal;list-style:disc none outside;margin:0;max-height:none;max-width:none;min-height:0;min-width:0;opacity:1;orphans:2;outline:medium none currentcolor;overflow:visible;overflow-x:visible;overflow-y:visible;padding:0;page-break-after:auto;page-break-before:auto;page-break-inside:auto;all:initial;bottom:0;display:block;font-size:16px;left:0;line-height:normal;overflow:hidden;-webkit-perspective:none;perspective:none;-webkit-perspective-origin:50% 50%;perspective-origin:50% 50%;pointer-events:none;position:static;position:absolute;right:auto;right:0;-moz-tab-size:8;-o-tab-size:8;tab-size:8;table-layout:auto;text-align:left;-moz-text-align-last:auto;text-align-last:auto;-webkit-text-decoration:none;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;top:auto;top:0;-webkit-transform:none;transform:none;-webkit-transform-origin:50% 50% 0;transform-origin:50% 50% 0;-webkit-transform-style:flat;transform-style:flat;-webkit-transition:none 0s ease 0s;transition:none 0s ease 0s;vertical-align:baseline;visibility:visible;white-space:normal;widows:2;width:auto;word-spacing:normal;z-index:auto;z-index:0}</style></div></div><a data-videolink="" href="https://yandex.ru/an/count/XEeejI_zOoVX2Las1UKc04f8P153KAZnMVqr1YVfvzHGD0a15GgzLd70esePrJfxyeQKe16NDPx3mcsLs90GMLzSGQaEqMns4zkV21u740xUhnjW5c2R11e15m7c05ouMXB9cC57Qka1W8SRenOVD3HLZlxSs9wcc2Ei4NAocBG10XQ6ES0uG0VJMTSB06l93j9eZSZ8BpeMhGML5JM7YfW2qhOm8IhBNVrOhlmTHuZ6617v0zA6laeKQ50YHBAeDxHa19ZrVXEcX9bJzd9TlTpMYJRF9-WO0qRGf0Wo53bq0_qIKgB71MRG7uaDnH8AEXwH-Rxlsy2jeKiSKBxWcWlETf3XjXQSxI336PTmMAULDcl0d6j1NYSJNH94JDbPXYvn0WJj9CETI0b2caklyujeQMJZSXvnldzr8oo93kRvwv9ViawifAqfUKx_N4RnmMM63fP0MbO9j5xWFk0o9EXoPBxTRZSOOB-aDXVVK0mkefXUUdAq0RuAUX1erxpYLBxVnE9Kljz4Fqr7RhaMMK9MguRRhQXNeSyTj2Ecj09WI2OcbDZIYBP2icJISNJbJze4GSTFcRUqhAr6Mriw5fGcSRP0wO-piQK_hlOb_N4rB-cFgodJ7rTBfZ-krYNzSJKkwOyhsQG_hboJ_hXIJVhZoZJfZolHf3-I52i_vi0fqYKhnPewm-FW2oUcfSK5HUP4Xml8OTk0QzwGOaM75IfGH5dmyG4OsEW0Q6lAa3HcofGi7OC_0LviFBIrBLqfEFOKR9rdpYWXXPI-a9IwJY9eND0e6KyhRTQ0GJ0cDoOMvaUmbHlB4kT7O3po3nmJeBdHikVEKYo7WIwS0IDQah0oO5ik6AFCCFFW98a6KaILvG3tDx3MURktj_DL3-RulTCpBUyrKMLxtgq7zVwsAl8h7UyrKUtjFHYZUFzM-wRoyJMGrzzMHNwbyl4ra7xtcgWETmf2NCz_UhtN_0tiRzy-30fvjrMHNs_VFWmAQTrU4zMsPT-tdTcsj_FLtMkYgfDrymllTZBSstaFvyMmxEhcUIVBRM_dgrtJxLuJ-njOwoiBmpFylgtSs_bAsxbFgCRkZltfTM_TRrslUy7RpecyNX2u_eItpNlX5NPvKpkFltMVs-FnEJ2lMldSldSVRUS-eUh6imxUpUpyld9B3w5-lhmgB2kr8PQAaegZEB2wLcfcWLGXZS8L2m8a7XmeuSJ8wWUgJg-7IZeXnQfShy10icH20flGcoR-qzhJdFCfUPez-QWKDM5YJaq7JidSs9mpFvoEIKv-13z3Do3yiEi6DNbfpoOifrdJrzbqFCsQkcBNVLzTA-zULfxVMDx5C6tdAnwiMlcSIgNjVDrlUm-gxYvcOpdMpMqRop3hohITgxfT3B_o_CAj_CgxUNRVkANjV2ZZjlMwgBQs1wetYluDLHhUQw8QkwoxOz-MTdj3eQfpPzXjOzUTPnbsuTbbvxv8jxsXK9LpuctJLRRQty1QN_aRtslUhcbshmCc_3WEqyatYQPcfKNtJgoXt2e6TX84UBYd1QYqHslXmfKP1v0fHMWTzARa06vZyIFut2fqZAVyi-yFinNRR40CGwk1Lt3LGHq7YQ0JUifG-Bk_kxF0DHMJZxImGQoutbPQqXCnk70ACM1FkkmRyjXq3kPJAyUG21ctXEpfTlu7~2?media-test-tag=2251799813688227" target="_blank" data-hidden="" class="b128ca00d"></a><div class="l85270c20"><div class="k8a29d805 m3245cd62" data-mute-unmute-button="" data-active="mute"><div class="de3f87655 b355cce37"><svg width="26" height="24" filter="drop-shadow(0 2px 3px rgba(0,0,0,.2))" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.61 4L2.5 5.328 7.145 9.24H3.637v5.201h3.966l3.973 3.901h1.33v-4.25L19.92 20s.3-.292.62-.64c.242-.271.582-.697.582-.697L3.61 4zm12.907 8.412l2.002 1.686a7.556 7.556 0 00.346-2.258 7.666 7.666 0 00-2.054-5.2l-1.732 1.487a5.48 5.48 0 011.469 3.713c0 .192-.01.383-.031.572zm3.817 3.215l1.79 1.508A10.962 10.962 0 0023.5 11.84c0-2.871-1.147-5.642-3.23-7.801l-1.73 1.42c1.704 1.767 2.643 4.034 2.643 6.381a8.918 8.918 0 01-.85 3.787zM9.98 6.907l2.925 2.464V5.339h-1.33L9.981 6.907z" fill="#F2F2F2"></path></svg></div><div class="de3f87655 db9ce316c"><svg width="26" height="24" filter="drop-shadow(0 2px 3px rgba(0,0,0,.2))" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.263 4.06c2.08 2.159 3.227 4.929 3.227 7.8 0 2.871-1.146 5.641-3.227 7.8l-1.73-1.42c1.703-1.768 2.641-4.032 2.641-6.38 0-2.347-.938-4.613-2.641-6.38l1.73-1.42zM7.61 9.26l3.964-3.9h1.33v13h-1.33l-3.97-3.9H3.64v-5.2h3.97zm11.248 2.6a7.666 7.666 0 00-2.053-5.2l-1.73 1.487a5.48 5.48 0 011.467 3.712 5.48 5.48 0 01-1.467 3.714l1.73 1.487a7.667 7.667 0 002.053-5.2z" fill="#F2F2F2"></path></svg></div></div><div data-name="subtitles-button" data-hidden="" class="tb1190e1c m3245cd62"><div class="bcfb61f33"><svg viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M16.7951 0H3.20486C2.09046 0 1.68635 0.116032 1.27894 0.333916C0.871535 0.5518 0.5518 0.871535 0.333916 1.27894C0.116032 1.68635 0 2.09046 0 3.20486V10.7951C0 11.9095 0.116032 12.3136 0.333916 12.7211C0.5518 13.1285 0.871535 13.4482 1.27894 13.6661C1.68635 13.884 2.09046 14 3.20486 14H16.7951C17.9095 14 18.3137 13.884 18.7211 13.6661C19.1285 13.4482 19.4482 13.1285 19.6661 12.7211C19.884 12.3136 20 11.9095 20 10.7951V3.20486C20 2.09046 19.884 1.68635 19.6661 1.27894C19.4482 0.871535 19.1285 0.5518 18.7211 0.333916C18.3137 0.116032 17.9095 0 16.7951 0ZM2.35599 2.04897C2.51125 2.01899 2.77844 2 3.20486 2H16.7951C17.2216 2 17.4887 2.01899 17.644 2.04897C17.7048 2.06072 17.7183 2.06567 17.7779 2.09754C17.8367 2.12903 17.871 2.16327 17.9025 2.22214C17.9343 2.28173 17.9393 2.29517 17.951 2.35599C17.981 2.51125 18 2.77844 18 3.20486V10.7951C18 11.2216 17.981 11.4887 17.951 11.644C17.9393 11.7048 17.9343 11.7183 17.9025 11.7779C17.871 11.8367 17.8367 11.871 17.7779 11.9025C17.7183 11.9343 17.7048 11.9393 17.644 11.951C17.4887 11.981 17.2216 12 16.7951 12H3.20486C2.77844 12 2.51125 11.981 2.35599 11.951C2.29517 11.9393 2.28173 11.9343 2.22214 11.9025C2.16327 11.871 2.12903 11.8367 2.09754 11.7779C2.06567 11.7183 2.06072 11.7048 2.04897 11.644C2.01899 11.4887 2 11.2216 2 10.7951V3.20486C2 2.77844 2.01899 2.51125 2.04897 2.35599C2.06072 2.29517 2.06567 2.28173 2.09754 2.22214C2.12903 2.16327 2.16327 2.12903 2.22214 2.09754C2.28173 2.06567 2.29517 2.06072 2.35599 2.04897ZM4 9C4 8.44771 4.44772 8 5 8H10C10.5523 8 11 8.44771 11 9C11 9.55229 10.5523 10 10 10H5C4.44772 10 4 9.55229 4 9ZM13 8C12.4477 8 12 8.44771 12 9C12 9.55229 12.4477 10 13 10H15C15.5523 10 16 9.55229 16 9C16 8.44771 15.5523 8 15 8H13ZM4 5C4 4.44772 4.44772 4 5 4H6C6.55228 4 7 4.44772 7 5C7 5.55228 6.55228 6 6 6H5C4.44772 6 4 5.55228 4 5ZM9 4C8.44771 4 8 4.44772 8 5C8 5.55228 8.44771 6 9 6H15C15.5523 6 16 5.55228 16 5C16 4.44772 15.5523 4 15 4H9Z"></path></svg></div><div class="ffeebcfbd"><svg viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path fill-rule="evenodd" d="M0 4C0 2.59987 0 1.8998 0.27248 1.36502C0.51217 0.89462 0.89462 0.51217 1.36502 0.27248C1.8998 0 2.59987 0 4 0H16C17.4001 0 18.1002 0 18.635 0.27248C19.1054 0.51217 19.4878 0.89462 19.7275 1.36502C20 1.8998 20 2.59987 20 4V10C20 11.4001 20 12.1002 19.7275 12.635C19.4878 13.1054 19.1054 13.4878 18.635 13.7275C18.1002 14 17.4001 14 16 14H4C2.59987 14 1.8998 14 1.36502 13.7275C0.89462 13.4878 0.51217 13.1054 0.27248 12.635C0 12.1002 0 11.4001 0 10V4ZM2.5 10C2.5 9.4477 2.94772 9 3.5 9H10.5C11.0523 9 11.5 9.4477 11.5 10C11.5 10.5523 11.0523 11 10.5 11H3.5C2.94772 11 2.5 10.5523 2.5 10ZM14 9C13.4477 9 13 9.4477 13 10C13 10.5523 13.4477 11 14 11H16.5C17.0523 11 17.5 10.5523 17.5 10C17.5 9.4477 17.0523 9 16.5 9H14ZM2.5 6C2.5 5.44772 2.94772 5 3.5 5H6C6.55228 5 7 5.44772 7 6C7 6.55228 6.55228 7 6 7H3.5C2.94772 7 2.5 6.55228 2.5 6ZM9.5 5C8.9477 5 8.5 5.44772 8.5 6C8.5 6.55228 8.9477 7 9.5 7H16.5C17.0523 7 17.5 6.55228 17.5 6C17.5 5.44772 17.0523 5 16.5 5H9.5Z"></path></svg></div></div></div></div></div>
+      <style type="text/css">.qf0123e38{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;overflow:hidden}.r7713789f{display:block;height:-webkit-fit-content;height:-moz-fit-content;height:fit-content;width:-webkit-fit-content;width:-moz-fit-content;width:fit-content}.d15404518{border:none;display:block}.v472098c4,.k60e4fe2a,.b128ca00d{bottom:0;height:100%;left:0;position:absolute;right:0;top:0;width:100%}.b128ca00d[data-hidden]{display:none}.t3862ed49{position:relative}.xbdf76f10.xbdf76f10{position:absolute;right:4px;top:4px;z-index:10}.c72384323{display:-webkit-box;display:-ms-flexbox;display:flex;position:absolute;right:8px;top:8px;z-index:10;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-box-align:center;-ms-flex-align:center;align-items:center;border-radius:12px;padding:2px 4px}.d25bc123c{background-color:hsla(0,0%,100%,.6)}.h257fbfde{background-color:rgba(16,21,27,.6)}.l85270c20{display:-webkit-box;display:-ms-flexbox;display:flex;left:2px;position:absolute;top:0}.tbc750bd0{top:10px}.m3245cd62{position:relative}.m3245cd62:before{content:"";height:44px;left:0;position:absolute;right:0;top:50%;-webkit-transform:translateY(-50%);transform:translateY(-50%)}.m3245cd62:first-child:before{left:-2px}.m3245cd62:hover{-webkit-filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));filter:drop-shadow(0 2px 3px rgba(0,0,0,.2))}.c1db28313.m7ac143d2{width: 240px; height: 135px;}.w33812091.h908fe150{width: 240px; height: 465px;}.rdb652217.g3873e2d6{width: 240px; height: 600px;}.jeb949fd9{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;border-radius:10px;cursor:pointer;justify-content:center;pointer-events:auto;position:relative;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}.jeb949fd9.g4dad0bb4{border-radius:50%}.jeb949fd9:before{content:"";height:var(--kebab-click-area-size-height);position:absolute;right:calc(-4px - 4px - 0px - 0px);right:calc(-4px - 4px - var(--badge-indent, 0px) - var(--kebab-indent, 0px));top:calc(-4px - 0px);top:calc(-4px - var(--kebab-indent, 0px));width:var(--kebab-click-area-size-width)}.jeb949fd9.gb8f273eb:before{content:normal}.jeb949fd9.w8772e874:before{right:50%;top:50%;-webkit-transform:translate(50%,-50%);transform:translate(50%,-50%)}.jeb949fd9.gb6fb61c9:before{background-color:rgba(255,0,0,.4)}.jeb949fd9 .n73d665bc{background:var(--label-bg-color);border-radius:inherit;color:var(--secondary-color);height:100%;left:0;pointer-events:none;position:absolute;top:0;-webkit-transition:opacity .15s;transition:opacity .15s;-webkit-transition:background-color .5s ease-in-out;transition:background-color .5s ease-in-out;width:100%}.jeb949fd9.da68bfa12 .n73d665bc{opacity:.8}.jeb949fd9.y823538a .n73d665bc,.jeb949fd9.w4bdae2a8 .n73d665bc{background:none}.jeb949fd9.y823538a:hover{background-color:#e9e9e9}.jeb949fd9.w4bdae2a8:hover{background-color:rgba(248,250,255,.2)}.jeb949fd9:hover .n73d665bc{opacity:.8}.jeb949fd9:hover .n73d665bc.cab1a8f16{opacity:.5}.jeb949fd9:hover .n73d665bc.ddde38cb4{opacity:.9}.jeb949fd9 .r4c4758f2{pointer-events:none;-webkit-transition:fill .5s ease-in-out;transition:fill .5s ease-in-out;z-index:1}.jeb949fd9 .r4c4758f2 svg{display:block;fill:var(--tertiary-color);-webkit-transform:translate(0);transform:translate(0)}.jeb949fd9.k94bc4b4a.gf0d66a01{height:4px;width:14px}.jeb949fd9.w69a1dc1a.k1de4e527{height:6px;width:12px}.jeb949fd9.w69a1dc1a.k1de4e527.g4dad0bb4,.jeb949fd9.w69a1dc1a.k1de4e527.g4dad0bb4.q54860544{height:12px;width:12px}.jeb949fd9.w69a1dc1a.k1de4e527.q54860544{height:12px;width:6px}.jeb949fd9.w69a1dc1a.wbea838df{height:8px;width:16px}.jeb949fd9.w69a1dc1a.wbea838df.g4dad0bb4,.jeb949fd9.w69a1dc1a.wbea838df.g4dad0bb4.q54860544{height:16px;width:16px}.jeb949fd9.w69a1dc1a.wbea838df.q54860544{height:16px;width:8px}.jeb949fd9.w69a1dc1a.gf0d66a01{height:12px;width:24px}.jeb949fd9.w69a1dc1a.gf0d66a01.g4dad0bb4,.jeb949fd9.w69a1dc1a.gf0d66a01.g4dad0bb4.q54860544{height:24px;width:24px}.jeb949fd9.w69a1dc1a.gf0d66a01.q54860544{height:24px;width:12px}.jeb949fd9.w69a1dc1a.yf65c9520{height:14px;width:28px}.jeb949fd9.w69a1dc1a.yf65c9520.g4dad0bb4,.jeb949fd9.w69a1dc1a.yf65c9520.g4dad0bb4.q54860544{height:28px;width:28px}.jeb949fd9.w69a1dc1a.yf65c9520.q54860544{height:28px;width:14px}.jeb949fd9.w69a1dc1a.he872cbf8{height:16px;width:32px}.jeb949fd9.w69a1dc1a.he872cbf8.g4dad0bb4,.jeb949fd9.w69a1dc1a.he872cbf8.g4dad0bb4.q54860544{height:32px;width:32px}.jeb949fd9.w69a1dc1a.he872cbf8.q54860544{height:32px;width:16px}.mf133bf95{--tertiary-color: #575c66; --kebab-click-area-size-width: 42px; --kebab-click-area-size-height: 42px;}.b4e428054{--secondary-color: #575c66; --label-bg-color: #ffffff;}.k8a29d805{cursor:pointer;display:-webkit-box;display:-ms-flexbox;display:flex;height:32px;position:relative;width:32px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center}.k8a29d805[data-hidden]{display:none}.de3f87655{display:-webkit-box;display:-ms-flexbox;display:flex;height:32px;width:32px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center}.k8a29d805[data-active=mute] .db9ce316c,.k8a29d805[data-active=unmute] .b355cce37{display:none}.tb1190e1c{cursor:pointer}.tb1190e1c[data-hidden]{display:none}.tb1190e1c[data-off] .bcfb61f33{display:-webkit-box;display:-ms-flexbox;display:flex}.tb1190e1c[data-off] .ffeebcfbd,.bcfb61f33[class]{display:none}.bcfb61f33,.ffeebcfbd{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;height:32px;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;width:32px}.tb1190e1c svg{fill:#f2f2f2;-webkit-filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));height:14px;width:20px}</style></div></template></div></div><div class="ab773285c ae7c02ad7 ab4d6d490" data-label="true" style="--secondary-color: rgba(87, 92, 102, 0.8); --label-bg-color: rgba(255, 255, 255, 0.8);"><span>Реклама</span></div></div></div></div><div data-r-a-201169-26-yandex_rtb_r-a-201169-26="" class="csr-uniq5"></div></div>
+<script>
+window.yaContextCb.push(()=>{
+	Ya.Context.AdvManager.render({
+		"blockId": "R-A-201169-26",
+		"renderTo": "yandex_rtb_R-A-201169-26"
+	})
+})
+</script>
+</div>
+</div>
+</div></div>
+</div>
