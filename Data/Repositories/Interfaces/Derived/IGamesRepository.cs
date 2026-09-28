@@ -26,7 +26,21 @@ public interface IGamesRepository : IRepository<Game, AddGameModel, UpdateGameMo
     );
 
     Task<IEnumerable<Game>> GetFirstAsync(int offset, int limit);
+
     Task<IEnumerable<Game>> GetLastAsync(int offset, int limit);
-    Task<IEnumerable<Game>> GetNearestAsync(short limit);
+    Task<IEnumerable<Game>> GetNearestAsync(short offset, short limit);
+    Task<IEnumerable<Game>> GetNearestAsync();
+
+    Task<IEnumerable<Game>> GetNearestByParametersAsync(
+    long[]? genresIds,
+    long[]? platformsIds,
+    short offset,
+    short limit);
+
+    Task<int> GetNearestCountByParametersAsync(
+
+        long[]? genresIds,
+        long[]? platformsIds);
+
     Task<IEnumerable<Game>> GetByNameAsync(string name);
 }

@@ -1,0 +1,98 @@
+﻿@page "/games/releases-dates"
+@using BlazorClient.Components.PagesComponents.GamesList
+@using BlazorClient.Components.PagesComponents.GamesReleasesDates
+
+<div class="content-title">
+    <h1>Даты релизов игр</h1>
+</div>
+<div class="post-info" style="max-height: 85px;">
+    <p>Здесь собраны ближайшие и недавние релизы игр. Используйте фильтры по платформам и жанрам, чтобы найти интересующие вас проекты.</p>
+</div>
+
+<div id="filter">
+    @if (Platforms is not null || Genres is not null)
+    {
+        <CascadingValue Name="PlatformId" Value="PlatformId">
+            <CascadingValue Name="GenreId" Value="GenreId">
+                <CascadingValue Name="Platforms" Value="Platforms">
+                    <CascadingValue Name="Genres" Value="Genres">
+                        <ReleasesDatesFilterComponent />
+                    </CascadingValue>
+                </CascadingValue>
+            </CascadingValue>
+        </CascadingValue>
+    }
+</div>
+
+@if (FutureGames is null)
+{
+    <p>Загружается...</p>
+}
+else if (!FutureGames.Any())
+{
+    <p>Игры не найдены.</p>
+}
+else
+{
+    <div id="loop" class="list clear best">
+        @for (int i = 0; i < FutureGames.Count(); i++)
+        {
+            <BestGamesListElement Game="FutureGames.ElementAt(i)" Order="@(i + 1)" />
+        }
+    </div>
+
+    @* ПАГИНАЦИЯ *@
+    @if (PagedResponse != null && PagedResponse.TotalPages > 1)
+    {
+        <div class="pagination">
+            <div class="navi">
+                @if (PagedResponse.HasPrevious)
+                {
+                    <a class="prev page-numbers" href="@GetPageUrl(PagedResponse.Page - 1)">← Предыдущая</a>
+                }
+
+                @{
+                    int currentPage = PagedResponse.Page;
+                    int totalPages = PagedResponse.TotalPages;
+                    int startPage = Math.Max(1, currentPage - 2);
+                    int endPage = Math.Min(totalPages, currentPage + 2);
+
+                    if (startPage > 1)
+                    {
+                        <a class="page-numbers" href="@GetPageUrl(1)">1</a>
+                        if (startPage > 2)
+                        {
+                            <span class="page-numbers dots">…</span>
+                        }
+                    }
+
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        if (i == currentPage)
+                        {
+                            <span class="page-numbers current">@i</span>
+                        }
+                        else
+                        {
+                            <a class="page-numbers" href="@GetPageUrl(i)">@i</a>
+                        }
+                    }
+
+                    if (endPage < totalPages)
+                    {
+                        if (endPage < totalPages - 1)
+                        {
+                            <span class="page-numbers dots">…</span>
+                        }
+                        <a class="page-numbers" href="@GetPageUrl(totalPages)">@totalPages</a>
+                    }
+                }
+
+                @if (PagedResponse.HasNext)
+                {
+                    <a class="next page-numbers" href="@GetPageUrl(PagedResponse.Page + 1)">Показать еще</a>
+                }
+            </div>
+        </div>
+    }
+}

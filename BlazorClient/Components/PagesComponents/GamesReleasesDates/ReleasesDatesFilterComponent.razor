@@ -1,0 +1,42 @@
+﻿@using Domain.Games
+
+<div class="filter-section">
+    <h3>Фильтры</h3>
+
+    @if (Platforms is not null)
+    {
+        <div class="filter-group">
+            <label>Платформа:</label>
+            <select @onchange="OnPlatformChanged">
+                <option value="">Все платформы</option>
+                @foreach (var platform in Platforms)
+                {
+                    <option value="@platform.Id" selected="@(PlatformId == platform.Id)">
+                        @platform.Name
+                    </option>
+                }
+            </select>
+        </div>
+    }
+
+    @if (Genres is not null)
+    {
+        <div class="filter-group">
+            <label>Жанр:</label>
+            <select @onchange="OnGenreChanged">
+                <option value="">Все жанры</option>
+                @foreach (var genre in Genres)
+                {
+                    <option value="@genre.Id" selected="@(GenreId == genre.Id)">
+                        @genre.Name
+                    </option>
+                }
+            </select>
+        </div>
+    }
+
+    @if (PlatformId.HasValue || GenreId.HasValue)
+    {
+        <button class="reset-filters" @onclick="ResetFilters">Сбросить фильтры</button>
+    }
+</div>

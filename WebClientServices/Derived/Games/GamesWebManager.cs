@@ -67,9 +67,9 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
         return null;
     }
 
-    public async Task<IEnumerable<Game>> GetNearestAsync(short offset)
+    public async Task<IEnumerable<Game>> GetNearestAsync(long offset, long limit)
     {
-        IEnumerable<Game> nearestGames = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/nearest/{offset}");
+        IEnumerable<Game> nearestGames = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/games-releases-dates/{offset}/{limit}");
         return nearestGames;
     }
 

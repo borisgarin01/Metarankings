@@ -105,16 +105,6 @@ public sealed class HomeController : ControllerBase
         }
     }
 
-    [HttpGet("nearest/{limit}")]
-    public async Task<ActionResult<IEnumerable<GamesReleaseDateItemViewModel>>> GetNearestAsync(short limit)
-    {
-        IEnumerable<Game> games = await _gamesRepository.GetNearestAsync(limit);
-
-        IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDatetItemViewModels = games.Select(b => new GamesReleaseDateItemViewModel($"/games/Details/{b.Id}", b.Name, b.Image, b.Name, b.Name, b.Platforms.Select(c => new Link(c.Name, $"/platforms/{c.Id}")).ToArray(), b.Genres.Select(c => new Link(c.Name, $"/games/genres/{c.Id}")).ToArray(), b.ReleaseDate.HasValue ? b.ReleaseDate.Value : DateOnly.FromDateTime(DateTime.Today.AddYears(5))));
-
-        return Ok(gamesReleaseDatetItemViewModels);
-    }
-
     [HttpGet("games-release-dates/{pageNumber}/{pageSize}")]
     public async Task<ActionResult<IEnumerable<GamesReleaseDateItemComponent>>> GetGamesReleasesDatesAsync(int pageNumber, int pageSize)
     {
