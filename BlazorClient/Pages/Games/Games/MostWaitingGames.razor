@@ -1,5 +1,7 @@
 ﻿@page "/games/most-waiting-games/{PageSize:int}/{PageNumber:int}"
+@using System.Globalization
 @using BlazorClient.Components.PagesComponents.Common
+@using Domain.Games
 
 <div class="wrapper">
     <GameMenu Year="@DateTime.Now.AddYears(1).Year" />
@@ -17,13 +19,13 @@
                 <div class="filter-nav">
                     <div class="filter-name">Платформа</div>
                     <div class="filter-menu">
-                        <a class="@(GenreId is null ? "selected" : "")"
+                        <a class="@(PlatformId is null ? "selected" : "")"
                            href="/games/most-waiting-games/1/5">Все</a>
-                        @foreach (var genre in GamesGenres)
+                        @foreach (Platform platform in GamesPlatforms)
                         {
-                            <a class="@(GenreId == genre.Id ? "selected" : "")"
-                               href="/games/most-waiting-games/1/5?genre=@genre.Id">
-                                @genre.Name
+                            <a class="@(PlatformId == platform.Id ? "selected" : "")"
+                               href="/games/most-waiting-games/1/5?platformId=@platform.Id">
+                                @platform.Name
                             </a>
                         }
                     </div>
