@@ -1,0 +1,84 @@
+﻿@page "/admin/news"
+
+<h3>Управление новостями</h3>
+
+@if (!string.IsNullOrEmpty(_message))
+{
+    <div class="alert @(_isError ? "alert-danger" : "alert-success")">
+        @_message
+    </div>
+}
+
+@* ============ ФОРМА ДОБАВЛЕНИЯ / РЕДАКТИРОВАНИЯ ============ *@
+<div class="card mb-4">
+    <div class="card-header">
+        @(_editingId is null ? "Добавить новость" : $"Редактировать новость #{_editingId}")
+    </div>
+    <div class="card-body">
+        <div class="mb-2">
+            <label class="form-label">Заголовок</label>
+            <input class="form-control" @bind="_form.Title" maxlength="511" />
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Текст</label>
+            <textarea class="form-control" rows="5" @bind="_form.TextContent"></textarea>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Ссылка на картинку</label>
+            <input class="form-control" @bind="_form.ImageSource" />
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">ID пользователя</label>
+            <input class="form-control" type="number" @bind="_form.UserId" />
+        </div>
+
+        <button class="btn btn-primary" @onclick="SaveAsync" disabled="@_isSaving">
+            @(_editingId is null ? "Добавить" : "Сохранить")
+        </button>
+
+        @if (_editingId is not null)
+        {
+            <button class="btn btn-secondary ms-2" @onclick="CancelEdit">Отмена</button>
+        }
+    </div>
+</div>
+
+@* ============ СПИСОК НОВОСТЕЙ ============ *@
+<div id="loop" class="news list">
+    @if (NewsItems is null || !NewsItems.Any())
+    {
+        <p>Новостей пока нет.</p>
+    }
+    else
+    {
+        @foreach (var news in NewsItems)
+        {
+            <div class="post clear">
+                <a href="@news.ImageSource" title="@news.Title" class="news-thumb">
+                    <img class="news-image" src="@news.ImageSource" alt="@news.Title" />
+                </a>
+
+                <a class="news-title" href="@news.ImageSource">@news.Title</a>
+
+                <div class="postmeta">
+                    <span>@news.PublishTimestamp.ToString("dd.MM.yyyy")</span>
+                    <span>
+                        <a rel="nofollow" href="#">Комментировать</a>
+                    </span>
+                </div>
+
+                <div class="post-content">
+                    @Truncate(news.TextContent, 150)
+                </div>
+
+                <div class="mt-2">
+                    <button class="btn btn-sm btn-warning" @onclick="() => StartEdit(news)">Редактировать</button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteAsync(news.Id)">Удалить</button>
+                </div>
+            </div>
+        }
+    }
+</div>
