@@ -3,6 +3,7 @@ using BlazorClient.Auth;
 using BlazorClient.IServiceCollectionsExtensions;
 using BlazorClient.Modal;
 using Blazored.Toast;
+using WebManagers.Derived;
 
 internal class Program
 {
@@ -44,9 +45,9 @@ internal class Program
 
         builder.Services.AddScoped<IAuthService, AuthService>();
 
-        builder.Services.AddGamesWebManagers();
-
-        builder.Services.AddMoviesWebManagers();
+        builder.Services.AddGamesWebManagers()
+            .AddMoviesWebManagers()
+            .AddScoped<NewsWebManager>();
 
         builder.Services.AddScoped<IModalService, ModalService>();
 
