@@ -14,10 +14,10 @@ public partial class MostWaitingGames : ComponentBase
     public IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel> GamesGenresWebManager { get; set; } = default!;
 
     [Parameter]
-    public long PageSize { get; set; } = 5;
+    public int PageSize { get; set; } = 5;
 
     [Parameter]
-    public long PageNumber { get; set; } = 1;
+    public int PageNumber { get; set; } = 1;
 
     [SupplyParameterFromQuery(Name = "platform")]
     public long? PlatformId { get; set; }
@@ -34,6 +34,11 @@ public partial class MostWaitingGames : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
+        if (PageNumber < 1)
+            PageNumber = 1;
+        if (PageSize < 1)
+            PageSize = 5;
+
         var genresIds = GenreId.HasValue ? new[] { GenreId.Value } : null;
         var platformsIds = PlatformId.HasValue ? new[] { PlatformId.Value } : null;
 
