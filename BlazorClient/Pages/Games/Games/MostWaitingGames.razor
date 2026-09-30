@@ -1,4 +1,4 @@
-﻿@page "/games/most-waiting-games"
+﻿@page "/games/most-waiting-games/{PageNumber}/{PageSize}"
 @using BlazorClient.Components.PagesComponents.Common
 
 <div class="wrapper">
@@ -17,13 +17,15 @@
                 <div class="filter-nav">
                     <div class="filter-name">Платформа</div>
                     <div class="filter-menu">
-                        <a class="selected" href="/most-waiting-games/">Все</a>
-                        <a href="/most-waiting-games/?platform=pc">PC</a>
-                        <a href="/most-waiting-games/?platform=ps5">PS5</a>
-                        <a href="/most-waiting-games/?platform=xboxx">Xbox Series X</a>
-                        <a href="/most-waiting-games/?platform=ps4">PS4</a>
-                        <a href="/most-waiting-games/?platform=xboxone">Xbox One</a>
-                        <a href="/most-waiting-games/?platform=switch">Switch</a>
+                        <a class="@(GenreId is null ? "selected" : "")"
+                           href="/games/most-waiting-games/1/5">Все</a>
+                        @foreach (var genre in GamesGenres)
+                        {
+                            <a class="@(GenreId == genre.Id ? "selected" : "")"
+                               href="/games/most-waiting-games/1/5?genre=@genre.Id">
+                                @genre.Name
+                            </a>
+                        }
                     </div>
                 </div>
 
@@ -787,9 +789,9 @@
                         <!-- Внутренняя разметка рекламного блока Яндекса оставлена как есть -->
                     </div>
                     <script>
-                                            wi nd ow.yaContextCb.push(() => {
-                                                      Ya.Context.AdvManager.render({
-                                                       "blockId": "R-A-201169-26",
+                                                                                        wi nd ow.yaContextCb.push(() => {
+                                                Ya.Context.AdvManager.render({
+                                                    "blockId": "R-A-201169-26",
                                                     "renderTo": "yandex_rtb_R-A-201169-26"
                                                 })
                                             })
