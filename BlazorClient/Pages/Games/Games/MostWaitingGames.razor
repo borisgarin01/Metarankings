@@ -35,22 +35,13 @@
                     <div class="filter-name">Жанр</div>
                     <div class="filter-menu">
                         <a class="selected" href="/most-waiting-games/">Все</a>
-                        <a href="/most-waiting-games/?genre=ekshen">Экшены</a>
-                        <a href="/most-waiting-games/?genre=shuter">Шутеры</a>
-                        <a href="/most-waiting-games/?genre=rpg">RPG</a>
-                        <a href="/most-waiting-games/?genre=priklyuchenie">Приключения</a>
-                        <a href="/most-waiting-games/?genre=gonki">Гонки</a>
-                        <a href="/most-waiting-games/?genre=xorror">Хорроры</a>
-                        <a href="/most-waiting-games/?genre=strategiya">Стратегии</a>
-                        <a href="/most-waiting-games/?genre=mmo">ММО</a>
-                        <a href="/most-waiting-games/?genre=arkada">Аркады</a>
-                        <a href="/most-waiting-games/?genre=platformer">Платформеры</a>
-                        <a href="/most-waiting-games/?genre=sport">Спорт</a>
-                        <a href="/most-waiting-games/?genre=fajting">Файтинги</a>
-                        <a href="/most-waiting-games/?genre=taktika">Тактика</a>
-                        <a href="/most-waiting-games/?genre=simulyator">Симуляторы</a>
-                        <a href="/most-waiting-games/?genre=golovolomka">Головоломки</a>
-                        <a href="/most-waiting-games/?genre=yaponskoe-rpg">JRPG</a>
+                        @foreach (Genre genre in GamesGenres)
+                        {
+                            <a class="@(GenreId == genre.Id ? "selected" : "")"
+                               href="/games/most-waiting-games/1/5?genreId=@genre.Id">
+                                @genre.Name
+                            </a>
+                        }
                     </div>
                 </div>
             </div>
