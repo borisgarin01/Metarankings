@@ -5,8 +5,11 @@ namespace BlazorClient.Pages.Admin;
 
 public partial class NewsPage : ComponentBase
 {
-    [Inject] public NewsWebManager NewsWebManager { get; set; } = default!;
-    [Inject] public IJSRuntime JSRuntime { get; set; } = default!;
+    [Inject] 
+    public NewsWebManager NewsWebManager { get; set; } = default!;
+    
+    [Inject] 
+    public IJSRuntime JSRuntime { get; set; } = default!;
 
     public IEnumerable<NewsItem> NewsItems { get; set; } = new List<NewsItem>();
 

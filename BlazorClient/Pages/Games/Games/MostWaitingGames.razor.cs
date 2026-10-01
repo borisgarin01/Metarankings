@@ -1,7 +1,9 @@
+using Domain.Common.News;
 using Domain.Games;
 using Domain.RequestsModels.Games.Genres;
 using Domain.RequestsModels.Games.Platforms;
 using WebManagers;
+using WebManagers.Derived;
 using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Games.Games;
@@ -10,6 +12,9 @@ public partial class MostWaitingGames : ComponentBase
 {
     private const int PageSize = 25;
     private bool isLoading = false;
+
+    [Inject]
+    public NewsWebManager NewsWebManager { get; set; } = default!;
 
     [Inject]
     public GamesWebManager GamesWebManager { get; set; } = default!;
@@ -32,6 +37,7 @@ public partial class MostWaitingGames : ComponentBase
     public IEnumerable<Game> FutureGames { get; set; } = Enumerable.Empty<Game>();
     public IEnumerable<Genre> GamesGenres { get; set; } = Enumerable.Empty<Genre>();
     public IEnumerable<Platform> GamesPlatforms { get; set; } = Enumerable.Empty<Platform>();
+    public IEnumerable<NewsItem> NewsItems { get; set; } = new List<NewsItem>();
 
     public int TotalCount { get; set; }
     public int TotalPages => PageSize > 0
@@ -44,24 +50,29 @@ public partial class MostWaitingGames : ComponentBase
     {
         Task<IEnumerable<Genre>> genresTask = GamesGenresWebManager.GetAllAsync();
         Task<IEnumerable<Platform>> platformsTask = GamesPlatformsWebManager.GetAllAsync();
+        Task<IEnumerable<NewsItem>> newsItemsTask = NewsWebManager.GetAllAsync();
 
         try
         {
-            await Task.WhenAll(genresTask, platformsTask);
+            await Task.WhenAll(genresTask, platformsTask, newsItemsTask);
             GamesGenres = genresTask.Result ?? Enumerable.Empty<Genre>();
             GamesPlatforms = platformsTask.Result ?? Enumerable.Empty<Platform>();
+            NewsItems = newsItemsTask.Result ?? Enumerable.Empty<NewsItem>();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to load filters: {ex.Message}");
             GamesGenres = Enumerable.Empty<Genre>();
             GamesPlatforms = Enumerable.Empty<Platform>();
+            NewsItems = Enumerable.Empty<NewsItem>();
         }
     }
 
     protected override async Task OnParametersSetAsync()
     {
         isLoading = true;
+        StateHasChanged(); // <-- показываем "Загружается..." сразу
+
         try
         {
             currentPage = Page ?? 1;
@@ -92,6 +103,8 @@ public partial class MostWaitingGames : ComponentBase
         finally
         {
             isLoading = false;
+            // StateHasChanged() здесь не обязателен — Blazor отрисует после завершения метода,
+            // но можно добавить для явности.
         }
     }
 
@@ -120,5 +133,11 @@ public partial class MostWaitingGames : ComponentBase
     private string GetPageUrl(int page)
     {
         return $"/games/most-waiting-games{BuildQueryString(page)}";
+    }
+
+    private static string Truncate(string text, int maxLength)
+    {
+        if (string.IsNullOrEmpty(text)) return string.Empty;
+        return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
     }
 }

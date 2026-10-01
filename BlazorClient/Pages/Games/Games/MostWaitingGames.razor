@@ -149,54 +149,17 @@
             }
 
             <div class="news-module">
-                <div class="news-item">
-                    <a href="/sony-obyavila-sistemnye-trebovaniya-god-of-war-ragnarok-dlya-pc/" title="Sony объявила системные требования God of War Ragnarök для PC">
-                        <img class="news-thumb" src="/images/uploads/2024/08/god-of-war-ragnarok-445x250.jpg" alt="Sony объявила системные требования God of War Ragnarök для PC">
-                        <span class="news-title">God of War Ragnarök выходит на PC 19 сентября 2024 года! Чтобы подготовиться к путешествию по Девяти Царствам, ознакомьтесь с системными требованиями. PC-версия поддерживает технологии...</span>
-                    </a>
-                </div>
-                <div class="news-item">
-                    <a href="/activision-predstavila-kinematograficheskij-trejler-zombi-rezhima-call-of-duty-black-ops-6/" title="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6">
-                        <img class="news-thumb" src="/images/uploads/2024/08/kinematograficheskij-trejler-zombi-rezhima-v-call-of-duty-black-ops-6-445x250.jpg" alt="Activision представила кинематографический трейлер зомби-режима Call of Duty: Black Ops 6">
-                        <span class="news-title">Activision представила кинематографический трейлер зомби-режима шутера Call of Duty: Black Ops 6, который выходит 25 октября 2024 года на PC, а также Xbox Series X|S...</span>
-                    </a>
-                </div>
-                <div class="news-item">
-                    <a href="/nintendo-pokazala-metroid-prime-4-beyond-dlya-switch/" title="Nintendo показала Metroid Prime 4: Beyond для Switch">
-                        <img class="news-thumb" src="/images/uploads/2024/06/metroid-prime-4-beyond-445x250.jpg" alt="Nintendo показала Metroid Prime 4: Beyond для Switch">
-                        <span class="news-title">Компания Nintendo показала геймплейный трейлер экшен-приключения Metroid Prime 4: Beyond для своей гибридной игровой консоли Switch, которое выйдет в 2025 году. В трейлере можно видеть...</span>
-                    </a>
-                </div>
-                <div class="news-item">
-                    <a href="/konami-pokazala-2-minutnyj-gejmplejnyj-rolik-remejka-metal-gear-solid-delta-snake-eater/" title="Konami показала 2-минутный геймплейный ролик ремейка Metal Gear Solid Delta: Snake Eater">
-                        <img class="news-thumb" src="/images/uploads/2024/06/metal-gear-solid-delta-snake-eater-445x250.jpg" alt="Konami показала 2-минутный геймплейный ролик ремейка Metal Gear Solid Delta: Snake Eater">
-                        <span class="news-title">Компания Konami показала&nbsp;2-минутный геймплейный ролик ремейка Metal Gear Solid Δ: Snake Eater, который готовится к выходу на PlayStation 5, Xbox Series X|S и PC. Вам...</span>
-                    </a>
-                </div>
-                <div class="news-item">
-                    <a href="/anonsirovan-doom-the-dark-ages-predystoriya-sobytij-doom-2016/" title="Анонсирован DOOM: The Dark Ages — предыстория событий DOOM 2016">
-                        <img class="news-thumb" src="/images/uploads/2024/06/doom-the-dark-ages-445x250.jpg" alt="Анонсирован DOOM: The Dark Ages — предыстория событий DOOM 2016">
-                        <span class="news-title">На Xbox Games Showcase 2024 состоялся анонс шутера DOOM: The Dark Ages, который поведает что предвещало событиям DOOM 2016. Это сюжетный однопользовательский шутер, разрабатываемый на...</span>
-                    </a>
-                </div>
-                <div class="news-item">
-                    <a href="/anonsirovan-gears-of-war-e-day-dlya-xbox-series-xs-i-pk/" title="Анонсирован Gears of War: E-Day для Xbox Series X|S и ПК">
-                        <img class="news-thumb" src="/images/uploads/2024/06/gears-of-war-e-day-445x250.jpg" alt="Анонсирован Gears of War: E-Day для Xbox Series X|S и ПК">
-                        <span class="news-title">На Xbox Games Showcase 2024 состоялся анонс экшена Gears of War: E-Day, который готовится к выходу на Xbox Series X|S и ПК. Gears of War:...</span>
-                    </a>
-                </div>
-                <div class="news-item">
-                    <a href="/microsoft-pokazali-gejmplej-perfect-dark/" title="Microsoft показали геймплей перезапуска Perfect Dark">
-                        <img class="news-thumb" src="/images/uploads/2024/06/perfect-dark-445x250.jpg" alt="Microsoft показали геймплей перезапуска Perfect Dark">
-                        <span class="news-title">На Xbox Games Showcase 2024 состоялась дебютная демонстрация геймплея амбициозного перезапуска Perfect Dark от студии The Initiative. Perfect Dark отправит в недалекое будущее, когда на...</span>
-                    </a>
-                </div>
-                <div class="news-item">
-                    <a href="/god-of-war-ragnarok-poyavitsya-na-pk-v-sentyabre-2024/" title="God Of War Ragnarok появится на ПК в сентябре 2024">
-                        <img class="news-thumb" src="/images/uploads/2024/05/god-of-war-ragnarok-445x250.jpg" alt="God Of War Ragnarok появится на ПК в сентябре 2024">
-                        <span class="news-title">Компания Sony официально анонссировала PC-порт God Of War Ragnarok, который появится на этой игровой платформе этой осенью, 19 сентября 2024 года. ПК-версия God of War...</span>
-                    </a>
-                </div>
+                @foreach (var news in NewsItems)
+                {
+                    <div class="news-item">
+                        <a href="/news/@news.Id" title="@news.Title">
+                            <img class="news-thumb" src="@news.ImageSource" alt="@news.Title">
+                            <span class="news-title">
+                                @Truncate(news.TextContent, 150)
+                            </span>
+                        </a>
+                    </div>
+                }
             </div>
         </div>
 
