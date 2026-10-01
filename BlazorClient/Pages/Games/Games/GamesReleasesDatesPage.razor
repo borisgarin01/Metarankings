@@ -1,245 +1,98 @@
-﻿@page "/games/games-releases-dates"
+﻿@page "/games/releases-dates"
+@using BlazorClient.Components.PagesComponents.GamesList
+@using BlazorClient.Components.PagesComponents.GamesReleasesDates
 
-<div id="container" class="clear">
-    <div class="sidebar">
+<div class="content-title">
+    <h1>Даты релизов игр</h1>
+</div>
+<div class="post-info" style="max-height: 85px;">
+    <p>Здесь собраны ближайшие и недавние релизы игр. Используйте фильтры по платформам и жанрам, чтобы найти интересующие вас проекты.</p>
+</div>
+
+<div id="filter">
+    @if (Platforms is not null || Genres is not null)
+    {
+        <CascadingValue Name="PlatformId" Value="PlatformId">
+            <CascadingValue Name="GenreId" Value="GenreId">
+                <CascadingValue Name="Platforms" Value="Platforms">
+                    <CascadingValue Name="Genres" Value="Genres">
+                        <ReleasesDatesFilterComponent />
+                    </CascadingValue>
+                </CascadingValue>
+            </CascadingValue>
+        </CascadingValue>
+    }
+</div>
+
+@if (FutureGames is null)
+{
+    <p>Загружается...</p>
+}
+else if (!FutureGames.Any())
+{
+    <p>Игры не найдены.</p>
+}
+else
+{
+    <div id="loop" class="list clear best">
+        @for (int i = 0; i < FutureGames.Count(); i++)
+        {
+            <BestGamesListElement Game="FutureGames.ElementAt(i)" Order="@(i + 1)" />
+        }
     </div>
 
-    <div id="content" class="lcol">
-        <div class="content-title">
-            <script type="application/ld+json">
-                            {
-                                "@@context": "https://schema.org",
-                                "@@type": "BreadcrumbList",
-                                "itemListElement": [
-                                    {
-                                        "@@type": "ListItem",
-                                        "position": 1,
-                                        "name": "rankings-meta",
-                                        "item": "https://rankings-meta.ru"
-                                    },
-                                    {
-                                        "@@type": "ListItem",
-                                        "position": 2,
-                                        "name": "Дата выхода игр",
-                                        "item": "https://rankings-meta.ru/games/games-releases-dates/"
-                                    }
-                                ]
-                            }
-            </script>
-            <h1>Дата выхода игр</h1>
-        </div>
-
-        <div id="filter">
-            <div class="filter-nav">
-                <div class="filter-name">Платформа</div>
-                <div class="filter-menu">
-                    <a class="selected" href="/release-date/">Все</a>
-                    <a href="/release-date/?platform=pc">PC</a>
-                    <a href="/release-date/?platform=ps5">PS5</a>
-                    <a href="/release-date/?platform=xboxx">Xbox Series X</a>
-                    <a href="/release-date/?platform=ps4">PS4</a>
-                    <a href="/release-date/?platform=xboxone">Xbox One</a>
-                    <a href="/release-date/?platform=switch">Switch</a>
-                </div>
-            </div>
-
-            <div class="filter-nav">
-                <div class="filter-name">Жанр</div>
-                <div class="filter-menu">
-                    <a class="selected" href="/release-date/">Все</a>
-                    <a href="/release-date/?genre=ekshen">Экшены</a>
-                    <a href="/release-date/?genre=shuter">Шутеры</a>
-                    <a href="/release-date/?genre=rpg">RPG</a>
-                    <a href="/release-date/?genre=priklyuchenie">Приключения</a>
-                    <a href="/release-date/?genre=gonki">Гонки</a>
-                    <a href="/release-date/?genre=xorror">Хорроры</a>
-                    <a href="/release-date/?genre=strategiya">Стратегии</a>
-                    <a href="/release-date/?genre=mmo">ММО</a>
-                    <a href="/release-date/?genre=arkada">Аркады</a>
-                    <a href="/release-date/?genre=platformer">Платформеры</a>
-                    <a href="/release-date/?genre=sport">Спорт</a>
-                    <a href="/release-date/?genre=fajting">Файтинги</a>
-                    <a href="/release-date/?genre=taktika">Тактика</a>
-                    <a href="/release-date/?genre=simulyator">Симуляторы</a>
-                    <a href="/release-date/?genre=golovolomka">Головоломки</a>
-                    <a href="/release-date/?genre=yaponskoe-rpg">JRPG</a>
-                </div>
-            </div>
-        </div>
-
-        <div id="loop" class="list clear">
-            <div class="post clear">
-                <a href="/game-phantom-blade-zero/" title="Игра «Phantom Blade Zero»" class="thumb">
-                    <img class="post-image" src="/images/uploads/2023/05/phantom-blade-zero-boxart-cover-100x140.jpg" alt="Phantom Blade Zero">
-                </a>
-                <a class="name" href="/game-phantom-blade-zero/">Phantom Blade Zero</a>
-                <div class="post-meta">
-                    <div class="date">
-                        <p>29 октября 2026</p>
-                    </div>
-                </div>
-                <div class="post-meta">
-                    <p>Вы станете элитным ассасином по имени Соул, работающим на мощную организацию Орден. Но герой обвиняется в убийстве патриарха...</p>
-                </div>
-                <div class="wait">
-                    <span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'21296','like')">+ <span>105</span></span></span>
-                    <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'21296','dislike')">- <span>63</span></span></span>
-                </div>
-                <div class="trailer" data-video="/game-phantom-blade-zero/#content-trailer"></div>
-            </div>
-
-            <div class="post clear">
-                <a href="/grand-theft-auto-6/" title="«Grand Theft Auto 6»" class="thumb">
-                    <img class="post-image" src="/images/uploads/2023/12/grand-theft-auto-6-boxcover-art-100x140.jpg" alt="Grand Theft Auto 6">
-                </a>
-                <a class="name" href="/grand-theft-auto-6/">Grand Theft Auto 6</a>
-                <div class="post-meta">
-                    <div class="date">
-                        <p>19 ноября 2026</p>
-                    </div>
-                </div>
-                <div class="post-meta">
-                    <p>В шестой части культовой серии вы отправитесь в масштабный штат под названием Леонида, который раскинулся на просторах неонового...</p>
-                </div>
-                <div class="wait">
-                    <span class="w-yes">
-                        <span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'22987','like')">
-                            +
-                            <span>971</span>
-                        </span>
-                    </span>
-                    <span class="w-no">
-                        <span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'22987','dislike')">
-                            -
-                            <span>85</span>
-                        </span>
-                    </span>
-                </div>
-                <div class="trailer" data-video="/grand-theft-auto-6/#content-trailer"></div>
-            </div>
-
-            <div class="post clear">
-                <a href="/horizon-hunters-gathering/" title="Игра «Horizon Hunters Gathering»" class="thumb">
-                    <img class="post-image" src="/images/uploads/2026/02/horizon-hunters-gathering-boxart-cover-100x140.jpg" alt="Horizon Hunters Gathering">
-                </a>
-                <a class="name" href="/horizon-hunters-gathering/">Horizon Hunters Gathering</a>
-                <div class="post-meta">
-                    <div class="date">
-                        <p>1 декабря 2026</p>
-                    </div>
-                </div>
-                <div class="post-meta">
-                    <p>В кооперативной приключенческой игре Horizon Hunters Gathering вас ждёт битва за выживание в компании до двух союзников. Вы...</p>
-                </div>
-                <div class="wait">
-                    <span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'29058','like')">+ <span>2</span></span></span>
-                    <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'29058','dislike')">- <span>2</span></span></span>
-                </div>
-                <div class="trailer" data-video="/horizon-hunters-gathering/#content-trailer"></div>
-            </div>
-
-            <div class="ads">
-                <!-- Yandex.RTB R-A-201169-5 -->
-                <div id="yandex_rtb_R-A-201169-5" data-63ee7e91f1="">
-                    <div style="width: 100%;">
-                        <template shadowrootmode="open">
-                            <div data-name="shadow-root-inner">
-                                <div data-animation-state="idle" class="g26014274 r5d965fb8 w7848c43b">
-                                    <div data-root="" data-container="outer" data-name="visibility-slot" data-headersize="none" data-theme="light" data-iscpmwithdisclaimer="" class="p125cc521 xdc9d789c re262e3ba s25758335 sf37c4039">
-                                        <div data-close="" data-new-adtune="true" data-sticky-adtune="false" style="--tertiary-color: #FFFFFFCC;" class="b8533cc8 jeb949fd9 gf0d66a01 w69a1dc1a la6ea385f" data-on-packshot="false" data-kebab-hidden="false">
-                                            <div style="--secondary-color: #FFFFFFCC; --label-bg-color: #12151A66;" class="n73d665bc k2f02ef98 cab1a8f16"></div>
-                                            <div class="r4c4758f2">
-                                                <svg width="16" height="4" viewBox="0 0 16 4" fill="white" xmlns="http://www.w3.org/2000/svg">
-                                                    <circle cx="2" cy="2" r="1.5"></circle>
-                                                    <circle cx="8" cy="2" r="1.5"></circle>
-                                                    <circle cx="14" cy="2" r="1.5"></circle>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <div class="bebd0794d">
-                                            <div class="g6c672dc8 n8f8fa2b4 ycec2309c">
-                                                <div data-name="background-slot" class="nb277d260"></div>
-                                                <video data-name="video-slot" muted="" playsinline="" webkit-playsinline="" pip="false" class="xf0d1b8ff uc211385d pb39b309e"></video>
-                                                <div data-name="skin-slot" class="f64d8c0b1"></div>
-                                                <div data-name="packshot" class="v64bd8b9e"></div>
-                                                <div data-name="video-first-frame-container" style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; display: block; overflow: hidden; opacity: 1; transition: opacity 1s;">
-                                                    <div data-name="video-first-frame" style="background-image: url(&quot;https://avatars.mds.yandex.net/get-vh/19783842/2a000001a08c0aeaf4b9d84d107a2f692370/scale_600&quot;); position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; background-position: center; background-repeat: no-repeat; background-size: contain;"></div>
-                                                </div>
-                                            </div>
-                                            <div class="lb9a2e8e3 s72a71551 xa3de94eb"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <style>
-                                                            /* ... стили ... */
-                            </style>
-                        </template>
-                    </div>
-                    <div data-r-a-201169-5-yandex_rtb_r-a-201169-5="" class="csr-uniq1"></div>
-                </div>
-                <script>
-                                    window.yaContextCb.push(() => {
-                                        Ya.Context.AdvManager.render({
-                                            renderTo: 'yandex_rtb_R-A-201169-5',
-                                            blockId: 'R-A-201169-5'
-                                        })
-                                    })
-                </script>
-            </div>
-
-            <!-- Остальные .post блоки оформлены аналогично, с единообразными отступами -->
-            <!-- ... -->
-
-            <div class="post clear">
-                <a href="/synduality/" title="Игра «Synduality»" class="thumb">
-                    <img class="post-image" src="/images/uploads/2022/09/synduality-boxart-cover-100x140.jpg" alt="Synduality">
-                </a>
-                <a class="name" href="/synduality/">Synduality</a>
-                <div class="post-meta">
-                    <div class="date">
-                        <p>1 декабря 2026</p>
-                    </div>
-                </div>
-                <div class="post-meta">
-                    <p>Научно-фантастический шутер с видом от третьего лица, действия которого развиваются в антиутопическом будущем, где ядовитый дождь и монстры...</p>
-                </div>
-                <div class="wait">
-                    <span class="w-yes"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'19493','like')">+ <span>44</span></span></span>
-                    <span class="w-no"><span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'19493','dislike')">- <span>53</span></span></span>
-                </div>
-                <div class="trailer" data-video="/synduality/#content-trailer"></div>
-            </div>
-
-            <!-- ... остальные посты ... -->
-        </div>
-
+    @* ПАГИНАЦИЯ *@
+    @if (PagedResponse != null && PagedResponse.TotalPages > 1)
+    {
         <div class="pagination">
             <div class="navi">
-                <span class="page-numbers current">1</span>
-                <a class="page-numbers" href="/release-date/page/2/">2</a>
-                <a class="next page-numbers" href="/release-date/page/2/">Показать еще</a>
+                @if (PagedResponse.HasPrevious)
+                {
+                    <a class="prev page-numbers" href="@GetPageUrl(PagedResponse.Page - 1)">← Предыдущая</a>
+                }
+
+                @{
+                    int currentPage = PagedResponse.Page;
+                    int totalPages = PagedResponse.TotalPages;
+                    int startPage = Math.Max(1, currentPage - 2);
+                    int endPage = Math.Min(totalPages, currentPage + 2);
+
+                    if (startPage > 1)
+                    {
+                        <a class="page-numbers" href="@GetPageUrl(1)">1</a>
+                        if (startPage > 2)
+                        {
+                            <span class="page-numbers dots">…</span>
+                        }
+                    }
+
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        if (i == currentPage)
+                        {
+                            <span class="page-numbers current">@i</span>
+                        }
+                        else
+                        {
+                            <a class="page-numbers" href="@GetPageUrl(i)">@i</a>
+                        }
+                    }
+
+                    if (endPage < totalPages)
+                    {
+                        if (endPage < totalPages - 1)
+                        {
+                            <span class="page-numbers dots">…</span>
+                        }
+                        <a class="page-numbers" href="@GetPageUrl(totalPages)">@totalPages</a>
+                    }
+                }
+
+                @if (PagedResponse.HasNext)
+                {
+                    <a class="next page-numbers" href="@GetPageUrl(PagedResponse.Page + 1)">Показать еще</a>
+                }
             </div>
         </div>
-
-        <div class="page-description">
-            <p>Календарь выхода игр всех жанров для всех актуальных игровых платформ, которые готовятся к выходу.</p>
-        </div>
-    </div>
-
-    <div class="sidebar rcol" style="height: 5526px;">
-        <div class="widget last-reviews">
-            <div class="widget-body">
-                <div id="yandex_rtb_R-A-201169-26" data-2dd85f180b=""></div>
-                <script>
-                                    window.yaContextCb.push(() => {
-                                        Ya.Context.AdvManager.render({
-                                            "blockId": "R-A-201169-26",
-                                            "renderTo": "yandex_rtb_R-A-201169-26"
-                                        })
-                                    })
-                </script>
-            </div>
-        </div>
-    </div>
-</div>
+    }
+}

@@ -135,4 +135,28 @@ public sealed class GamesController : ControllerBase
     {
         return Ok(await _gamesRepository.GetByNameAsync(name));
     }
+
+    [HttpGet("games-releases-dates/{offset}/{limit}")]
+    public async Task<ActionResult<IEnumerable<Game>>> GamesReleasesDates(
+    short offset,
+    short limit,
+    [FromQuery] long[]? genresIds = null,
+    [FromQuery] long[]? platformsIds = null)
+    {
+        if (genresIds?.Length > 0 || platformsIds?.Length > 0)
+        {
+            return Ok(await _gamesRepository.GetNearestByParametersAsync(
+                genresIds, platformsIds, offset, limit));
+        }
+
+        return Ok(await _gamesRepository.GetNearestAsync(offset, limit));
+    }
+
+    [HttpGet("games-releases-dates/count")]
+    public async Task<ActionResult<int>> GamesReleasesDatesCount(
+        [FromQuery] long[]? genresIds = null,
+        [FromQuery] long[]? platformsIds = null)
+    {
+        return Ok(await _gamesRepository.GetNearestCountByParametersAsync(genresIds, platformsIds));
+    }
 }

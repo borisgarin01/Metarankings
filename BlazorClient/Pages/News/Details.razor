@@ -1,0 +1,100 @@
+﻿@page "/news/{Id:long}"
+@using BlazorClient.Components.PagesComponents.Common
+@using Domain.Common.News
+@using Domain.Games
+
+<GameMenu Year="@DateTime.Now.Year" />
+
+<div id="container" class="clear">
+    <div class="sidebar">
+    </div>
+    <div id="content" class="lcol">
+        <div class="news-text entry" itemscope="" itemtype="http://schema.org/Article">
+            <div itemscope="" itemprop="publisher" itemtype="http://schema.org/Organization">
+                <meta itemprop="name" content="MetaRankings">
+                <div itemprop="logo" itemscope="" itemtype="https://schema.org/ImageObject">
+                    <meta itemprop="url" content="/logo.png">
+                    <meta itemprop="width" content="300">
+                    <meta itemprop="height" content="50">
+                </div>
+                <meta itemprop="url" content="https://rankings-meta.ru/">
+            </div>
+            <meta itemscope="" itemprop="mainEntityOfPage" itemtype="https://schema.org/WebPage" itemid="https://rankings-meta.ru/news/@Id">
+            <div class="post single clear">
+                <div class="post-meta">
+                    <script type="application/ld+json">
+                                              {
+                                            "@@context": "https://schema.org",
+                                            "@@type": "BreadcrumbList",
+                                            "itemListElement": [{
+                                                    "@@type": "ListItem",
+                                                    "position": 1,
+                                                    "name": "MetaRankings",
+                                                    "item": "https://rankings-meta.ru"
+                                                },
+                                                {
+                                                    "@@type": "ListItem",
+                                                    "position": 2,
+                                                    "name": "Новости игр",
+                                                    "item": "https://rankings-meta.ru/meta/news/igri/"
+                                                }
+                                                ,{
+                                                    "@@type": "ListItem",
+                                                    "position": 3,
+                                                    "name": "@NewsItem.Title",
+                                                    "item": "https://rankings-meta.ru/news/@Id"
+                                                }
+                                            ]}
+                    </script>
+                    <div class="breadcrumbs news-meta">
+                        <a itemprop="genre" href="https://rankings-meta.ru/news">Новости игр</a>
+                    </div>
+                    <h1><span itemprop="headline">@NewsItem.Title</span></h1>
+                    <meta itemprop="datePublished" content="@NewsItem.PublishTimestamp.ToString("yyyy-MM-dd")">
+                    <div class="postmeta" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+                        <span itemprop="name">@NewsItem.ApplicationUser.UserName</span> <span>@NewsItem.PublishTimestamp.ToString("dd.MM.yyyy HH:mm")</span>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <div class="news-img">
+                        <img class="news-image" src="@NewsItem.ImageSource" alt="@NewsItem.Title" title="@NewsItem.Title" itemprop="image">
+                    </div>
+                    <div itemprop="articleBody">
+                        <p>@NewsItem.TextContent</p>
+                    </div>
+                    <div class="podborki">
+                        <a class="mark-link" href="/games/best-games/?Year=@NewsItem.PublishTimestamp.Year">Игры @NewsItem.PublishTimestamp.Year</a>
+                    </div>
+                </div>
+
+                <div class="news-module">
+                    @foreach (NewsItem newsItem in NewsItems)
+                    {
+                        <div class="news-item">
+                            <a href="/news/@newsItem.Id" title="@newsItem.Title">
+                                <img class="news-thumb" src="@newsItem.ImageSource" alt="@newsItem.Title">
+                                <span class="news-title">
+                                    @Truncate(newsItem.TextContent, 150)
+                                </span>
+                            </a>
+                        </div>
+                    }
+                </div>
+
+ 
+                <div class="list clear similar">
+                    @foreach (Game game in SimilarGames)
+                    {
+                        <a href="/games/details/@game.Id" title="@game.Name">
+                            <div class="featured-image">
+                                <img class="post-image" src="@game.Image" alt="@game.Name">
+                                <div class="small-score mark-@Math.Round(game.UsersScore)">@Math.Round(game.UsersScore, 1)</div>
+                                <span>@game.Name</span>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

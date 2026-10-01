@@ -1,0 +1,104 @@
+﻿@page "/news"
+@using Domain.Common.News
+
+<div id="container" class="clear">
+    <div class="sidebar"></div>
+
+    <div id="content" class="lcol">
+        <div class="content-title">
+            <h1>Новости игр</h1>
+        </div>
+
+        <div class="title-index">
+            <div class="dropdown-menu genre">
+                <span class="title">Год</span>
+                <ul>
+                    @for (int year = DateTime.Now.Year; year > DateTime.Now.AddYears(-7).Year; year--)
+                    {
+                        <li>
+                            <a href="/games/best-games/?year=@year">Игры @year</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <div class="dropdown-menu genre">
+                <span class="title">Лучшие</span>
+                <ul>
+                    @foreach (var platform in Platforms)
+                    {
+                        <li>
+                            <a href="/games/best-games/?platformId=@platform.Id">@platform.Name</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div id="loop" class="news list">
+            @if (IsLoading && News.Count == 0)
+            {
+                <p>Загрузка новостей…</p>
+            }
+            else if (News.Count == 0)
+            {
+                <p>Новостей пока нет.</p>
+            }
+            else
+            {
+                @foreach (NewsItem item in News)
+                {
+                    <div class="post clear" @key="item.Id">
+                        <a href="/news/@item.Id" title="@item.Title" class="news-thumb">
+                            <img class="news-image" src="@item.ImageSource" alt="@item.Title">
+                        </a>
+
+                        <a class="news-title" href="/news/@item.Id">@item.Title</a>
+
+                        <div class="postmeta">
+                            <span>@item.PublishTimestamp.ToString("dd.MM.yyyy")</span>
+                            <span>
+                                <a rel="nofollow"
+                                   href="/news/@item.Id#news-comments">
+                                    Комментировать
+                                </a>
+                            </span>
+                        </div>
+
+                        <div class="post-content">
+                            @Truncate(item.TextContent,150)
+                        </div>
+                    </div>
+
+                    @* Рекламный блок после 3-й новости *@
+                    @if (item == News.ElementAtOrDefault(2))
+                    {
+                        <div class="ads-horizont hor-1">
+                            <!-- Yandex.RTB R-A-201169-5 -->
+                            <div id="yandex_rtb_R-A-201169-5"></div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+
+        <div class="pagination">
+            <div class="navi">
+                <span class="page-numbers current">@CurrentPage</span>
+                <button class="next page-numbers"
+                        disabled="@IsLoading"
+                        @onclick="LoadNextPageAsync">
+                    Показать еще
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar rcol">
+        <div class="widget last-reviews">
+            <div class="widget-body">
+                <div id="yandex_rtb_R-A-201169-26"></div>
+            </div>
+        </div>
+    </div>
+</div>

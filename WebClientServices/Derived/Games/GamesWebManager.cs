@@ -67,10 +67,54 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
         return null;
     }
 
-    public async Task<IEnumerable<Game>> GetNearestAsync(short offset)
+    public async Task<IEnumerable<Game>> GetNearestAsync(
+    long offset,
+    long limit,
+    IEnumerable<long>? genresIds = null,
+    IEnumerable<long>? platformsIds = null)
     {
-        IEnumerable<Game> nearestGames = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/nearest/{offset}");
+        var queryParams = new List<string>();
+
+        if (genresIds?.Any() == true)
+            queryParams.AddRange(genresIds.Select(id => $"genresIds={id}"));
+
+        if (platformsIds?.Any() == true)
+            queryParams.AddRange(platformsIds.Select(id => $"platformsIds={id}"));
+
+        string query = queryParams.Count > 0
+            ? "?" + string.Join("&", queryParams)
+            : string.Empty;
+
+        IEnumerable<Game> nearestGames = await HttpClientFactory
+            .CreateClient("AuthorizedClient")
+            .GetFromJsonAsync<IEnumerable<Game>>(
+                $"/api/Games/Games/games-releases-dates/{offset}/{limit}{query}");
+
         return nearestGames;
+    }
+
+    public async Task<int> GetNearestCountAsync(
+        IEnumerable<long>? genresIds = null,
+        IEnumerable<long>? platformsIds = null)
+    {
+        var queryParams = new List<string>();
+
+        if (genresIds?.Any() == true)
+            queryParams.AddRange(genresIds.Select(id => $"genresIds={id}"));
+
+        if (platformsIds?.Any() == true)
+            queryParams.AddRange(platformsIds.Select(id => $"platformsIds={id}"));
+
+        string query = queryParams.Count > 0
+            ? "?" + string.Join("&", queryParams)
+            : string.Empty;
+
+        int count = await HttpClientFactory
+            .CreateClient("AuthorizedClient")
+            .GetFromJsonAsync<int>(
+                $"/api/Games/Games/games-releases-dates/count{query}");
+
+        return count;
     }
 
     public async Task<IEnumerable<Game>> SearchByName(string? name)

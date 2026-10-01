@@ -1,7 +1,9 @@
-﻿using Data.Repositories.Classes.Derived.Games;
+﻿using Data.Repositories.Classes.Derived;
+using Data.Repositories.Classes.Derived.Games;
 using Data.Repositories.Classes.Derived.Movies;
 using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
+using Domain.Common.News;
 using Domain.Games;
 using Domain.Games.Collections;
 using Domain.Movies;
@@ -59,6 +61,8 @@ public static class RepositoriesRegistrator
         services.AddScoped<IRepository<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsRepository>(instance => new MoviesCollectionsItemsRepository(metarankingsConnectionString));
 
         services.AddScoped<GamesPlayersReviewsShiftsRepository>(instance => new GamesPlayersReviewsShiftsRepository(metarankingsConnectionString));
+
+        services.AddScoped<NewsRepository>(instance => new NewsRepository(metarankingsConnectionString));
 
         return services;
     }

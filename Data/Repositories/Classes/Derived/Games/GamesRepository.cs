@@ -254,28 +254,44 @@ gc.Id, gc.Name, gc.Description
         return result;
     }
 
-    public async Task<IEnumerable<Game>> GetNearestAsync(short limit)
+    public async Task<IEnumerable<Game>> GetNearestAsync(short offset, short limit)
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
 
-        IEnumerable<Game> games = await connection.QueryAsync<Game>(@"WITH future_games AS (
+        IEnumerable<Game> games = await connection.QueryAsync<Game>(@"
+WITH future_games AS (
     SELECT Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer
     FROM Games
     WHERE ReleaseDate >= CURRENT_DATE
     ORDER BY ReleaseDate ASC
+    OFFSET @Offset
     LIMIT @Limit
+)
+SELECT * FROM future_games", new { Offset = offset, Limit = limit });
+
+        return games;
+    }
+
+    public async Task<IEnumerable<Game>> GetNearestAsync()
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+
+        IEnumerable<Game> games = await connection.QueryAsync<Game>(@"
+WITH future_games AS (
+    SELECT Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer
+    FROM Games
+    WHERE ReleaseDate >= CURRENT_DATE
 ),
 past_games AS (
     SELECT Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer
     FROM Games
     WHERE ReleaseDate < CURRENT_DATE
-    ORDER BY ReleaseDate DESC
-    LIMIT @Limit
 )
 SELECT * FROM future_games
 UNION ALL
 SELECT * FROM past_games
-WHERE NOT EXISTS (SELECT 1 FROM future_games);", new { Limit = limit });
+WHERE NOT EXISTS (SELECT 1 FROM future_games)
+ORDER BY ReleaseDate ASC");
 
         return games;
     }
@@ -806,6 +822,83 @@ WHERE g.name ILIKE '%' || @name || '%'
         {
             countSql.Append(" AND g.localizationid = ANY(@LocalizationsIds)");
             parameters.Add("LocalizationsIds", localizationsIds);
+        }
+
+        int totalCount = await connection.ExecuteScalarAsync<int>(countSql.ToString(), parameters);
+        return totalCount;
+    }
+
+    public async Task<IEnumerable<Game>> GetNearestByParametersAsync(
+    long[]? genresIds,
+    long[]? platformsIds,
+    short offset,
+    short limit)
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+
+        StringBuilder filterSql = new StringBuilder(@"
+    SELECT DISTINCT
+        g.Id, g.Name, g.Image, g.LocalizationId, g.ReleaseDate, g.Description, g.Trailer
+    FROM games g
+    LEFT JOIN gamesgenres   gg    ON gg.gameid    = g.id
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    WHERE g.ReleaseDate >= CURRENT_DATE
+");
+
+        DynamicParameters parameters = new DynamicParameters();
+
+        if (genresIds != null && genresIds.Length > 0)
+        {
+            filterSql.Append(" AND gg.genreid = ANY(@GenresIds)");
+            parameters.Add("GenresIds", genresIds);
+        }
+
+        if (platformsIds != null && platformsIds.Length > 0)
+        {
+            filterSql.Append(" AND gplatf.platformid = ANY(@PlatformsIds)");
+            parameters.Add("PlatformsIds", platformsIds);
+        }
+
+        filterSql.Append(@"
+    ORDER BY g.ReleaseDate ASC
+    OFFSET @Offset
+    LIMIT @Limit
+");
+
+        parameters.Add("Offset", offset);
+        parameters.Add("Limit", limit);
+
+        IEnumerable<Game> games = await connection.QueryAsync<Game>(filterSql.ToString(), parameters);
+
+        return games;
+    }
+
+    public async Task<int> GetNearestCountByParametersAsync(
+    long[]? genresIds,
+    long[]? platformsIds)
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+
+        StringBuilder countSql = new StringBuilder(@"
+    SELECT COUNT(DISTINCT g.Id)
+    FROM games g
+    LEFT JOIN gamesgenres    gg     ON gg.gameid     = g.id
+    LEFT JOIN gamesplatforms gplatf ON gplatf.gameid = g.id
+    WHERE g.ReleaseDate >= CURRENT_DATE
+");
+
+        DynamicParameters parameters = new DynamicParameters();
+
+        if (genresIds != null && genresIds.Length > 0)
+        {
+            countSql.Append(" AND gg.genreid = ANY(@GenresIds)");
+            parameters.Add("GenresIds", genresIds);
+        }
+
+        if (platformsIds != null && platformsIds.Length > 0)
+        {
+            countSql.Append(" AND gplatf.platformid = ANY(@PlatformsIds)");
+            parameters.Add("PlatformsIds", platformsIds);
         }
 
         int totalCount = await connection.ExecuteScalarAsync<int>(countSql.ToString(), parameters);
