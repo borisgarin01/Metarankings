@@ -15,6 +15,8 @@ public partial class NewsPage : ComponentBase
     private bool _isError;
     private string? _message;
 
+    // Форма редактирования/создания — UserId здесь не нужен,
+    // он берётся на сервере из JWT-claims.
     private UpdateNewsItemModel _form = new();
 
     protected override async Task OnInitializedAsync()
@@ -42,12 +44,12 @@ public partial class NewsPage : ComponentBase
         {
             if (!wasEditing)
             {
+                // Маппинг формы -> AddNewsItemModel (frontend, без UserId)
                 var addModel = new AddNewsItemModel
                 {
                     Title = _form.Title,
                     TextContent = _form.TextContent,
-                    ImageSource = _form.ImageSource,
-                    UserId = _form.UserId
+                    ImageSource = _form.ImageSource
                 };
 
                 var response = await NewsWebManager.AddAsync(addModel);
@@ -59,7 +61,15 @@ public partial class NewsPage : ComponentBase
             }
             else
             {
-                var updated = await NewsWebManager.UpdateAsync(_editingId!.Value, _form);
+                // Маппинг формы -> UpdateNewsItemModel (frontend, без UserId)
+                var updateModel = new UpdateNewsItemModel
+                {
+                    Title = _form.Title,
+                    TextContent = _form.TextContent,
+                    ImageSource = _form.ImageSource
+                };
+
+                var updated = await NewsWebManager.UpdateAsync(_editingId!.Value, updateModel);
                 if (updated is null)
                 {
                     ShowError("Не удалось обновить новость.");
@@ -88,8 +98,8 @@ public partial class NewsPage : ComponentBase
         {
             Title = news.Title,
             TextContent = news.TextContent,
-            ImageSource = news.ImageSource,
-            UserId = news.UserId
+            ImageSource = news.ImageSource
+            // UserId НЕ присваиваем — его на сервере возьмут из JWT-claims
         };
         _message = null;
     }

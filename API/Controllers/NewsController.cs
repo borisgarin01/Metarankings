@@ -1,4 +1,4 @@
-﻿using Data.Repositories.Interfaces;
+﻿using Data.Repositories.Classes.Derived;
 using Domain.Common.News;
 
 namespace API.Controllers;
@@ -7,10 +7,9 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public sealed class NewsController : ControllerBase
 {
-    private readonly IRepository<NewsItem, AddNewsItemModel, UpdateNewsItemModel> _newsRepository;
+    private readonly NewsRepository _newsRepository;
 
-    public NewsController(
-        IRepository<NewsItem, AddNewsItemModel, UpdateNewsItemModel> newsRepository)
+    public NewsController(NewsRepository newsRepository)
     {
         _newsRepository = newsRepository;
     }
@@ -52,21 +51,31 @@ public sealed class NewsController : ControllerBase
     // POST: api/news
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    public async Task<ActionResult<NewsItem>> Create(AddNewsItemModel addNewsItemModel)
+    public async Task<ActionResult<NewsItem>> Create([FromBody] AddNewsItemModel addNewsItemModel)
     {
+        long userId = GetUserIdFromClaims();
+
+        // Маппинг: AddNewsItemModel (frontend) -> AddNewsItemDbModel (backend)
+        var dbModel = new AddNewsItemDbModel
+        {
+            Title = addNewsItemModel.Title,
+            TextContent = addNewsItemModel.TextContent,
+            ImageSource = addNewsItemModel.ImageSource,
+            UserId = userId,
+            PublishTimestamp = DateTime.Now
+        };
+
         long newId;
         try
         {
-            newId = await _newsRepository.AddAsync(addNewsItemModel);
+            newId = await _newsRepository.AddAsync(dbModel);
         }
         catch (Npgsql.PostgresException ex) when (ex.SqlState == "23505")
         {
-            // unique_violation по Title
             return Conflict(new { message = "News with the same title already exists." });
         }
         catch (Npgsql.PostgresException ex) when (ex.SqlState == "23503")
         {
-            // foreign_key_violation по UserId
             return BadRequest(new { message = "Specified user does not exist." });
         }
 
@@ -81,10 +90,21 @@ public sealed class NewsController : ControllerBase
         long id,
         [FromBody] UpdateNewsItemModel request)
     {
-        NewsItem updated;
+        long userId = GetUserIdFromClaims();
+
+        // Маппинг: UpdateNewsItemModel (frontend) -> UpdateNewsItemDbModel (backend)
+        var dbModel = new UpdateNewsItemDbModel
+        {
+            Title = request.Title,
+            TextContent = request.TextContent,
+            ImageSource = request.ImageSource,
+            UserId = userId
+        };
+
+        NewsItem? updated;
         try
         {
-            updated = await _newsRepository.UpdateAsync(request, id);
+            updated = await _newsRepository.UpdateAsync(dbModel, id);
         }
         catch (Npgsql.PostgresException ex) when (ex.SqlState == "23505")
         {
@@ -124,5 +144,17 @@ public sealed class NewsController : ControllerBase
 
         await _newsRepository.RemoveRangeAsync(ids);
         return NoContent();
+    }
+
+    // ---- Helpers ----
+
+    private long GetUserIdFromClaims()
+    {
+        string? raw = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(raw) || !long.TryParse(raw, out long userId))
+        {
+            throw new InvalidOperationException("User identifier claim is missing or invalid.");
+        }
+        return userId;
     }
 }

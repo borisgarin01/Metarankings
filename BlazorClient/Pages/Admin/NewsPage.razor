@@ -30,11 +30,6 @@
             <input class="form-control" @bind="_form.ImageSource" />
         </div>
 
-        <div class="mb-2">
-            <label class="form-label">ID пользователя</label>
-            <input class="form-control" type="number" @bind="_form.UserId" />
-        </div>
-
         <button class="btn btn-primary" @onclick="SaveAsync" disabled="@_isSaving">
             @(_editingId is null ? "Добавить" : "Сохранить")
         </button>
