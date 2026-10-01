@@ -1,5 +1,6 @@
 ﻿using Data.Repositories.Interfaces;
 using Domain.Common.News;
+using IdentityLibrary.DTOs;
 
 namespace Data.Repositories.Classes.Derived;
 
@@ -49,12 +50,39 @@ RETURNING Id;",
     public async Task<NewsItem?> GetAsync(long id)
     {
         using var connection = new NpgsqlConnection(ConnectionString);
-        var newsItem = await connection.QueryFirstOrDefaultAsync<NewsItem>(@"
-            SELECT Id, Title, UserId, TextContent, ImageSource, PublishTimestamp
-            FROM News
-            WHERE Id=@id",
-            new { id });
-        return newsItem;
+
+        const string sql = @"
+        SELECT  n.Id,
+                n.Title,
+                n.UserId,
+                n.TextContent,
+                n.ImageSource,
+                n.PublishTimestamp,
+                u.Id,
+                u.UserName,
+                u.NormalizedUserName,
+                u.Email,
+                u.NormalizedEmail,
+                u.EmailConfirmed,
+                u.PasswordHash,
+                u.PhoneNumber,
+                u.PhoneNumberConfirmed,
+                u.TwoFactorEnabled
+        FROM News n
+        LEFT JOIN ApplicationUsers u ON u.Id = n.UserId
+        WHERE n.Id = @id";
+
+        var result = await connection.QueryAsync<NewsItem, ApplicationUser, NewsItem>(
+            sql,
+            (news, user) =>
+            {
+                news.ApplicationUser = user;
+                return news;
+            },
+            new { id },
+            splitOn: "Id");
+
+        return result.FirstOrDefault();
     }
 
     public async Task<IEnumerable<NewsItem>> GetAsync(long offset, long limit)

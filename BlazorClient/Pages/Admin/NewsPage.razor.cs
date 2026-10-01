@@ -5,10 +5,10 @@ namespace BlazorClient.Pages.Admin;
 
 public partial class NewsPage : ComponentBase
 {
-    [Inject] 
+    [Inject]
     public NewsWebManager NewsWebManager { get; set; } = default!;
-    
-    [Inject] 
+
+    [Inject]
     public IJSRuntime JSRuntime { get; set; } = default!;
 
     public IEnumerable<NewsItem> NewsItems { get; set; } = new List<NewsItem>();
@@ -158,7 +158,8 @@ public partial class NewsPage : ComponentBase
 
     private static string Truncate(string text, int maxLength)
     {
-        if (string.IsNullOrEmpty(text)) return string.Empty;
+        if (string.IsNullOrEmpty(text))
+            return string.Empty;
         return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
     }
 }
