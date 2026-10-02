@@ -22,6 +22,9 @@ public partial class Details : ComponentBase
     [Inject]
     public GamesWebManager GamesWebManager { get; set; } = default!;
 
+    [Inject]
+    public TextTruncater TextTruncater { get; set; }
+
     private long _loadedId = -1;
 
     protected override async Task OnParametersSetAsync()
@@ -57,17 +60,5 @@ public partial class Details : ComponentBase
             NewsItems = Enumerable.Empty<NewsItem>();
             SimilarGames = Enumerable.Empty<Game>();
         }
-    }
-
-    protected static string Truncate(string? text, int maxLength)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        return text.Length <= maxLength
-            ? text
-            : text.Substring(0, maxLength) + "...";
     }
 }

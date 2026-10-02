@@ -55,6 +55,8 @@ internal class Program
         builder.Services.AddScoped<AuthenticationStateProvider>(
             provider => provider.GetRequiredService<JwtAuthenticationStateProvider>());
 
+        builder.Services.AddScoped<TextTruncater>();
+
         _ = builder.Services.AddBlazoredToast();
 
         builder.Logging.SetMinimumLevel(LogLevel.Debug);

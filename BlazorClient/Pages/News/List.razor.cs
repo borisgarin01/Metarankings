@@ -18,6 +18,9 @@ public partial class List
     public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> PlatformsWebManager { get; set; } = default!;
 
     [Inject]
+    public TextTruncater TextTruncater { get; set; }
+
+    [Inject]
     public IJSRuntime JSRuntime { get; set; } = default!;
 
     protected List<NewsItem> News { get; } = new();
@@ -82,12 +85,5 @@ public partial class List
     {
         await JSRuntime.InvokeVoidAsync("renderYandexAds", "R-A-201169-5");
         await JSRuntime.InvokeVoidAsync("renderYandexAds", "R-A-201169-26");
-    }
-
-    private static string Truncate(string text, int maxLength)
-    {
-        if (string.IsNullOrEmpty(text))
-            return string.Empty;
-        return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
     }
 }

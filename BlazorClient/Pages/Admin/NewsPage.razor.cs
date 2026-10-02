@@ -13,6 +13,9 @@ public partial class NewsPage : ComponentBase
 
     public IEnumerable<NewsItem> NewsItems { get; set; } = new List<NewsItem>();
 
+    [Inject]
+    public TextTruncater TextTruncater { get; set; }
+
     private long? _editingId;
     private bool _isSaving;
     private bool _isError;
@@ -154,12 +157,5 @@ public partial class NewsPage : ComponentBase
     {
         _isError = true;
         _message = text;
-    }
-
-    private static string Truncate(string text, int maxLength)
-    {
-        if (string.IsNullOrEmpty(text))
-            return string.Empty;
-        return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
     }
 }

@@ -25,6 +25,9 @@ public partial class MostWaitingGames : ComponentBase
     [Inject]
     public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> GamesPlatformsWebManager { get; set; } = default!;
 
+    [Inject]
+    public TextTruncater TextTruncater { get; set; }
+
     [SupplyParameterFromQuery(Name = "genreId")]
     public long? GenreId { get; set; }
 
@@ -133,11 +136,5 @@ public partial class MostWaitingGames : ComponentBase
     private string GetPageUrl(int page)
     {
         return $"/games/most-waiting-games{BuildQueryString(page)}";
-    }
-
-    private static string Truncate(string text, int maxLength)
-    {
-        if (string.IsNullOrEmpty(text)) return string.Empty;
-        return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
     }
 }

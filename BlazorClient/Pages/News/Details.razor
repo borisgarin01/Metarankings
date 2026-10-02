@@ -74,7 +74,7 @@
                             <a href="/news/@newsItem.Id" title="@newsItem.Title">
                                 <img class="news-thumb" src="@newsItem.ImageSource" alt="@newsItem.Title">
                                 <span class="news-title">
-                                    @Truncate(newsItem.TextContent, 150)
+                                    @TextTruncater.Truncate(newsItem.TextContent, 150)
                                 </span>
                             </a>
                         </div>
