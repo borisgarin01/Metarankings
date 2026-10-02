@@ -1,0 +1,74 @@
+﻿@page "/user-reviews"
+@using Domain.Common.News
+@using Domain.Reviews
+
+<div id="content" class="lcol">
+    <div class="content-title">
+        <h1>Отзывы пользователей</h1>
+    </div>
+    @if (GamesReviews is null || MovieViewersReviews is null || News is null)
+    {
+        <p>Загружается...</p>
+    }
+    else
+    {
+        <div class="post-reviews">
+            @foreach (GameReview review in GamesReviews)
+            {
+                <div class="reviews-text mark-@review.Score">
+                    <div class="thumb-mini">
+                        <a href="/games/Details/@review.GameId" title="@review.Game.Name">
+                            <img width="50" height="37" src="@review.Game.Image" class="attachment-mini-thumbnail wp-post-image" alt="@review.Game.Name">
+                        </a>
+                    </div>
+                    <div class="reviews-content">
+                        <div class="small-score mark-@review.Score">
+                            <span>@review.Score</span>
+                            <meta content="0">
+                            <meta content="10">
+                        </div>
+                        <div class="title-reviews">
+                            <a href="/user-reviews/@review.Id">@review.Game.Name</a>
+                        </div>
+                        <div class="reviews-author">@review.ApplicationUser.UserName</div>
+                    </div>
+                </div>
+            }
+            @foreach (MovieViewerReview review in MovieViewersReviews)
+            {
+                <div class="reviews-text mark-@review.Score">
+                    <div class="thumb-mini">
+                        <a href="/movies/Details/@review.MovieId" title="@review.Movie.Name">
+                            <img width="50" height="37" src="@review.Movie.ImageSource" class="attachment-mini-thumbnail wp-post-image" alt="@review.Movie.Name">
+                        </a>
+                    </div>
+                    <div class="reviews-content">
+                        <div class="small-score mark-@review.Score">
+                            <span>@review.Score</span>
+                            <meta content="0">
+                            <meta content="10">
+                        </div>
+                        <div class="title-reviews">
+                            <a href="/user-reviews/@review.Id">@review.Movie.Name</a>
+                        </div>
+                        <div class="reviews-author">@review.ApplicationUser.UserName</div>
+                    </div>
+                </div>
+            }
+            <div class="navi"><span>1</span><a href="https://metarankings.ru/user-reviews/?nav=2">2</a><a href="https://metarankings.ru/user-reviews/?nav=3">3</a><a href="https://metarankings.ru/user-reviews/?nav=4">4</a><a href="https://metarankings.ru/user-reviews/?nav=5">5</a><a href="https://metarankings.ru/user-reviews/?nav=6">6</a> <span>...</span> <a href="https://metarankings.ru/user-reviews/?nav=142">142</a></div>
+        </div>
+        <div class="news-module">
+            @foreach (NewsItem newsItem in News)
+            {
+                <div class="news-item">
+                    <a href="/news/@newsItem.Id" title="@newsItem.Title">
+                        <img class="news-thumb" src="@newsItem.ImageSource" alt="@newsItem.Title">
+                        <span class="news-title">
+                            @TextTruncater.Truncate(newsItem.TextContent, 150)
+                        </span>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
