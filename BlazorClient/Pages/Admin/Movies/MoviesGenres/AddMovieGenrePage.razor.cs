@@ -22,7 +22,7 @@ public partial class AddMovieGenrePage : ComponentBase
     {
         HttpResponseMessage httpResponseMessage = await MoviesGenresManager.AddAsync(new AddMovieGenreModel(Name));
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
-            NavigationManager.NavigateTo("/movies/movies-genres/list-genres");
+            NavigationManager.NavigateTo("/admin/movies/movies-genres/movies-genres-list");
         else
             if (httpResponseMessage is not null)
             ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
