@@ -2,9 +2,9 @@ using Domain.Common.News;
 using Domain.Reviews;
 using WebManagers.Derived;
 
-namespace BlazorClient.Pages;
+namespace BlazorClient.Pages.Reviews;
 
-public partial class UserReviews : ComponentBase
+public partial class UserReviewsPage : ComponentBase
 {
     private IEnumerable<GameReview> gamesReviews;
     private IEnumerable<MovieViewerReview> movieViewersReviews;

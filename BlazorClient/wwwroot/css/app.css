@@ -460,61 +460,6 @@ img.lazyload {
         height: auto;
     }
 
-.rew-menu {
-    cursor: pointer;
-    position: relative;
-}
-
-.menu-dot {
-    background: #939393;
-    border-radius: 1000px;
-    height: 3px;
-    width: 3px;
-    margin: 2px;
-    display: inline-block;
-}
-
-.rew-menu ul {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    list-style: none;
-    overflow: hidden;
-    opacity: 0;
-    visibility: hidden;
-    height: 0;
-    position: absolute;
-    margin-top: 10px;
-    z-index: 100;
-}
-
-    .rew-menu ul li {
-        background: #fff;
-        font-size: 14px;
-        color: #555;
-        padding: 5px;
-        margin: 0;
-    }
-
-        .rew-menu ul li:hover {
-            background: #f1f1f1;
-        }
-
-        .rew-menu ul li a {
-            display: block;
-            text-decoration: none;
-            color: #555;
-            padding: 5px;
-        }
-
-.rew-menu.open ul {
-    background: #fff;
-    border: 1px solid #999;
-    opacity: 1;
-    visibility: visible;
-    height: auto;
-}
-
 #slideshow {
     background: #fff;
     height: 210px;
