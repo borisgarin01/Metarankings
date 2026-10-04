@@ -182,7 +182,8 @@ COALESCE((SELECT COUNT(*) FROM MoviesCriticsReviews WHERE MovieId = m.Id), 0) AS
 mg.Id, mg.Name,
 ms.Id, ms.Name,
 md.Id, md.Name,
-vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
+vmr.Id, vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
+vmrs.Id, vmrs.ViewerMovieReviewId AS MovieViewerReviewId, vmrs.ShifterId, vmrs.Direction,
 au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
 au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
     FROM movies m
@@ -193,6 +194,7 @@ au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.
     LEFT JOIN moviesMoviesDirectors mmd ON mmd.movieId = m.id
     LEFT JOIN moviesDirectors md ON md.id = mmd.movieDirectorId
     LEFT JOIN viewersMoviesReviews vmr on vmr.movieId = m.Id
+    LEFT JOIN viewersMoviesReviewsShifts vmrs on vmrs.ViewerMovieReviewId = vmr.Id
     LEFT JOIN applicationUsers au on au.Id = vmr.ViewerId
 
 WHERE m.id=@id";
@@ -201,7 +203,7 @@ WHERE m.id=@id";
 
         IEnumerable<Movie> query = await connection.QueryAsync(
             sql,
-            (Movie movie, Domain.Movies.Genre movieGenre, MovieStudio movieStudio, MovieDirector movieDirector, MovieViewerReview movieReview, ApplicationUser applicationUser) =>
+            (Movie movie, Domain.Movies.Genre movieGenre, MovieStudio movieStudio, MovieDirector movieDirector, MovieViewerReview movieReview, MovieViewerReviewShift movieViewerReviewShift, ApplicationUser applicationUser) =>
             {
                 if (!moviesDictionary.TryGetValue(movie.Id, out Movie? movieEntry))
                 {
@@ -221,16 +223,31 @@ WHERE m.id=@id";
                 if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(md => md.Id == movieDirector.Id))
                     movieEntry.MoviesDirectors.Add(movieDirector);
 
-                if (movieReview is not null && !movieEntry.MovieReviews.Any(mr => mr.Id == movieReview.Id) && applicationUser is not null)
+                if (movieReview?.Id > 0 && applicationUser?.Id > 0)
                 {
-                    movieReview = movieReview with { ApplicationUser = applicationUser };
-                    movieEntry.MovieReviews.Add(movieReview);
+                    MovieViewerReview? existingReview = movieEntry.MovieReviews.FirstOrDefault(mr => mr.Id == movieReview.Id);
+
+                    if (existingReview is null)
+                    {
+                        existingReview = movieReview with
+                        {
+                            ApplicationUser = applicationUser,
+                            MovieViewerReviewShifts = new List<MovieViewerReviewShift>()
+                        };
+                        movieEntry.MovieReviews.Add(existingReview);
+                    }
+
+                    if (movieViewerReviewShift?.Id > 0
+                        && !existingReview.MovieViewerReviewShifts.Any(s => s.Id == movieViewerReviewShift.Id))
+                    {
+                        existingReview.MovieViewerReviewShifts.Add(movieViewerReviewShift);
+                    }
                 }
 
                 return movieEntry;
             },
             new { id },
-            splitOn: "Id,Id,Id,Id,MovieId,Id" // The columns where each new entity starts
+            splitOn: "Id,Id,Id,Id,Id,Id" // Genre, MovieStudio, MovieDirector, MovieViewerReview, MovieViewerReviewShift, ApplicationUser
         );
 
         Movie? result = moviesDictionary.Values.FirstOrDefault();

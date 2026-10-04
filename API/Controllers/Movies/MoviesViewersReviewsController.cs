@@ -1,4 +1,5 @@
-﻿using Data.Repositories.Interfaces.Derived;
+﻿using Data.Repositories.Classes.Derived.Movies;
+using Data.Repositories.Interfaces.Derived;
 using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesViewersReviews;
 using Domain.Reviews;
@@ -12,14 +13,16 @@ public sealed class MoviesViewersReviewsController : ControllerBase
 {
     private readonly IMoviesViewersReviewsRepository _moviesViewersReviewsRepository;
     private readonly IMoviesRepository _moviesRepository;
+    private readonly MoviesViewersReviewsShiftsRepository _moviesViewersReviewsShiftsRepository;
 
     private readonly UserManager<ApplicationUser> _usersManager;
 
     private readonly ILogger<MoviesViewersReviewsController> _logger;
 
-    public MoviesViewersReviewsController(IMoviesViewersReviewsRepository moviesViewersReviewsRepository, IMoviesRepository moviesRepository, UserManager<ApplicationUser> usersManager, ILogger<MoviesViewersReviewsController> logger)
+    public MoviesViewersReviewsController(IMoviesViewersReviewsRepository moviesViewersReviewsRepository, IMoviesRepository moviesRepository, UserManager<ApplicationUser> usersManager, ILogger<MoviesViewersReviewsController> logger, MoviesViewersReviewsShiftsRepository moviesViewersReviewsShiftsRepository)
     {
         _moviesViewersReviewsRepository = moviesViewersReviewsRepository;
+        _moviesViewersReviewsShiftsRepository = moviesViewersReviewsShiftsRepository;
         _moviesRepository = moviesRepository;
         _usersManager = usersManager;
         _logger = logger;
@@ -66,7 +69,7 @@ public sealed class MoviesViewersReviewsController : ControllerBase
 
     [HttpPut("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<MovieViewerReview>> UpdateReview(long id, UpdateMovieViewerReviewWithUserIdAndDateModel updateMovieViewerReviewWithUserIdAndDateModel)
+    public async Task<ActionResult<MovieViewerReview>> UpdateReview(long id, UpdateMovieViewerReviewModel updateMovieViewerReviewModel)
     {
         MovieViewerReview movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
         if (movieReview is null)
@@ -78,7 +81,7 @@ public sealed class MoviesViewersReviewsController : ControllerBase
         else
             try
             {
-                MovieViewerReview updatedMovieReview = await _moviesViewersReviewsRepository.UpdateAsync(updateMovieViewerReviewWithUserIdAndDateModel, id);
+                MovieViewerReview updatedMovieReview = await _moviesViewersReviewsRepository.UpdateAsync(updateMovieViewerReviewModel, id);
                 return Ok(updatedMovieReview);
             }
             catch (Exception ex)
@@ -109,6 +112,52 @@ public sealed class MoviesViewersReviewsController : ControllerBase
         {
             _logger.LogError($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             return StatusCode(500, $"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+        }
+    }
+
+    [HttpPost("shift")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult<long>> Shift(Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Frontend.AddMovieViewerReviewShiftModel addMovieViewerReviewShiftModel)
+    {
+        try
+        {
+            long shifterId = long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value);
+
+            _logger.LogInformation("MovieViewerReviewId - {MovieViewerReviewId}, Direction - {Direction}, ShifterId - {ShifterId}", addMovieViewerReviewShiftModel.MovieViewerReviewId, addMovieViewerReviewShiftModel.Direction, shifterId);
+
+            MovieViewerReview movieReview = await _moviesViewersReviewsRepository.GetAsync(addMovieViewerReviewShiftModel.MovieViewerReviewId);
+
+            if (movieReview is null)
+            {
+                _logger.LogWarning("movieReview is null");
+                return NotFound("Отзыв не найден");
+            }
+
+            if (shifterId == movieReview.ViewerId)
+            {
+                _logger.LogWarning("shifterId == movieReview.ViewerId. Нельзя голосовать за свои обзоры");
+                return BadRequest("Нельзя голосовать за свои обзоры");
+            }
+
+            MovieViewerReviewShift shift = await _moviesViewersReviewsShiftsRepository.GetByShifterIdAsync(shifterId, movieReview.Id);
+            if (shift is null)
+            {
+                long insertedShift = await _moviesViewersReviewsShiftsRepository.AddAsync(new Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Backend.AddMovieViewerReviewShiftModel(movieReview.Id, shifterId, addMovieViewerReviewShiftModel.Direction));
+                return Ok(insertedShift);
+            }
+            else if (shift.Direction != addMovieViewerReviewShiftModel.Direction)
+            {
+                MovieViewerReviewShift updatedShift = await _moviesViewersReviewsShiftsRepository.UpdateAsync(new Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Backend.UpdateMovieViewerReviewShiftModel(shift.MovieViewerReviewId, shift.ShifterId, addMovieViewerReviewShiftModel.Direction), shift.Id);
+                return Ok(updatedShift.Id);
+            }
+
+            _logger.LogWarning("Пользователь уже голосовал за обзор");
+            return BadRequest("Пользователь уже голосовал за обзор");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при голосовании за отзыв о фильме");
+            return StatusCode(500, ex.Message);
         }
     }
 }

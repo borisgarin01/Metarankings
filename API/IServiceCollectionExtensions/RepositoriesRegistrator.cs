@@ -62,6 +62,8 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<GamesPlayersReviewsShiftsRepository>(instance => new GamesPlayersReviewsShiftsRepository(metarankingsConnectionString));
 
+        services.AddScoped<MoviesViewersReviewsShiftsRepository>(instance => new MoviesViewersReviewsShiftsRepository(metarankingsConnectionString));
+
         services.AddScoped<NewsRepository>(instance => new NewsRepository(metarankingsConnectionString));
 
         return services;

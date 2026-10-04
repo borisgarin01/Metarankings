@@ -67,7 +67,7 @@ on vmr.ViewerId=au.Id;", (movieReview, movie, applicationUser) =>
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieViewerReview, Movie, ApplicationUser, MovieViewerReview>(@"
-SELECT vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
+SELECT vmr.Id, vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
     m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description,
     au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
         au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
@@ -103,7 +103,7 @@ WHERE ViewerId=@userId and MovieId=@movieId;", (movieReview, movie, applicationU
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieViewerReview, Movie, ApplicationUser, MovieViewerReview>(@"
-SELECT vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
+SELECT vmr.Id, vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
     m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description,
     au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, 
         au.EmailConfirmed, au.PasswordHash, au.PhoneNumber, au.PhoneNumberConfirmed, au.TwoFactorEnabled
@@ -152,18 +152,36 @@ OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", (movieReview, movie, applicati
     }
 
 
-    public Task RemoveAsync(long id)
+    public async Task RemoveAsync(long id)
     {
-        throw new NotImplementedException();
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            // Лайки/дизлайки удаляются каскадно (ON DELETE CASCADE в ViewersMoviesReviewsShifts)
+            await connection.ExecuteAsync("DELETE FROM ViewersMoviesReviews WHERE Id=@id", new { id });
+        }
     }
 
-    public Task RemoveRangeAsync(IEnumerable<long> ids)
+    public async Task RemoveRangeAsync(IEnumerable<long> ids)
     {
-        throw new NotImplementedException();
+        foreach (long id in ids)
+            await RemoveAsync(id);
     }
 
-    public Task<MovieViewerReview> UpdateAsync(UpdateMovieViewerReviewWithUserIdAndDateModel entity, long id)
+    public async Task<MovieViewerReview> UpdateAsync(UpdateMovieViewerReviewModel entity, long id)
     {
-        throw new NotImplementedException();
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            await connection.ExecuteAsync(@"UPDATE ViewersMoviesReviews
+SET TextContent=@TextContent, Score=@Score, Date=@TimeStamp
+WHERE Id=@id", new
+            {
+                entity.TextContent,
+                entity.Score,
+                TimeStamp = DateTime.Now,
+                id
+            });
+        }
+
+        return await GetAsync(id);
     }
 }

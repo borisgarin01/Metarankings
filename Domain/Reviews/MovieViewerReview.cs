@@ -30,4 +30,7 @@ public sealed record MovieViewerReview
 
     [JsonPropertyName("date")]
     public DateTime Date { get; init; }
+
+    [JsonPropertyName("movieViewerReviewShifts")]
+    public List<MovieViewerReviewShift> MovieViewerReviewShifts { get; init; } = new();
 }

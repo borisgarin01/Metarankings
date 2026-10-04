@@ -18,7 +18,8 @@ public static class MoviesWebManagersRegistrator
             .AddSingleton<IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosWebManager>()
             .AddSingleton<MoviesWebManager>()
             .AddSingleton<IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>, MoviesCollectionsWebManager>()
-            .AddSingleton<IWebManager<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsWebManager>();
+            .AddSingleton<IWebManager<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsWebManager>()
+            .AddSingleton<MoviesViewersReviewsShiftsWebManager>();
 
         return serviceCollection;
     }
