@@ -29,13 +29,21 @@ public partial class MoviesListPage : ComponentBase
     public IEnumerable<Movie> Movies
     {
         get => movies;
-        set { movies = value; StateHasChanged(); }
+        set
+        {
+            movies = value;
+            StateHasChanged();
+        }
     }
 
     public IEnumerable<MovieStudio> MovieStudios
     {
         get => movieStudios;
-        set { movieStudios = value; StateHasChanged(); }
+        set
+        {
+            movieStudios = value;
+            StateHasChanged();
+        }
     }
 
     public IEnumerable<Domain.Movies.Genre> Genres
@@ -47,12 +55,21 @@ public partial class MoviesListPage : ComponentBase
     public PagedResponse<Movie> PagedResponse
     {
         get => pagedResponse;
-        set { pagedResponse = value; StateHasChanged(); }
+        set
+        {
+            pagedResponse = value;
+            StateHasChanged();
+        }
     }
 
-    [Inject] public IHttpClientFactory HttpClientFactory { get; set; } = default!;
-    [Inject] public IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel> MovieStudiosWebManager { get; set; } = default!;
-    [Inject] public IWebManager<Domain.Movies.Genre, AddMovieGenreModel, UpdateMovieGenreModel> GenresWebManager { get; set; } = default!;
+    [Inject] 
+    public IHttpClientFactory HttpClientFactory { get; set; } = default!;
+    
+    [Inject] 
+    public IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel> MovieStudiosWebManager { get; set; } = default!;
+    
+    [Inject] 
+    public IWebManager<Domain.Movies.Genre, AddMovieGenreModel, UpdateMovieGenreModel> GenresWebManager { get; set; } = default!;
 
     protected override async Task OnParametersSetAsync()
     {
