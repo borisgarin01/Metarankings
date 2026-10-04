@@ -1,0 +1,123 @@
+.nav ul li {
+    color: #777;
+    display: inline-block;
+    text-align: center;
+    padding: 22px 12px;
+    position: relative;
+    cursor: pointer;
+}
+
+.nav ul li a {
+    color: #777;
+    display: block;
+    text-decoration: none;
+}
+
+.nav ul li a:hover {
+    color: #0082ae;
+}
+
+.nav ul li span:before {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #ccc;
+    content: "";
+    position: absolute;
+    right: -1px;
+    top: 30px;
+}
+
+.nav ul li:hover span:before {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #000;
+}
+
+.movie-drop {
+    background: #fff;
+    color: #333;
+    z-index: 999;
+    position: absolute;
+    left: 0;
+    text-align: left;
+    margin-top: 15px;
+    padding: 0;
+    min-width: 180px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.1);
+    overflow: hidden;
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #555 transparent;
+    display: none;
+}
+
+.movie-drop a {
+    color: #333 !important;
+    padding: 10px;
+}
+
+.movie-drop a:hover {
+    color: #000 !important;
+    background: #f1f1f1;
+}
+
+.nav ul li:hover .movie-drop {
+    padding: 5px;
+    display: block;
+}
+
+.movie-drop a {
+    transition: all .3s ease 0s;
+}
+
+@media only screen and (max-width:670px) {
+    .nav ul li {
+        color: #fff;
+        font-size: 18px;
+        display: block;
+        padding: 15px;
+        float: none;
+        text-align: left;
+    }
+
+    .nav ul li a {
+        color: #fff;
+        font-size: 18px;
+        padding: 5px 0 10px 0;
+        font-weight: normal;
+    }
+
+    .nav ul li span:before {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #fff;
+        content: "";
+        position: absolute;
+        left: -8px;
+        top: 20px;
+        right: inherit;
+    }
+
+    .movie-drop {
+        position: relative;
+        margin-top: 10px;
+        height: 150px;
+        overflow: auto;
+        display: block;
+    }
+
+    .movie-drop a {
+        padding: 10px !important;
+    }
+
+    .nav ul li:hover .movie-drop {
+        position: relative;
+        margin-top: 10px;
+        height: 150px;
+        overflow: auto;
+        visibility: visible;
+        opacity: 1;
+        padding: 0;
+    }
+}

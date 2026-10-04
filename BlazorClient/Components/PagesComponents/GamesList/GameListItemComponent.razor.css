@@ -1,0 +1,31 @@
+.index-games .item {
+    padding: 10px 0 20px 10px;
+}
+
+.item-description {
+    background: #fff;
+    display: none;
+    font-size: 12px;
+    color: #555;
+    padding: 5px 5px 10px 0;
+    border-bottom: 1px dotted #cbcbcb;
+    line-height: 1.4;
+}
+
+.item:hover .item-description {
+    display: block;
+    z-index: 1000;
+    position: absolute;
+}
+
+@media only screen and (max-width:800px) {
+    .item:hover .item-description {
+        display: none;
+    }
+}
+
+@media only screen and (max-width:620px) {
+    .index-games .item {
+        padding: 15px 0;
+    }
+}

@@ -1,41 +1,41 @@
-﻿<div class="slideshow-wrap">
+﻿@* Разметка и поведение повторяют слайдер оригинального сайта (jQuery Cycle2, fx: scrollHorz):
+   стили берутся из темы, а позиции слайдов и полоса прогресса задаются inline, как это делает Cycle2. *@
 
-    @* ─── ПЕЙДЖЕР ─── *@
-    @if (ShowPager && _groups.Count > 1)
-    {
-        <div class="pager">
-            Лучшие в прошлом месяце
+@if (ShowPager)
+{
+    <div class="pager">
+        Лучшие в прошлом месяце
+        @if (_groups.Count > 1)
+        {
             @for (int i = 0; i < _groups.Count; i++)
             {
                 var idx = i;
-                <span class="@(idx == CurrentIndex ? "cycle-pager-active" : "")"
+                <span class="@(idx == CurrentIndex ? "cycle-pager-active" : null)"
                       @onclick="() => GoTo(idx)">@_groups[idx].PagerTitle</span>
             }
-        </div>
-    }
-
-    @* ─── ЛЕНТА ─── *@
-    <div class="slideshow">
-        <div class="slideshow-track"
-             style="transform: translateX(-@(CurrentIndex * 100)%)">
-            @foreach (var group in _groups)
-            {
-                <div class="slide clear">
-                    <div class="post">
-                        @foreach (var item in group.Items)
-                        {
-                            <a href="@item.Url" title="@item.Title">
-                                <div class="featured-image">
-                                    <img class="post-image" src="@item.Image" alt="@item.Title" />
-                                    <div class="small-score mark-@GetMarkClass(item.Score)">@item.Score</div>
-                                    <span>@item.Title</span>
-                                </div>
-                            </a>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
+        }
     </div>
-
+}
+<div class="progress" style="@ProgressStyle"></div>
+<div class="slideshow">
+    <div id="slideshow" class="cycle-slideshow" style="position: relative;">
+        @for (int i = 0; i < _groups.Count; i++)
+        {
+            var group = _groups[i];
+            <div class="slide clear" style="@SlideStyle(i)">
+                <div class="post">
+                    @foreach (var item in group.Items)
+                    {
+                        <a href="@item.Url" title="@item.Title">
+                            <div class="featured-image">
+                                <img class="post-image" src="@item.Image" alt="@item.Title" />
+                                <div class="small-score mark-@GetMarkClass(item.Score)">@item.Score</div>
+                                <span>@item.Title</span>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
 </div>

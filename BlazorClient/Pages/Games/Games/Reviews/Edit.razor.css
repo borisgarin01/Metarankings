@@ -1,0 +1,46 @@
+.links-add {
+    background: #394042;
+    color: #fff;
+    font-size: 14px;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 50px;
+    margin: 10px 0;
+    display: block;
+    text-align: center;
+}
+
+.links-add:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.rating {
+    font-size: 14px;
+    padding: 0 0 4px 0;
+}
+
+.rating h2 {
+    font-size: 15px;
+    margin: 0;
+    text-transform: none;
+    display: inline-block;
+}
+
+.widget h2 {
+    color: #111;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.textwidget {
+    color: #333;
+    font-size: 14px;
+}
+
+@media only screen and (max-width:800px) {
+    .links-add {
+    }
+}

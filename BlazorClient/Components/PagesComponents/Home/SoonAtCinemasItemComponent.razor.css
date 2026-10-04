@@ -1,0 +1,11 @@
+.index-movies .item {
+    padding: 10px 10px 20px 0;
+    border-right: 1px dotted #cbcbcb;
+}
+
+@media only screen and (max-width:620px) {
+    .index-movies .item {
+        padding: 15px 0;
+        border-right: none;
+    }
+}

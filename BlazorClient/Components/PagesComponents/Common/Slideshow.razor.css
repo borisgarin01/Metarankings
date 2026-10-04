@@ -1,0 +1,113 @@
+.slideshow {
+    background: #fff;
+    height: 210px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.slide {
+    height: 210px;
+    width: 100%;
+}
+
+.slide .post {
+    display: flex;
+}
+
+.featured-image {
+    background-position: center center;
+    background-size: cover;
+    display: block;
+    float: left;
+    height: 200px;
+    position: relative;
+    margin: 10px 2px 0 2px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.featured-image img {
+    width: 100%;
+}
+
+.featured-image:hover {
+    opacity: 0.8;
+}
+
+.featured-image .small-score {
+    top: 0;
+    right: 5px;
+    position: absolute;
+}
+
+.pager {
+    background: #f1f1f1;
+    color: #333;
+    padding: 12px 0;
+    overflow: hidden;
+    text-align: center;
+    width: 100%;
+}
+
+.pager span {
+    cursor: pointer;
+    margin: 0 5px;
+    padding: 2px 15px;
+    border-radius: 50px;
+}
+
+.pager span.cycle-pager-active {
+    background: #555;
+    color: #fff;
+}
+
+.progress {
+    background: #777;
+    height: 1px;
+    width: 0;
+}
+
+@media only screen and (max-width:800px) {
+    .slideshow,
+    .slide {
+        width: 100%;
+    }
+
+    #slideshow,
+    .slideshow,
+    .slide,
+    .featured-image {
+        height: 135px;
+    }
+
+    .featured-image {
+        margin: 10px 1px 0 1px;
+    }
+}
+
+@media only screen and (max-width:670px) {
+    .slideshow,
+    .pager,
+    .progress {
+    }
+
+    .featured-image {
+        background: #333;
+    }
+}
+
+@media only screen and (max-width:480px) {
+    .pager {
+        font-size: 20px;
+    }
+
+    .pager span {
+        margin: 10px 10px;
+        display: inline-block;
+    }
+
+    .featured-image .small-score {
+        top: 5px;
+    }
+}

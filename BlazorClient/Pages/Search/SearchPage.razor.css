@@ -1,0 +1,100 @@
+.index-movies {
+    width: 49.9%;
+    float: left;
+    margin: 15px 0;
+}
+
+.index-games {
+    width: 49.9%;
+    float: right;
+    margin: 15px 0;
+}
+
+.index-movies h3,
+.index-games h3 {
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.index-movies h3:after,
+.index-games h3:after {
+    color: #888;
+    content: "›";
+    margin-left: 5px;
+}
+
+.index-movies h3:hover:after,
+.index-games h3:hover:after {
+    color: #333;
+    margin-left: 7px;
+}
+
+.index-movies .item {
+    padding: 10px 10px 20px 0;
+    border-right: 1px dotted #cbcbcb;
+}
+
+.index-games .item {
+    padding: 10px 0 20px 10px;
+}
+
+.item-description {
+    background: #fff;
+    display: none;
+    font-size: 12px;
+    color: #555;
+    padding: 5px 5px 10px 0;
+    border-bottom: 1px dotted #cbcbcb;
+    line-height: 1.4;
+}
+
+.item:hover .item-description {
+    display: block;
+    z-index: 1000;
+    position: absolute;
+}
+
+.post-info {
+    color: #555;
+    margin: 0 0 20px;
+    font-size: 14px;
+    line-height: 1.4;
+    overflow: hidden;
+    position: relative;
+}
+
+.post-info p {
+    padding: 5px 0;
+}
+
+.specials-index {
+    margin-top: 20px;
+}
+
+@media only screen and (max-width:800px) {
+    .item:hover .item-description {
+        display: none;
+    }
+}
+
+@media only screen and (max-width:620px) {
+    .index-movies,
+    .index-games {
+        width: 100%;
+    }
+
+    .index-movies .item {
+        padding: 15px 0;
+        border-right: none;
+    }
+
+    .index-games .item {
+        padding: 15px 0;
+    }
+
+    .post-info {
+        font-size: 16px;
+        line-height: 1.5;
+    }
+}

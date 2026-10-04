@@ -1,0 +1,29 @@
+.specials-index h3 {
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.specials-index h3:after {
+    color: #888;
+    content: "›";
+    margin-left: 5px;
+}
+
+.specials-index h3:hover:after {
+    color: #333;
+    margin-left: 7px;
+}
+
+.specials-index a {
+    color: #000;
+    text-decoration: none;
+}
+
+.specials-index a:hover {
+    color: #0068BF;
+}
+
+.specials-index {
+    margin-top: 20px;
+}

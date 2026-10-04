@@ -1,0 +1,109 @@
+.post-content h1 {
+    color: #000;
+    font-weight: normal;
+    margin: 0 0 10px;
+}
+
+.post-content h1 {
+    font-size: 24px;
+    color: #111;
+    margin-top: 10px;
+    font-weight: 700;
+}
+
+.your-score {
+    font-size: 18px;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 10px;
+    padding: 5px 0;
+}
+
+.your-score {
+    font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif,fontello;
+}
+
+.comment-respond {
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 15px;
+    border: 1px solid #ccc;
+}
+
+.comments h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 10px 0;
+    color: #333;
+    line-height: 1.5;
+    display: inline;
+}
+
+.comments h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 10px 0;
+    color: #333;
+    line-height: 1.5;
+    display: inline;
+}
+
+#respond p {
+    color: #444;
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+#respond .commform-author {
+    width: 45%;
+    margin-bottom: 15px;
+}
+
+#respond .commform-author p {
+    font: bold 12px Helvetica, Arial, sans-serif;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+#respond p.form-submit {
+    margin-bottom: 0;
+}
+
+#respond p.form-submit #submit {
+}
+
+#submit:hover {
+    background: #999;
+}
+
+.widget h2 {
+    color: #111;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.textwidget {
+    color: #333;
+    font-size: 14px;
+}
+
+@media only screen and (max-width:800px) {
+    .your-score {
+        padding: 0;
+        margin-top: -2px;
+    }
+
+    #respond .commform-author,
+    #respond p.form-submit #submit {
+        float: none;
+        margin-bottom: 10px;
+    }
+}
+
+@media only screen and (max-width:480px) {
+    .your-score {
+        padding: 5px 0;
+    }
+}
