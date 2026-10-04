@@ -1,46 +1,56 @@
 ﻿@page "/user-reviews/games/{ReviewId:long}"
+@using BlazorClient.Components.PagesComponents.Common
 @using Domain.Common.News
 
-<div id="content" class="lcol">
-    <div class="content-title">
-        <h3><a href="/games/details/@GameGamerReview.GameId">@GameGamerReview.Game.Name</a></h3>
-    </div>
-    <div class="post-reviews">
-        <div class="reviews-text mark-@gameGamerReview.Score.ToString("0")">
-            <div class="comment-meta">
-                <div class="rating-com">
-                    <span class="ldc-ul_like" onclick="alter_ul_post_values(this,'18045','c_like')">+ <span>0</span></span><span class="ldc-ul_dislike" onclick="alter_ul_post_values(this,'18045','c_dislike')">- <span>0</span></span>
+<GameMenu Year="@((GameGamerReview.Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
+
+@if (GameGamerReview is null || News is null)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <div id="content" class="lcol">
+        <div class="content-title">
+            <h3><a href="/games/details/@GameGamerReview.GameId">@GameGamerReview.Game.Name</a></h3>
+        </div>
+        <div class="post-reviews">
+            <div class="reviews-text mark-@gameGamerReview.Score.ToString("0")">
+                <div class="comment-meta">
+                    <div class="rating-com">
+                        <span class="ldc-ul_like" onclick="alter_ul_post_values(this,'18045','c_like')">+ <span>0</span></span><span class="ldc-ul_dislike" onclick="alter_ul_post_values(this,'18045','c_dislike')">- <span>0</span></span>
+                    </div>
+                    <div class="small-score mark-@GameGamerReview.Score.ToString("0")">
+                        <span>2</span>
+                        <meta content="0">
+                        <meta content="10">
+                    </div>
+                    <div class="title-reviews">
+                        @GameGamerReview.ApplicationUser.UserName
+                    </div>
+                    @GameGamerReview.Date.ToString("dd.MM.yyyy")
                 </div>
-                <div class="small-score mark-@GameGamerReview.Score.ToString("0")">
-                    <span>2</span>
-                    <meta content="0">
-                    <meta content="10">
+                <p>@GameGamerReview.TextContent</p>
+                <div class="rew-menu">
+                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                    <ul>
+                        <li><a class="complain" rel="nofollow" href="/zhaloba/?r=18045">Пожаловаться</a></li>
+                    </ul>
                 </div>
-                <div class="title-reviews">
-                    @GameGamerReview.ApplicationUser.UserName
-                </div>
-                @GameGamerReview.Date.ToString("dd.MM.yyyy")
-            </div>
-            <p>@GameGamerReview.TextContent</p>
-            <div class="rew-menu">
-                <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
-                <ul>
-                    <li><a class="complain" rel="nofollow" href="/zhaloba/?r=18045">Пожаловаться</a></li>
-                </ul>
             </div>
         </div>
+        <div class="news-module">
+            @foreach (NewsItem newsItem in News)
+            {
+                <div class="news-item">
+                    <a href="/news/@newsItem.Id" title="@newsItem.Title">
+                        <img class="news-thumb" src="@newsItem.ImageSource" alt="@newsItem.Title">
+                        <span class="news-title">
+                            @TextTruncater.Truncate(newsItem.TextContent, 150)
+                        </span>
+                    </a>
+                </div>
+            }
+        </div>
     </div>
-    <div class="news-module">
-        @foreach (NewsItem newsItem in News)
-        {
-            <div class="news-item">
-                <a href="/news/@newsItem.Id" title="@newsItem.Title">
-                    <img class="news-thumb" src="@newsItem.ImageSource" alt="@newsItem.Title">
-                    <span class="news-title">
-                        @TextTruncater.Truncate(newsItem.TextContent, 150)
-                    </span>
-                </a>
-            </div>
-        }
-    </div>
-</div>
+}
