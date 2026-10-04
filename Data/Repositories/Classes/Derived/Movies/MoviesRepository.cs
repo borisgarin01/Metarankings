@@ -468,6 +468,10 @@ md.id, md.name
 
         string sql = @"SELECT
 m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
+COALESCE((SELECT AVG(Score)::float FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersScore,
+COALESCE((SELECT COUNT(*) FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersReviewsCount,
+COALESCE((SELECT AVG(Score)::float FROM MoviesCriticsReviews WHERE MovieId = m.Id), 0) AS CriticsScore,
+COALESCE((SELECT COUNT(*) FROM MoviesCriticsReviews WHERE MovieId = m.Id), 0) AS CriticsReviewsCount,
 mg.Id, mg.Name,
 ms.Id, ms.Name,
 md.Id, md.Name
