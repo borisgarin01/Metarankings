@@ -1,6 +1,4 @@
-﻿
-
-using Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Frontend;
+﻿using Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Frontend;
 using WebManagers.Derived.Games;
 
 namespace BlazorClient.Components.PagesComponents.GameDetails;
