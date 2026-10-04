@@ -1,0 +1,88 @@
+.thumb-mini img {
+    float: left;
+    margin: 0 10px 0 0;
+    border-radius: 3px;
+}
+
+.news-module {
+    margin-top: 30px;
+}
+
+.news-module .news-item {
+    width: 49.5%;
+    display: inline-block;
+}
+
+.news-module .news-item:hover {
+    opacity: 0.7;
+}
+
+.post-reviews {
+    color: #555;
+    margin: 10px 0;
+    font-size: 14px;
+    line-height: normal;
+    padding: 2px 0;
+}
+
+.reviews-text .small-score {
+    border-radius: 50px;
+    float: left;
+    font-size: 16px;
+    margin: 0 10px 0 0;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-shadow: none;
+}
+
+.reviews-text {
+    overflow: hidden;
+}
+
+.title-reviews {
+    font-weight: 600;
+    margin: 6px 0 10px 0;
+}
+
+.reviews-author {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+.reviews-content {
+    color: #333;
+    margin: 0 0 0 64px;
+}
+
+.reviews-text a {
+    font-size: 14px;
+    color: #0082ae;
+    text-decoration: none;
+}
+
+.reviews-text a:hover {
+    text-decoration: underline;
+}
+
+.reviews-text .title-reviews {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 10px 0 0;
+    display: inline-block;
+    padding: 6px 0;
+}
+
+@media only screen and (max-width:620px) {
+    .reviews-text .title-reviews {
+        display: block;
+        padding: 0;
+    }
+
+    .news-module .news-item {
+        width: 100%;
+        display: block;
+    }
+}

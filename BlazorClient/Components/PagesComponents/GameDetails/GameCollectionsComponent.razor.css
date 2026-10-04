@@ -1,0 +1,14 @@
+.podborki a {
+    background: #e7e7e7;
+    color: #111 !important;
+    border-radius: 4px;
+    padding: 5px 10px;
+    display: inline-block;
+    margin: 5px 2px 0 0;
+    font-weight: 600;
+}
+
+.podborki a:hover {
+    background: #f0f0f0;
+    text-decoration: none !important;
+}

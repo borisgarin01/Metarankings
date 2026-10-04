@@ -1,0 +1,41 @@
+#larr:hover,
+#rarr:hover {
+    opacity: 1;
+}
+
+#mode:hover {
+    opacity: 1;
+}
+
+#submit:hover {
+    background: #999;
+}
+
+#forgot:hover {
+    color: #444;
+    text-decoration: underline;
+}
+
+#toTop:hover {
+    opacity: 1;
+}
+
+@media only screen and (max-width:800px) {
+    #content-trailer {
+        position: relative;
+        padding-bottom: 56.25%;
+        padding-right: 100%;
+        padding-top: 30px;
+        height: 0;
+        overflow: hidden;
+        width: 0;
+    }
+
+    #slideshow {
+        height: 135px;
+    }
+
+    #search_form-result {
+        max-height: 400px;
+    }
+}

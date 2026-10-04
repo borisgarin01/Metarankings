@@ -1,0 +1,33 @@
+.postid .post {
+    overflow: hidden;
+}
+
+.postid .spec-img {
+    position: relative;
+    width: 100px;
+    height: 140px;
+    float: left;
+    margin-right: 15px;
+}
+
+.postid .spec-img .small-score {
+    position: absolute;
+    right: 5px;
+}
+
+.postid .p-meta {
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+@media only screen and (max-width:480px) {
+    .postid .spec-img {
+        height: 120px;
+        width: 85px;
+        margin: 0 10px 15px 0;
+    }
+
+    .postid .spec-img .small-score {
+        top: 5px;
+    }
+}
