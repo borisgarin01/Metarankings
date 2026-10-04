@@ -1,0 +1,19 @@
+.featured-game {
+    color: #111;
+}
+
+@media only screen and (max-width:620px) {
+    .featured-game {
+        overflow: hidden;
+    }
+}
+
+@media only screen and (max-width:480px) {
+    .featured-game {
+        margin: 0;
+    }
+
+    .featured-game {
+        height: auto;
+    }
+}

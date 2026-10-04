@@ -1,0 +1,25 @@
+.page-description {
+    border: 1px solid #ccc;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 10px 0;
+    padding: 20px;
+    border-radius: 3px;
+}
+
+.ads {
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    margin: 30px 0;
+}
+
+@media only screen and (max-width:800px) {
+    .ads {
+        padding-top: 10px;
+    }
+
+    .page-description {
+    }
+}
