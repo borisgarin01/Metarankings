@@ -59,7 +59,7 @@ public class GenresController : ControllerBase
 
                 var insertedMovieGenre = await _moviesGenresRepository.GetAsync(insertedId);
 
-                return Created($"/api/movies/moviesGenres/{insertedId}", insertedMovieGenre);
+                return Created($"/api/movies/genres/{insertedId}", insertedMovieGenre);
             }
             catch (Exception ex)
             {

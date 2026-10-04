@@ -11,6 +11,6 @@ public partial class ListMoviesGenresPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Genres = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Genre>>("/api/movies/MoviesGenres");
+        Genres = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Genre>>("/api/movies/Genres");
     }
 }
