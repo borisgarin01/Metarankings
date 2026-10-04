@@ -1294,7 +1294,7 @@ h1, h2, h3, h4, h5 {
 }
 
 .critic-text .allreviews:before {
-    content: 'вЂє';
+    content: '›';
     display: block;
     text-align: center;
 }
@@ -1311,7 +1311,7 @@ h1, h2, h3, h4, h5 {
 }
 
 .critic-text .clnk:before {
-    content: 'вЂє';
+    content: '›';
     display: block;
     text-align: center;
 }
@@ -3473,7 +3473,7 @@ p#cancel-comment-reply {
 }
 
 .modal-left:before {
-    content: "вЂ№";
+    content: "‹";
     float: left;
     font-size: 50px;
     font-weight: bold;
@@ -3481,7 +3481,7 @@ p#cancel-comment-reply {
 }
 
 .modal-right:before {
-    content: "вЂє";
+    content: "›";
     float: right;
     font-size: 50px;
     font-weight: bold;
@@ -4026,7 +4026,7 @@ a.help {
     }
 
     .post-meta li:before {
-        content: " вЂў ";
+        content: " • ";
     }
 
 @media only screen and (max-width:800px) {

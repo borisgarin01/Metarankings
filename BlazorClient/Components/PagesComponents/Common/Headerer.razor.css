@@ -2,7 +2,6 @@
     width: 100%;
     top: 0;
     height: 100px;
-    position: relative;
 }
 
 .header-bottom {
@@ -18,12 +17,6 @@
 .header {
     width: 1000px;
     margin: 0 auto;
-}
-
-.headerer {
-    width: 100%;
-    top: 0;
-    height: 100px;
 }
 
 .logo {
@@ -371,18 +364,5 @@
 @media only screen and (max-width:240px) {
     .logo {
         font-size: 16px;
-    }
-}
-
-.headerer {
-    width: 100%;
-    top: 0;
-    height: 100px;
-}
-
-@media only screen and (max-width: 800px) {
-    .headerer {
-        margin-bottom: 20px;
-        height: 100px;
     }
 }
