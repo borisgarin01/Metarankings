@@ -1,0 +1,36 @@
+.news-item .rubrika {
+    left: 10px;
+    top: 10px;
+}
+
+.news-item .rubrika a {
+    color: #fff;
+}
+
+.news-item .news-title a {
+    color: #000;
+    white-space: normal;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+.specials-index a {
+    color: #000;
+    text-decoration: none;
+}
+
+.specials-index a:hover,
+.news-item .news-title a:hover {
+    color: #0068BF;
+}
+
+.specials-index .news-item {
+    width: 49.6%;
+    display: inline-block;
+}
+
+@media only screen and (max-width:620px) {
+    .specials-index .news-item {
+        width: 100%;
+    }
+}

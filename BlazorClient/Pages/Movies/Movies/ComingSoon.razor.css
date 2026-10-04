@@ -1,0 +1,50 @@
+.list .post .post-meta .date {
+    font-size: 14px;
+}
+
+.wait {
+    color: #555;
+    font-size: 14px;
+    display: block;
+    margin: 10px 0;
+}
+
+.ldc-ul_wait {
+    position: relative;
+    color: #333;
+    cursor: pointer;
+    font-size: 14px;
+    outline: 0 none;
+    padding: 4px 0 4px 10px;
+    position: relative;
+    border-radius: 8px;
+}
+
+.ldc-ul_wait:hover {
+    color: #000;
+}
+
+.wait span {
+    margin: 0 !important;
+}
+
+.w-yes .ldc-ul_wait {
+    background: #9ad77f;
+}
+
+.w-no .ldc-ul_wait {
+    background: #ed8e7f;
+}
+
+.ldc-ul_wait span {
+    color: #000;
+    padding: 3px 8px;
+    opacity: 0.8;
+}
+
+@media only screen and (max-width:620px) {
+    .wait {
+        display: block;
+        margin: 15px 0;
+    }
+}

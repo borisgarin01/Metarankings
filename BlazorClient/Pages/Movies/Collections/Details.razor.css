@@ -1,0 +1,36 @@
+.breadcrumbs {
+}
+
+.breadcrumbs a {
+}
+
+.breadcrumbs a:hover {
+}
+
+.news-meta {
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.news-meta a {
+    color: #333 !important;
+}
+
+.news-img img {
+    width: 100%;
+}
+
+.entry .post-meta a {
+    text-decoration: none;
+    color: #0082ae;
+}
+
+.entry .post-meta a:hover {
+    text-decoration: underline;
+}
+
+@media only screen and (max-width:800px) {
+    .breadcrumbs {
+        padding: 5px 10px;
+    }
+}

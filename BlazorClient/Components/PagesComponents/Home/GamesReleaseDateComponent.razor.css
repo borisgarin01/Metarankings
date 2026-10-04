@@ -1,0 +1,33 @@
+.index-games {
+    width: 49.9%;
+    float: right;
+    margin: 15px 0;
+}
+
+.index-games h3 {
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.index-games h3:after {
+    color: #888;
+    content: "›";
+    margin-left: 5px;
+}
+
+.index-games h3:hover:after {
+    color: #333;
+    margin-left: 7px;
+}
+
+.allreviews:hover {
+    border: 1px solid #AAA;
+    text-decoration: none !important;
+}
+
+@media only screen and (max-width:620px) {
+    .index-games {
+        width: 100%;
+    }
+}

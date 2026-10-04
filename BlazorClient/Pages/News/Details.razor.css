@@ -1,0 +1,156 @@
+.featured-image {
+    background-position: center center;
+    background-size: cover;
+    display: block;
+    float: left;
+    height: 200px;
+    position: relative;
+    margin: 10px 2px 0 2px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.featured-image img {
+    width: 100%;
+}
+
+.featured-image:hover {
+    opacity: 0.8;
+}
+
+.featured-image .small-score {
+    top: 0;
+    right: 5px;
+    position: absolute;
+}
+
+.breadcrumbs {
+}
+
+.breadcrumbs a {
+}
+
+.breadcrumbs a:hover {
+}
+
+.news-meta {
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.news-meta a {
+    color: #333 !important;
+}
+
+.news-img img {
+    width: 100%;
+}
+
+.news-module {
+    margin-top: 30px;
+}
+
+.news-module .news-item {
+    width: 49.5%;
+    display: inline-block;
+}
+
+.news-module .news-item:hover {
+    opacity: 0.7;
+}
+
+.postmeta {
+    font-size: 12px;
+    margin: 10px 0;
+}
+
+.postmeta span {
+    margin-right: 10px;
+}
+
+.entry .post-meta a {
+    text-decoration: none;
+    color: #0082ae;
+}
+
+.entry .post-meta a:hover {
+    text-decoration: underline;
+}
+
+.similar {
+    margin-top: 30px;
+}
+
+.similar .featured-image {
+    width: 23%;
+    height: 220px;
+    margin: 10px 1%;
+}
+
+.similar .featured-image span {
+    font-size: 16px;
+}
+
+.podborki a {
+    background: #e7e7e7;
+    color: #111 !important;
+    border-radius: 4px;
+    padding: 5px 10px;
+    display: inline-block;
+    margin: 5px 2px 0 0;
+    font-weight: 600;
+}
+
+.podborki a:hover {
+    background: #f0f0f0;
+    text-decoration: none !important;
+}
+
+@media only screen and (max-width:800px) {
+    .featured-image {
+        height: 135px;
+    }
+
+    .featured-image {
+        margin: 10px 1px 0 1px;
+    }
+
+    .breadcrumbs {
+        padding: 5px 10px;
+    }
+}
+
+@media only screen and (max-width:670px) {
+    .featured-image {
+        background: #333;
+    }
+
+    .similar .featured-image {
+        width: 31%;
+        height: 240px;
+        margin: 10px 1%;
+    }
+}
+
+@media only screen and (max-width:620px) {
+    .news-module .news-item {
+        width: 100%;
+        display: block;
+    }
+}
+
+@media only screen and (max-width:480px) {
+    .similar .featured-image {
+        width: 49%;
+        height: 240px;
+        margin: 5px 0.5%;
+    }
+
+    .similar .featured-image span {
+        font-size: 14px;
+    }
+
+    .featured-image .small-score {
+        top: 5px;
+    }
+}

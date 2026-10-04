@@ -1,0 +1,41 @@
+.systems {
+    margin-bottom: 30px;
+}
+
+.systr {
+    cursor: pointer;
+    position: relative;
+}
+
+.systr:after {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #ccc;
+    content: "";
+    position: absolute;
+    top: 2px;
+    margin: 10px;
+}
+
+.systr:hover:after {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #333;
+    content: "";
+}
+
+.system-info {
+    display: none;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.systems td {
+    padding: 5px 0;
+}
+
+.systems td:first-child {
+    width: 180px;
+}
