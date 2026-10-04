@@ -4,7 +4,7 @@ using WebManagers.Derived;
 
 namespace BlazorClient.Pages.Reviews;
 
-public partial class UserReviews : ComponentBase
+public partial class UserReviewsPage : ComponentBase
 {
     private IEnumerable<GameReview> gamesReviews;
     private IEnumerable<MovieViewerReview> movieViewersReviews;

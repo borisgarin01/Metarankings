@@ -1,0 +1,166 @@
+.rew-menu {
+    cursor: pointer;
+    position: relative;
+}
+
+.menu-dot {
+    background: #939393;
+    border-radius: 1000px;
+    height: 3px;
+    width: 3px;
+    margin: 2px;
+    display: inline-block;
+}
+
+.rew-menu ul {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    list-style: none;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    height: 0;
+    position: absolute;
+    margin-top: 10px;
+    z-index: 100;
+}
+
+    .rew-menu ul li {
+        background: #fff;
+        font-size: 14px;
+        color: #555;
+        padding: 5px;
+        margin: 0;
+    }
+
+        .rew-menu ul li:hover {
+            background: #f1f1f1;
+        }
+
+        .rew-menu ul li a {
+            display: block;
+            text-decoration: none;
+            color: #555;
+            padding: 5px;
+        }
+
+.rew-menu.open ul {
+    background: #fff;
+    border: 1px solid #999;
+    opacity: 1;
+    visibility: visible;
+    height: auto;
+}
+
+/* Restored rules from the pre-split app.css (order kept so the cascade matches) */
+.post-reviews {
+    color: #555;
+    margin: 10px 0;
+    font-size: 14px;
+    line-height: normal;
+    padding: 2px 0;
+}
+
+.news-module {
+    margin-top: 30px;
+}
+
+    .news-module .news-item {
+        width: 49.5%;
+        display: inline-block;
+    }
+
+        .news-module .news-item:hover {
+            opacity: 0.7;
+        }
+
+.comment-meta .small-score {
+    border-radius: 50px;
+    float: left;
+    font-size: 20px;
+    margin: -5px 10px 0 0;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-shadow: none;
+}
+
+.reviews-text .small-score {
+    border-radius: 50px;
+    float: left;
+    font-size: 16px;
+    margin: 0 10px 0 0;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-shadow: none;
+}
+
+.comment-meta {
+    position: relative;
+    min-height: 10px;
+    font-size: 12px;
+    margin: 5px 0 20px 0;
+}
+
+.reviews-text {
+    overflow: hidden;
+}
+
+.title-reviews {
+    font-weight: 600;
+    margin: 6px 0 10px 0;
+}
+
+    .reviews-text a {
+        font-size: 14px;
+        color: #0082ae;
+        text-decoration: none;
+    }
+
+        .reviews-text a:hover {
+            text-decoration: underline;
+        }
+
+.reviews-text .title-reviews {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 10px 0 0;
+    display: inline-block;
+    padding: 6px 0;
+}
+
+.ldc-ul_like:hover {
+    background: #60b200;
+    color: #FFF;
+}
+
+.ldc-ul_dislike:hover {
+    background: #ed8e7f;
+    color: #FFF;
+}
+
+.rating-com {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+@media only screen and (max-width:670px) {
+    .comment-meta .small-score {
+        margin: 0 8px 0 0;
+    }
+}
+
+@media only screen and (max-width:620px) {
+    .reviews-text .title-reviews {
+        display: block;
+        padding: 0;
+    }
+
+    .news-module .news-item {
+        width: 100%;
+        display: block;
+    }
+}
