@@ -538,12 +538,6 @@ img.lazyload {
         line-height: 1.2;
     }
 
-.progress {
-    background: #777;
-    height: 1px;
-    width: 0;
-}
-
 #larr, #rarr {
     display: block;
     width: 32px;
@@ -4181,9 +4175,6 @@ a.help {
             max-width: 100%;
         }
 
-    .progress {
-    }
-
     .post-content .search_form input {
         width: 87%;
     }
@@ -4441,6 +4432,4 @@ a.help {
         font-size: 9px;
     }
 }
-
-/* Карусель — лента */
 

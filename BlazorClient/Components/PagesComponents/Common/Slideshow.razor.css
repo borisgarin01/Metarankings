@@ -62,12 +62,19 @@
     color: #fff;
 }
 
+.progress {
+    background: #777;
+    height: 1px;
+    width: 0;
+}
+
 @media only screen and (max-width:800px) {
     .slideshow,
     .slide {
         width: 100%;
     }
 
+    #slideshow,
     .slideshow,
     .slide,
     .featured-image {
@@ -81,7 +88,8 @@
 
 @media only screen and (max-width:670px) {
     .slideshow,
-    .pager {
+    .pager,
+    .progress {
     }
 
     .featured-image {
@@ -102,20 +110,4 @@
     .featured-image .small-score {
         top: 5px;
     }
-}
-
-/* Карусель — лента */
-.slideshow-track {
-    display: flex !important;
-    flex-direction: row !important;
-    width: 100% !important;
-    transition: transform .6s ease-in-out !important;
-}
-
-.slideshow-track > .slide {
-    flex: 0 0 100% !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    position: relative !important;
-    float: none !important;
 }
