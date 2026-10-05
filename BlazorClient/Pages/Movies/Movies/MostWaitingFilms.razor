@@ -1,7 +1,160 @@
 ﻿@page "/movies/most-waiting-movies"
+@using System.Globalization
+@using BlazorClient.Components.PagesComponents.Common
+@using Domain.Movies
 
-<h3>Самые ожидаемые фильмы</h3>
+<div class="wrapper">
+    <MovieMenu Year="@DateTime.Now.Year" />
 
-@code {
+    <div id="container" class="clear">
+        <div class="sidebar">
+        </div>
 
-}
+        <div id="content" class="lcol">
+            <div class="content-title">
+                <h1>Самые ожидаемые фильмы @DateTime.Now.Year-@(DateTime.Now.Year + 1) года</h1>
+            </div>
+
+            <div id="filter">
+                <div class="filter-nav">
+                    <div class="filter-name">Жанр</div>
+                    <div class="filter-menu">
+                        <a class="@(GenreId is null ? "selected" : "")"
+                           href="@BasePath">Все</a>
+                        @foreach (Genre genre in MoviesGenres)
+                        {
+                            <a class="@(GenreId == genre.Id ? "selected" : "")"
+                               href="@BuildPageUrl(page: 1, genreId: genre.Id)">
+                                @genre.Name
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <section id="loop" class="list clear best movie">
+                @if (isLoading)
+                {
+                    <p>Загружается...</p>
+                }
+                else if (!MostWaitingMovies.Any())
+                {
+                    <p>Ничего не найдено.</p>
+                }
+                else
+                {
+                    int order = (currentPage - 1) * PageSize + 1;
+                    foreach (Movie movie in MostWaitingMovies)
+                    {
+                        <article class="post clear movie" @key="movie.Id">
+                            <a href="/movies/details/@movie.Id" class="thumb">
+                                <img class="post-image" src="@movie.ImageSource" alt="@movie.Name">
+                            </a>
+                            <div class="best-prod">
+                                <div class="counter">@order</div>
+                            </div>
+                            <a class="name" href="/movies/details/@movie.Id">@movie.Name</a>
+                            @if (movie.MoviesDirectors.Any())
+                            {
+                                <div class="post-meta">Режиссёр: @string.Join(", ", movie.MoviesDirectors.Select(md => md.Name))</div>
+                            }
+                            @if (movie.MovieGenres.Any())
+                            {
+                                <div class="post-meta">
+                                    @for (int i = 0; i < movie.MovieGenres.Count; i++)
+                                    {
+                                        Genre genre = movie.MovieGenres[i];
+                                        <a href="@BuildPageUrl(page: 1, genreId: genre.Id)">@genre.Name</a>@(i < movie.MovieGenres.Count - 1 ? ", " : "")
+                                    }
+                                </div>
+                            }
+                            <div class="post-meta">
+                                @(movie.PremierDate.HasValue
+                                    ? movie.PremierDate.Value.ToString("d MMMM yyyy", RussianCulture)
+                                    : "Скоро")
+                            </div>
+                            <div class="post-meta">@TextTruncater.Truncate(movie.Description, 220)</div>
+                            <div class="trailer" data-video="/movies/details/@movie.Id/#content-trailer"></div>
+                        </article>
+                        order++;
+                    }
+                }
+            </section>
+
+            @* ПАГИНАЦИЯ *@
+            @if (TotalPages > 1)
+            {
+                <div class="pagination">
+                    <div class="navi">
+                        @if (currentPage > 1)
+                        {
+                            <a class="prev page-numbers" href="@GetPageUrl(currentPage - 1)">← Предыдущая</a>
+                        }
+
+                        @{
+                            int startPage = Math.Max(1, currentPage - 2);
+                            int endPage = Math.Min(TotalPages, currentPage + 2);
+
+                            if (startPage > 1)
+                            {
+                                <a class="page-numbers" href="@GetPageUrl(1)">1</a>
+                                if (startPage > 2)
+                                {
+                                    <span class="page-numbers dots">…</span>
+                                }
+                            }
+
+                            for (int i = startPage; i <= endPage; i++)
+                            {
+                                if (i == currentPage)
+                                {
+                                    <span class="page-numbers current">@i</span>
+                                }
+                                else
+                                {
+                                    <a class="page-numbers" href="@GetPageUrl(i)">@i</a>
+                                }
+                            }
+
+                            if (endPage < TotalPages)
+                            {
+                                if (endPage < TotalPages - 1)
+                                {
+                                    <span class="page-numbers dots">…</span>
+                                }
+                                <a class="page-numbers" href="@GetPageUrl(TotalPages)">@TotalPages</a>
+                            }
+                        }
+
+                        @if (currentPage < TotalPages)
+                        {
+                            <a class="next page-numbers" href="@GetPageUrl(currentPage + 1)">Показать еще</a>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="news-module">
+                @foreach (var news in NewsItems)
+                {
+                    <div class="news-item">
+                        <a href="/news/@news.Id" title="@news.Title">
+                            <img class="news-thumb" src="@news.ImageSource" alt="@news.Title">
+                            <span class="news-title">
+                                @TextTruncater.Truncate(news.TextContent, 150)
+                            </span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="sidebar rcol">
+            <div class="widget last-reviews">
+                <div class="widget-body">
+                    <div id="yandex_rtb_R-A-201169-26"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

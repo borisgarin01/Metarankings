@@ -92,6 +92,24 @@ public sealed class MoviesController : ControllerBase
         return Ok(await _moviesModelsRepository.GetByNameAsync(name));
     }
 
+    [HttpGet("most-waiting/{offset:int}/{limit:int}")]
+    public async Task<ActionResult<IEnumerable<Movie>>> GetMostWaitingAsync(
+        int offset,
+        int limit,
+        [FromQuery] long[]? genresIds = null)
+    {
+        if (offset < 0 || limit <= 0)
+            return BadRequest();
+
+        return Ok(await _moviesModelsRepository.GetMostWaitingAsync(genresIds, offset, limit));
+    }
+
+    [HttpGet("most-waiting/count")]
+    public async Task<ActionResult<int>> GetMostWaitingCountAsync([FromQuery] long[]? genresIds = null)
+    {
+        return Ok(await _moviesModelsRepository.GetMostWaitingCountAsync(genresIds));
+    }
+
     [HttpPost("byParameters")]
     public async Task<IActionResult> GetByParameters([FromBody] MovieFilterRequest filter)
     {

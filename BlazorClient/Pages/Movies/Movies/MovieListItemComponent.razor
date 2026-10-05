@@ -16,7 +16,7 @@
         }
         <a href="@(ListMovieGenreModels.ElementAt(ListMovieGenreModels.Count() - 1).Url)">@(ListMovieGenreModels.ElementAt(ListMovieGenreModels.Count() - 1).Title)</a>
     </span>
-    <span class="item-meta"><a rel="nofollow" href="@ReviewsHref">Рецензии (0)</a> <a rel="nofollow" href="@Href/#comments">Отзывы (0)</a></span>
+    <span class="item-meta"><a rel="nofollow" href="@ReviewsHref">Рецензии (@CriticsReviewsCount)</a> <a rel="nofollow" href="@Href/#comments">Отзывы (@UsersReviewsCount)</a></span>
     <span class="item-meta">@ReleaseDate.ToString("dd MMMM yyyy")</span>
     <span class="item-description">@Description</span>
 </div>

@@ -10,5 +10,7 @@
                                                              Title="@($"Фильм {movie.Name}")"
                                                              ReleaseDate="@(movie.PremierDate.HasValue ? movie.PremierDate.Value:DateOnly.FromDateTime(DateTime.Today))"
                                                              ListMovieGenreModels="@movie.MovieGenres.Select(mg=>new ListMovieGenreModel(mg.Name,$"/movies/genres/{mg.Id}"))"
+                                                             CriticsReviewsCount="@movie.CriticsReviewsCount"
+                                                             UsersReviewsCount="@movie.UsersReviewsCount"
                                                              ReviewsHref="@($"/movies/details/{movie.Id}/#reviews")" />
 }
