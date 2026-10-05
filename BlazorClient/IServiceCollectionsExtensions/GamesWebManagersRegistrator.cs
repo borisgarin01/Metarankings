@@ -8,6 +8,7 @@ using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Games.Publishers;
 using WebManagers;
 using WebManagers.Derived.Games;
+using WebManagers.Derived.Waitings;
 
 namespace BlazorClient.IServiceCollectionsExtensions;
 
@@ -23,7 +24,8 @@ public static class GamesWebManagersRegistrator
             .AddSingleton<GamesWebManager>()
             .AddSingleton<IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>, GamesCollectionsWebManager>()
             .AddSingleton<IWebManager<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>, GamesCollectionsItemsWebManager>()
-            .AddSingleton<GamesPlayersReviewsShiftsWebManager>();
+            .AddSingleton<GamesPlayersReviewsShiftsWebManager>()
+            .AddSingleton<GamesWaitingsWebManager>();
 
         return serviceCollection;
     }

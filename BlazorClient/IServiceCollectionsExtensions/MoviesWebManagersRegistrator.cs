@@ -6,6 +6,7 @@ using Domain.RequestsModels.Movies.MoviesGenres;
 using Domain.RequestsModels.Movies.MoviesStudios;
 using WebManagers;
 using WebManagers.Derived.Movies;
+using WebManagers.Derived.Waitings;
 
 namespace BlazorClient.IServiceCollectionsExtensions;
 
@@ -19,7 +20,8 @@ public static class MoviesWebManagersRegistrator
             .AddSingleton<MoviesWebManager>()
             .AddSingleton<IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>, MoviesCollectionsWebManager>()
             .AddSingleton<IWebManager<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsWebManager>()
-            .AddSingleton<MoviesViewersReviewsShiftsWebManager>();
+            .AddSingleton<MoviesViewersReviewsShiftsWebManager>()
+            .AddSingleton<MoviesWaitingsWebManager>();
 
         return serviceCollection;
     }

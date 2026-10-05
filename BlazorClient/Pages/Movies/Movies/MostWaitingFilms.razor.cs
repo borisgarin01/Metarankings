@@ -5,6 +5,8 @@ using System.Globalization;
 using WebManagers;
 using WebManagers.Derived;
 using WebManagers.Derived.Movies;
+using WebManagers.Derived.Waitings;
+using Domain.Waitings;
 
 namespace BlazorClient.Pages.Movies.Movies;
 
@@ -16,6 +18,7 @@ public partial class MostWaitingFilms : ComponentBase
 
     private bool isLoading = false;
     private int currentPage = 1;
+    private Dictionary<long, bool?> userVotes = new Dictionary<long, bool?>();
 
     [Inject]
     public NewsWebManager NewsWebManager { get; set; } = default!;
@@ -25,6 +28,12 @@ public partial class MostWaitingFilms : ComponentBase
 
     [Inject]
     public IWebManager<Genre, AddMovieGenreModel, UpdateMovieGenreModel> MoviesGenresWebManager { get; set; } = default!;
+
+    [Inject]
+    public MoviesWaitingsWebManager MoviesWaitingsWebManager { get; set; } = default!;
+
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
     [Inject]
     public TextTruncater TextTruncater { get; set; } = default!;
@@ -81,6 +90,8 @@ public partial class MostWaitingFilms : ComponentBase
 
             MostWaitingMovies = moviesTask.Result ?? Enumerable.Empty<Movie>();
             TotalCount = countTask.Result;
+
+            await LoadUserVotesAsync();
         }
         catch (Exception ex)
         {
@@ -92,6 +103,30 @@ public partial class MostWaitingFilms : ComponentBase
         {
             isLoading = false;
         }
+    }
+
+    private async Task LoadUserVotesAsync()
+    {
+        userVotes = new Dictionary<long, bool?>();
+
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated != true || !MostWaitingMovies.Any())
+            return;
+
+        try
+        {
+            IEnumerable<WaitingStatistics> statistics = await MoviesWaitingsWebManager.GetAsync(MostWaitingMovies.Select(m => m.Id));
+            userVotes = statistics.ToDictionary(s => s.EntityId, s => s.UserVote);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to load user waiting votes: {ex.Message}");
+        }
+    }
+
+    private bool? GetUserVote(long movieId)
+    {
+        return userVotes.TryGetValue(movieId, out bool? vote) ? vote : null;
     }
 
     private string BuildPageUrl(int? page = null, long? genreId = null)

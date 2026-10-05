@@ -1,6 +1,7 @@
 ﻿using Data.Repositories.Classes.Derived;
 using Data.Repositories.Classes.Derived.Games;
 using Data.Repositories.Classes.Derived.Movies;
+using Data.Repositories.Classes.Derived.Waitings;
 using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Common.News;
@@ -65,6 +66,10 @@ public static class RepositoriesRegistrator
         services.AddScoped<MoviesViewersReviewsShiftsRepository>(instance => new MoviesViewersReviewsShiftsRepository(metarankingsConnectionString));
 
         services.AddScoped<NewsRepository>(instance => new NewsRepository(metarankingsConnectionString));
+
+        services.AddScoped<GamesWaitingsRepository>(instance => new GamesWaitingsRepository(metarankingsConnectionString));
+
+        services.AddScoped<MoviesWaitingsRepository>(instance => new MoviesWaitingsRepository(metarankingsConnectionString));
 
         return services;
     }

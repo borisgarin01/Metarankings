@@ -1,5 +1,4 @@
 ﻿@page "/movies/most-waiting-movies"
-@using System.Globalization
 @using BlazorClient.Components.PagesComponents.Common
 @using Domain.Movies
 
@@ -75,18 +74,11 @@
                                     : "Скоро")
                             </div>
                             <div class="post-meta">@TextTruncater.Truncate(movie.Description, 220)</div>
-                            <div class="wait">
-                                <span class="w-yes">
-                                    <span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26060','like')">
-                                        + <span>7</span>
-                                    </span>
-                                </span>
-                                <span class="w-no">
-                                    <span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'26060','dislike')">
-                                        - <span>1</span>
-                                    </span>
-                                </span> Ожидания: 86%
-                            </div>
+                            <WaitingVoteComponent EntityId="@movie.Id"
+                                                  Target="WaitingTarget.Movie"
+                                                  WaitingCount="@movie.WaitingCount"
+                                                  NotWaitingCount="@movie.NotWaitingCount"
+                                                  UserVote="@GetUserVote(movie.Id)" />
                             <div class="trailer" data-video="/movies/details/@movie.Id/#content-trailer"></div>
                         </article>
                         order++;

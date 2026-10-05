@@ -27,3 +27,9 @@
     width: 18px !important;
     background: #c9c9c9;
 }
+
+.reviews-locked {
+    color: #555;
+    font-size: 14px;
+    margin: 15px 0;
+}

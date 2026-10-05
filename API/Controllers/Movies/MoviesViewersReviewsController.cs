@@ -43,6 +43,9 @@ public sealed class MoviesViewersReviewsController : ControllerBase
         if (movie is null)
             return NotFound("Movie not found");
 
+        if (!movie.IsReleased)
+            return BadRequest("Оценки и отзывы можно оставлять только после выхода фильма");
+
         var addGameReviewWithUserIdAndDateModel = new AddMovieViewerReviewWithUserIdAndDateModel(addMovieViewerReviewModel.MovieId, addMovieViewerReviewModel.TextContent, addMovieViewerReviewModel.Score, long.Parse(User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value), DateTime.Now);
 
         var movieReviewId = await _moviesViewersReviewsRepository.AddAsync(addGameReviewWithUserIdAndDateModel);
@@ -77,6 +80,10 @@ public sealed class MoviesViewersReviewsController : ControllerBase
 
         if (long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value) != movieReview.ViewerId)
             return BadRequest("User are not a review author");
+
+        Movie movie = await _moviesRepository.GetAsync(movieReview.MovieId);
+        if (movie is null || !movie.IsReleased)
+            return BadRequest("Оценки и отзывы можно оставлять только после выхода фильма");
 
         else
             try

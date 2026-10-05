@@ -43,6 +43,9 @@ public sealed class GamesGamersReviewsController : ControllerBase
         if (game is null)
             return NotFound("Game not found");
 
+        if (!game.IsReleased)
+            return BadRequest("Оценки и отзывы можно оставлять только после выхода игры");
+
         AddGamePlayerReviewWithUserIdAndDateModel addGameReviewWithUserIdAndDateModel = new(addGameReviewModel.GameId, addGameReviewModel.TextContent, addGameReviewModel.Score, long.Parse(User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value), DateTime.Now);
 
         long gameReviewId = await _gamesPlayersReviewsRepository.AddAsync(addGameReviewWithUserIdAndDateModel);
@@ -77,6 +80,10 @@ public sealed class GamesGamersReviewsController : ControllerBase
 
         if (long.Parse(User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value) != gameReview.UserId)
             return BadRequest("User are not a review author");
+
+        Domain.Games.Game game = await _gamesRepository.GetAsync(gameReview.GameId);
+        if (game is null || !game.IsReleased)
+            return BadRequest("Оценки и отзывы можно оставлять только после выхода игры");
 
         else
             try
