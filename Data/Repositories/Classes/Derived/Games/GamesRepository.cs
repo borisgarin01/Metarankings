@@ -904,4 +904,58 @@ WHERE g.name ILIKE '%' || @name || '%'
         int totalCount = await connection.ExecuteScalarAsync<int>(countSql.ToString(), parameters);
         return totalCount;
     }
+
+    private const string MostWaitingGamesWhereSql = @"
+WHERE (g.ReleaseDate IS NULL OR g.ReleaseDate > CURRENT_DATE)
+    AND (@GenresIds::bigint[] IS NULL OR EXISTS (
+        SELECT 1 FROM GamesGenres gg
+        WHERE gg.GameId = g.Id AND gg.GenreId = ANY(@GenresIds::bigint[])))
+    AND (@PlatformsIds::bigint[] IS NULL OR EXISTS (
+        SELECT 1 FROM GamesPlatforms gp
+        WHERE gp.GameId = g.Id AND gp.PlatformId = ANY(@PlatformsIds::bigint[])))";
+
+    public async Task<IEnumerable<Game>> GetMostWaitingAsync(long[]? genresIds, long[]? platformsIds, int skip, int take)
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+
+        IEnumerable<Game> games = await connection.QueryAsync<Game>($@"
+SELECT g.Id, g.Name, g.Image, g.LocalizationId, g.ReleaseDate, g.Description, g.Trailer,
+    COALESCE(w.WaitingCount, 0) AS WaitingCount,
+    COALESCE(w.NotWaitingCount, 0) AS NotWaitingCount
+FROM Games g
+LEFT JOIN (
+    SELECT GameId,
+        COUNT(*) FILTER (WHERE IsWaiting)::int AS WaitingCount,
+        COUNT(*) FILTER (WHERE NOT IsWaiting)::int AS NotWaitingCount
+    FROM GamesWaitings
+    GROUP BY GameId
+) w ON w.GameId = g.Id
+{MostWaitingGamesWhereSql}
+ORDER BY COALESCE(w.WaitingCount, 0) - COALESCE(w.NotWaitingCount, 0) DESC,
+    COALESCE(w.WaitingCount, 0) DESC,
+    g.ReleaseDate ASC NULLS LAST,
+    g.Id DESC
+OFFSET @Skip LIMIT @Take;",
+            new
+            {
+                GenresIds = genresIds is { Length: > 0 } ? genresIds : null,
+                PlatformsIds = platformsIds is { Length: > 0 } ? platformsIds : null,
+                Skip = skip,
+                Take = take
+            });
+
+        return games;
+    }
+
+    public async Task<int> GetMostWaitingCountAsync(long[]? genresIds, long[]? platformsIds)
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+
+        return await connection.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM Games g {MostWaitingGamesWhereSql};",
+            new
+            {
+                GenresIds = genresIds is { Length: > 0 } ? genresIds : null,
+                PlatformsIds = platformsIds is { Length: > 0 } ? platformsIds : null
+            });
+    }
 }

@@ -117,6 +117,47 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
         return count;
     }
 
+    public async Task<IEnumerable<Game>> GetMostWaitingAsync(
+        int offset,
+        int limit,
+        IEnumerable<long>? genresIds = null,
+        IEnumerable<long>? platformsIds = null)
+    {
+        IEnumerable<Game>? games = await HttpClientFactory
+            .CreateClient("AuthorizedClient")
+            .GetFromJsonAsync<IEnumerable<Game>>(
+                $"/api/Games/Games/most-waiting/{offset}/{limit}{BuildFiltersQuery(genresIds, platformsIds)}");
+
+        return games ?? Enumerable.Empty<Game>();
+    }
+
+    public async Task<int> GetMostWaitingCountAsync(
+        IEnumerable<long>? genresIds = null,
+        IEnumerable<long>? platformsIds = null)
+    {
+        int count = await HttpClientFactory
+            .CreateClient("AuthorizedClient")
+            .GetFromJsonAsync<int>(
+                $"/api/Games/Games/most-waiting/count{BuildFiltersQuery(genresIds, platformsIds)}");
+
+        return count;
+    }
+
+    private static string BuildFiltersQuery(IEnumerable<long>? genresIds, IEnumerable<long>? platformsIds)
+    {
+        List<string> queryParams = new List<string>();
+
+        if (genresIds?.Any() == true)
+            queryParams.AddRange(genresIds.Select(id => $"genresIds={id}"));
+
+        if (platformsIds?.Any() == true)
+            queryParams.AddRange(platformsIds.Select(id => $"platformsIds={id}"));
+
+        return queryParams.Count > 0
+            ? "?" + string.Join("&", queryParams)
+            : string.Empty;
+    }
+
     public async Task<IEnumerable<Game>> SearchByName(string? name)
     {
         IEnumerable<Game> games;

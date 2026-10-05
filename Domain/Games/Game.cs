@@ -27,11 +27,24 @@ public sealed record Game
     [JsonPropertyName("criticsReviewsCount")]
     public required int CriticsReviewsCount { get; set; }
 
+    [JsonPropertyName("waitingCount")]
+    public int WaitingCount { get; set; }
+
+    [JsonPropertyName("notWaitingCount")]
+    public int NotWaitingCount { get; set; }
+
     [JsonPropertyName("publishers")]
     public required List<Publisher> Publishers { get; set; } = new();
 
     [JsonPropertyName("releaseDate")]
     public required DateOnly? ReleaseDate { get; set; }
+
+    /// <summary>
+    /// Игра считается вышедшей с дня релиза. Без даты релиза - еще не вышла.
+    /// До выхода можно только голосовать "жду / не жду", оценки и отзывы запрещены.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsReleased => ReleaseDate.HasValue && ReleaseDate.Value <= DateOnly.FromDateTime(DateTime.Today);
 
     [JsonPropertyName("description")]
     public required string Description { get; set; }

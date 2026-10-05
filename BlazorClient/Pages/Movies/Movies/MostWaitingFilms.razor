@@ -1,5 +1,4 @@
 ﻿@page "/movies/most-waiting-movies"
-@using System.Globalization
 @using BlazorClient.Components.PagesComponents.Common
 @using Domain.Movies
 
@@ -64,7 +63,8 @@
                                     @for (int i = 0; i < movie.MovieGenres.Count; i++)
                                     {
                                         Genre genre = movie.MovieGenres[i];
-                                        <a href="@BuildPageUrl(page: 1, genreId: genre.Id)">@genre.Name</a>@(i < movie.MovieGenres.Count - 1 ? ", " : "")
+                                        <a href="@BuildPageUrl(page: 1, genreId: genre.Id)">@genre.Name</a>
+                                        @(i < movie.MovieGenres.Count - 1 ? ", " : "")
                                     }
                                 </div>
                             }
@@ -74,6 +74,11 @@
                                     : "Скоро")
                             </div>
                             <div class="post-meta">@TextTruncater.Truncate(movie.Description, 220)</div>
+                            <WaitingVoteComponent EntityId="@movie.Id"
+                                                  Target="WaitingTarget.Movie"
+                                                  WaitingCount="@movie.WaitingCount"
+                                                  NotWaitingCount="@movie.NotWaitingCount"
+                                                  UserVote="@GetUserVote(movie.Id)" />
                             <div class="trailer" data-video="/movies/details/@movie.Id/#content-trailer"></div>
                         </article>
                         order++;
