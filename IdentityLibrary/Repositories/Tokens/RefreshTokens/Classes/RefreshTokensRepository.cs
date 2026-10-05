@@ -78,6 +78,18 @@ public class RefreshTokensRepository : IRefreshTokensRepository
         await connection.ExecuteAsync(sql, new { TokenId = tokenId });
     }
 
+    public async Task<bool> TryRevokeAsync(long tokenId)
+    {
+        const string sql = @"
+            UPDATE RefreshTokens
+            SET IsRevoked = true
+            WHERE Id = @TokenId
+              AND IsRevoked = false;";
+
+        using var connection = CreateConnection();
+        return await connection.ExecuteAsync(sql, new { TokenId = tokenId }) > 0;
+    }
+
     public async Task RevokeAllByUserIdAsync(long userId)
     {
         const string sql = @"

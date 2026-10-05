@@ -1,0 +1,125 @@
+@page "/add"
+@using BlazorClient.Components.PagesComponents.Common
+@using BlazorClient.Components.PagesComponents.ContentRequests
+@using Domain.ContentRequests
+
+<PageTitle>Добавить фильм или игру</PageTitle>
+
+<div class="wrapper">
+    <div class="movie-menu">
+        <div class="genre-menu">
+            <ul>
+                <li>
+                    <a class="bst" href="/movies/best-movies/?Year=@(DateTime.Now.Year - 1)">Лучшие фильмы @(DateTime.Now.Year - 1)</a>
+                </li>
+                <li>
+                    <a href="/movies/most-waiting-movies/">Самые ожидаемые фильмы</a>
+                </li>
+                <li>
+                    <a class="bst" href="/games/best-games/?Year=@(DateTime.Now.Year - 1)">Лучшие игры @(DateTime.Now.Year - 1)</a>
+                </li>
+                <li>
+                    <a href="/games/most-waiting-games/">Самые ожидаемые игры</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="container" class="clear">
+        <div class="sidebar">
+        </div>
+        <div id="content" class="lcol">
+            <div class="entry">
+                <div class="page type-page hentry single clear">
+                    <div class="post-meta">
+                        <h1>Добавить</h1>
+                    </div>
+                    <div class="post-content">
+                        <p>Если не можете найти в нашей базе интересующий фильм или игру, на который хотите оставить свой отзыв, то можете воспользоваться данной формой для его добавления. Администраторы рассмотрят заявку, а её статус появится ниже.</p>
+
+                        <AuthorizeView>
+                            <Authorized>
+                                <EditForm Model="@Form" OnValidSubmit="@SubmitAsync" class="add-form" Context="formContext">
+                                    <DataAnnotationsValidator />
+
+                                    <InputRadioGroup @bind-Value="@Form.ContentType">
+                                        <div class="content-type">
+                                            <label><InputRadio Value="@((ContentRequestType?)ContentRequestType.Movie)" /> Фильм</label>
+                                            <label><InputRadio Value="@((ContentRequestType?)ContentRequestType.Game)" /> Игра</label>
+                                        </div>
+                                    </InputRadioGroup>
+                                    <ValidationMessage For="() => Form.ContentType" />
+
+                                    <InputText class="input-name" @bind-Value="@Form.Title" maxlength="511"
+                                               placeholder="Название (фильм или игра)" />
+                                    <ValidationMessage For="() => Form.Title" />
+
+                                    <InputTextArea class="textarea" @bind-Value="@Form.Description" maxlength="4000"
+                                                   placeholder="Описание: год выхода, разработчик или режиссёр, ссылки" />
+                                    <ValidationMessage For="() => Form.Description" />
+
+                                    <button type="submit" class="submit" disabled="@IsSubmitting">
+                                        @(IsSubmitting ? "Отправляем..." : "Отправить")
+                                    </button>
+                                </EditForm>
+
+                                <AuthorizeView Policy="Admin" Context="adminContext">
+                                    <p class="admin-link">
+                                        Вы администратор: <a href="/admin/content-requests">все заявки пользователей</a>
+                                    </p>
+                                </AuthorizeView>
+
+                                <h2 class="my-requests-title">Мои заявки</h2>
+
+                                @if (IsLoading)
+                                {
+                                    <p>Загружается...</p>
+                                }
+                                else if (!MyRequests.Any())
+                                {
+                                    <p>Вы ещё не отправляли заявок.</p>
+                                }
+                                else
+                                {
+                                    <ul class="requests">
+                                        @foreach (ContentRequest contentRequest in MyRequests)
+                                        {
+                                            <li class="request">
+                                                <div class="request-head">
+                                                    <span class="request-type">@ContentRequestLabels.GetTypeLabel(contentRequest.ContentType)</span>
+                                                    <strong class="request-title">@contentRequest.Title</strong>
+                                                    <ContentRequestStatusBadge Status="@contentRequest.Status" />
+                                                </div>
+                                                <div class="request-date">Отправлено @contentRequest.CreatedTimestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                                @if (!string.IsNullOrEmpty(contentRequest.Description))
+                                                {
+                                                    <div class="request-description">@contentRequest.Description</div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(contentRequest.AdminComment))
+                                                {
+                                                    <div class="request-comment"><b>Ответ администратора:</b> @contentRequest.AdminComment</div>
+                                                }
+                                                @if (contentRequest.Status == ContentRequestStatus.Pending)
+                                                {
+                                                    <button type="button" class="link-button" @onclick="() => WithdrawAsync(contentRequest)">Отозвать заявку</button>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </Authorized>
+                            <NotAuthorized>
+                                <p>
+                                    Чтобы отправить заявку,
+                                    <a href="javascript:void(0)" @onclick="OpenLogin">войдите</a>
+                                    или <a href="/auth/register">зарегистрируйтесь</a>.
+                                </p>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<LoginModal @bind-IsVisible="IsLoginOpen" />

@@ -1,0 +1,195 @@
+.genre-menu {
+    background: #fff;
+    margin-bottom: 25px;
+    border-radius: 4px;
+}
+
+.genre-menu a {
+    transition: all .3s ease 0s;
+}
+
+.genre-menu .bst {
+    background: #9ad77f !important;
+}
+
+.genre-menu ul {
+    list-style: outside none none;
+    width: 100%;
+}
+
+.genre-menu ul li {
+    display: inline-block;
+    overflow: hidden;
+    text-align: center;
+}
+
+.genre-menu ul li a {
+    background: #f1f1f1;
+    color: #333;
+    font-size: 18px;
+    display: block;
+    padding: 15px 20px;
+    text-decoration: none;
+    border-radius: 50px;
+    margin-bottom: 10px;
+}
+
+.genre-menu ul li a:hover {
+    background: #e9e9e9 !important;
+    color: #111;
+}
+
+@media only screen and (max-width:670px) {
+    .genre-menu {
+        overflow-x: scroll;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .genre-menu::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@media only screen and (max-width:620px) {
+    .genre-menu ul {
+        height: auto;
+    }
+}
+
+/* ===== Форма заявки (по образцу формы на metarankings.ru/add) ===== */
+
+.add-form {
+    max-width: 640px;
+    margin: 15px 0 25px;
+}
+
+.content-type {
+    display: flex;
+    gap: 20px;
+    margin: 5px 0;
+}
+
+.content-type label {
+    cursor: pointer;
+}
+
+.add-form ::deep .input-name,
+.add-form ::deep .textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 1px;
+    background: #fff;
+    color: #000;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.add-form ::deep .input-name {
+    height: 30px;
+    padding: 0 5px;
+    margin: 5px 0;
+}
+
+.add-form ::deep .textarea {
+    min-height: 110px;
+    padding: 5px;
+    margin: 10px 0;
+    resize: vertical;
+}
+
+.add-form ::deep .validation-message {
+    color: #c0392b;
+    font-size: 13px;
+}
+
+.submit {
+    border: 0;
+    border-radius: 50px;
+    background: #394042;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    padding: 10px 25px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.submit:hover {
+    background: #222;
+}
+
+.submit:disabled {
+    opacity: .6;
+    cursor: default;
+}
+
+.admin-link {
+    margin-bottom: 20px;
+}
+
+/* ===== Мои заявки ===== */
+
+.my-requests-title {
+    margin-top: 10px;
+}
+
+.requests {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.request {
+    border-bottom: 1px solid #eee;
+    padding: 12px 0;
+}
+
+.request-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.request-type {
+    color: #777;
+    font-size: 13px;
+}
+
+.request-title {
+    overflow-wrap: anywhere;
+}
+
+.request-date {
+    color: #999;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.request-description,
+.request-comment {
+    margin-top: 6px;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.request-comment {
+    background: #f7f7f7;
+    border-left: 3px solid #9ad77f;
+    padding: 6px 10px;
+}
+
+.link-button {
+    background: none;
+    border: 0;
+    padding: 0;
+    margin-top: 6px;
+    color: #c0392b;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+}

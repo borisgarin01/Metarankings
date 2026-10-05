@@ -69,8 +69,8 @@ public sealed class AuthController : ControllerBase
 
     private async Task<AuthResponseDto> IssueTokensAsync(ApplicationUser user)
     {
-        await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
-
+        // Old tokens are NOT revoked: each device keeps its own refresh token,
+        // so logging in on one device doesn't log the user out on the others.
         string accessToken = await _authTokenGenerator.GenerateAccessToken(user);
         string refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
 
@@ -247,26 +247,36 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("logout")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult> Logout()
+    public async Task<ActionResult> Logout(
+        [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] RefreshTokenRequest? request)
     {
         try
         {
-            string? userId = GetCurrentUserId();
-            if (userId is null)
+            // Log out this device: the refresh token itself proves the session,
+            // so this works even when the access token has already expired.
+            if (!string.IsNullOrEmpty(request?.RefreshToken))
+            {
+                IdentityLibrary.DTOs.RefreshToken? storedToken = await _refreshTokensRepo.GetByValueAsync(request.RefreshToken);
+                if (storedToken is not null)
+                    await _refreshTokensRepo.RevokeAsync(storedToken.Id);
+
+                // Always OK: the client clears its tokens anyway, and an unknown token is already unusable.
+                return Ok("Logged out successfully");
+            }
+
+            // No refresh token (old clients): require a valid access token and revoke all of the user's tokens.
+            AuthenticateResult auth = await HttpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
+            string? userId = auth.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!auth.Succeeded || userId is null)
                 return Unauthorized();
 
-            ApplicationUser? user = await _usersManager.FindByIdAsync(userId);
-            if (user is null)
-                return NotFound();
-
-            await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
+            await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(userId));
             return Ok("Logged out successfully");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during logout");
-            return StatusCode(500, ex.Message);
+            return StatusCode(500, "Internal server error during logout");
         }
     }
 
@@ -306,10 +316,25 @@ public sealed class AuthController : ControllerBase
                 return BadRequest("User not found");
             }
 
-            await _refreshTokensRepo.RevokeAsync(storedToken.Id);
+            // Rotate only this token: revoking all of the user's tokens here would
+            // log out other tabs/devices that refresh concurrently.
+            // Atomic: if a parallel request already rotated this token, don't issue a second pair.
+            if (!await _refreshTokensRepo.TryRevokeAsync(storedToken.Id))
+            {
+                _logger.LogWarning("Refresh token was already used for user {UserId}", storedToken.UserId);
+                return BadRequest("Invalid refresh token");
+            }
 
-            AuthResponseDto response = await IssueTokensAsync(user);
-            return Ok(response);
+            string accessToken = await _authTokenGenerator.GenerateAccessToken(user);
+            string refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
+            await _refreshTokensRepo.CreateAsync(new IdentityLibrary.DTOs.RefreshToken(
+                0,
+                storedToken.UserId,
+                refreshTokenValue,
+                false,
+                DateTime.UtcNow));
+
+            return Ok(new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue));
         }
         catch (Exception ex)
         {

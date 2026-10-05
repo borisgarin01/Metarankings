@@ -4,6 +4,7 @@ using IdentityLibrary.DTOs;
 using IdentityLibrary.Models;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace BlazorClient.Auth;
 
@@ -14,7 +15,10 @@ public class AuthService : IAuthService
     private readonly IToastService _toastService;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    private string? _cachedAccessToken;
+    // Static: IHttpClientFactory resolves JwtAuthorizationHandler (and its IAuthService) in a
+    // separate DI scope, so per-instance state would not be shared with the rest of the app.
+    private static string? _cachedAccessToken;
+    private static readonly SemaphoreSlim _refreshLock = new(1, 1);
 
     public AuthService(IHttpClientFactory httpClientFactory,
                       ILocalStorageService localStorage,
@@ -73,6 +77,12 @@ public class AuthService : IAuthService
     {
         _logger.LogInformation("Refreshing token");
 
+        // Refresh tokens are single-use (rotated on the server), so concurrent refreshes with the
+        // same token make all but the first fail with "Invalid refresh token". Serialize them and
+        // reuse the result if another caller already refreshed while we were waiting.
+        string? refreshTokenBeforeWait = await _localStorage.GetItemAsync<string>(REFRESH_KEY);
+        await _refreshLock.WaitAsync();
+
         try
         {
             var refreshToken = await _localStorage.GetItemAsync<string>(REFRESH_KEY);
@@ -81,7 +91,13 @@ public class AuthService : IAuthService
             {
                 _logger.LogWarning("Refresh token missing");
                 await LogoutAsync();
-                return new AuthResponseDto(false, false, null, null, "Refresh token is missing");
+                return new AuthResponseDto(false, false, "Refresh token is missing", null, null);
+            }
+
+            if (refreshToken != refreshTokenBeforeWait)
+            {
+                _logger.LogInformation("Token was already refreshed by another request");
+                return await GetStoredTokensResultAsync(refreshToken);
             }
 
             // ВАЖНО: Используем UnauthorizedClient для refresh-token!
@@ -110,18 +126,80 @@ public class AuthService : IAuthService
             {
                 var error = await response.Content.ReadAsStringAsync();
                 _logger.LogError("Refresh token failed: {Status}, {Error}", response.StatusCode, error);
+
+                // Server unavailable (e.g. during a redeploy) - keep the tokens and retry later.
+                if ((int)response.StatusCode >= 500)
+                    return new AuthResponseDto(false, false, "Server unavailable", null, null);
+
+                // Another browser tab may be rotating the same token right now (tabs share localStorage,
+                // but not _refreshLock). Its response may not have been saved yet, so wait for it briefly.
+                var rotatedByOtherTab = await WaitForTokenRotatedByOtherTabAsync(refreshToken);
+                if (rotatedByOtherTab != null)
+                {
+                    _logger.LogInformation("Token was refreshed by another tab");
+                    return await GetStoredTokensResultAsync(rotatedByOtherTab);
+                }
             }
 
+            // Clear only the local session. Calling /api/auth/logout here would revoke ALL of the
+            // user's refresh tokens on the server, including the one another tab has just received.
             _logger.LogWarning("Token refresh failed");
-            await LogoutAsync();
-            return new AuthResponseDto(false, false, null, null, "Failed to refresh token");
+            await ClearLocalTokensAsync();
+            return new AuthResponseDto(false, false, "Failed to refresh token", null, null);
         }
         catch (Exception ex)
         {
+            // Network error - don't drop the session, the refresh token may still be valid.
             _logger.LogError(ex, "Error refreshing token");
-            await LogoutAsync();
-            return new AuthResponseDto(false, false, null, null, $"Error refreshing token: {ex.Message}");
+            return new AuthResponseDto(false, false, $"Error refreshing token: {ex.Message}", null, null);
         }
+        finally
+        {
+            _refreshLock.Release();
+        }
+    }
+
+    private async Task<string?> WaitForTokenRotatedByOtherTabAsync(string usedRefreshToken)
+    {
+        const int attempts = 10;
+        const int delayMs = 300;
+
+        for (int i = 0; i < attempts; i++)
+        {
+            var current = await _localStorage.GetItemAsync<string>(REFRESH_KEY);
+            if (string.IsNullOrEmpty(current))
+                return null; // другая вкладка разлогинилась
+            if (current != usedRefreshToken)
+                return current;
+
+            await Task.Delay(delayMs);
+        }
+
+        return null;
+    }
+
+    private async Task ClearLocalTokensAsync()
+    {
+        try
+        {
+            await _localStorage.RemoveItemAsync(ACCESS_KEY);
+            await _localStorage.RemoveItemAsync(REFRESH_KEY);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error clearing local tokens");
+        }
+
+        _cachedAccessToken = null;
+        _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Remove("Authorization");
+    }
+
+    private async Task<AuthResponseDto> GetStoredTokensResultAsync(string refreshToken)
+    {
+        var accessToken = await _localStorage.GetItemAsync<string>(ACCESS_KEY);
+        _cachedAccessToken = accessToken;
+        AddDefaultRequestHeaderBearer(accessToken);
+        return new AuthResponseDto(true, false, string.Empty, accessToken, refreshToken);
     }
 
     public async Task<AuthResponseDto> VerifyTwoFactorAsync(string userId, string token)
@@ -212,46 +290,35 @@ public class AuthService : IAuthService
 
         try
         {
-            // Отправляем запрос на сервер для аннулирования токена
-            var token = await GetCurrentAccessTokenAsync();
+            // Пытаемся отозвать refresh token на сервере. Не требует валидного access token:
+            // сервер принимает сам refresh token как доказательство.
+            string? refreshToken = await _localStorage.GetItemAsync<string>(REFRESH_KEY);
+            string? accessToken = await _localStorage.GetItemAsync<string>(ACCESS_KEY);
 
-            if (!string.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(refreshToken) || !string.IsNullOrEmpty(accessToken))
             {
-                try
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/logout")
                 {
-                    var client = _httpClientFactory.CreateClient("AuthorizedClient");
-                    var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/logout");
-                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                    await client.SendAsync(request);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Error during logout request to server");
-                }
+                    Content = JsonContent.Create(new RefreshTokenRequest { RefreshToken = refreshToken ?? string.Empty })
+                };
+                if (!string.IsNullOrEmpty(accessToken))
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var response = await _httpClientFactory.CreateClient("UnauthorizedClient").SendAsync(request, cts.Token);
+                if (!response.IsSuccessStatusCode)
+                    _logger.LogWarning("Server logout returned {Status}", response.StatusCode);
             }
-
-            // Очищаем локальное состояние
-            await _localStorage.RemoveItemAsync(ACCESS_KEY);
-            await _localStorage.RemoveItemAsync(REFRESH_KEY);
-            _cachedAccessToken = null;
-
-            var client2 = _httpClientFactory.CreateClient("AuthorizedClient");
-            client2.DefaultRequestHeaders.Remove("Authorization");
-
-            _logger.LogInformation("Logout completed");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception during logout");
-            // Пытаемся очистить состояние даже в случае ошибки
-            try
-            {
-                await _localStorage.RemoveItemAsync(ACCESS_KEY);
-                await _localStorage.RemoveItemAsync(REFRESH_KEY);
-                _cachedAccessToken = null;
-                _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Remove("Authorization");
-            }
-            catch { }
+            // Сервер недоступен / таймаут / ошибка — всё равно разлогиниваемся локально
+            _logger.LogWarning(ex, "Server logout failed, logging out locally");
+        }
+        finally
+        {
+            await ClearLocalTokensAsync();
+            _logger.LogInformation("Logout completed");
         }
     }
 

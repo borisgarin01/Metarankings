@@ -9,8 +9,6 @@ public class JwtAuthorizationHandler : DelegatingHandler
 {
     private readonly IAuthService _authService;
     private readonly ILogger<JwtAuthorizationHandler> _logger;
-    private readonly SemaphoreSlim _refreshLock = new(1, 1);
-    private bool _isRefreshing;
 
     public JwtAuthorizationHandler(
         IAuthService authService,
@@ -26,12 +24,14 @@ public class JwtAuthorizationHandler : DelegatingHandler
     {
         var path = request.RequestUri?.AbsolutePath;
 
-        // Пропускаем refresh-token, login и register
+        // Пропускаем refresh-token, login, register и logout
+        // (logout вызывается изнутри refresh, повторный refresh здесь привёл бы к дедлоку)
         bool isRefreshToken = path?.Contains("/api/auth/refresh-token") == true;
         bool isLogin = path?.Contains("/api/auth/login") == true;
         bool isRegister = path?.Contains("/api/auth/register") == true;
+        bool isLogout = path?.Contains("/api/auth/logout") == true;
 
-        if (isRefreshToken || isLogin || isRegister)
+        if (isRefreshToken || isLogin || isRegister || isLogout)
         {
             return await base.SendAsync(request, cancellationToken);
         }
@@ -52,15 +52,9 @@ public class JwtAuthorizationHandler : DelegatingHandler
                 }
                 else
                 {
+                    // AuthService сам разлогинивает, если refresh-токен действительно невалиден
                     request.Headers.Authorization = null;
-                    var unauthorizedResponse = await base.SendAsync(request, cancellationToken);
-
-                    if (unauthorizedResponse.StatusCode == HttpStatusCode.Unauthorized || unauthorizedResponse.StatusCode == HttpStatusCode.BadRequest)
-                    {
-                        await _authService.LogoutAsync();
-                    }
-
-                    return unauthorizedResponse;
+                    return await base.SendAsync(request, cancellationToken);
                 }
             }
 
@@ -91,7 +85,6 @@ public class JwtAuthorizationHandler : DelegatingHandler
             }
             else
             {
-                await _authService.LogoutAsync();
                 return response;
             }
         }
@@ -152,37 +145,15 @@ public class JwtAuthorizationHandler : DelegatingHandler
 
     private async Task<string?> RefreshTokenAsync(CancellationToken cancellationToken)
     {
-        await _refreshLock.WaitAsync(cancellationToken);
+        // Синхронизация конкурентных refresh-запросов — внутри AuthService (общая для всего приложения)
+        var result = await _authService.RefreshTokenAsync();
 
-        try
+        if (result != null && result.IsAuthSuccessful && !string.IsNullOrEmpty(result.AccessToken))
         {
-            if (_isRefreshing)
-            {
-                _logger.LogWarning("Refresh already in progress, waiting...");
-                while (_isRefreshing)
-                {
-                    await Task.Delay(100, cancellationToken);
-                }
-
-                return await _authService.GetCurrentAccessTokenAsync();
-            }
-
-            _isRefreshing = true;
-
-            var result = await _authService.RefreshTokenAsync();
-
-            if (result != null && result.IsAuthSuccessful && !string.IsNullOrEmpty(result.AccessToken))
-            {
-                return result.AccessToken;
-            }
-
-            return null;
+            return result.AccessToken;
         }
-        finally
-        {
-            _isRefreshing = false;
-            _refreshLock.Release();
-        }
+
+        return null;
     }
 
     private bool IsTokenExpired(string token)

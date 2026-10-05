@@ -47,7 +47,8 @@ internal class Program
 
         builder.Services.AddGamesWebManagers()
             .AddMoviesWebManagers()
-            .AddScoped<NewsWebManager>();
+            .AddScoped<NewsWebManager>()
+            .AddScoped<ContentRequestsWebManager>();
 
         builder.Services.AddScoped<IModalService, ModalService>();
 

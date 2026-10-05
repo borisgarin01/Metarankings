@@ -43,8 +43,9 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 
                 if (refreshResult == null || !refreshResult.IsAuthSuccessful || string.IsNullOrEmpty(refreshResult.AccessToken))
                 {
-                    _logger.LogWarning("Token refresh failed, logging out");
-                    await _authService.LogoutAsync();
+                    // AuthService сам разлогинивает при невалидном refresh-токене;
+                    // при недоступности сервера токены сохраняются для следующей попытки
+                    _logger.LogWarning("Token refresh failed");
                     return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
                 }
 

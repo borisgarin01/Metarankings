@@ -30,6 +30,12 @@ public interface IRefreshTokensRepository
     Task RevokeAsync(long tokenId);
 
     /// <summary>
+    /// Атомарно отзывает токен, если он ещё не отозван.
+    /// Возвращает false, если токен уже был отозван (например, параллельным запросом).
+    /// </summary>
+    Task<bool> TryRevokeAsync(long tokenId);
+
+    /// <summary>
     /// Отзывает все токены пользователя
     /// </summary>
     Task RevokeAllByUserIdAsync(long userId);
