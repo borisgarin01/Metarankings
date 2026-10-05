@@ -574,17 +574,29 @@ COALESCE((SELECT AVG(Score)::float FROM ViewersMoviesReviews WHERE MovieId = m.I
 COALESCE((SELECT COUNT(*) FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersReviewsCount,
 COALESCE((SELECT AVG(Score)::float FROM MoviesCriticsReviews WHERE MovieId = m.Id), 0) AS CriticsScore,
 COALESCE((SELECT COUNT(*) FROM MoviesCriticsReviews WHERE MovieId = m.Id), 0) AS CriticsReviewsCount,
+m.WaitingCount, m.NotWaitingCount,
 mg.Id, mg.Name,
 ms.Id, ms.Name,
 md.Id, md.Name
 FROM (
-    SELECT m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description
+    SELECT m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
+        COALESCE(w.WaitingCount, 0) AS WaitingCount,
+        COALESCE(w.NotWaitingCount, 0) AS NotWaitingCount
     FROM Movies m
-    WHERE (m.PremierDate IS NULL OR m.PremierDate >= CURRENT_DATE)
+    LEFT JOIN (
+        SELECT MovieId,
+            COUNT(*) FILTER (WHERE IsWaiting)::int AS WaitingCount,
+            COUNT(*) FILTER (WHERE NOT IsWaiting)::int AS NotWaitingCount
+        FROM MoviesWaitings
+        GROUP BY MovieId
+    ) w ON w.MovieId = m.Id
+    WHERE (m.PremierDate IS NULL OR m.PremierDate > CURRENT_DATE)
        AND (@GenresIds::bigint[] IS NULL OR EXISTS (
             SELECT 1 FROM MoviesMoviesGenres mmg
             WHERE mmg.MovieId = m.Id AND mmg.MovieGenreId = ANY(@GenresIds::bigint[])))
-    ORDER BY m.PremierDate ASC NULLS LAST, m.Id DESC
+    ORDER BY COALESCE(w.WaitingCount, 0) - COALESCE(w.NotWaitingCount, 0) DESC,
+        COALESCE(w.WaitingCount, 0) DESC,
+        m.PremierDate ASC NULLS LAST, m.Id DESC
     OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY
 ) AS m
 LEFT JOIN MoviesMoviesGenres mmg ON mmg.MovieId = m.Id
@@ -593,7 +605,7 @@ LEFT JOIN MoviesMoviesStudios mms ON mms.MovieId = m.Id
 LEFT JOIN MoviesStudios ms ON ms.Id = mms.MovieStudioId
 LEFT JOIN MoviesMoviesDirectors mmd ON mmd.MovieId = m.Id
 LEFT JOIN MoviesDirectors md ON md.Id = mmd.MovieDirectorId
-ORDER BY m.PremierDate ASC NULLS LAST, m.Id DESC;";
+ORDER BY m.WaitingCount - m.NotWaitingCount DESC, m.WaitingCount DESC, m.PremierDate ASC NULLS LAST, m.Id DESC;";
 
         Dictionary<long, Movie> moviesDictionary = new Dictionary<long, Movie>();
 
@@ -639,7 +651,7 @@ ORDER BY m.PremierDate ASC NULLS LAST, m.Id DESC;";
 
         string sql = @"SELECT COUNT(*)
 FROM Movies m
-WHERE (m.PremierDate IS NULL OR m.PremierDate >= CURRENT_DATE)
+WHERE (m.PremierDate IS NULL OR m.PremierDate > CURRENT_DATE)
     AND (@GenresIds::bigint[] IS NULL OR EXISTS (
         SELECT 1 FROM MoviesMoviesGenres mmg
         WHERE mmg.MovieId = m.Id AND mmg.MovieGenreId = ANY(@GenresIds::bigint[])));";

@@ -101,3 +101,9 @@
 .comments li h3 span {
     display: none;
 }
+
+.reviews-locked {
+    color: #555;
+    font-size: 14px;
+    margin: 15px 0;
+}

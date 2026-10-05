@@ -159,4 +159,25 @@ public sealed class GamesController : ControllerBase
     {
         return Ok(await _gamesRepository.GetNearestCountByParametersAsync(genresIds, platformsIds));
     }
+
+    [HttpGet("most-waiting/{offset:int}/{limit:int}")]
+    public async Task<ActionResult<IEnumerable<Game>>> GetMostWaitingAsync(
+        int offset,
+        int limit,
+        [FromQuery] long[]? genresIds = null,
+        [FromQuery] long[]? platformsIds = null)
+    {
+        if (offset < 0 || limit <= 0)
+            return BadRequest();
+
+        return Ok(await _gamesRepository.GetMostWaitingAsync(genresIds, platformsIds, offset, limit));
+    }
+
+    [HttpGet("most-waiting/count")]
+    public async Task<ActionResult<int>> GetMostWaitingCountAsync(
+        [FromQuery] long[]? genresIds = null,
+        [FromQuery] long[]? platformsIds = null)
+    {
+        return Ok(await _gamesRepository.GetMostWaitingCountAsync(genresIds, platformsIds));
+    }
 }

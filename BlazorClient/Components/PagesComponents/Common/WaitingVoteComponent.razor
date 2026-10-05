@@ -1,0 +1,28 @@
+<div class="wait">
+    <span class="w-yes">
+        <button type="button"
+                class="ldc-ul_wait @(userVote == true ? "voted" : "")"
+                title="@(userVote == true ? "Отменить голос" : "Жду")"
+                disabled="@isSending"
+                @onclick="() => VoteAsync(true)">
+            + <span>@waitingCount</span>
+        </button>
+    </span>
+    <span class="w-no">
+        <button type="button"
+                class="ldc-ul_wait @(userVote == false ? "voted" : "")"
+                title="@(userVote == false ? "Отменить голос" : "Не жду")"
+                disabled="@isSending"
+                @onclick="() => VoteAsync(false)">
+            - <span>@notWaitingCount</span>
+        </button>
+    </span>
+    @if (WaitingsCount > 0)
+    {
+        <text> Ожидания: @WaitingPercent%</text>
+    }
+    else if (ShowEmptyHint)
+    {
+        <text> Ждёте?</text>
+    }
+</div>

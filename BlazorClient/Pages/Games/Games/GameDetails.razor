@@ -55,8 +55,11 @@ else
                                ImageSource="@Game.Image"
                                Prefix="Games" />
 
-                    <RatingComponent Score="@Game.UsersScore"
-                                     ScoresCount="@Game.GamesPlayersReviews.Count" />
+                    @if (Game.IsReleased)
+                    {
+                        <RatingComponent Score="@Game.UsersScore"
+                                         ScoresCount="@Game.GamesPlayersReviews.Count" />
+                    }
 
                     <GameMetadata Developers="@Game.Developers"
                                   Publishers="@Game.Publishers"
@@ -64,6 +67,14 @@ else
                                   Genres="@Game.Genres"
                                   Localization="@Game.Localization"
                                   ReleaseDate="@(Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now))" />
+
+                    @if (!Game.IsReleased)
+                    {
+                        <WaitingVoteComponent EntityId="@Game.Id"
+                                              Target="WaitingTarget.Game"
+                                              LoadStatistics="true"
+                                              ShowEmptyHint="true" />
+                    }
 
                     <Description TextContent="@Game.Description" />
 
@@ -100,9 +111,13 @@ else
                                     }
                                 </ol>
                             </div>
+                            @if (!Game.IsReleased)
+                            {
+                                <p class="reviews-locked">Оценки и отзывы можно будет оставить после выхода игры.</p>
+                            }
                             <AuthorizeView>
                                 <Authorized>
-                                    @if (IsAbleToWriteComments)
+                                    @if (IsAbleToWriteComments && Game.IsReleased)
                                     {
                                         <YourScoreComponent GameId="@Game.Id"
                                                             GameScore="@Game.UsersScore"

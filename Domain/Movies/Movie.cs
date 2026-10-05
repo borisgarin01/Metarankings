@@ -29,8 +29,21 @@ public sealed record Movie
     [JsonPropertyName("criticsReviewsCount")]
     public required int CriticsReviewsCount { get; set; }
 
+    [JsonPropertyName("waitingCount")]
+    public int WaitingCount { get; set; }
+
+    [JsonPropertyName("notWaitingCount")]
+    public int NotWaitingCount { get; set; }
+
     [JsonPropertyName("premierDate")]
     public DateOnly? PremierDate { get; set; }
+
+    /// <summary>
+    /// Фильм считается вышедшим с дня премьеры. Без даты премьеры - еще не вышел.
+    /// До выхода можно только голосовать "жду / не жду", оценки и отзывы запрещены.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsReleased => PremierDate.HasValue && PremierDate.Value <= DateOnly.FromDateTime(DateTime.Today);
 
     [JsonPropertyName("description")]
     public required string Description { get; set; }

@@ -58,7 +58,7 @@
                 }
                 else
                 {
-                    int order = 1;
+                    int order = (currentPage - 1) * PageSize + 1;
                     foreach (Game game in FutureGames)
                     {
                         <article class="post clear game" @key="game.Id">
@@ -75,19 +75,11 @@
                                     : "Скоро")
                             </div>
                             <div class="post-meta">@game.Description</div>
-                            <div class="wait">
-                                <span class="w-yes">
-                                    <span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'@game.Id','like')">
-                                        + <span>972</span>
-                                    </span>
-                                </span>
-                                <span class="w-no">
-                                    <span class="ldc-ul_wait" onclick="alter_ul_post_values(this,'@game.Id','dislike')">
-                                        - <span>85</span>
-                                    </span>
-                                </span>
-                                Ожидания: 91%
-                            </div>
+                            <WaitingVoteComponent EntityId="@game.Id"
+                                                  Target="WaitingTarget.Game"
+                                                  WaitingCount="@game.WaitingCount"
+                                                  NotWaitingCount="@game.NotWaitingCount"
+                                                  UserVote="@GetUserVote(game.Id)" />
                             <div class="trailer" data-video="/games/details/@game.Id/#content-trailer"></div>
                         </article>
                         order++;

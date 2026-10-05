@@ -55,13 +55,24 @@ else
                                ImageSource="@Movie.ImageSource"
                                Prefix="Movies" />
 
-                    <RatingComponent Score="@Movie.UsersScore"
-                                     ScoresCount="@Movie.MovieReviews.Count" />
+                    @if (Movie.IsReleased)
+                    {
+                        <RatingComponent Score="@Movie.UsersScore"
+                                         ScoresCount="@Movie.MovieReviews.Count" />
+                    }
 
                     <MovieMetadata Genres="@Movie.MovieGenres"
                                    OriginalName="@Movie.OriginalName"
                                    MoviesStudios="@Movie.MoviesStudios"
                                    PremierDate="@(Movie.PremierDate.HasValue ? Movie.PremierDate.Value:default)" />
+
+                    @if (!Movie.IsReleased)
+                    {
+                        <WaitingVoteComponent EntityId="@Movie.Id"
+                                              Target="WaitingTarget.Movie"
+                                              LoadStatistics="true"
+                                              ShowEmptyHint="true" />
+                    }
 
                     <Description TextContent="@Movie.Description" />
 
@@ -86,9 +97,13 @@ else
                                     }
                                 </ol>
                             </div>
+                            @if (!Movie.IsReleased)
+                            {
+                                <p class="reviews-locked">Оценки и отзывы можно будет оставить после выхода фильма.</p>
+                            }
                             <AuthorizeView>
                                 <Authorized>
-                                    @if (IsAbleToWriteComments)
+                                    @if (IsAbleToWriteComments && Movie.IsReleased)
                                     {
                                         <MovieYourScoreComponent MovieId="@Movie.Id"
                                                                  MovieScore="@Movie.UsersScore"

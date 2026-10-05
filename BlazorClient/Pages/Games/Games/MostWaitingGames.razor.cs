@@ -5,6 +5,8 @@ using Domain.RequestsModels.Games.Platforms;
 using WebManagers;
 using WebManagers.Derived;
 using WebManagers.Derived.Games;
+using WebManagers.Derived.Waitings;
+using Domain.Waitings;
 
 namespace BlazorClient.Pages.Games.Games;
 
@@ -24,6 +26,12 @@ public partial class MostWaitingGames : ComponentBase
 
     [Inject]
     public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> GamesPlatformsWebManager { get; set; } = default!;
+
+    [Inject]
+    public GamesWaitingsWebManager GamesWaitingsWebManager { get; set; } = default!;
+
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
     [Inject]
     public TextTruncater TextTruncater { get; set; }
@@ -48,6 +56,7 @@ public partial class MostWaitingGames : ComponentBase
         : 1;
 
     private int currentPage = 1;
+    private Dictionary<long, bool?> userVotes = new Dictionary<long, bool?>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,18 +93,20 @@ public partial class MostWaitingGames : ComponentBase
             long[]? genresIds = GenreId.HasValue ? new[] { GenreId.Value } : null;
             long[]? platformsIds = PlatformId.HasValue ? new[] { PlatformId.Value } : null;
 
-            long offset = (currentPage - 1) * (long)PageSize;
+            int offset = (currentPage - 1) * PageSize;
 
-            Task<IEnumerable<Game>> gamesTask = GamesWebManager.GetNearestAsync(
+            Task<IEnumerable<Game>> gamesTask = GamesWebManager.GetMostWaitingAsync(
                 offset, PageSize, genresIds, platformsIds);
 
-            Task<int> countTask = GamesWebManager.GetNearestCountAsync(
+            Task<int> countTask = GamesWebManager.GetMostWaitingCountAsync(
                 genresIds, platformsIds);
 
             await Task.WhenAll(gamesTask, countTask);
 
             FutureGames = gamesTask.Result ?? Enumerable.Empty<Game>();
             TotalCount = countTask.Result;
+
+            await LoadUserVotesAsync();
         }
         catch (Exception ex)
         {
@@ -109,6 +120,30 @@ public partial class MostWaitingGames : ComponentBase
             // StateHasChanged() здесь не обязателен — Blazor отрисует после завершения метода,
             // но можно добавить для явности.
         }
+    }
+
+    private async Task LoadUserVotesAsync()
+    {
+        userVotes = new Dictionary<long, bool?>();
+
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated != true || !FutureGames.Any())
+            return;
+
+        try
+        {
+            IEnumerable<WaitingStatistics> statistics = await GamesWaitingsWebManager.GetAsync(FutureGames.Select(g => g.Id));
+            userVotes = statistics.ToDictionary(s => s.EntityId, s => s.UserVote);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to load user waiting votes: {ex.Message}");
+        }
+    }
+
+    private bool? GetUserVote(long gameId)
+    {
+        return userVotes.TryGetValue(gameId, out bool? vote) ? vote : null;
     }
 
     // --- URL builder, по образу BestGamesListPage ---
