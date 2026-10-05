@@ -564,6 +564,96 @@ WHERE 1=1
         return count;
     }
 
+    public async Task<IEnumerable<Movie>> GetMostWaitingAsync(long[]? genresIds, int skip, int take)
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+
+        string sql = @"SELECT
+m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
+COALESCE((SELECT AVG(Score)::float FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersScore,
+COALESCE((SELECT COUNT(*) FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersReviewsCount,
+COALESCE((SELECT AVG(Score)::float FROM MoviesCriticsReviews WHERE MovieId = m.Id), 0) AS CriticsScore,
+COALESCE((SELECT COUNT(*) FROM MoviesCriticsReviews WHERE MovieId = m.Id), 0) AS CriticsReviewsCount,
+mg.Id, mg.Name,
+ms.Id, ms.Name,
+md.Id, md.Name
+FROM (
+    SELECT m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description
+    FROM Movies m
+    WHERE (m.PremierDate IS NULL OR m.PremierDate >= CURRENT_DATE)
+       AND (@GenresIds::bigint[] IS NULL OR EXISTS (
+            SELECT 1 FROM MoviesMoviesGenres mmg
+            WHERE mmg.MovieId = m.Id AND mmg.MovieGenreId = ANY(@GenresIds::bigint[])))
+    ORDER BY m.PremierDate ASC NULLS LAST, m.Id DESC
+    OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY
+) AS m
+LEFT JOIN MoviesMoviesGenres mmg ON mmg.MovieId = m.Id
+LEFT JOIN MoviesGenres mg ON mg.Id = mmg.MovieGenreId
+LEFT JOIN MoviesMoviesStudios mms ON mms.MovieId = m.Id
+LEFT JOIN MoviesStudios ms ON ms.Id = mms.MovieStudioId
+LEFT JOIN MoviesMoviesDirectors mmd ON mmd.MovieId = m.Id
+LEFT JOIN MoviesDirectors md ON md.Id = mmd.MovieDirectorId
+ORDER BY m.PremierDate ASC NULLS LAST, m.Id DESC;";
+
+        Dictionary<long, Movie> moviesDictionary = new Dictionary<long, Movie>();
+
+        IEnumerable<Movie> query = await connection.QueryAsync(
+            sql,
+            (Movie movie, Domain.Movies.Genre movieGenre, MovieStudio movieStudio, MovieDirector movieDirector) =>
+            {
+                if (!moviesDictionary.TryGetValue(movie.Id, out Movie? movieEntry))
+                {
+                    movieEntry = movie;
+                    movieEntry.MovieGenres = new List<Domain.Movies.Genre>();
+                    movieEntry.MoviesStudios = new List<MovieStudio>();
+                    movieEntry.MoviesDirectors = new List<MovieDirector>();
+                    moviesDictionary.Add(movieEntry.Id, movieEntry);
+                }
+
+                if (movieGenre is not null && !movieEntry.MovieGenres.Any(g => g.Id == movieGenre.Id))
+                    movieEntry.MovieGenres.Add(movieGenre);
+
+                if (movieStudio is not null && !movieEntry.MoviesStudios.Any(s => s.Id == movieStudio.Id))
+                    movieEntry.MoviesStudios.Add(movieStudio);
+
+                if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(d => d.Id == movieDirector.Id))
+                    movieEntry.MoviesDirectors.Add(movieDirector);
+
+                return movieEntry;
+            },
+            new
+            {
+                GenresIds = genresIds is { Length: > 0 } ? genresIds : null,
+                Skip = skip,
+                Take = take
+            },
+            splitOn: "Id,Id,Id,Id"
+        );
+
+        return moviesDictionary.Values.ToList();
+    }
+
+    public async Task<int> GetMostWaitingCountAsync(long[]? genresIds)
+    {
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+
+        string sql = @"SELECT COUNT(*)
+FROM Movies m
+WHERE (m.PremierDate IS NULL OR m.PremierDate >= CURRENT_DATE)
+    AND (@GenresIds::bigint[] IS NULL OR EXISTS (
+        SELECT 1 FROM MoviesMoviesGenres mmg
+        WHERE mmg.MovieId = m.Id AND mmg.MovieGenreId = ANY(@GenresIds::bigint[])));";
+
+        int count = await connection.ExecuteScalarAsync<int>(
+            sql,
+            new
+            {
+                GenresIds = genresIds is { Length: > 0 } ? genresIds : null
+            });
+
+        return count;
+    }
+
     public async Task RemoveAsync(long id)
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);

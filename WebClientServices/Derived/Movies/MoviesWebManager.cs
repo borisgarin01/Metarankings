@@ -65,6 +65,35 @@ public sealed class MoviesWebManager : WebManager, IWebManager<Movie, AddMovieMo
         throw new NotImplementedException();
     }
 
+    public async Task<IEnumerable<Movie>> GetMostWaitingAsync(
+        int offset,
+        int limit,
+        IEnumerable<long>? genresIds = null)
+    {
+        IEnumerable<Movie>? movies = await HttpClientFactory
+            .CreateClient("AuthorizedClient")
+            .GetFromJsonAsync<IEnumerable<Movie>>(
+                $"/api/movies/most-waiting/{offset}/{limit}{BuildGenresQuery(genresIds)}");
+
+        return movies ?? Enumerable.Empty<Movie>();
+    }
+
+    public async Task<int> GetMostWaitingCountAsync(IEnumerable<long>? genresIds = null)
+    {
+        int count = await HttpClientFactory
+            .CreateClient("AuthorizedClient")
+            .GetFromJsonAsync<int>($"/api/movies/most-waiting/count{BuildGenresQuery(genresIds)}");
+
+        return count;
+    }
+
+    private static string BuildGenresQuery(IEnumerable<long>? genresIds)
+    {
+        return genresIds?.Any() == true
+            ? "?" + string.Join("&", genresIds.Select(id => $"genresIds={id}"))
+            : string.Empty;
+    }
+
     public async Task<IEnumerable<Movie>> SearchByName(string name)
     {
         IEnumerable<Movie> movies;

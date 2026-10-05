@@ -22,4 +22,8 @@ public interface IMoviesRepository : IRepository<Movie, AddMovieModel, UpdateMov
         long[]? moviesStudiosIds,
         int[]? years
     );
+
+    Task<IEnumerable<Movie>> GetMostWaitingAsync(long[]? genresIds, int skip, int take);
+
+    Task<int> GetMostWaitingCountAsync(long[]? genresIds);
 }
