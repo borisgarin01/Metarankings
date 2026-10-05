@@ -1,25 +1,38 @@
 using Domain.Waitings;
+using System.Text.RegularExpressions;
 
 namespace Data.Repositories.Classes.Derived.Waitings;
 
 /// <summary>
 /// Голоса "жду / не жду" для игр и фильмов.
-/// Имена таблиц и колонок задаются только наследниками (константы), поэтому их подстановка в SQL безопасна.
+/// Имена таблиц и колонок подставляются в текст SQL (параметризовать идентификаторы в Postgres нельзя), поэтому:
+/// наследовать класс можно только внутри сборки Data (private protected), а каждый идентификатор проверяется в конструкторе.
+/// Все значения из запросов передаются только параметрами.
 /// </summary>
 public abstract class WaitingsRepository : Repository
 {
+    private static readonly Regex SqlIdentifierRegex = new Regex("^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
+
     private readonly string _waitingsTable;
     private readonly string _entityColumn;
     private readonly string _entitiesTable;
     private readonly string _releaseDateColumn;
 
-    protected WaitingsRepository(string connectionString, string waitingsTable, string entityColumn, string entitiesTable, string releaseDateColumn)
+    private protected WaitingsRepository(string connectionString, string waitingsTable, string entityColumn, string entitiesTable, string releaseDateColumn)
         : base(connectionString)
     {
-        _waitingsTable = waitingsTable;
-        _entityColumn = entityColumn;
-        _entitiesTable = entitiesTable;
-        _releaseDateColumn = releaseDateColumn;
+        _waitingsTable = EnsureSqlIdentifier(waitingsTable, nameof(waitingsTable));
+        _entityColumn = EnsureSqlIdentifier(entityColumn, nameof(entityColumn));
+        _entitiesTable = EnsureSqlIdentifier(entitiesTable, nameof(entitiesTable));
+        _releaseDateColumn = EnsureSqlIdentifier(releaseDateColumn, nameof(releaseDateColumn));
+    }
+
+    private static string EnsureSqlIdentifier(string identifier, string parameterName)
+    {
+        if (identifier is null || !SqlIdentifierRegex.IsMatch(identifier))
+            throw new ArgumentException($"Недопустимый SQL-идентификатор: '{identifier}'", parameterName);
+
+        return identifier;
     }
 
     /// <summary>
