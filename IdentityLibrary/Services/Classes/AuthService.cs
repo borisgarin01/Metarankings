@@ -39,8 +39,7 @@ namespace IdentityLibrary.Services.Classes
                 return new AuthResponseDto(false, true, "Two-factor authentication required", string.Empty, string.Empty);
             }
 
-            // ✅ Отзываем все старые токены
-            await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
+            // Старые токены не отзываем — поддержка входа с нескольких устройств
 
             var accessToken = await _tokenGenerator.GenerateAccessToken(user);
             var refreshTokenValue = _tokenGenerator.GenerateRefreshToken();

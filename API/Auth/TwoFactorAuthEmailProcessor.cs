@@ -243,9 +243,8 @@ public sealed class TwoFactorAuthEmailProcessor
     /// </summary>
     private async Task<AuthResponseDto> IssueTokensAsync(ApplicationUser user)
     {
-        // Отзываем все старые refresh tokens пользователя
-        await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(user.Id));
-
+        // Старые refresh tokens не отзываем: у каждого устройства свой токен,
+        // вход на одном устройстве не должен разлогинивать остальные.
         string accessToken = await _authTokenGenerator.GenerateAccessToken(user);
         string refreshTokenValue = _authTokenGenerator.GenerateRefreshToken();
 
