@@ -1,0 +1,89 @@
+@page "/admin/content-requests"
+@using BlazorClient.Components.PagesComponents.ContentRequests
+@using Domain.ContentRequests
+
+<PageTitle>Заявки на добавление</PageTitle>
+
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        <h3>Заявки на добавление игр и фильмов</h3>
+
+        <div class="filters">
+            <button type="button" class="@(StatusFilter is null ? "selected" : "")" @onclick="() => SetFilterAsync(null)">Все</button>
+            @foreach (ContentRequestStatus status in Enum.GetValues<ContentRequestStatus>())
+            {
+                <button type="button" class="@(StatusFilter == status ? "selected" : "")" @onclick="() => SetFilterAsync(status)">
+                    @ContentRequestLabels.GetStatusLabel(status)
+                </button>
+            }
+        </div>
+
+        @if (IsLoading)
+        {
+            <p>Загружается...</p>
+        }
+        else if (!Requests.Any())
+        {
+            <p>Заявок нет.</p>
+        }
+        else
+        {
+            <ul class="requests">
+                @foreach (ContentRequest contentRequest in Requests)
+                {
+                    <li class="request" @key="contentRequest.Id">
+                        <div class="request-head">
+                            <span class="request-type">@ContentRequestLabels.GetTypeLabel(contentRequest.ContentType)</span>
+                            <strong class="request-title">@contentRequest.Title</strong>
+                            <ContentRequestStatusBadge Status="@contentRequest.Status" />
+                        </div>
+                        <div class="request-meta">
+                            #@contentRequest.Id · @(contentRequest.UserName ?? $"пользователь {contentRequest.UserId}")
+                            · @contentRequest.CreatedTimestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                            @if (contentRequest.ProcessedTimestamp is not null)
+                            {
+                                <span> · рассмотрено @contentRequest.ProcessedTimestamp.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                            }
+                        </div>
+                        @if (!string.IsNullOrEmpty(contentRequest.Description))
+                        {
+                            <div class="request-description">@contentRequest.Description</div>
+                        }
+
+                        <textarea class="form-control comment" rows="2" maxlength="2000"
+                                  placeholder="Ответ пользователю (необязательно)"
+                                  @bind="Comments[contentRequest.Id]"></textarea>
+
+                        <div class="actions">
+                            @if (contentRequest.Status != ContentRequestStatus.Accepted)
+                            {
+                                <button type="button" class="btn btn-sm btn-success" disabled="@IsBusy"
+                                        @onclick="() => SetStatusAsync(contentRequest, ContentRequestStatus.Accepted)">Добавлено</button>
+                            }
+                            @if (contentRequest.Status != ContentRequestStatus.Rejected)
+                            {
+                                <button type="button" class="btn btn-sm btn-warning" disabled="@IsBusy"
+                                        @onclick="() => SetStatusAsync(contentRequest, ContentRequestStatus.Rejected)">Отклонить</button>
+                            }
+                            @if (contentRequest.Status != ContentRequestStatus.Pending)
+                            {
+                                <button type="button" class="btn btn-sm btn-secondary" disabled="@IsBusy"
+                                        @onclick="() => SetStatusAsync(contentRequest, ContentRequestStatus.Pending)">Вернуть в новые</button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-secondary" disabled="@IsBusy"
+                                        @onclick="() => SaveCommentAsync(contentRequest)">Сохранить ответ</button>
+                            }
+                            <button type="button" class="btn btn-sm btn-danger" disabled="@IsBusy"
+                                    @onclick="() => DeleteAsync(contentRequest)">Удалить</button>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Страница доступна только администраторам.</p>
+    </NotAuthorized>
+</AuthorizeView>

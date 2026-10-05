@@ -1,0 +1,8 @@
+@using Domain.ContentRequests
+
+<span class="request-status status-@Status.ToString().ToLowerInvariant()">@ContentRequestLabels.GetStatusLabel(Status)</span>
+
+@code {
+    [Parameter, EditorRequired]
+    public ContentRequestStatus Status { get; set; }
+}

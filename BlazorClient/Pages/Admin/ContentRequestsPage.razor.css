@@ -1,0 +1,70 @@
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.filters button {
+    border: 0;
+    border-radius: 50px;
+    background: #f1f1f1;
+    color: #333;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.filters button.selected {
+    background: #9ad77f;
+}
+
+.requests {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.request {
+    border-bottom: 1px solid #eee;
+    padding: 14px 0;
+}
+
+.request-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.request-type {
+    color: #777;
+    font-size: 13px;
+}
+
+.request-title {
+    overflow-wrap: anywhere;
+}
+
+.request-meta {
+    color: #999;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.request-description {
+    margin-top: 6px;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.comment {
+    margin-top: 8px;
+    max-width: 640px;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}

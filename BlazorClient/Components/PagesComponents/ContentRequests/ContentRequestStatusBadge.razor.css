@@ -1,0 +1,22 @@
+.request-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.status-pending {
+    background: #f1f1f1;
+    color: #555;
+}
+
+.status-accepted {
+    background: #9ad77f;
+    color: #1f3d12;
+}
+
+.status-rejected {
+    background: #f3c0c0;
+    color: #6b1d1d;
+}
