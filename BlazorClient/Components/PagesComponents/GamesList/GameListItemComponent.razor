@@ -1,22 +1,21 @@
-﻿@using Domain.Games
-@using Microsoft.Extensions.Configuration
-@inject IConfiguration Configuration
+﻿@using System.Globalization
+@using Domain.Games
 
 <div class="item">
     <a href="/games/details/@Game.Id" title="Игра @Game.Name">
         <img class="post-image" src="@Game.Image" alt="@Game.Name">
     </a>
     <div class="small-score mark-@Math.Round(Game.UsersScore)">
-        <span data-title="Рейтинг игры" class="tooltip">@Math.Round(Game.UsersScore, 1)</span>
+        <span data-title="Рейтинг игры" class="tooltip">@Game.UsersScore.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))</span>
     </div>
     <span class="item-name"><a href="/games/Details/@Game.Id">@Game.Name</a></span>
     <span class="item-meta">
-        @foreach (Platform platform in Game.Platforms)
+        @for (int i = 0; i < Game.Platforms.Count - 1; i++)
         {
-            <a href="/platforms/@platform.Id">@platform.Name</a>
-
+            <a href="/platforms/@Game.Platforms[i].Id">@Game.Platforms[i].Name</a>
             <text> / </text>
         }
+        <a href="/platforms/@Game.Platforms[Game.Platforms.Count - 1].Id">@Game.Platforms[Game.Platforms.Count - 1].Name</a>
     </span>
     <span class="item-meta"><a rel="nofollow" href="/games/Details/@Game.Id/#reviews">Рецензии (@Game.CriticsReviewsCount)</a> <a rel="nofollow" href="/games/Details/@Game.Id/#comments">Отзывы (@Game.UsersReviewsCount)</a></span>
     <span class="item-meta">@Game.ReleaseDate.Value.ToString("dd MMMM yyyy")</span>

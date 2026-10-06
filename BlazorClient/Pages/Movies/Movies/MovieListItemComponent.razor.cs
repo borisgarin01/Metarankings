@@ -27,11 +27,14 @@ public partial class MovieListItemComponent : ComponentBase
     [Parameter, EditorRequired]
     public string Description { get; set; }
 
-    [Parameter,EditorRequired]
+    [Parameter, EditorRequired]
     public int UsersReviewsCount { get; set; }
 
     [Parameter, EditorRequired]
     public int CriticsReviewsCount { get; set; }
+
+    [Parameter, EditorRequired]
+    public float? Rating { get; set; }
 
     [Parameter, EditorRequired]
     public IEnumerable<ListMovieGenreModel> ListMovieGenreModels { get; set; }

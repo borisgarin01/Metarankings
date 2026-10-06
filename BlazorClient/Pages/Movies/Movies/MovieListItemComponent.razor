@@ -1,11 +1,9 @@
-﻿@using Domain.Games
-@using Domain.Movies
-
+﻿@using System.Globalization
 <div class="item">
     <a href="@Href" title="@Title">
         <img class="post-image" src="@ImageSource" alt="@ImageAlt">
     </a>
-    <div class="small-score mark-0"><span data-title="Рейтинг фильма" class="tooltip">0</span></div>
+    <div class="small-score mark-@Math.Round(Rating.HasValue ? Rating.Value : 0)"><span data-title="Рейтинг фильма" class="tooltip">@(Rating.HasValue ? Rating.Value.ToString("0.0", CultureInfo.GetCultureInfo("en-US")) : "0.0")</span></div>
     <span class="item-name"><a href="@Href">@Title</a></span>
     <span class="item-meta">
         @for (int i = 0; i < ListMovieGenreModels.Count() - 1; i++)

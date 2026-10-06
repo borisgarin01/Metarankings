@@ -1,4 +1,5 @@
 ﻿@page "/movies/new-movies"
+@using System.Globalization
 @using Domain.Movies
 
 <div id="loop" class="list clear">
@@ -17,8 +18,8 @@
             <div class="trailer" data-video="@($"/movies/details/{movie.Id}")/#content-trailer">Трейлер</div>
             <div class="ratings-graph">
                 <div class="graph">
-                    <div class="small-score mark-@Math.Round(movie.UsersScore)">@Math.Round(movie.UsersScore)</div>
-                    <div class="graph-body"><div style="width:0%" class="rating-graph mark-0"></div></div>
+                    <div class="small-score mark-@Math.Round(movie.UsersScore)">@movie.UsersScore.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))</div>
+                    <div class="graph-body"><div style="width:0%" class="rating-graph mark-@Math.Round(movie.UsersScore)"></div></div>
                 </div>
             </div>
         </div>
