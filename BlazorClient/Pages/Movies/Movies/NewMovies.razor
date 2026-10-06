@@ -17,7 +17,7 @@
             <div class="trailer" data-video="@($"/movies/details/{movie.Id}")/#content-trailer">Трейлер</div>
             <div class="ratings-graph">
                 <div class="graph">
-                    <div class="small-score mark-@(movie.MovieReviews.Count > 0 ? Math.Round(movie.MovieReviews.Average(b => b.Score)) : 0)">@(movie.MovieReviews.Count > 0 ? Math.Round(movie.MovieReviews.Average(b => b.Score)) : 0)</div>
+                    <div class="small-score mark-@Math.Round(movie.UsersScore)">@Math.Round(movie.UsersScore)</div>
                     <div class="graph-body"><div style="width:0%" class="rating-graph mark-0"></div></div>
                 </div>
             </div>
@@ -28,26 +28,26 @@
         <!-- Yandex.RTB R-A-201169-7 -->
         <div id="yandex_rtb_R-A-201169-7"></div>
         <script>
-            window.yaContextCb.push(()=>{
-              Ya.Context.AdvManager.render({
-                renderTo: 'yandex_rtb_R-A-201169-7',
-                blockId: 'R-A-201169-7'
-              })
+                    window.yaContextCb.push(() => {
+                        Ya.Context.AdvManager.render({
+                            renderTo: 'yandex_rtb_R-A-201169-7',
+                            blockId: 'R-A-201169-7'
+                        })
             })</script>
+        </div>
     </div>
-</div>
-<div class="pagination">
-    <div class="navi">
-        <span class='page-numbers current'>1</span>
-        <a class='page-numbers' href='/new-movies/page/2/'>2</a>
-        <a class='page-numbers' href='/new-movies/page/3/'>3</a>
-        <a class='page-numbers' href='/new-movies/page/4/'>4</a>
-        <span class="page-numbers dots">&hellip;</span>
-        <a class='page-numbers' href='/new-movies/page/78/'>78</a>
-        <a class="next page-numbers" href="/new-movies/page/2/">Показать еще</a>
+    <div class="pagination">
+        <div class="navi">
+            <span class='page-numbers current'>1</span>
+            <a class='page-numbers' href='/new-movies/page/2/'>2</a>
+            <a class='page-numbers' href='/new-movies/page/3/'>3</a>
+            <a class='page-numbers' href='/new-movies/page/4/'>4</a>
+            <span class="page-numbers dots">&hellip;</span>
+            <a class='page-numbers' href='/new-movies/page/78/'>78</a>
+            <a class="next page-numbers" href="/new-movies/page/2/">Показать еще</a>
+        </div>
     </div>
-</div>
-<div class="page-description">
-    <p>Здесь собран список из новых фильмов всех жанров, начиная с самой нового. Более подробную информацию о том или ином фильме можно узнать нажав на интересующее кино из списка. Там же можно выставить оценку и оставить свой отзыв.</p>
-    <p>Страница динамически меняется, новые ленты добавляются автоматически, так что зайдя в следующий раз на эту страницу, вы можете видеть обновленные данные с актуальным списком новинок.</p>
-</div>
+    <div class="page-description">
+        <p>Здесь собран список из новых фильмов всех жанров, начиная с самой нового. Более подробную информацию о том или ином фильме можно узнать нажав на интересующее кино из списка. Там же можно выставить оценку и оставить свой отзыв.</p>
+        <p>Страница динамически меняется, новые ленты добавляются автоматически, так что зайдя в следующий раз на эту страницу, вы можете видеть обновленные данные с актуальным списком новинок.</p>
+    </div>
