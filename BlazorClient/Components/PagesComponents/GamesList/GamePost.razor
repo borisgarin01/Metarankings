@@ -1,4 +1,5 @@
-﻿@using BlazorClient.Components.PagesComponents.Common
+﻿@using System.Globalization
+@using BlazorClient.Components.PagesComponents.Common
 @using BlazorClient.Components.PagesComponents.GameDetails
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
@@ -32,7 +33,7 @@
     <div class="trailer" data-video="/games/Details/@Id/#content-trailer"></div>
     <div class="ratings-graph">
         <div class="graph">
-            <div class="small-score mark-@Math.Round(Score ?? 0)">@(Score ?? 0)</div>
+            <div class="small-score mark-@Math.Round(Score ?? 0)">@(Score.HasValue ? Score.Value.ToString("0.0", CultureInfo.GetCultureInfo("en-US")) : "0")</div>
             <div class="graph-body">
                 <div style="width: @((Score ?? 0) * 10)%;"
                      class="rating-graph mark-@Math.Round(Score ?? 0)">
