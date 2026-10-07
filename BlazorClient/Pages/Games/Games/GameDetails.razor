@@ -92,6 +92,11 @@ else
                                ReleaseDate="@(Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now))"
                                GameId="@Game.Id" />
 
+                    <CriticsReviewsComponent EntityId="@Game.Id"
+                                             Target="CriticReviewTarget.Game"
+                                             Name="@Game.Name"
+                                             Year="@Game.ReleaseDate?.Year" />
+
                     <div class="user-reviews comments">
                         <div id="comments">
                             <h1 id="users">Отзывы</h1>

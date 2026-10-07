@@ -5,6 +5,7 @@ using Domain.RequestsModels.Movies.MoviesDirectors;
 using Domain.RequestsModels.Movies.MoviesGenres;
 using Domain.RequestsModels.Movies.MoviesStudios;
 using WebManagers;
+using WebManagers.Derived.CriticsReviews;
 using WebManagers.Derived.Movies;
 using WebManagers.Derived.Waitings;
 
@@ -21,7 +22,8 @@ public static class MoviesWebManagersRegistrator
             .AddSingleton<IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>, MoviesCollectionsWebManager>()
             .AddSingleton<IWebManager<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>, MoviesCollectionsItemsWebManager>()
             .AddSingleton<MoviesViewersReviewsShiftsWebManager>()
-            .AddSingleton<MoviesWaitingsWebManager>();
+            .AddSingleton<MoviesWaitingsWebManager>()
+            .AddSingleton<MoviesCriticsReviewsWebManager>();
 
         return serviceCollection;
     }
