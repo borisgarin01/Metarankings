@@ -13,6 +13,7 @@ namespace BlazorClient.Pages.Games.Games;
 public partial class MostWaitingGames : ComponentBase
 {
     private const int PageSize = 25;
+    private const string BasePath = "/games/most-waiting-games";
     private bool isLoading = false;
 
     [Inject]
@@ -146,30 +147,41 @@ public partial class MostWaitingGames : ComponentBase
         return userVotes.TryGetValue(gameId, out bool? vote) ? vote : null;
     }
 
-    // --- URL builder, по образу BestGamesListPage ---
-
-    private string BuildQueryString(int? page = null, long? genreId = null, long? platformId = null)
+    // Адреса всегда абсолютные: относительный "?genreId=1" при <base href="/"> ведёт на главную.
+    private string BuildPageUrl(int page, long? genreId, long? platformId)
     {
         var parameters = new List<string>();
 
-        long? targetGenre = genreId ?? GenreId;
-        long? targetPlatform = platformId ?? PlatformId;
-        int targetPage = page ?? currentPage;
+        if (genreId.HasValue)
+            parameters.Add($"genreId={genreId.Value}");
 
-        if (targetGenre.HasValue)
-            parameters.Add($"genreId={targetGenre.Value}");
+        if (platformId.HasValue)
+            parameters.Add($"platformId={platformId.Value}");
 
-        if (targetPlatform.HasValue)
-            parameters.Add($"platformId={targetPlatform.Value}");
+        if (page > 1)
+            parameters.Add($"page={page}");
 
-        if (targetPage > 1)
-            parameters.Add($"page={targetPage}");
-
-        return parameters.Count > 0 ? $"?{string.Join("&", parameters)}" : "";
+        return parameters.Count > 0 ? $"{BasePath}?{string.Join("&", parameters)}" : BasePath;
     }
 
     private string GetPageUrl(int page)
     {
-        return $"/games/most-waiting-games{BuildQueryString(page)}";
+        return BuildPageUrl(page, GenreId, PlatformId);
+    }
+
+    /// <summary>
+    /// Сменить жанр (null — все жанры), сохранив выбранную платформу; пагинация сбрасывается.
+    /// </summary>
+    private string GetGenreUrl(long? genreId)
+    {
+        return BuildPageUrl(1, genreId, PlatformId);
+    }
+
+    /// <summary>
+    /// Сменить платформу (null — все платформы), сохранив выбранный жанр; пагинация сбрасывается.
+    /// </summary>
+    private string GetPlatformUrl(long? platformId)
+    {
+        return BuildPageUrl(1, GenreId, platformId);
     }
 }
