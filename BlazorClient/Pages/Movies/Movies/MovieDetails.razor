@@ -83,6 +83,11 @@ else
                                 Image="@Movie.ImageSource"
                                 PremierDate="@Movie.PremierDate" />
 
+                    <CriticsReviewsComponent EntityId="@Movie.Id"
+                                             Target="CriticReviewTarget.Movie"
+                                             Name="@Movie.Name"
+                                             Year="@Movie.PremierDate?.Year" />
+
                     <div class="user-reviews comments">
                         <div id="comments">
                             <h1 id="users">Отзывы</h1>

@@ -7,6 +7,7 @@ using Domain.RequestsModels.Games.Localizations;
 using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Games.Publishers;
 using WebManagers;
+using WebManagers.Derived.CriticsReviews;
 using WebManagers.Derived.Games;
 using WebManagers.Derived.Waitings;
 
@@ -25,7 +26,8 @@ public static class GamesWebManagersRegistrator
             .AddSingleton<IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>, GamesCollectionsWebManager>()
             .AddSingleton<IWebManager<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>, GamesCollectionsItemsWebManager>()
             .AddSingleton<GamesPlayersReviewsShiftsWebManager>()
-            .AddSingleton<GamesWaitingsWebManager>();
+            .AddSingleton<GamesWaitingsWebManager>()
+            .AddSingleton<GamesCriticsReviewsWebManager>();
 
         return serviceCollection;
     }

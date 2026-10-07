@@ -1,0 +1,138 @@
+@page "/admin/{Section}/critics-reviews/{EntityId:long}"
+@using BlazorClient.Components.PagesComponents.Common
+@using Domain.Reviews
+
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        <a href="/admin">К странице админа</a>
+        @if (Target is not null)
+        {
+            <a href="@ListHref">@(Target == CriticReviewTarget.Game ? "К списку игр" : "К списку фильмов")</a>
+            <a href="@DetailsHref">На страницу @(Target == CriticReviewTarget.Game ? "игры" : "фильма")</a>
+        }
+
+        @if (Target is null)
+        {
+            <p>Неизвестный раздел «@Section».</p>
+        }
+        else if (!isLoaded)
+        {
+            <LoadingIndicator />
+        }
+        else if (EntityName is null)
+        {
+            <p>@(Target == CriticReviewTarget.Game ? "Игра не найдена." : "Фильм не найден.")</p>
+        }
+        else
+        {
+            <h3>Рецензии критиков: «@EntityName»</h3>
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
+            }
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    @(editingId is null ? "Добавить рецензию" : $"Редактировать рецензию #{editingId}")
+                </div>
+                <div class="card-body">
+                    <EditForm Model="@form" OnValidSubmit="@SaveAsync" Context="formContext">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="row">
+                            <div class="col-md-5 mb-2">
+                                <label class="form-label">Издание *</label>
+                                <InputText class="form-control" @bind-Value="form.Publication" placeholder="Канобу, IGN, Film.ru..." />
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label">Автор</label>
+                                <InputText class="form-control" @bind-Value="form.Author" />
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Оценка (0–10) *</label>
+                                <InputNumber class="form-control" @bind-Value="form.Score" step="0.1" min="0" max="10" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-9 mb-2">
+                                <label class="form-label">Ссылка на рецензию</label>
+                                <InputText class="form-control" @bind-Value="form.SourceUrl" placeholder="https://..." />
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Дата</label>
+                                <InputDate class="form-control" @bind-Value="form.Date" />
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Цитата / краткий текст</label>
+                            <InputTextArea class="form-control" rows="4" @bind-Value="form.TextContent" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" disabled="@isSaving">
+                            @(editingId is null ? "Добавить" : "Сохранить")
+                        </button>
+                        @if (editingId is not null)
+                        {
+                            <button type="button" class="btn btn-secondary ms-2" @onclick="CancelEdit">Отмена</button>
+                        }
+                    </EditForm>
+                </div>
+            </div>
+
+            @if (CriticsReviews.Count == 0)
+            {
+                <p>Рецензий пока нет.</p>
+            }
+            else
+            {
+                <p>
+                    Рецензий: @CriticsReviews.Count,
+                    рейтинг критиков: <b>@CriticsReviewsComponent.FormatScore(CriticsReviews.Average(cr => cr.Score))</b>
+                </p>
+
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Оценка</th>
+                            <th>Издание</th>
+                            <th>Автор</th>
+                            <th>Дата</th>
+                            <th>Ссылка</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (CriticReview criticReview in CriticsReviews)
+                        {
+                            <tr @key="criticReview.Id" class="@(criticReview.Id == editingId ? "table-warning" : "")">
+                                <td>
+                                    <span class="small-score mark-@CriticsReviewsComponent.GetMark(criticReview.Score)">@CriticsReviewsComponent.FormatScore(criticReview.Score)</span>
+                                </td>
+                                <td>@criticReview.Publication</td>
+                                <td>@criticReview.Author</td>
+                                <td>@criticReview.Date.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(criticReview.SourceUrl))
+                                    {
+                                        <a href="@criticReview.SourceUrl" target="_blank" rel="noopener noreferrer">открыть</a>
+                                    }
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <button class="btn btn-sm btn-warning" @onclick="() => StartEdit(criticReview)">Редактировать</button>
+                                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteAsync(criticReview)">Удалить</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Страница доступна только администратору.</p>
+    </NotAuthorized>
+</AuthorizeView>
