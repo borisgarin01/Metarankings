@@ -1,4 +1,6 @@
-﻿using Domain.Games;
+﻿using Domain.RequestsModels.Games.Platforms;
+using WebManagers;
+using Domain.Games;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BlazorClient.Pages.Admin.Games.Platforms;
@@ -9,10 +11,10 @@ public partial class ListPlatformsPage : ComponentBase
     public IEnumerable<Platform> Platforms { get; private set; }
 
     [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; }
+    public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> WebManager { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        Platforms = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Platform>>(@"/api/Games/Platforms");
+        Platforms = await WebManager.GetAllAsync();
     }
 }

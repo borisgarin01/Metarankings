@@ -7,15 +7,15 @@ using IdentityLibrary.DTOs;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 
-public sealed class MoviesRepository : Repository, IMoviesRepository
+public sealed class MoviesRepository : Repository<Movie, AddMovieModel, UpdateMovieModel>, IMoviesRepository
 {
     public MoviesRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddMovieModel entity)
+    public override async Task<long> AddAsync(AddMovieModel entity)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         List<Domain.Movies.Genre> insertedMovieGenres = new List<Domain.Movies.Genre>();
         List<MovieStudio> insertedMovieStudios = new List<MovieStudio>();
         List<MovieDirector> insertedMovieDirectors = new List<MovieDirector>();
@@ -115,17 +115,9 @@ new { MovieId = insertedMovie.Id, MovieDirectorId = insertedMovieDirector.Id });
         return insertedMovie.Id;
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddMovieModel> entities)
+    public override async Task<IEnumerable<Movie>> GetAllAsync()
     {
-        foreach (AddMovieModel movieModel in entities)
-        {
-            await AddAsync(movieModel);
-        }
-    }
-
-    public async Task<IEnumerable<Movie>> GetAllAsync()
-    {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
 m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
 COALESCE((SELECT AVG(Score)::float FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersScore,
@@ -177,9 +169,9 @@ md.Id, md.Name
         return result;
     }
 
-    public async Task<Movie> GetAsync(long id)
+    public override async Task<Movie> GetAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"select m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description, m.Trailer,
 COALESCE((SELECT AVG(Score)::float FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersScore,
 COALESCE((SELECT COUNT(*) FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersReviewsCount,
@@ -263,7 +255,7 @@ WHERE m.id=@id";
 
     public async Task<IEnumerable<Movie>> GetAsync(DateTime dateFrom, DateTime dateTo)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
 mg.id, mg.name,
@@ -313,9 +305,9 @@ ORDER BY m.id DESC;";
         return result;
     }
 
-    public async Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<Movie>> GetAsync(long offset, long limit)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
 m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
 COALESCE((SELECT AVG(Score)::float FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersScore,
@@ -373,7 +365,7 @@ md.id, md.name
 
     public async Task<IEnumerable<Movie>> GetByGenreAsync(long genreId)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
             m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
             mg.id, mg.name,
@@ -423,7 +415,7 @@ md.id, md.name
 
     public async Task<IEnumerable<Movie>> GetByNameAsync(string name)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
             m.id, m.name, m.imageSource, m.originalname, m.premierdate, m.description,
             mg.id, mg.name,
@@ -474,7 +466,7 @@ md.id, md.name
 
     public async Task<IEnumerable<Movie>> GetByParametersAsync(long[]? genresIds, long[]? moviesStudiosIds, int[]? years, int skip, int take)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         string sql = @"SELECT
 m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
@@ -547,7 +539,7 @@ ORDER BY m.Id DESC;";
 
     public async Task<int> GetCountByParametersAsync(long[]? genresIds, long[]? moviesStudiosIds, int[]? years)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         string sql = @"SELECT COUNT(DISTINCT m.Id)
 FROM Movies m
@@ -572,7 +564,7 @@ WHERE 1=1
 
     public async Task<IEnumerable<Movie>> GetMostWaitingAsync(long[]? genresIds, int skip, int take)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         string sql = @"SELECT
 m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
@@ -653,7 +645,7 @@ ORDER BY m.WaitingCount - m.NotWaitingCount DESC, m.WaitingCount DESC, m.Premier
 
     public async Task<int> GetMostWaitingCountAsync(long[]? genresIds)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         string sql = @"SELECT COUNT(*)
 FROM Movies m
@@ -672,21 +664,15 @@ WHERE (m.PremierDate IS NULL OR m.PremierDate > CURRENT_DATE)
         return count;
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         await connection.ExecuteAsync("DELETE FROM Movies WHERE Id=@Id", new { Id = id });
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<Movie> UpdateAsync(UpdateMovieModel entity, long id)
     {
-        foreach (var id in ids)
-            await RemoveAsync(id);
-    }
-
-    public async Task<Movie> UpdateAsync(UpdateMovieModel entity, long id)
-    {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         connection.Open();
 
         using NpgsqlTransaction transaction = connection.BeginTransaction();

@@ -5,15 +5,15 @@ using Domain.RequestsModels.Movies.Collections;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 
-public sealed class MoviesCollectionsRepository : Repository, IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>
+public sealed class MoviesCollectionsRepository : Repository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>
 {
     public MoviesCollectionsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddMoviesCollectionModel entity)
+    public override async Task<long> AddAsync(AddMoviesCollectionModel entity)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var insertedMovieCollectionId = await connection.QuerySingleAsync<long>(@"
 INSERT INTO MoviesCollections(Name,Description, ImageSource) 
@@ -24,17 +24,9 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddMoviesCollectionModel> entities)
+    public override async Task<IEnumerable<MoviesCollection>> GetAllAsync()
     {
-        foreach (var entity in entities)
-        {
-            await AddAsync(entity);
-        }
-    }
-
-    public async Task<IEnumerable<MoviesCollection>> GetAllAsync()
-    {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
 
         var moviesCollectionsDictionary = new Dictionary<long, MoviesCollection>();
 
@@ -71,9 +63,9 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
         return moviesCollectionsDictionary.Values;
     }
 
-    public async Task<MoviesCollection> GetAsync(long id)
+    public override async Task<MoviesCollection> GetAsync(long id)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
 
         var moviesCollection = await connection.QueryAsync<MoviesCollection, MoviesCollectionItem, Movie, MoviesCollection>(
             @"SELECT mc.Id, mc.Name, mc.Description, mc.ImageSource,
@@ -110,9 +102,9 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
         return moviesCollectionGrouped.SingleOrDefault();
     }
 
-    public async Task<IEnumerable<MoviesCollection>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<MoviesCollection>> GetAsync(long offset, long limit)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
 
         var moviesCollectionsDictionary = new Dictionary<long, MoviesCollection>();
 
@@ -156,25 +148,17 @@ RETURNING Id;", new { entity.Name, entity.Description, entity.ImageSource });
         return moviesCollectionsDictionary.Values;
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             await connection.ExecuteAsync(@"DELETE FROM MoviesCollections WHERE Id=@Id", new { Id = id });
         }
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<MoviesCollection> UpdateAsync(UpdateMoviesCollectionModel entity, long id)
     {
-        foreach (var id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<MoviesCollection> UpdateAsync(UpdateMoviesCollectionModel entity, long id)
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var updatedGameCollection = await connection.QuerySingleOrDefaultAsync<MoviesCollection>(@"UPDATE MoviesCollections 
 SET Name=@Name, Description=@Description, ImageSource=@ImageSource 

@@ -4,15 +4,15 @@ using Domain.RequestsModels.Games.Localizations;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class LocalizationsRepository : Repository, ILocalizationsRepository
+public sealed class LocalizationsRepository : Repository<Localization, AddLocalizationModel, UpdateLocalizationModel>, ILocalizationsRepository
 {
     public LocalizationsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddLocalizationModel localization)
+    public override async Task<long> AddAsync(AddLocalizationModel localization)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         long id = await connection.QueryFirstAsync<long>(@"INSERT INTO Localizations
 (Name)
 VALUES (@Name)
@@ -24,15 +24,9 @@ RETURNING Id;"
         return id;
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddLocalizationModel> localizations)
+    public override async Task<IEnumerable<Localization>> GetAllAsync()
     {
-        foreach (AddLocalizationModel localization in localizations)
-            await AddAsync(localization);
-    }
-
-    public async Task<IEnumerable<Localization>> GetAllAsync()
-    {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Dictionary<string, Localization> localizationsDictionary = new Dictionary<string, Localization>();
         Dictionary<long, Game> gamesDictionary = new Dictionary<long, Game>();
 
@@ -106,9 +100,9 @@ RETURNING Id;"
         return localizationsDictionary.Values;
     }
 
-    public async Task<Localization> GetAsync(long id)
+    public override async Task<Localization> GetAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Localization> localizationDictionary = new Dictionary<long, Localization>();
         Dictionary<long, Game> gamesDictionary = new Dictionary<long, Game>();
         Dictionary<long, Platform> platformsDictionary = new Dictionary<long, Platform>();
@@ -183,7 +177,7 @@ WHERE loc.Id = @id",
 
     public async Task<Localization> GetByPlatformAsync(long id, long platformId)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Localization> localizationDictionary = new Dictionary<long, Localization>();
         Dictionary<long, Game> gamesDictionary = new Dictionary<long, Game>();
         Dictionary<long, Platform> platformsDictionary = new Dictionary<long, Platform>();
@@ -260,9 +254,9 @@ WHERE loc.Id = @id",
         return localizationDictionary.Values.FirstOrDefault();
     }
 
-    public async Task<IEnumerable<Localization>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<Localization>> GetAsync(long offset, long limit)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Localization> localizationDictionary = new Dictionary<long, Localization>();
         Dictionary<long, Game> gamesDictionary = new Dictionary<long, Game>();
         Dictionary<long, Platform> platformsDictionary = new Dictionary<long, Platform>();
@@ -335,24 +329,16 @@ WHERE loc.Id = @id",
         return localizationDictionary.Values;
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         await connection.ExecuteAsync(@"DELETE FROM 
 Localizations WHERE Id=@id", new { id });
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<Localization> UpdateAsync(UpdateLocalizationModel localization, long id)
     {
-        foreach (long id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<Localization> UpdateAsync(UpdateLocalizationModel localization, long id)
-    {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         dynamic? updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name
 WHERE Id=@Id
 RETURNING Name, Href, Id;", new

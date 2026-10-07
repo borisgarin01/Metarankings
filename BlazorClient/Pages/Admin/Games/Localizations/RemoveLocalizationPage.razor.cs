@@ -1,37 +1,9 @@
-﻿using Blazored.Toast.Services;
-using Domain.Games;
+﻿using Domain.Games;
 using Domain.RequestsModels.Games.Localizations;
-using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Games.Localizations;
 
-public partial class RemoveLocalizationPage : ComponentBase
+public partial class RemoveLocalizationPage : RemoveEntityPageBase<Localization, AddLocalizationModel, UpdateLocalizationModel>
 {
-    [Parameter]
-    public long Id { get; set; }
-
-    public Localization Localization { get; private set; }
-
-    [Inject]
-    public IWebManager<Localization, AddLocalizationModel, UpdateLocalizationModel> LocalizationsWebManager { get; set; }
-
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
-
-    [Inject]
-    public IToastService ToastService { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        Localization = await LocalizationsWebManager.GetAsync(Id);
-    }
-
-    public async Task RemoveLocalizationAsync()
-    {
-        HttpResponseMessage httpResponseMessage = await LocalizationsWebManager.DeleteAsync(Id);
-        if (httpResponseMessage.IsSuccessStatusCode)
-            NavigationManager.NavigateTo("/admin/Games/localizations/list-localizations");
-        else
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
-    }
+    protected override string ListUrl => "/admin/Games/localizations/list-localizations";
 }

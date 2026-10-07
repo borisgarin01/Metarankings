@@ -1,9 +1,12 @@
 ﻿@page "/admin/games/developers/remove-developer/{Id:long}"
+@using Domain.Games
+@using Domain.RequestsModels.Games.Developers
+@inherits RemoveEntityPageBase<Developer, AddDeveloperModel, UpdateDeveloperModel>
 
 <AuthorizeView Policy="Admin">
     <Authorized>
         <a href="/admin">К странице админа</a>
-        @if (Developer is null)
+        @if (Entity is null)
         {
             <p>Загружается...</p>
         }
@@ -11,10 +14,10 @@
         {
             <a href="/admin/games/developers/list-developers" class="list-group-item link-dark">Разработчики</a>
 
-            <h3>Удалить @Developer.Name</h3>
+            <h3>Удалить @Entity.Name</h3>
             <p>Вы уверены, что хотите удалить этого разработчика?</p>
             <p>
-                <button type="button" @onclick="RemoveDeveloperAsync">Удалить</button>
+                <button type="button" @onclick="RemoveAsync">Удалить</button>
             </p>
         }
     </Authorized>

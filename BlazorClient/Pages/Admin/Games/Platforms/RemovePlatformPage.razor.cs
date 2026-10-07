@@ -1,37 +1,9 @@
-﻿using Blazored.Toast.Services;
-using Domain.Games;
+﻿using Domain.Games;
 using Domain.RequestsModels.Games.Platforms;
-using WebManagers;
-using WebManagers.Derived;
 
 namespace BlazorClient.Pages.Admin.Games.Platforms;
 
-public partial class RemovePlatformPage : ComponentBase
+public partial class RemovePlatformPage : RemoveEntityPageBase<Platform, AddPlatformModel, UpdatePlatformModel>
 {
-    [Parameter]
-    public long Id { get; set; }
-    public Platform Platform { get; private set; }
-
-    [Inject]
-    public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> PlatformsWebManager { get; set; }
-
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
-
-    [Inject]
-    public IToastService ToastService { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        Platform = await PlatformsWebManager.GetAsync(Id);
-    }
-
-    public async Task RemovePlatformAsync()
-    {
-        HttpResponseMessage httpResponseMessage = await PlatformsWebManager.DeleteAsync(Id);
-        if (httpResponseMessage.IsSuccessStatusCode)
-            NavigationManager.NavigateTo("/admin/games/platforms/list-platforms");
-        else
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
-    }
+    protected override string ListUrl => "/admin/games/platforms/list-platforms";
 }

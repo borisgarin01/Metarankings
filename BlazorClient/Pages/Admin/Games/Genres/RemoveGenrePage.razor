@@ -1,18 +1,21 @@
 ﻿@page "/admin/games/genres/remove-genre/{Id:long}"
+@using Domain.Games
+@using Domain.RequestsModels.Games.Genres
+@inherits RemoveEntityPageBase<Genre, AddGameGenreModel, UpdateGameGenreModel>
 
 <AuthorizeView Policy="Admin">
     <Authorized>
         <a href="/admin">К странице админа</a>
-        @if (Genre is null)
+        @if (Entity is null)
         {
             <p>Загружается...</p>
         }
         else
         {
-            <h3>Удалить @Genre.Name</h3>
+            <h3>Удалить @Entity.Name</h3>
             <p>Вы уверены, что хотите удалить этот жанр?</p>
             <p>
-                <button type="button" @onclick="RemoveGenreAsync">Удалить</button>
+                <button type="button" @onclick="RemoveAsync">Удалить</button>
             </p>
         }
     </Authorized>

@@ -1,3 +1,4 @@
+﻿using API.Auth;
 using Data.Repositories.Classes.Derived.CriticsReviews;
 using Domain.RequestsModels.CriticsReviews;
 using Domain.Reviews;
@@ -39,7 +40,7 @@ public abstract class CriticsReviewsControllerBase : ControllerBase
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<CriticReview>> AddAsync(CriticReviewModel criticReviewModel)
     {
-        if (!long.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out long userId))
+        if (User.GetUserId() is not long userId)
             return Unauthorized();
 
         try

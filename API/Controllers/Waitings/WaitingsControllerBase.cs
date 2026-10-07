@@ -1,3 +1,4 @@
+﻿using API.Auth;
 using Data.Repositories.Classes.Derived.Waitings;
 using Domain.RequestsModels.Waitings;
 using Domain.Waitings;
@@ -24,7 +25,7 @@ public abstract class WaitingsControllerBase : ControllerBase
     [HttpGet("{entityId:long}")]
     public async Task<ActionResult<WaitingStatistics>> GetAsync(long entityId)
     {
-        return Ok(await _waitingsRepository.GetStatisticsAsync(entityId, GetCurrentUserId()));
+        return Ok(await _waitingsRepository.GetStatisticsAsync(entityId, User.GetUserId()));
     }
 
     [HttpGet]
@@ -33,7 +34,7 @@ public abstract class WaitingsControllerBase : ControllerBase
         if (ids.Length > MaxIdsPerRequest)
             return BadRequest($"Нельзя запросить больше {MaxIdsPerRequest} элементов за раз");
 
-        return Ok(await _waitingsRepository.GetStatisticsAsync(ids, GetCurrentUserId()));
+        return Ok(await _waitingsRepository.GetStatisticsAsync(ids, User.GetUserId()));
     }
 
     /// <summary>
@@ -44,7 +45,7 @@ public abstract class WaitingsControllerBase : ControllerBase
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<WaitingStatistics>> VoteAsync(AddWaitingVoteModel addWaitingVoteModel)
     {
-        long? userId = GetCurrentUserId();
+        long? userId = User.GetUserId();
         if (userId is null)
             return Unauthorized();
 
@@ -64,11 +65,5 @@ public abstract class WaitingsControllerBase : ControllerBase
             _logger.LogError(ex, "Failed to save waiting vote for {EntityId}", addWaitingVoteModel.EntityId);
             return StatusCode(500);
         }
-    }
-
-    private long? GetCurrentUserId()
-    {
-        string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return long.TryParse(userId, out long parsedUserId) ? parsedUserId : null;
     }
 }

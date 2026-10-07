@@ -4,15 +4,15 @@ using Domain.RequestsModels.Movies.MoviesGenres;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 
-public sealed class MoviesGenresRepository : Repository, IRepository<Genre, AddMovieGenreModel, UpdateMovieGenreModel>
+public sealed class MoviesGenresRepository : Repository<Genre, AddMovieGenreModel, UpdateMovieGenreModel>
 {
     public MoviesGenresRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddMovieGenreModel entity)
+    public override async Task<long> AddAsync(AddMovieGenreModel entity)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var insertedId = await connection.QueryFirstOrDefaultAsync<long>(@"INSERT INTO MoviesGenres(Name) 
 VALUES (@Name)
@@ -22,17 +22,9 @@ RETURNING Id;", new { entity.Name });
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddMovieGenreModel> entities)
+    public override async Task<IEnumerable<Genre>> GetAllAsync()
     {
-        foreach (var movieGenre in entities)
-        {
-            await AddAsync(movieGenre);
-        }
-    }
-
-    public async Task<IEnumerable<Genre>> GetAllAsync()
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var moviesGenres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
 FROM MoviesGenres;");
@@ -41,9 +33,9 @@ FROM MoviesGenres;");
         }
     }
 
-    public async Task<Genre> GetAsync(long id)
+    public override async Task<Genre> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var moviesGenres = await connection.QueryAsync<Genre, Movie,Genre>(@"
 SELECT MoviesGenres.Id, MoviesGenres.Name, 
@@ -78,9 +70,9 @@ WHERE MoviesGenres.Id = @Id", (genre, movie) =>
         }
     }
 
-    public async Task<IEnumerable<Genre>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<Genre>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var moviesGenres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
 FROM MoviesGenres
@@ -90,23 +82,15 @@ LIMIT @limit;", new { offset, limit });
             return moviesGenres;
         }
     }
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
             await connection.ExecuteAsync(@"DELETE FROM MoviesGenres WHERE Id=@id", new { id });
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<Genre> UpdateAsync(UpdateMovieGenreModel movieGenre, long id)
     {
-        foreach (var id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<Genre> UpdateAsync(UpdateMovieGenreModel movieGenre, long id)
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE MoviesGenres 
 SET Name=@Name
