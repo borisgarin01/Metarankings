@@ -1,0 +1,19 @@
+<div class="trailer-field">
+    <label>
+        Трейлер (ссылка YouTube / Rutube):
+        <input type="text" value="@Value" @oninput="OnInputAsync" placeholder="https://rutube.ru/video/... или https://youtu.be/..." />
+    </label>
+    @if (!string.IsNullOrWhiteSpace(PreviewUrl))
+    {
+        <div class="trailer-preview">
+            <iframe title="Предпросмотр трейлера"
+                    src="@PreviewUrl"
+                    allow="clipboard-write; encrypted-media; picture-in-picture"
+                    allowfullscreen></iframe>
+        </div>
+    }
+    else
+    {
+        <small>Без трейлера кнопка «Трейлер» на странице не показывается.</small>
+    }
+</div>

@@ -53,6 +53,26 @@ public sealed class MoviesController : ControllerBase
         return Ok(insertedMovie);
     }
 
+    [HttpPut("{id:long}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
+    public async Task<ActionResult<Movie>> UpdateAsync(long id, UpdateMovieModel updateMovieModel)
+    {
+        try
+        {
+            Movie? updatedMovie = await _moviesModelsRepository.UpdateAsync(updateMovieModel, id);
+
+            if (updatedMovie is null)
+                return NotFound();
+
+            return Ok(updatedMovie);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{ex.Message}\t{ex.StackTrace}");
+            return StatusCode(500, ex.Message);
+        }
+    }
+
     [HttpGet("{dateFrom:datetime}/{dateTo:datetime}")]
     public async Task<ActionResult<IEnumerable<Movie>>> GetAsync(DateTime dateFrom, DateTime dateTo)
     {

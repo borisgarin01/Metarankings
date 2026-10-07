@@ -54,6 +54,8 @@ public sealed partial class AddMoviePage : ComponentBase
     public string Description { get; set; }
     public string ImageSource { get; private set; }
 
+    public string? Trailer { get; set; }
+
     [EditorRequired]
     public DateTime? PremierDate { get; set; }
 
@@ -159,7 +161,8 @@ public sealed partial class AddMoviePage : ComponentBase
                         MoviesStudiosNames: MoviesStudiosToSelectFrom
                             .Where(s => SelectedMoviesStudiosIds.Contains(s.Id))
                             .Select(b => b.Name)
-                            .ToList()
+                            .ToList(),
+                        Trailer: Trailer
                     );
 
                     HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addMovieModel);

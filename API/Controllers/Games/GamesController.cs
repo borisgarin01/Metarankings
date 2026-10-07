@@ -47,6 +47,26 @@ public sealed class GamesController : ControllerBase
         return Created($"api/games/{createdGame.Id}", createdGame);
     }
 
+    [HttpPut("{id:long}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
+    public async Task<ActionResult<Game>> UpdateAsync(long id, UpdateGameModel updateGameModel)
+    {
+        try
+        {
+            Game? updatedGame = await _gamesRepository.UpdateAsync(updateGameModel, id);
+
+            if (updatedGame is null)
+                return NotFound();
+
+            return Ok(updatedGame);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{ex.Message}\t{ex.StackTrace}");
+            return StatusCode(500, ex.Message);
+        }
+    }
+
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
     public async Task<ActionResult<long>> RemoveAsync(long id)

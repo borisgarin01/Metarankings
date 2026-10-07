@@ -8,4 +8,5 @@ public sealed record AddMovieModel(
     [property: JsonPropertyName("premierDate")] DateTime PremierDate,
     [property: JsonPropertyName("moviesDirectorsNames")] IEnumerable<string> MoviesDirectorsNames,
     [property: JsonPropertyName("moviesGenresNames")] IEnumerable<string> MoviesGenresNames,
-    [property: JsonPropertyName("moviesStudiosNames")] IEnumerable<string> MoviesStudiosNames);
+    [property: JsonPropertyName("moviesStudiosNames")] IEnumerable<string> MoviesStudiosNames,
+    [property: JsonPropertyName("trailer")] string? Trailer = null);

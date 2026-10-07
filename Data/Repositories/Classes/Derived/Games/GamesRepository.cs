@@ -1,5 +1,6 @@
 ﻿using Data.Extensions;
 using Data.Repositories.Interfaces.Derived;
+using Domain.Common;
 using Domain.Games;
 using Domain.Games.Collections;
 using Domain.RequestsModels.Games;
@@ -31,7 +32,7 @@ RETURNING Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer;", 
             entity.LocalizationId,
             ReleaseDate = entity.ReleaseDate.Value,
             entity.Description,
-            entity.Trailer
+            Trailer = TrailerUrl.ToEmbed(entity.Trailer)
         }, transaction: transaction);
 
         foreach (long genreId in entity.GenresIds)
@@ -379,7 +380,7 @@ gc.Id, gc.Name, gc.Description
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
         string sql = @"SELECT         
-g.Id, g.name, g.image, g.releasedate, g.description,
+g.Id, g.name, g.image, g.releasedate, g.description, g.trailer, g.localizationid,
 COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
 COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
 COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
@@ -514,7 +515,52 @@ WHERE Id=@id", new { id });
 
     public async Task<Game> UpdateAsync(UpdateGameModel entity, long id)
     {
-        throw new NotImplementedException();
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        connection.Open();
+
+        using NpgsqlTransaction transaction = connection.BeginTransaction();
+
+        int affectedRows = await connection.ExecuteAsync(@"UPDATE Games SET
+Name=@Name, Image=@Image, LocalizationId=@LocalizationId, ReleaseDate=CAST(@ReleaseDate AS DATE),
+Description=@Description, Trailer=@Trailer
+WHERE Id=@Id;", new
+        {
+            Id = id,
+            entity.Name,
+            entity.Image,
+            entity.LocalizationId,
+            ReleaseDate = entity.ReleaseDate.Value,
+            entity.Description,
+            Trailer = TrailerUrl.ToEmbed(entity.Trailer)
+        }, transaction: transaction);
+
+        if (affectedRows == 0)
+            return null;
+
+        await connection.ExecuteAsync(@"DELETE FROM GamesGenres WHERE GameId=@Id;
+DELETE FROM GamesPublishers WHERE GameId=@Id;
+DELETE FROM GamesPlatforms WHERE GameId=@Id;
+DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: transaction);
+
+        foreach (long genreId in entity.GenresIds.Distinct())
+            await connection.ExecuteAsync("INSERT INTO GamesGenres (GameId, GenreId) VALUES (@GameId, @GenreId);",
+                new { GameId = id, GenreId = genreId }, transaction: transaction);
+
+        foreach (long publisherId in entity.PublishersIds.Distinct())
+            await connection.ExecuteAsync("INSERT INTO GamesPublishers (GameId, PublisherId) VALUES (@GameId, @PublisherId);",
+                new { GameId = id, PublisherId = publisherId }, transaction: transaction);
+
+        foreach (long platformId in entity.PlatformsIds.Distinct())
+            await connection.ExecuteAsync("INSERT INTO GamesPlatforms (GameId, PlatformId) VALUES (@GameId, @PlatformId);",
+                new { GameId = id, PlatformId = platformId }, transaction: transaction);
+
+        foreach (long developerId in entity.DevelopersIds.Distinct())
+            await connection.ExecuteAsync("INSERT INTO GamesDevelopers (GameId, DeveloperId) VALUES (@GameId, @DeveloperId);",
+                new { GameId = id, DeveloperId = developerId }, transaction: transaction);
+
+        await transaction.CommitAsync();
+
+        return await GetAsync(id);
     }
 
     public Task<IEnumerable<Game>> GetAsync(long offset, long limit)

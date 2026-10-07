@@ -47,6 +47,15 @@
     padding: 0 8px;
 }
 
+/* .wbody / .window / #content-trailer come from app.css (original theme); they are hidden by default there */
+.wbody, .window {
+    display: block;
+}
+
+.window-content {
+    padding: 10px;
+}
+
 @media only screen and (max-width:670px) {
     .p-twatch {
         display: none;

@@ -1,0 +1,143 @@
+@page "/admin/games/edit-game/{Id:long}"
+@using Domain.Games
+@using BlazorClient.Components.PagesComponents.Common
+
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        <a href="/admin/games/games/list-games" class="list-group-item link-dark">Игры</a>
+        <a href="/admin">К странице админа</a>
+
+        @if (IsNotFound)
+        {
+            <p>Игра не найдена.</p>
+        }
+        else if (Game is null || DevelopersToSelectFrom is null || GenresToSelectFrom is null || LocalizationsToSelectFrom is null || PlatformsToSelectFrom is null || PublishersToSelectFrom is null)
+        {
+            <p>Загружается...</p>
+        }
+        else
+        {
+            <h3>Редактировать игру: @Game.Name</h3>
+
+            <EditForm OnValidSubmit="UpdateGameAsync" Model="this" Context="editContext">
+                <p>
+                    <label>
+                        Название:
+                        <InputText @bind-Value="@Name" />
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        Дата выхода:
+                        <InputDate @bind-Value="@ReleaseDate" />
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        Описание:
+                        <InputTextArea @bind-Value="@Description" rows="6" cols="80" />
+                    </label>
+                </p>
+
+                <TrailerField @bind-Value="Trailer" />
+
+                <p>
+                    <label>Разработчики:</label>
+                    @{
+                        var devSelector = (Developer d) => d.Id;
+                        var devDisplay = (Developer d) => d.Name;
+                    }
+                    <MultiSelect TItem="Developer"
+                                 TId="long"
+                                 Items="DevelopersToSelectFrom.ToList()"
+                                 @bind-SelectedIds="SelectedDevelopersIds"
+                                 IdSelector="devSelector"
+                                 DisplaySelector="devDisplay"
+                                 Placeholder="Select developers..."
+                                 LabelPlural="developers" />
+                </p>
+
+                <p>
+                    <label>Жанры:</label>
+                    @{
+                        var genreSelector = (Genre g) => g.Id;
+                        var genreDisplay = (Genre g) => g.Name;
+                    }
+                    <MultiSelect TItem="Genre"
+                                 TId="long"
+                                 Items="GenresToSelectFrom.ToList()"
+                                 @bind-SelectedIds="SelectedGenresIds"
+                                 IdSelector="genreSelector"
+                                 DisplaySelector="genreDisplay"
+                                 Placeholder="Select genres..."
+                                 LabelPlural="genres" />
+                </p>
+
+                <p>
+                    <label>Локализация:</label>
+                    @{
+                        var locSelector = (Localization l) => (long?)l.Id;
+                        var locDisplay = (Localization l) => l.Name;
+                    }
+                    <SingleSelect TItem="Localization"
+                                  TId="long?"
+                                  Items="LocalizationsToSelectFrom.ToList()"
+                                  @bind-SelectedId="SelectedLocalizationId"
+                                  IdSelector="locSelector"
+                                  DisplaySelector="locDisplay"
+                                  Placeholder="Select localization..." />
+                </p>
+
+                <p>
+                    <label>Платформы:</label>
+                    @{
+                        var platSelector = (Platform p) => p.Id;
+                        var platDisplay = (Platform p) => p.Name;
+                    }
+                    <MultiSelect TItem="Platform"
+                                 TId="long"
+                                 Items="PlatformsToSelectFrom.ToList()"
+                                 @bind-SelectedIds="SelectedPlatformsIds"
+                                 IdSelector="platSelector"
+                                 DisplaySelector="platDisplay"
+                                 Placeholder="Select platforms..."
+                                 LabelPlural="platforms" />
+                </p>
+
+                <p>
+                    <label>Издатели:</label>
+                    @{
+                        var pubSelector = (Publisher p) => p.Id;
+                        var pubDisplay = (Publisher p) => p.Name;
+                    }
+                    <MultiSelect TItem="Publisher"
+                                 TId="long"
+                                 Items="PublishersToSelectFrom.ToList()"
+                                 @bind-SelectedIds="SelectedPublishersIds"
+                                 IdSelector="pubSelector"
+                                 DisplaySelector="pubDisplay"
+                                 Placeholder="Select publishers..."
+                                 LabelPlural="publishers" />
+                </p>
+
+                <p>
+                    <label>
+                        Обложка (оставьте пустым, чтобы не менять):
+                        <InputFile OnChange="FileUploaded" accept="image/*" />
+                    </label>
+                    <div class="image-container">
+                        <img class="post-image" src="@ImagePreview" alt="Обложка игры @Name" title="Игра @Name">
+                    </div>
+                </p>
+
+                <p>
+                    <button type="submit" disabled="@IsSaving">@(IsSaving ? "Сохранение..." : "Сохранить")</button>
+                    <a href="/games/details/@Id">К странице игры</a>
+                </p>
+            </EditForm>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы редактировать игру
+    </NotAuthorized>
+</AuthorizeView>
