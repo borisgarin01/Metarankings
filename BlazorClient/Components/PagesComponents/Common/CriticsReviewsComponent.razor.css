@@ -1,0 +1,16 @@
+.links-add {
+    background: #394042;
+    color: #fff !important;
+    font-size: 14px;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 50px;
+    margin: 10px 0;
+    display: block;
+    text-align: center;
+}
+
+    .links-add:hover {
+        opacity: 0.8;
+        text-decoration: none;
+    }

@@ -1,0 +1,73 @@
+@using Domain.Reviews
+
+<section class="reviews">
+    <div id="reviews">
+        <h1 id="critics">Оценки</h1>
+        <span class="countnum">@CriticsReviews.Count</span>
+        <p>Ниже собраны оценки рецензий «@Name» от интернет-изданий. Мы пытаемся составить максимально объективное мнение на основе разных точек зрения.</p>
+
+        @if (CriticsReviews.Count == 0)
+        {
+            <div class="reviews-none">
+                <p>@(isLoaded ? "Рецензий критиков пока нет." : "Загрузка рецензий...")</p>
+            </div>
+        }
+        else
+        {
+            <div class="reviews_list">
+                @for (int i = 0; i < CriticsReviews.Count; i++)
+                {
+                    CriticReview criticReview = CriticsReviews[i];
+                    <section id="review-@(i + 1)" class="critic-text mark-@GetMark(criticReview.Score)">
+                        <div class="review-meta">
+                            <div class="small-score mark-@GetMark(criticReview.Score)">
+                                <span data-title="Оценка издания" class="tooltip">@FormatScore(criticReview.Score)</span>
+                            </div>
+                            <div class="review-author">
+                                <p>
+                                    @if (string.IsNullOrEmpty(criticReview.SourceUrl))
+                                    {
+                                        <span><cite>@criticReview.Publication</cite></span>
+                                    }
+                                    else
+                                    {
+                                        <a href="@criticReview.SourceUrl" target="_blank" rel="nofollow noopener noreferrer"><span><cite>@criticReview.Publication</cite></span></a>
+                                    }
+                                    @criticReview.Author
+                                </p>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(criticReview.TextContent))
+                        {
+                            <p>@criticReview.TextContent</p>
+                        }
+                        @if (!string.IsNullOrEmpty(criticReview.SourceUrl))
+                        {
+                            <a class="review-link" href="@criticReview.SourceUrl" target="_blank" rel="nofollow noopener noreferrer">Читать рецензию полностью</a>
+                        }
+                    </section>
+                }
+            </div>
+        }
+    </div>
+
+    @if (CriticsReviews.Count > 0)
+    {
+        <div class="reviews-num">
+            <div class="htitle">@CriticsReviews.Count @ReviewsWord на @KindLabel «@Name»@(Year.HasValue ? $" ({Year})" : "") от критиков</div>
+        </div>
+        <div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+            <meta itemprop="reviewCount" content="@CriticsReviews.Count" />
+            <meta itemprop="ratingCount" content="@CriticsReviews.Count" />
+            <meta itemprop="bestRating" content="10" />
+            <meta itemprop="worstRating" content="0" />
+            Общий рейтинг критиков на основе @CriticsReviews.Count @ScoresWord = <span itemprop="ratingValue">@FormatScore(AverageScore)</span>
+        </div>
+    }
+
+    <AuthorizeView Policy="Admin">
+        <Authorized>
+            <a class="links-add" href="@AdminHref">Добавить рецензию</a>
+        </Authorized>
+    </AuthorizeView>
+</section>
