@@ -1,0 +1,27 @@
+.post-footer h2 {
+    color: #333;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 15px 0;
+    line-height: 1.5;
+}
+
+@media only screen and (max-width:800px) {
+    #content-trailer {
+        position: relative;
+        padding-bottom: 56.25%;
+        padding-right: 100%;
+        padding-top: 30px;
+        height: 0;
+        overflow: hidden;
+        width: 0;
+    }
+
+    #content-trailer iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+}

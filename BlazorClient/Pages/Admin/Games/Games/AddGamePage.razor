@@ -38,13 +38,7 @@
                 <ValidationMessage For="() => Description" />
             </label>
         </p>
-        <p>
-            <label>
-                Enter trailer:
-                <InputText @bind-Value="@Trailer" />
-                <ValidationMessage For="() => Trailer" />
-            </label>
-        </p>
+        <TrailerField @bind-Value="Trailer" />
 
         <p>
             <label>Select developers:</label>

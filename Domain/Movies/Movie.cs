@@ -48,6 +48,12 @@ public sealed record Movie
     [JsonPropertyName("description")]
     public required string Description { get; set; }
 
+    /// <summary>
+    /// Embed-ссылка на трейлер (YouTube / Rutube), null - трейлера нет.
+    /// </summary>
+    [JsonPropertyName("trailer")]
+    public string? Trailer { get; set; }
+
     [JsonPropertyName("movieGenres")]
     public List<Genre> MovieGenres { get; set; } = new List<Genre>();
 

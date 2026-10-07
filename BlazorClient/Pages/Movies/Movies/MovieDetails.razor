@@ -53,6 +53,7 @@ else
                                ReleaseYear="@PremierDate.Year"
                                ReleaseMonth="@PremierDate.Month"
                                ImageSource="@Movie.ImageSource"
+                               Trailer="@Movie.Trailer"
                                Prefix="Movies" />
 
                     @if (Movie.IsReleased)
@@ -75,6 +76,12 @@ else
                     }
 
                     <Description TextContent="@Movie.Description" />
+
+                    <MovieMedia MovieId="@Movie.Id"
+                                Trailer="@Movie.Trailer"
+                                Name="@Movie.Name"
+                                Image="@Movie.ImageSource"
+                                PremierDate="@Movie.PremierDate" />
 
                     <div class="user-reviews comments">
                         <div id="comments">

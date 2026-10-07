@@ -56,7 +56,7 @@ public sealed class MoviesWebManager : WebManager, IWebManager<Movie, AddMovieMo
     {
         HttpResponseMessage publisherUpdateHttpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PutAsJsonAsync($"/api/movies/{id}", updateMovieModel);
         if (publisherUpdateHttpResponseMessage.IsSuccessStatusCode)
-            return await JsonSerializer.DeserializeAsync<Movie>(await publisherUpdateHttpResponseMessage.Content.ReadAsStreamAsync());
+            return await publisherUpdateHttpResponseMessage.Content.ReadFromJsonAsync<Movie>();
         return null;
     }
 

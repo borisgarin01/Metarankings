@@ -53,6 +53,7 @@ else
                                ReleaseYear="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)"
                                ReleaseMonth="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Month)"
                                ImageSource="@Game.Image"
+                               Trailer="@Game.Trailer"
                                Prefix="Games" />
 
                     @if (Game.IsReleased)

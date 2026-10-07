@@ -1,0 +1,30 @@
+@if (!string.IsNullOrWhiteSpace(Trailer))
+{
+    <section class="post-footer">
+        <h2>Трейлер и кадры</h2>
+        <div id="tcontent">
+            <div class="video-content" itemprop="subjectOf" itemscope itemtype="https://schema.org/VideoObject">
+                <div id="content-trailer">
+                    <meta itemprop="isFamilyFriendly" content="true">
+                    @if (PremierDate.HasValue)
+                    {
+                        <meta itemprop="uploadDate" content="@PremierDate.Value.ToString("yyyy-MM-dd")">
+                    }
+                    <link itemprop="url" href="/movies/details/@MovieId">
+                    <meta itemprop="name" content="Трейлер @Name">
+                    <meta itemprop="description" content="Трейлер фильма @Name">
+                    <link itemprop="thumbnail" href="@Image">
+                    <link itemprop="thumbnailUrl" href="@Image">
+                    <link itemprop="embedUrl" href="@Trailer">
+                    <iframe title="Трейлер @Name"
+                            src="@Trailer"
+                            height="240"
+                            width="670"
+                            allow="clipboard-write; autoplay; encrypted-media; picture-in-picture"
+                            allowfullscreen
+                            style="border-width:0"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+}

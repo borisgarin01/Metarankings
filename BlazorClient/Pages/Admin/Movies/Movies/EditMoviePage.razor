@@ -1,52 +1,54 @@
-﻿@page "/admin/movies/add-movie"
+@page "/admin/movies/edit-movie/{Id:long}"
 @using BlazorClient.Components.PagesComponents.Common
 @using Domain.Movies
 
-<h3>Add movie page</h3>
-
-<a href="/admin/movies/list-movies" class="list-group-item link-dark">Фильмы</a>
-
-<AuthorizeView Roles="Admin">
+<AuthorizeView Policy="Admin">
     <Authorized>
+        <a href="/admin/movies/list-movies" class="list-group-item link-dark">Фильмы</a>
         <a href="/admin">К странице админа</a>
-        @if (MoviesDirectorsToSelectFrom is null || MoviesGenresToSelectFrom is null || MoviesStudiosToSelectFrom is null)
+
+        @if (IsNotFound)
+        {
+            <p>Фильм не найден.</p>
+        }
+        else if (Movie is null || MoviesDirectorsToSelectFrom is null || MoviesGenresToSelectFrom is null || MoviesStudiosToSelectFrom is null)
         {
             <p>Загружается...</p>
         }
         else
         {
-            <EditForm OnValidSubmit="AddMovieAsync" Model="this" Context="myContext">
+            <h3>Редактировать фильм: @Movie.Name</h3>
+
+            <EditForm OnValidSubmit="UpdateMovieAsync" Model="this" Context="editContext">
                 <p>
                     <label>
-                        Enter original name:
-                        <InputText @bind-Value="@OriginalName" />
-                        <ValidationMessage For="() => OriginalName" />
-                    </label>
-                </p>
-                <p>
-                    <label>
-                        Enter name:
+                        Название:
                         <InputText @bind-Value="@Name" />
-                        <ValidationMessage For="() => OriginalName" />
                     </label>
                 </p>
                 <p>
                     <label>
-                        Enter premier date:
+                        Оригинальное название:
+                        <InputText @bind-Value="@OriginalName" />
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        Дата премьеры:
                         <InputDate @bind-Value="@PremierDate" />
-                        <ValidationMessage For="() => PremierDate" />
                     </label>
                 </p>
                 <p>
                     <label>
-                        Enter description:
-                        <InputTextArea @bind-Value="@Description" />
-                        <ValidationMessage For="() => Description" />
+                        Описание:
+                        <InputTextArea @bind-Value="@Description" rows="6" cols="80" />
                     </label>
                 </p>
+
                 <TrailerField @bind-Value="Trailer" />
+
                 <p>
-                    <label>Select movie director:</label>
+                    <label>Режиссёры:</label>
                     @{
                         var directorSelector = (MovieDirector d) => d.Id;
                         var directorDisplay = (MovieDirector d) => d.Name;
@@ -58,10 +60,10 @@
                                  IdSelector="directorSelector"
                                  DisplaySelector="directorDisplay"
                                  Placeholder="Select directors..."
-                                 LabelPlural="director" />
+                                 LabelPlural="directors" />
                 </p>
                 <p>
-                    <label>Select movie genre:</label>
+                    <label>Жанры:</label>
                     @{
                         var movieGenreSelector = (Genre mg) => mg.Id;
                         var movieGenreDisplay = (Genre mg) => mg.Name;
@@ -72,11 +74,11 @@
                                  @bind-SelectedIds="SelectedMoviesGenresIds"
                                  IdSelector="movieGenreSelector"
                                  DisplaySelector="movieGenreDisplay"
-                                 Placeholder="Select genres..." />
-                    <ValidationMessage For="() => SelectedMoviesGenres" />
+                                 Placeholder="Select genres..."
+                                 LabelPlural="genres" />
                 </p>
                 <p>
-                    <label>Select movie studio:</label>
+                    <label>Студии:</label>
                     @{
                         var movieStudioSelector = (MovieStudio ms) => ms.Id;
                         var movieStudioDisplay = (MovieStudio ms) => ms.Name;
@@ -87,24 +89,27 @@
                                  @bind-SelectedIds="SelectedMoviesStudiosIds"
                                  IdSelector="movieStudioSelector"
                                  DisplaySelector="movieStudioDisplay"
-                                 Placeholder="Select studios..." />
-                    <ValidationMessage For="() => SelectedMoviesStudios" />
+                                 Placeholder="Select studios..."
+                                 LabelPlural="studios" />
                 </p>
                 <p>
                     <label>
-                        Enter image:
-                        <InputFile OnChange="FileUploaded" />
-                        <ValidationMessage For="() => ImageToUpload" />
+                        Постер (оставьте пустым, чтобы не менять):
+                        <InputFile OnChange="FileUploaded" accept="image/*" />
                     </label>
                     <div class="image-container">
-                        <img class="post-image" src="@ImageSource" alt="Изображение на странице игры для загрузки фильма" title="Фильм @Name" itemprop="image">
+                        <img class="post-image" src="@ImagePreview" alt="Постер фильма @Name" title="Фильм @Name">
                     </div>
                 </p>
-                <input type="submit" value="Submit" />
+
+                <p>
+                    <button type="submit" disabled="@IsSaving">@(IsSaving ? "Сохранение..." : "Сохранить")</button>
+                    <a href="/movies/details/@Id">К странице фильма</a>
+                </p>
             </EditForm>
         }
     </Authorized>
     <NotAuthorized>
-        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы добавить фильм
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы редактировать фильм
     </NotAuthorized>
 </AuthorizeView>

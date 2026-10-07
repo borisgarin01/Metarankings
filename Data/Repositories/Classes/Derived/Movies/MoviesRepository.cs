@@ -1,4 +1,5 @@
 ﻿using Data.Repositories.Interfaces.Derived;
+using Domain.Common;
 using Domain.Movies;
 using Domain.RequestsModels.Movies.Movies;
 using Domain.Reviews;
@@ -77,16 +78,17 @@ RETURNING Id, Name;", new { Name = movieDirectorName });
         }
 
         Movie insertedMovie = await connection.QueryFirstAsync<Movie>(@"INSERT INTO Movies 
-(Name, OriginalName, ImageSource, PremierDate, Description) 
+(Name, OriginalName, ImageSource, PremierDate, Description, Trailer)
 VALUES
-(@Name, @OriginalName, @ImageSource, CAST(@PremierDate AS DATE), @Description)
-RETURNING Id, Name, OriginalName, ImageSource, PremierDate, Description;", new
+(@Name, @OriginalName, @ImageSource, CAST(@PremierDate AS DATE), @Description, @Trailer)
+RETURNING Id, Name, OriginalName, ImageSource, PremierDate, Description, Trailer;", new
         {
             entity.Name,
             entity.OriginalName,
             entity.ImageSource,
             entity.PremierDate,
-            entity.Description
+            entity.Description,
+            Trailer = TrailerUrl.ToEmbed(entity.Trailer)
         });
 
         foreach (Genre movieGenre in insertedMovieGenres)
@@ -178,7 +180,7 @@ md.Id, md.Name
     public async Task<Movie> GetAsync(long id)
     {
         using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
-        string sql = @"select m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description,
+        string sql = @"select m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description, m.Trailer,
 COALESCE((SELECT AVG(Score)::float FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersScore,
 COALESCE((SELECT COUNT(*) FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersReviewsCount,
 COALESCE((SELECT AVG(Score)::float FROM MoviesCriticsReviews WHERE MovieId = m.Id), 0) AS CriticsScore,
@@ -682,8 +684,48 @@ WHERE (m.PremierDate IS NULL OR m.PremierDate > CURRENT_DATE)
             await RemoveAsync(id);
     }
 
-    public Task<Movie> UpdateAsync(UpdateMovieModel entity, long id)
+    public async Task<Movie> UpdateAsync(UpdateMovieModel entity, long id)
     {
-        throw new NotImplementedException();
+        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        connection.Open();
+
+        using NpgsqlTransaction transaction = connection.BeginTransaction();
+
+        int affectedRows = await connection.ExecuteAsync(@"UPDATE Movies SET
+Name=@Name, OriginalName=@OriginalName, ImageSource=@ImageSource, PremierDate=CAST(@PremierDate AS DATE),
+Description=@Description, Trailer=@Trailer
+WHERE Id=@Id;", new
+        {
+            Id = id,
+            entity.Name,
+            entity.OriginalName,
+            entity.ImageSource,
+            entity.PremierDate,
+            entity.Description,
+            Trailer = TrailerUrl.ToEmbed(entity.Trailer)
+        }, transaction: transaction);
+
+        if (affectedRows == 0)
+            return null;
+
+        await connection.ExecuteAsync(@"DELETE FROM MoviesMoviesGenres WHERE MovieId=@Id;
+DELETE FROM MoviesMoviesStudios WHERE MovieId=@Id;
+DELETE FROM MoviesMoviesDirectors WHERE MovieId=@Id;", new { Id = id }, transaction: transaction);
+
+        foreach (long movieGenreId in entity.MoviesGenresIds.Distinct())
+            await connection.ExecuteAsync("INSERT INTO MoviesMoviesGenres (MovieId, MovieGenreId) VALUES (@MovieId, @MovieGenreId);",
+                new { MovieId = id, MovieGenreId = movieGenreId }, transaction: transaction);
+
+        foreach (long movieStudioId in entity.MoviesStudiosIds.Distinct())
+            await connection.ExecuteAsync("INSERT INTO MoviesMoviesStudios (MovieId, MovieStudioId) VALUES (@MovieId, @MovieStudioId);",
+                new { MovieId = id, MovieStudioId = movieStudioId }, transaction: transaction);
+
+        foreach (long movieDirectorId in entity.MoviesDirectorsIds.Distinct())
+            await connection.ExecuteAsync("INSERT INTO MoviesMoviesDirectors (MovieId, MovieDirectorId) VALUES (@MovieId, @MovieDirectorId);",
+                new { MovieId = id, MovieDirectorId = movieDirectorId }, transaction: transaction);
+
+        await transaction.CommitAsync();
+
+        return await GetAsync(id);
     }
 }

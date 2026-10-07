@@ -61,9 +61,9 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
 
     public async Task<Game> UpdateAsync(long id, UpdateGameModel updateGameModel)
     {
-        HttpResponseMessage publisherUpdateHttpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PutAsJsonAsync($"/api/Games/Games/{id}", updateGameModel);
+        HttpResponseMessage publisherUpdateHttpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PutAsJsonAsync($"/api/games/Games/{id}", updateGameModel);
         if (publisherUpdateHttpResponseMessage.IsSuccessStatusCode)
-            return await JsonSerializer.DeserializeAsync<Game>(await publisherUpdateHttpResponseMessage.Content.ReadAsStreamAsync());
+            return await publisherUpdateHttpResponseMessage.Content.ReadFromJsonAsync<Game>();
         return null;
     }
 

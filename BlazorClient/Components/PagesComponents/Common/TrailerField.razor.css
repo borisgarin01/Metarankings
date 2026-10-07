@@ -1,0 +1,25 @@
+.trailer-field input {
+    width: 100%;
+    max-width: 600px;
+}
+
+.trailer-field small {
+    display: block;
+    color: #777;
+}
+
+.trailer-preview {
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 16 / 9;
+    margin-top: 8px;
+    background: #e9e9e9;
+    border: 1px solid #dbdbdb;
+}
+
+    .trailer-preview iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+    }
