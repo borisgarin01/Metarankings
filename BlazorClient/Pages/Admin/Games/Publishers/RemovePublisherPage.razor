@@ -1,20 +1,23 @@
 ﻿@page "/admin/Games/publishers/remove-publisher/{Id:long}"
+@using Domain.Games
+@using Domain.RequestsModels.Games.Publishers
+@inherits RemoveEntityPageBase<Publisher, AddPublisherModel, UpdatePublisherModel>
 
 <AuthorizeView Policy="Admin">
     <Authorized>
         <a href="/admin">К странице админа</a>
         <a href="/admin/games/publishers/list-publishers" class="list-group-item link-dark">Издатели</a>
 
-        @if (Publisher is null)
+        @if (Entity is null)
         {
             <p>Загружается...</p>
         }
         else
         {
-            <h3>Удалить @Publisher.Name</h3>
+            <h3>Удалить @Entity.Name</h3>
             <p>Вы уверены, что хотите удалить этого издателя?</p>
             <p>
-                <button type="button" @onclick="RemovePublisherAsync">Удалить</button>
+                <button type="button" @onclick="RemoveAsync">Удалить</button>
             </p>
         }
     </Authorized>

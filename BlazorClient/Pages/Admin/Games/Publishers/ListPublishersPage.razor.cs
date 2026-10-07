@@ -1,4 +1,6 @@
-﻿using Domain.Games;
+﻿using Domain.RequestsModels.Games.Publishers;
+using WebManagers;
+using Domain.Games;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BlazorClient.Pages.Admin.Games.Publishers;
@@ -19,10 +21,10 @@ public partial class ListPublishersPage : ComponentBase
     }
 
     [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; }
+    public IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel> WebManager { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        Publishers = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Publisher>>(@"/api/Games/Publishers");
+        Publishers = await WebManager.GetAllAsync();
     }
 }

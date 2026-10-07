@@ -1,4 +1,4 @@
-using Domain.RequestsModels.CriticsReviews;
+﻿using Domain.RequestsModels.CriticsReviews;
 using Domain.Reviews;
 using System.Text.RegularExpressions;
 
@@ -41,7 +41,7 @@ FROM {_reviewsTable}";
     /// </summary>
     public async Task<IEnumerable<CriticReview>> GetByEntityAsync(long entityId)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         return await connection.QueryAsync<CriticReview>(
             $"{SelectSql} WHERE {_entityColumn} = @EntityId ORDER BY Score DESC, Date DESC, Id;",
             new { EntityId = entityId });
@@ -49,14 +49,14 @@ FROM {_reviewsTable}";
 
     public async Task<CriticReview?> GetAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<CriticReview>($"{SelectSql} WHERE Id = @Id;", new { Id = id });
     }
 
     /// <param name="userId">Администратор, добавивший рецензию.</param>
     public async Task<long> AddAsync(CriticReviewModel model, long userId)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         return await connection.QueryFirstAsync<long>($@"
 INSERT INTO {_reviewsTable} ({_entityColumn}, UserId, Publication, Author, Score, TextContent, SourceUrl, Date)
 VALUES (@EntityId, @UserId, @Publication, @Author, @Score, @TextContent, @SourceUrl, @Date)
@@ -76,7 +76,7 @@ RETURNING Id;",
 
     public async Task<CriticReview?> UpdateAsync(CriticReviewModel model, long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<CriticReview>($@"
 UPDATE {_reviewsTable}
 SET Publication = @Publication, Author = @Author, Score = @Score, TextContent = @TextContent, SourceUrl = @SourceUrl, Date = @Date
@@ -96,7 +96,7 @@ RETURNING Id, {_entityColumn} AS EntityId, Publication, Author, Score, TextConte
 
     public async Task RemoveAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         await connection.ExecuteAsync($"DELETE FROM {_reviewsTable} WHERE Id = @Id;", new { Id = id });
     }
 

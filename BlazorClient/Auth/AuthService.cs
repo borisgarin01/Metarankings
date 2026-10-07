@@ -31,6 +31,9 @@ public class AuthService : IAuthService
         _toastService = toastService;
     }
 
+    private HttpClient AuthorizedClient => _httpClientFactory.CreateClient("AuthorizedClient");
+    private HttpClient UnauthorizedClient => _httpClientFactory.CreateClient("UnauthorizedClient");
+
     private const string ACCESS_KEY = nameof(ACCESS_KEY);
     private const string REFRESH_KEY = nameof(REFRESH_KEY);
 
@@ -41,7 +44,7 @@ public class AuthService : IAuthService
         try
         {
             // ВАЖНО: Используем UnauthorizedClient для логина!
-            var response = await _httpClientFactory.CreateClient("UnauthorizedClient")
+            var response = await UnauthorizedClient
                 .PostAsJsonAsync("/api/auth/login", loginModel);
 
             if (response.IsSuccessStatusCode)
@@ -53,9 +56,7 @@ public class AuthService : IAuthService
                 // Если токены получены сразу (без 2FA) - сохраняем
                 if (result != null && !string.IsNullOrEmpty(result.AccessToken))
                 {
-                    await StoreAccessTokenAsync(result.AccessToken);
-                    await StoreRefreshTokenAsync(result.RefreshToken);
-                    AddDefaultRequestHeaderBearer(result.AccessToken);
+                    await StoreTokensAsync(result.AccessToken, result.RefreshToken);
                 }
 
                 return result;
@@ -101,7 +102,7 @@ public class AuthService : IAuthService
             }
 
             // ВАЖНО: Используем UnauthorizedClient для refresh-token!
-            var client = _httpClientFactory.CreateClient("UnauthorizedClient");
+            var client = UnauthorizedClient;
 
             var request = new RefreshTokenRequest { RefreshToken = refreshToken };
             var response = await client.PostAsJsonAsync("/api/auth/refresh-token", request);
@@ -115,9 +116,7 @@ public class AuthService : IAuthService
                     _logger.LogInformation("Token refreshed successfully");
 
                     // Сохраняем новые токены
-                    await StoreAccessTokenAsync(tokenResponse.AccessToken);
-                    await StoreRefreshTokenAsync(tokenResponse.RefreshToken);
-                    AddDefaultRequestHeaderBearer(tokenResponse.AccessToken);
+                    await StoreTokensAsync(tokenResponse.AccessToken, tokenResponse.RefreshToken);
 
                     return tokenResponse;
                 }
@@ -191,7 +190,7 @@ public class AuthService : IAuthService
         }
 
         _cachedAccessToken = null;
-        _httpClientFactory.CreateClient("AuthorizedClient").DefaultRequestHeaders.Remove("Authorization");
+        AuthorizedClient.DefaultRequestHeaders.Remove("Authorization");
     }
 
     private async Task<AuthResponseDto> GetStoredTokensResultAsync(string refreshToken)
@@ -211,7 +210,7 @@ public class AuthService : IAuthService
             ConfirmLoginModel request = new(userId, token);
             _logger.LogDebug("Sending 2FA code for {UserId}", userId);
 
-            HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/auth/ConfirmLoginViaEmail", request);
+            HttpResponseMessage response = await AuthorizedClient.PostAsJsonAsync("/api/auth/ConfirmLoginViaEmail", request);
             _logger.LogDebug("2FA response: StatusCode = {StatusCode}", response.StatusCode);
 
             if (response.IsSuccessStatusCode)
@@ -225,10 +224,7 @@ public class AuthService : IAuthService
                 {
                     _logger.LogInformation("2FA verification successful for {UserId}", userId);
 
-                    await StoreAccessTokenAsync(result.AccessToken);
-                    await StoreRefreshTokenAsync(result.RefreshToken);
-
-                    AddDefaultRequestHeaderBearer(result.AccessToken);
+                    await StoreTokensAsync(result.AccessToken, result.RefreshToken);
 
                     return result;
                 }
@@ -305,7 +301,7 @@ public class AuthService : IAuthService
                 if (!string.IsNullOrEmpty(accessToken))
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-                var response = await _httpClientFactory.CreateClient("UnauthorizedClient").SendAsync(request, cts.Token);
+                var response = await UnauthorizedClient.SendAsync(request, cts.Token);
                 if (!response.IsSuccessStatusCode)
                     _logger.LogWarning("Server logout returned {Status}", response.StatusCode);
             }
@@ -329,7 +325,7 @@ public class AuthService : IAuthService
 
         try
         {
-            HttpResponseMessage httpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/auth/register", registerModel);
+            HttpResponseMessage httpResponseMessage = await AuthorizedClient.PostAsJsonAsync("/api/auth/register", registerModel);
             _logger.LogDebug("Registration response: StatusCode = {StatusCode}", httpResponseMessage.StatusCode);
 
             if (httpResponseMessage.StatusCode == HttpStatusCode.BadRequest ||
@@ -365,7 +361,7 @@ public class AuthService : IAuthService
 
         try
         {
-            HttpResponseMessage httpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync(
+            HttpResponseMessage httpResponseMessage = await AuthorizedClient.PostAsJsonAsync(
                 "/api/auth/resetPasswordConfirm", resetPasswordConfirmModel);
 
             _logger.LogDebug("Password reset confirmation response: {StatusCode}",
@@ -399,7 +395,7 @@ public class AuthService : IAuthService
 
         try
         {
-            HttpResponseMessage httpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync<ResetPasswordModel>(
+            HttpResponseMessage httpResponseMessage = await AuthorizedClient.PostAsJsonAsync<ResetPasswordModel>(
                 "/api/auth/resetPassword", resetPasswordModel);
 
             _logger.LogDebug("Password reset response: {StatusCode}", httpResponseMessage.StatusCode);
@@ -449,7 +445,7 @@ public class AuthService : IAuthService
 
             _logger.LogDebug("Sending 2FA change request: {Body}", jsonBody);
 
-            HttpResponseMessage httpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").SendAsync(httpRequest);
+            HttpResponseMessage httpResponseMessage = await AuthorizedClient.SendAsync(httpRequest);
             _logger.LogDebug("2FA change response: {StatusCode}", httpResponseMessage.StatusCode);
 
             if (httpResponseMessage.IsSuccessStatusCode)
@@ -479,7 +475,7 @@ public class AuthService : IAuthService
 
         try
         {
-            IEnumerable<AuthenticationScheme>? schemes = await _httpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<AuthenticationScheme>>(
+            IEnumerable<AuthenticationScheme>? schemes = await AuthorizedClient.GetFromJsonAsync<IEnumerable<AuthenticationScheme>>(
                 "/api/auth/external-providers");
 
             int count = schemes?.Count() ?? 0;
@@ -506,7 +502,7 @@ public class AuthService : IAuthService
 
         try
         {
-            ApplicationUser? applicationUser = await _httpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<ApplicationUser>("/api/auth/current-user");
+            ApplicationUser? applicationUser = await AuthorizedClient.GetFromJsonAsync<ApplicationUser>("/api/auth/current-user");
 
             if (applicationUser != null)
             {
@@ -531,7 +527,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            HttpResponseMessage changingPasswordHttpResponseMessage = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync(
+            HttpResponseMessage changingPasswordHttpResponseMessage = await AuthorizedClient.PostAsJsonAsync(
                 "/api/auth/set-password", changePasswordModel);
 
             _logger.LogDebug("Change password response: {StatusCode}",
@@ -559,7 +555,7 @@ public class AuthService : IAuthService
 
     public void AddDefaultRequestHeaderBearer(string accessToken)
     {
-        var client = _httpClientFactory.CreateClient("AuthorizedClient");
+        var client = AuthorizedClient;
         client.DefaultRequestHeaders.Remove("Authorization");
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
     }
@@ -581,11 +577,21 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<LinkAccountIdResponse> StartVkIdLinkAsync                 ()
+    public Task<LinkAccountIdResponse> StartVkIdLinkAsync()
     {
-        HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsync("/api/auth/link-vkid", null);
+        return StartExternalAccountLinkAsync("/api/auth/link-vkid", "VK");
+    }
 
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+    public Task<LinkAccountIdResponse> StartYandexIdLinkAsync()
+    {
+        return StartExternalAccountLinkAsync("/api/auth/link-yandexid", "Yandex");
+    }
+
+    private async Task<LinkAccountIdResponse> StartExternalAccountLinkAsync(string path, string providerName)
+    {
+        HttpResponseMessage response = await AuthorizedClient.PostAsync(path, null);
+
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
             throw new UnauthorizedAccessException("Необходимо войти в систему");
 
         response.EnsureSuccessStatusCode();
@@ -593,25 +599,14 @@ public class AuthService : IAuthService
         LinkAccountIdResponse? result = await response.Content.ReadFromJsonAsync<LinkAccountIdResponse>();
 
         if (result is null || string.IsNullOrWhiteSpace(result.Url))
-            throw new InvalidOperationException("Сервер не вернул URL авторизации VK");
+            throw new InvalidOperationException($"Сервер не вернул URL авторизации {providerName}");
 
         return result;
     }
 
-    public async Task<LinkAccountIdResponse> StartYandexIdLinkAsync()
+    private async Task StoreTokensAsync(string accessToken, string refreshToken)
     {
-        HttpResponseMessage response = await _httpClientFactory.CreateClient("AuthorizedClient").PostAsync("/api/auth/link-yandexid", null);
-
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            throw new UnauthorizedAccessException("Необходимо войти в систему");
-
-        response.EnsureSuccessStatusCode();
-
-        LinkAccountIdResponse? result = await response.Content.ReadFromJsonAsync<LinkAccountIdResponse>();
-
-        if (result is null || string.IsNullOrWhiteSpace(result.Url))
-            throw new InvalidOperationException("Сервер не вернул URL авторизации VK");
-
-        return result;
+        await StoreAccessTokenAsync(accessToken);
+        await StoreRefreshTokenAsync(refreshToken);
     }
 }

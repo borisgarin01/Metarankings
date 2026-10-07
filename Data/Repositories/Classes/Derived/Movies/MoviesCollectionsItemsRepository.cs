@@ -7,15 +7,15 @@ using Domain.RequestsModels.Movies.Collections;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class MoviesCollectionsItemsRepository : Repository, IRepository<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>
+public sealed class MoviesCollectionsItemsRepository : Repository<MoviesCollectionItem, AddMoviesCollectionItemModel, UpdateMoviesCollectionItemModel>
 {
     public MoviesCollectionsItemsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddMoviesCollectionItemModel entity)
+    public override async Task<long> AddAsync(AddMoviesCollectionItemModel entity)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var insertedGameCollectionItemId = await connection.QuerySingleAsync<long>(@"
 INSERT INTO MoviesCollectionsItems (MovieId, MovieCollectionId)
@@ -27,17 +27,9 @@ new { entity.MovieId, entity.MoviesCollectionId });
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddMoviesCollectionItemModel> entities)
+    public override async Task<IEnumerable<MoviesCollectionItem>> GetAllAsync()
     {
-        foreach (var entity in entities)
-        {
-            await AddAsync(entity);
-        }
-    }
-
-    public async Task<IEnumerable<MoviesCollectionItem>> GetAllAsync()
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var moviesCollectionItems = await connection.QueryAsync<MoviesCollectionItem, Movie, MoviesCollection, MoviesCollectionItem>(@"
 SELECT mci.Id, mci.MovieId, mci.MovieCollectionId,
@@ -65,9 +57,9 @@ ON mc.Id=mci.MovieCollectionId;", (moviesCollectionItem, movie, moviesCollection
         }
     }
 
-    public async Task<MoviesCollectionItem> GetAsync(long id)
+    public override async Task<MoviesCollectionItem> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var result = await connection.QueryAsync<MoviesCollectionItem, Movie, MoviesCollectionItem>(
                 @"SELECT mci.Id, mci.MovieId, mci.MovieCollectionId,
@@ -88,9 +80,9 @@ ON mc.Id=mci.MovieCollectionId;", (moviesCollectionItem, movie, moviesCollection
         }
     }
 
-    public async Task<IEnumerable<MoviesCollectionItem>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<MoviesCollectionItem>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var moviesCollectionsItems = await connection.QueryAsync<MoviesCollectionItem, Movie, MoviesCollectionItem>(@"SELECT mci.Id, mci.MovieId, mci.MovieCollectionId,
 m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description
@@ -117,24 +109,16 @@ OFFSET @Offset LIMIT @Limit;", (movieCollectionItem, movie) =>
         }
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             await connection.ExecuteAsync(@"DELETE FROM MoviesCollectionsItems
 WHERE Id=@Id;", new { Id = id });
         }
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
-    {
-        foreach (var id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<MoviesCollectionItem> UpdateAsync(UpdateMoviesCollectionItemModel entity, long id)
+    public override async Task<MoviesCollectionItem> UpdateAsync(UpdateMoviesCollectionItemModel entity, long id)
     {
         throw new NotImplementedException();
     }

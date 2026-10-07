@@ -6,15 +6,15 @@ using IdentityLibrary.DTOs;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 
-public sealed class MoviesViewersReviewsRepository : Repository, IMoviesViewersReviewsRepository
+public sealed class MoviesViewersReviewsRepository : Repository<MovieViewerReview, AddMovieViewerReviewWithUserIdAndDateModel, UpdateMovieViewerReviewModel>, IMoviesViewersReviewsRepository
 {
     public MoviesViewersReviewsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddMovieViewerReviewWithUserIdAndDateModel entity)
+    public override async Task<long> AddAsync(AddMovieViewerReviewWithUserIdAndDateModel entity)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var insertedMovieViewerReviewId = await connection.QueryFirstOrDefaultAsync<long>(@"
 INSERT INTO ViewersMoviesReviews(ViewerId, MovieId, Score, TextContent, Date)
@@ -35,7 +35,7 @@ RETURNING Id;",
 
     public async Task<IEnumerable<MovieViewerReview>> GetByTimespanAsync(DateTime dateFrom, DateTime dateTo)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieViewerReview, Movie, ApplicationUser, MovieViewerReview>(@"
 SELECT 
@@ -64,7 +64,7 @@ on vmr.ViewerId=au.Id;", (movieReview, movie, applicationUser) =>
 
     public async Task<MovieViewerReview> GetUserReviewForMovieAsync(long userId, long movieId)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieViewerReview, Movie, ApplicationUser, MovieViewerReview>(@"
 SELECT vmr.Id, vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
@@ -88,19 +88,19 @@ WHERE ViewerId=@userId and MovieId=@movieId;", (movieReview, movie, applicationU
         }
     }
 
-    public Task AddRangeAsync(IEnumerable<AddMovieViewerReviewWithUserIdAndDateModel> entities)
+    public override Task AddRangeAsync(IEnumerable<AddMovieViewerReviewWithUserIdAndDateModel> entities)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<MovieViewerReview>> GetAllAsync()
+    public override Task<IEnumerable<MovieViewerReview>> GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    public async Task<MovieViewerReview> GetAsync(long id)
+    public override async Task<MovieViewerReview> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieViewerReview, Movie, ApplicationUser, MovieViewerReview>(@"
 SELECT vmr.Id, vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
@@ -124,9 +124,9 @@ WHERE vmr.Id=@id;", (movieReview, movie, applicationUser) =>
         }
     }
 
-    public async Task<IEnumerable<MovieViewerReview>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<MovieViewerReview>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var moviesReviewsForTimespan = await connection.QueryAsync<MovieViewerReview, Movie, ApplicationUser, MovieViewerReview>(@"
 SELECT vmr.Id, vmr.MovieId, vmr.ViewerId, vmr.Score, vmr.TextContent, vmr.Date,
@@ -152,24 +152,18 @@ OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", (movieReview, movie, applicati
     }
 
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             // Лайки/дизлайки удаляются каскадно (ON DELETE CASCADE в ViewersMoviesReviewsShifts)
             await connection.ExecuteAsync("DELETE FROM ViewersMoviesReviews WHERE Id=@id", new { id });
         }
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<MovieViewerReview> UpdateAsync(UpdateMovieViewerReviewModel entity, long id)
     {
-        foreach (long id in ids)
-            await RemoveAsync(id);
-    }
-
-    public async Task<MovieViewerReview> UpdateAsync(UpdateMovieViewerReviewModel entity, long id)
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             await connection.ExecuteAsync(@"UPDATE ViewersMoviesReviews
 SET TextContent=@TextContent, Score=@Score, Date=@TimeStamp

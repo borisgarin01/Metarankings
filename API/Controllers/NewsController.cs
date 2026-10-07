@@ -1,4 +1,5 @@
-﻿using Data.Repositories.Classes.Derived;
+﻿using API.Auth;
+using Data.Repositories.Classes.Derived;
 using Domain.Common.News;
 
 namespace API.Controllers;
@@ -53,7 +54,7 @@ public sealed class NewsController : ControllerBase
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<ActionResult<NewsItem>> Create([FromBody] AddNewsItemModel addNewsItemModel)
     {
-        long userId = GetUserIdFromClaims();
+        long userId = User.GetUserId() ?? throw new InvalidOperationException("User identifier claim is missing or invalid.");
 
         // Маппинг: AddNewsItemModel (frontend) -> AddNewsItemDbModel (backend)
         var dbModel = new AddNewsItemDbModel
@@ -90,7 +91,7 @@ public sealed class NewsController : ControllerBase
         long id,
         [FromBody] UpdateNewsItemModel request)
     {
-        long userId = GetUserIdFromClaims();
+        long userId = User.GetUserId() ?? throw new InvalidOperationException("User identifier claim is missing or invalid.");
 
         // Маппинг: UpdateNewsItemModel (frontend) -> UpdateNewsItemDbModel (backend)
         var dbModel = new UpdateNewsItemDbModel
@@ -144,17 +145,5 @@ public sealed class NewsController : ControllerBase
 
         await _newsRepository.RemoveRangeAsync(ids);
         return NoContent();
-    }
-
-    // ---- Helpers ----
-
-    private long GetUserIdFromClaims()
-    {
-        string? raw = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(raw) || !long.TryParse(raw, out long userId))
-        {
-            throw new InvalidOperationException("User identifier claim is missing or invalid.");
-        }
-        return userId;
     }
 }

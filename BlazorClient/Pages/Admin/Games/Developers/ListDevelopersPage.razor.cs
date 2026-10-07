@@ -1,4 +1,6 @@
-﻿using Domain.Games;
+﻿using Domain.RequestsModels.Games.Developers;
+using WebManagers;
+using Domain.Games;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BlazorClient.Pages.Admin.Games.Developers;
@@ -9,10 +11,10 @@ public partial class ListDevelopersPage : ComponentBase
     public IEnumerable<Developer> Developers { get; set; }
 
     [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; }
+    public IWebManager<Developer, AddDeveloperModel, UpdateDeveloperModel> WebManager { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        Developers = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Developer>>(@"/api/Games/Developers");
+        Developers = await WebManager.GetAllAsync();
     }
 }

@@ -1,4 +1,6 @@
-﻿using Domain.Games;
+﻿using Domain.RequestsModels.Games;
+using WebManagers;
+using Domain.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Games;
 
@@ -7,10 +9,10 @@ public partial class ListGamesPage : ComponentBase
     public IEnumerable<Game> Games { get; private set; }
 
     [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; }
+    public IWebManager<Game, AddGameModel, UpdateGameModel> WebManager { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        Games = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Game>>(@"/api/Games/Games");
+        Games = await WebManager.GetAllAsync();
     }
 }

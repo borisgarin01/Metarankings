@@ -1,5 +1,6 @@
 ﻿using Domain.Games;
 using Domain.Games.Collections;
+using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Games.Collections;
 using Domain.RequestsModels.Games.Developers;
 using Domain.RequestsModels.Games.Genres;
@@ -23,6 +24,7 @@ public static class GamesWebManagersRegistrator
             .AddSingleton<IWebManager<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsWebManager>()
             .AddSingleton<IWebManager<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersWebManager>()
             .AddSingleton<GamesWebManager>()
+            .AddSingleton<IWebManager<Game, AddGameModel, UpdateGameModel>>(serviceProvider => serviceProvider.GetRequiredService<GamesWebManager>())
             .AddSingleton<IWebManager<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>, GamesCollectionsWebManager>()
             .AddSingleton<IWebManager<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>, GamesCollectionsItemsWebManager>()
             .AddSingleton<GamesPlayersReviewsShiftsWebManager>()

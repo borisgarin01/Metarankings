@@ -1,3 +1,4 @@
+﻿using API.Auth;
 using Data.Repositories.Classes.Derived.ContentRequests;
 using Domain.ContentRequests;
 using Domain.RequestsModels.ContentRequests;
@@ -42,7 +43,7 @@ public sealed class ContentRequestsController : ControllerBase
     [HttpGet("my")]
     public async Task<ActionResult<IEnumerable<ContentRequest>>> GetMineAsync()
     {
-        long? userId = GetCurrentUserId();
+        long? userId = User.GetUserId();
         if (userId is null)
             return Unauthorized();
 
@@ -53,7 +54,7 @@ public sealed class ContentRequestsController : ControllerBase
     [HttpGet("{id:long}")]
     public async Task<ActionResult<ContentRequest>> GetAsync(long id)
     {
-        long? userId = GetCurrentUserId();
+        long? userId = User.GetUserId();
         if (userId is null)
             return Unauthorized();
 
@@ -70,7 +71,7 @@ public sealed class ContentRequestsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ContentRequest>> AddAsync(AddContentRequestModel addContentRequestModel)
     {
-        long? userId = GetCurrentUserId();
+        long? userId = User.GetUserId();
         if (userId is null)
             return Unauthorized();
 
@@ -112,7 +113,7 @@ public sealed class ContentRequestsController : ControllerBase
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> DeleteAsync(long id)
     {
-        long? userId = GetCurrentUserId();
+        long? userId = User.GetUserId();
         if (userId is null)
             return Unauthorized();
 
@@ -127,11 +128,5 @@ public sealed class ContentRequestsController : ControllerBase
 
         await _contentRequestsRepository.RemoveAsync(id);
         return NoContent();
-    }
-
-    private long? GetCurrentUserId()
-    {
-        string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return long.TryParse(userId, out long parsedUserId) ? parsedUserId : null;
     }
 }

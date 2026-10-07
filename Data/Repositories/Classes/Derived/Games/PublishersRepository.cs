@@ -4,15 +4,15 @@ using Domain.RequestsModels.Games.Publishers;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class PublishersRepository : Repository, IRepository<Publisher, AddPublisherModel, UpdatePublisherModel>
+public sealed class PublishersRepository : Repository<Publisher, AddPublisherModel, UpdatePublisherModel>
 {
     public PublishersRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddPublisherModel publisher)
+    public override async Task<long> AddAsync(AddPublisherModel publisher)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         long id = await connection.QueryFirstAsync<long>(@"INSERT INTO Publishers
 (Name)
 VALUES (@Name)
@@ -24,17 +24,9 @@ RETURNING Id;"
         return id;
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddPublisherModel> publishers)
+    public override async Task<IEnumerable<Publisher>> GetAllAsync()
     {
-        foreach (AddPublisherModel publisher in publishers)
-        {
-            await AddAsync(publisher);
-        }
-    }
-
-    public async Task<IEnumerable<Publisher>> GetAllAsync()
-    {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Publisher> publisherDictionary = new Dictionary<long, Publisher>();
 
         await connection.QueryAsync<Publisher, Game, Publisher>(
@@ -67,9 +59,9 @@ RETURNING Id;"
         return publisherDictionary.Values;
     }
 
-    public async Task<Publisher> GetAsync(long id)
+    public override async Task<Publisher> GetAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Publisher> publisherDictionary = new Dictionary<long, Publisher>();
 
         await connection.QueryAsync<Publisher, Game, Platform, Publisher>(
@@ -115,9 +107,9 @@ RETURNING Id;"
         return publisherDictionary.Values.SingleOrDefault();
     }
 
-    public async Task<IEnumerable<Publisher>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<Publisher>> GetAsync(long offset, long limit)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Publisher> publisherDictionary = new Dictionary<long, Publisher>();
 
         await connection.QueryAsync<Publisher, Game, Publisher>(@"
@@ -156,24 +148,16 @@ RETURNING Id;"
         return publisherDictionary.Values;
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         await connection.ExecuteAsync(@"DELETE FROM 
 Publishers WHERE Id=@id", new { id });
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<Publisher> UpdateAsync(UpdatePublisherModel publisher, long id)
     {
-        foreach (long id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<Publisher> UpdateAsync(UpdatePublisherModel publisher, long id)
-    {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Publisher? updatedPublisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"UPDATE Publishers set Name=@Name 
 RETURNING Name, Id
 WHERE Id=@Id;", new

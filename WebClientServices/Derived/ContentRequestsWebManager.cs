@@ -1,4 +1,4 @@
-using Domain.ContentRequests;
+﻿using Domain.ContentRequests;
 using Domain.RequestsModels.ContentRequests;
 using System.Net.Http.Json;
 
@@ -22,9 +22,7 @@ public sealed class ContentRequestsWebManager : WebManager
     {
         string url = status is null ? BasePath : $"{BasePath}?status={(short)status.Value}";
 
-        IEnumerable<ContentRequest>? contentRequests = await HttpClientFactory
-            .CreateClient("AuthorizedClient")
-            .GetFromJsonAsync<IEnumerable<ContentRequest>>(url);
+        IEnumerable<ContentRequest>? contentRequests = await Client.GetFromJsonAsync<IEnumerable<ContentRequest>>(url);
 
         return contentRequests ?? Enumerable.Empty<ContentRequest>();
     }
@@ -34,31 +32,23 @@ public sealed class ContentRequestsWebManager : WebManager
     /// </summary>
     public async Task<IEnumerable<ContentRequest>> GetMineAsync()
     {
-        IEnumerable<ContentRequest>? contentRequests = await HttpClientFactory
-            .CreateClient("AuthorizedClient")
-            .GetFromJsonAsync<IEnumerable<ContentRequest>>($"{BasePath}/my");
+        IEnumerable<ContentRequest>? contentRequests = await Client.GetFromJsonAsync<IEnumerable<ContentRequest>>($"{BasePath}/my");
 
         return contentRequests ?? Enumerable.Empty<ContentRequest>();
     }
 
     public async Task<HttpResponseMessage> AddAsync(AddContentRequestModel addContentRequestModel)
     {
-        return await HttpClientFactory
-            .CreateClient("AuthorizedClient")
-            .PostAsJsonAsync(BasePath, addContentRequestModel);
+        return await Client.PostAsJsonAsync(BasePath, addContentRequestModel);
     }
 
     public async Task<HttpResponseMessage> UpdateStatusAsync(long id, UpdateContentRequestStatusModel updateContentRequestStatusModel)
     {
-        return await HttpClientFactory
-            .CreateClient("AuthorizedClient")
-            .PutAsJsonAsync($"{BasePath}/{id}/status", updateContentRequestStatusModel);
+        return await Client.PutAsJsonAsync($"{BasePath}/{id}/status", updateContentRequestStatusModel);
     }
 
     public async Task<HttpResponseMessage> DeleteAsync(long id)
     {
-        return await HttpClientFactory
-            .CreateClient("AuthorizedClient")
-            .DeleteAsync($"{BasePath}/{id}");
+        return await Client.DeleteAsync($"{BasePath}/{id}");
     }
 }

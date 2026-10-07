@@ -1,120 +1,46 @@
-﻿using Domain.Games;
+using Domain.Games;
 using Domain.RequestsModels.Games;
-using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace WebManagers.Derived.Games;
 
-public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel, UpdateGameModel>, IByNameSearchingManager<Game>
+public sealed class GamesWebManager : CrudWebManager<Game, AddGameModel, UpdateGameModel>, IByNameSearchingManager<Game>
 {
-    public GamesWebManager(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+    public GamesWebManager(IHttpClientFactory httpClientFactory) : base(httpClientFactory, "/api/Games/Games")
     {
     }
 
-    public async Task<HttpResponseMessage> AddAsync(AddGameModel addGameModel)
+    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddGameModel> addGamesModels)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Games/Games", addGameModel);
-        return httpResponseMessage;
+        return PostAsync("upload-games-from-json", addGamesModels);
     }
 
-    public Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile)
+    public override async Task<IEnumerable<Game>> GetFirstAsync(long offset, long limit)
     {
-        throw new NotImplementedException();
+        return await Client.GetFromJsonAsync<IEnumerable<Game>>($"{BasePath}/First/{offset}/{limit}");
     }
 
-    public async Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddGameModel> addGamesModels)
+    public override async Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
     {
-        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/games/Games/upload-games-from-json", addGamesModels);
-        return httpResponseMessage;
-    }
-
-    public async Task<HttpResponseMessage> DeleteAsync(long id)
-    {
-        HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").DeleteAsync($"/api/games/Games/{id}");
-        return httpResponseMessage;
-    }
-
-    public async Task<IEnumerable<Game>> GetAllAsync()
-    {
-        IEnumerable<Game>? games = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Game>>("/api/Games/Games");
-        return games;
-    }
-
-    public async Task<IEnumerable<Game>> GetFirstAsync(long offset, long limit)
-    {
-        IEnumerable<Game>? games = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/First/{offset}/{limit}");
-        return games;
-    }
-
-    public async Task<IEnumerable<Game>> GetLastAsync(long offset, long limit)
-    {
-        IEnumerable<Game>? games = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/Last/{offset}/{limit}");
-        return games;
-    }
-
-    public async Task<Game> GetAsync(long id)
-    {
-        Game? game = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Game>($"/api/Games/Games/{id}");
-        return game;
-    }
-
-    public async Task<Game> UpdateAsync(long id, UpdateGameModel updateGameModel)
-    {
-        HttpResponseMessage publisherUpdateHttpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").PutAsJsonAsync($"/api/games/Games/{id}", updateGameModel);
-        if (publisherUpdateHttpResponseMessage.IsSuccessStatusCode)
-            return await publisherUpdateHttpResponseMessage.Content.ReadFromJsonAsync<Game>();
-        return null;
+        return await Client.GetFromJsonAsync<IEnumerable<Game>>($"{BasePath}/Last/{offset}/{limit}");
     }
 
     public async Task<IEnumerable<Game>> GetNearestAsync(
-    long offset,
-    long limit,
-    IEnumerable<long>? genresIds = null,
-    IEnumerable<long>? platformsIds = null)
+        long offset,
+        long limit,
+        IEnumerable<long>? genresIds = null,
+        IEnumerable<long>? platformsIds = null)
     {
-        var queryParams = new List<string>();
-
-        if (genresIds?.Any() == true)
-            queryParams.AddRange(genresIds.Select(id => $"genresIds={id}"));
-
-        if (platformsIds?.Any() == true)
-            queryParams.AddRange(platformsIds.Select(id => $"platformsIds={id}"));
-
-        string query = queryParams.Count > 0
-            ? "?" + string.Join("&", queryParams)
-            : string.Empty;
-
-        IEnumerable<Game> nearestGames = await HttpClientFactory
-            .CreateClient("AuthorizedClient")
-            .GetFromJsonAsync<IEnumerable<Game>>(
-                $"/api/Games/Games/games-releases-dates/{offset}/{limit}{query}");
-
-        return nearestGames;
+        return await Client.GetFromJsonAsync<IEnumerable<Game>>(
+            $"{BasePath}/games-releases-dates/{offset}/{limit}{BuildFiltersQuery(genresIds, platformsIds)}");
     }
 
     public async Task<int> GetNearestCountAsync(
         IEnumerable<long>? genresIds = null,
         IEnumerable<long>? platformsIds = null)
     {
-        var queryParams = new List<string>();
-
-        if (genresIds?.Any() == true)
-            queryParams.AddRange(genresIds.Select(id => $"genresIds={id}"));
-
-        if (platformsIds?.Any() == true)
-            queryParams.AddRange(platformsIds.Select(id => $"platformsIds={id}"));
-
-        string query = queryParams.Count > 0
-            ? "?" + string.Join("&", queryParams)
-            : string.Empty;
-
-        int count = await HttpClientFactory
-            .CreateClient("AuthorizedClient")
-            .GetFromJsonAsync<int>(
-                $"/api/Games/Games/games-releases-dates/count{query}");
-
-        return count;
+        return await Client.GetFromJsonAsync<int>(
+            $"{BasePath}/games-releases-dates/count{BuildFiltersQuery(genresIds, platformsIds)}");
     }
 
     public async Task<IEnumerable<Game>> GetMostWaitingAsync(
@@ -123,10 +49,8 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
         IEnumerable<long>? genresIds = null,
         IEnumerable<long>? platformsIds = null)
     {
-        IEnumerable<Game>? games = await HttpClientFactory
-            .CreateClient("AuthorizedClient")
-            .GetFromJsonAsync<IEnumerable<Game>>(
-                $"/api/Games/Games/most-waiting/{offset}/{limit}{BuildFiltersQuery(genresIds, platformsIds)}");
+        IEnumerable<Game>? games = await Client.GetFromJsonAsync<IEnumerable<Game>>(
+            $"{BasePath}/most-waiting/{offset}/{limit}{BuildFiltersQuery(genresIds, platformsIds)}");
 
         return games ?? Enumerable.Empty<Game>();
     }
@@ -135,36 +59,20 @@ public sealed class GamesWebManager : WebManager, IWebManager<Game, AddGameModel
         IEnumerable<long>? genresIds = null,
         IEnumerable<long>? platformsIds = null)
     {
-        int count = await HttpClientFactory
-            .CreateClient("AuthorizedClient")
-            .GetFromJsonAsync<int>(
-                $"/api/Games/Games/most-waiting/count{BuildFiltersQuery(genresIds, platformsIds)}");
-
-        return count;
-    }
-
-    private static string BuildFiltersQuery(IEnumerable<long>? genresIds, IEnumerable<long>? platformsIds)
-    {
-        List<string> queryParams = new List<string>();
-
-        if (genresIds?.Any() == true)
-            queryParams.AddRange(genresIds.Select(id => $"genresIds={id}"));
-
-        if (platformsIds?.Any() == true)
-            queryParams.AddRange(platformsIds.Select(id => $"platformsIds={id}"));
-
-        return queryParams.Count > 0
-            ? "?" + string.Join("&", queryParams)
-            : string.Empty;
+        return await Client.GetFromJsonAsync<int>(
+            $"{BasePath}/most-waiting/count{BuildFiltersQuery(genresIds, platformsIds)}");
     }
 
     public async Task<IEnumerable<Game>> SearchByName(string? name)
     {
-        IEnumerable<Game> games;
-        if (!string.IsNullOrWhiteSpace(name))
-            games = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/Search?name={name}");
-        else
-            games = await GetAllAsync();
-        return games;
+        if (string.IsNullOrWhiteSpace(name))
+            return await GetAllAsync();
+
+        return await Client.GetFromJsonAsync<IEnumerable<Game>>($"{BasePath}/Search?name={name}");
+    }
+
+    private static string BuildFiltersQuery(IEnumerable<long>? genresIds, IEnumerable<long>? platformsIds)
+    {
+        return QueryStringBuilder.Build(("genresIds", genresIds), ("platformsIds", platformsIds));
     }
 }

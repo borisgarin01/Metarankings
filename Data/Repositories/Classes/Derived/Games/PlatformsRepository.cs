@@ -4,15 +4,15 @@ using Domain.RequestsModels.Games.Platforms;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class PlatformsRepository : Repository, IRepository<Platform, AddPlatformModel, UpdatePlatformModel>
+public sealed class PlatformsRepository : Repository<Platform, AddPlatformModel, UpdatePlatformModel>
 {
     public PlatformsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddPlatformModel platform)
+    public override async Task<long> AddAsync(AddPlatformModel platform)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         long id = await connection.QueryFirstAsync<long>(@"INSERT INTO Platforms
 (Name)
 VALUES (@Name)
@@ -24,17 +24,9 @@ RETURNING Id;"
         return id;
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddPlatformModel> platfroms)
+    public override async Task<IEnumerable<Platform>> GetAllAsync()
     {
-        foreach (var platform in platfroms)
-        {
-            await AddAsync(platform);
-        }
-    }
-
-    public async Task<IEnumerable<Platform>> GetAllAsync()
-    {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Platform> platformDictionary = new Dictionary<long, Platform>();
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
@@ -90,9 +82,9 @@ RETURNING Id;"
         return platformDictionary.Values;
     }
 
-    public async Task<Platform> GetAsync(long id)
+    public override async Task<Platform> GetAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Platform> platformDictionary = new Dictionary<long, Platform>();
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
@@ -150,9 +142,9 @@ RETURNING Id;"
         return platformDictionary.Values.FirstOrDefault();
     }
 
-    public async Task<IEnumerable<Platform>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<Platform>> GetAsync(long offset, long limit)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Platform> platformDictionary = new Dictionary<long, Platform>();
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
@@ -211,24 +203,16 @@ RETURNING Id;"
         return platformDictionary.Values;
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         await connection.ExecuteAsync(@"DELETE FROM 
 Platforms WHERE Id=@id", new { id });
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<Platform> UpdateAsync(UpdatePlatformModel platform, long id)
     {
-        foreach (long id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<Platform> UpdateAsync(UpdatePlatformModel platform, long id)
-    {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name 
 WHERE Id=@Id
 RETURNING Name, Href, Id;", new

@@ -6,15 +6,15 @@ using Npgsql;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class DevelopersRepository : Repository, IDevelopersRepository
+public sealed class DevelopersRepository : Repository<Developer, AddDeveloperModel, UpdateDeveloperModel>, IDevelopersRepository
 {
     public DevelopersRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddDeveloperModel developer)
+    public override async Task<long> AddAsync(AddDeveloperModel developer)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var id = await connection.QueryFirstAsync<long>(@"INSERT INTO Developers
 (Name)
@@ -28,17 +28,9 @@ RETURNING Id;"
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddDeveloperModel> developers)
+    public override async Task<IEnumerable<Developer>> GetAllAsync()
     {
-        foreach (var developer in developers)
-        {
-            await AddAsync(developer);
-        }
-    }
-
-    public async Task<IEnumerable<Developer>> GetAllAsync()
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var developersDictionary = new Dictionary<long, Developer>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -93,9 +85,9 @@ RETURNING Id;"
         }
     }
 
-    public async Task<Developer> GetAsync(long id)
+    public override async Task<Developer> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var developersDictionary = new Dictionary<long, Developer>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -156,9 +148,9 @@ RETURNING Id;"
         }
     }
 
-    public async Task<IEnumerable<Developer>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<Developer>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var developersDictionary = new Dictionary<long, Developer>();
             var gamesDictionary = new Dictionary<long, Game>();
@@ -220,7 +212,7 @@ RETURNING Id;"
 
     public async Task<Developer> GetByNameAsync(string name)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
         var developersDictionary = new Dictionary<long, Developer>();
         var gamesDictionary = new Dictionary<long, Game>();
 
@@ -275,24 +267,16 @@ RETURNING Id;"
         return developersDictionary.Values.FirstOrDefault();
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
         await connection.ExecuteAsync(@"DELETE FROM 
 Developers WHERE Id=@id", new { id });
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<Developer> UpdateAsync(UpdateDeveloperModel developer, long id)
     {
-        foreach (var id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<Developer> UpdateAsync(UpdateDeveloperModel developer, long id)
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var updatedDeveloper = await connection.QueryFirstOrDefaultAsync<Developer>(@"UPDATE Developers SET Name=@Name
 WHERE Id=@id

@@ -6,15 +6,15 @@ using IdentityLibrary.DTOs;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesPlayersReviewsRepository : Repository, IGamesPlayersReviewsRepository
+public sealed class GamesPlayersReviewsRepository : Repository<GameReview, AddGamePlayerReviewWithUserIdAndDateModel, UpdateGamePlayerReviewModel>, IGamesPlayersReviewsRepository
 {
     public GamesPlayersReviewsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddGamePlayerReviewWithUserIdAndDateModel gameReview)
+    public override async Task<long> AddAsync(AddGamePlayerReviewWithUserIdAndDateModel gameReview)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         long insertedGameReviewId = await connection.QueryFirstAsync<long>(@"
 INSERT INTO GamesPlayersReviews (GameId, UserId, TextContent, Score, Date)
 VALUES(@GameId, @UserId, @TextContent, @Score, @TimeStamp::DATE)
@@ -30,17 +30,9 @@ RETURNING Id;", new
         return insertedGameReviewId;
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddGamePlayerReviewWithUserIdAndDateModel> gamesReviews)
-    {
-        foreach (AddGamePlayerReviewWithUserIdAndDateModel gameReview in gamesReviews)
-        {
-            await AddAsync(gameReview);
-        }
-    }
-
     public async Task<GameReview> GetUserReviewForGameAsync(long userId, long gameId)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         IEnumerable<GameReview> gameReviewToCheckExistance = await connection.QueryAsync<GameReview, Game, GamePlayerReviewShift, ApplicationUser, GameReview>(@"
 SELECT gpr.Id, gpr.GameId, gpr.UserId, gpr.TextContent, gpr.Score, gpr.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
@@ -72,9 +64,9 @@ WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, shift, application
         return gameReviewToCheckExistance.FirstOrDefault();
     }
 
-    public async Task<IEnumerable<GameReview>> GetAllAsync()
+    public override async Task<IEnumerable<GameReview>> GetAllAsync()
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         IEnumerable<GameReview> gamesReviews = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
@@ -97,9 +89,9 @@ WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, applicationUser) =
         return gamesReviews;
     }
 
-    public async Task<GameReview> GetAsync(long id)
+    public override async Task<GameReview> GetAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         IEnumerable<GameReview> gamesReviews = await connection.QueryAsync<GameReview, GamePlayerReviewShift, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
     gprs.Id, gprs.GamePlayerReviewId, gprs.ShifterId, gprs.Direction,
@@ -126,9 +118,9 @@ WHERE GamesPlayersReviews.Id = @id;", (gameReview, gamePlayerReviewShift, game, 
         return gamesReviews.SingleOrDefault();
     }
 
-    public async Task<IEnumerable<GameReview>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<GameReview>> GetAsync(long offset, long limit)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
@@ -150,23 +142,15 @@ OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", (gameReview, game, application
         }, new { offset, limit });
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         await connection.ExecuteAsync(@"DELETE FROM GamesPlayersReviews WHERE Id=@id", new { id });
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<GameReview> UpdateAsync(UpdateGamePlayerReviewModel gameReview, long id)
     {
-        foreach (long id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<GameReview> UpdateAsync(UpdateGamePlayerReviewModel gameReview, long id)
-    {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         GameReview? updatedGamePlayerReview = await connection.QueryFirstOrDefaultAsync<GameReview>(@"UPDATE GamesPlayersReviews 
 SET TextContent=@TextContent, Score=@Score, Date=@TimeStamp
 WHERE Id=@id", new
@@ -182,7 +166,7 @@ WHERE Id=@id", new
 
     public async Task<IEnumerable<GameReview>> GetGameReviewsAsync(long gameId)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
@@ -206,7 +190,7 @@ ORDER BY GamesPlayersReviews.Id;", (gameReview, game, applicationUser) =>
 
     public async Task<IEnumerable<GameReview>> GetUserReviewsAsync(long userId)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,

@@ -1,91 +1,13 @@
-﻿using Data.Repositories.Interfaces;
+using Data.Repositories.Interfaces;
 using Domain.Games;
 using Domain.RequestsModels.Games.Genres;
 
 namespace API.Controllers.Games;
 
-[ApiController]
 [Route("api/games/[controller]")]
-public sealed class GenresController : ControllerBase
+public sealed class GenresController : CrudControllerBase<Genre, AddGameGenreModel, UpdateGameGenreModel>
 {
-    private readonly IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel> _genresRepository;
-
-    public GenresController(IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel> genresRepository)
+    public GenresController(IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel> genresRepository) : base(genresRepository)
     {
-        _genresRepository = genresRepository;
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Genre>>> GetAllAsync()
-    {
-        IEnumerable<Genre> genres = await _genresRepository.GetAllAsync();
-
-        return Ok(genres);
-    }
-
-    [HttpPost]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<Genre>> AddAsync(AddGameGenreModel addGenreModel)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(addGenreModel);
-        }
-
-        long insertedGenreId = await _genresRepository.AddAsync(addGenreModel);
-
-        Genre insertedGenre = await _genresRepository.GetAsync(insertedGenreId);
-
-        return Created($"api/games/genres/{insertedGenreId}", insertedGenre);
-    }
-
-    [HttpGet("{id:long}")]
-    public async Task<ActionResult<Genre>> GetAsync(long id)
-    {
-        Genre? genre = await _genresRepository.GetAsync(id);
-        if (genre is null)
-            return NotFound();
-        else
-            return Ok(genre);
-    }
-
-    [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult> DeleteAsync(long id)
-    {
-        Genre? developer = await _genresRepository.GetAsync(id);
-        if (developer is null)
-            return NotFound();
-        else
-        {
-            try
-            {
-                await _genresRepository.RemoveAsync(developer.Id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex);
-            }
-        }
-    }
-
-    [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<Genre>> UpdateAsync(long id, UpdateGameGenreModel updateGenreModel)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        Genre? genreToUpdate = await _genresRepository.GetAsync(id);
-        if (genreToUpdate is null)
-            return NotFound();
-
-        // Update and return the updated entity
-        Genre updatedGenre = await _genresRepository.UpdateAsync(updateGenreModel, id);
-
-        return Ok(updatedGenre);
     }
 }
