@@ -1,9 +1,12 @@
 ﻿@page "/admin/games/remove-game/{Id:long}"
+@using Domain.Games
+@using Domain.RequestsModels.Games
+@inherits RemoveEntityPageBase<Game, AddGameModel, UpdateGameModel>
 
 <AuthorizeView Policy="Admin">
     <Authorized>
         <a href="/admin">К странице админа</a>
-        @if (Game is null)
+        @if (Entity is null)
         {
             <p>Загружается...</p>
         }
@@ -11,10 +14,10 @@
         {
             <a href="/admin/games/games/list-games" class="list-group-item link-dark">Игры</a>
 
-            <h3>Удалить @Game.Name</h3>
+            <h3>Удалить @Entity.Name</h3>
             <p>Вы уверены, что хотите удалить эту игру?</p>
             <p>
-                <button type="button" @onclick="RemoveGameAsync">Удалить</button>
+                <button type="button" @onclick="RemoveAsync">Удалить</button>
             </p>
         }
     </Authorized>

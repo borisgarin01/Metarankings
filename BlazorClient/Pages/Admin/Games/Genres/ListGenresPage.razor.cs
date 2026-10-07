@@ -1,4 +1,6 @@
-﻿using Domain.Games;
+﻿using Domain.RequestsModels.Games.Genres;
+using WebManagers;
+using Domain.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Genres;
 
@@ -7,10 +9,10 @@ public partial class ListGenresPage : ComponentBase
     public IEnumerable<Genre> Genres { get; private set; }
 
     [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; }
+    public IWebManager<Genre, AddGameGenreModel, UpdateGameGenreModel> WebManager { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        Genres = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Genre>>(@"/api/Games/Genres");
+        Genres = await WebManager.GetAllAsync();
     }
 }

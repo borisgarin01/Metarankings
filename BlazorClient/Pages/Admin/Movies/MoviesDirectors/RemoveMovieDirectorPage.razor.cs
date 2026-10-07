@@ -1,37 +1,9 @@
-﻿using Blazored.Toast.Services;
-using Domain.Movies;
+﻿using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
-using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesDirectors;
 
-public partial class RemoveMovieDirectorPage : ComponentBase
+public partial class RemoveMovieDirectorPage : RemoveEntityPageBase<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>
 {
-    [Parameter]
-    public long Id { get; set; }
-
-    public MovieDirector MovieDirector { get; private set; }
-
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
-
-    [Inject]
-    public IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> MoviesDirectorsWebManager { get; private set; }
-
-    [Inject]
-    public IToastService ToastService { get; private set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        MovieDirector = await MoviesDirectorsWebManager.GetAsync(Id);
-    }
-
-    public async Task RemoveMovieDirectorAsync()
-    {
-        HttpResponseMessage httpResponseMessage = await MoviesDirectorsWebManager.DeleteAsync(Id);
-        if (httpResponseMessage.IsSuccessStatusCode)
-            NavigationManager.NavigateTo("/admin/movies/movies-directors/movies-directors-list");
-        else
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
-    }
+    protected override string ListUrl => "/admin/movies/movies-directors/movies-directors-list";
 }

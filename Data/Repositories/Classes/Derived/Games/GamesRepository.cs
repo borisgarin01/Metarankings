@@ -9,15 +9,15 @@ using IdentityLibrary.DTOs;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesRepository : Repository, IGamesRepository
+public sealed class GamesRepository : Repository<Game, AddGameModel, UpdateGameModel>, IGamesRepository
 {
     public GamesRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddGameModel entity)
+    public override async Task<long> AddAsync(AddGameModel entity)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         connection.Open();
 
         using NpgsqlTransaction transaction = connection.BeginTransaction();
@@ -69,15 +69,9 @@ RETURNING Id, GameId, DeveloperId;", new { GameId = insertedGame.Id, DeveloperId
         return insertedGame.Id;
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddGameModel> games)
-    {
-        foreach (AddGameModel entity in games)
-            await AddAsync(entity);
-    }
-
     public async Task<IEnumerable<Game>> GetFirstAsync(int offset, int limit)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
 -- Статистика отзывов
@@ -177,7 +171,7 @@ gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date
     }
     public async Task<IEnumerable<Game>> GetLastAsync(int offset, int limit)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
 COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
@@ -257,7 +251,7 @@ gc.Id, gc.Name, gc.Description
 
     public async Task<IEnumerable<Game>> GetNearestAsync(short offset, short limit)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         IEnumerable<Game> games = await connection.QueryAsync<Game>(@"
 WITH future_games AS (
@@ -275,7 +269,7 @@ SELECT * FROM future_games", new { Offset = offset, Limit = limit });
 
     public async Task<IEnumerable<Game>> GetNearestAsync()
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         IEnumerable<Game> games = await connection.QueryAsync<Game>(@"
 WITH future_games AS (
@@ -297,9 +291,9 @@ ORDER BY ReleaseDate ASC");
         return games;
     }
 
-    public async Task<IEnumerable<Game>> GetAllAsync()
+    public override async Task<IEnumerable<Game>> GetAllAsync()
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
 COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
@@ -376,9 +370,9 @@ gc.Id, gc.Name, gc.Description
         return result;
     }
 
-    public async Task<Game> GetAsync(long id)
+    public override async Task<Game> GetAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description, g.trailer, g.localizationid,
 COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
@@ -498,24 +492,16 @@ WHERE g.Id=@id";
         return gameDictionary.Values.FirstOrDefault();
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         await connection.ExecuteAsync(@"DELETE FROM Games
 WHERE Id=@id", new { id });
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<Game> UpdateAsync(UpdateGameModel entity, long id)
     {
-        foreach (long id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<Game> UpdateAsync(UpdateGameModel entity, long id)
-    {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         connection.Open();
 
         using NpgsqlTransaction transaction = connection.BeginTransaction();
@@ -563,7 +549,7 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
         return await GetAsync(id);
     }
 
-    public Task<IEnumerable<Game>> GetAsync(long offset, long limit)
+    public override Task<IEnumerable<Game>> GetAsync(long offset, long limit)
     {
         throw new NotImplementedException();
     }
@@ -578,7 +564,7 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
     int skip,
     int take)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         StringBuilder filterSql = new StringBuilder(@"
     SELECT DISTINCT g.Id, g.Name
@@ -721,7 +707,7 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
 
     public async Task<IEnumerable<Game>> GetByNameAsync(string name)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
 COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
@@ -819,7 +805,7 @@ WHERE g.name ILIKE '%' || @name || '%'
     long[]? publishersIds,
     long[]? localizationsIds)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         StringBuilder countSql = new StringBuilder(@"
         SELECT COUNT(DISTINCT g.Id)
@@ -880,7 +866,7 @@ WHERE g.name ILIKE '%' || @name || '%'
     short offset,
     short limit)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         StringBuilder filterSql = new StringBuilder(@"
     SELECT DISTINCT
@@ -923,7 +909,7 @@ WHERE g.name ILIKE '%' || @name || '%'
     long[]? genresIds,
     long[]? platformsIds)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         StringBuilder countSql = new StringBuilder(@"
     SELECT COUNT(DISTINCT g.Id)
@@ -962,7 +948,7 @@ WHERE (g.ReleaseDate IS NULL OR g.ReleaseDate > CURRENT_DATE)
 
     public async Task<IEnumerable<Game>> GetMostWaitingAsync(long[]? genresIds, long[]? platformsIds, int skip, int take)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         IEnumerable<Game> games = await connection.QueryAsync<Game>($@"
 SELECT g.Id, g.Name, g.Image, g.LocalizationId, g.ReleaseDate, g.Description, g.Trailer,
@@ -995,7 +981,7 @@ OFFSET @Skip LIMIT @Take;",
 
     public async Task<int> GetMostWaitingCountAsync(long[]? genresIds, long[]? platformsIds)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         return await connection.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM Games g {MostWaitingGamesWhereSql};",
             new

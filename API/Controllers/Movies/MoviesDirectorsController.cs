@@ -1,112 +1,13 @@
-﻿using Data.Repositories.Interfaces;
+using Data.Repositories.Interfaces;
 using Domain.Movies;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 
 namespace API.Controllers.Movies;
 
-[ApiController]
 [Route("api/movies/[controller]")]
-public class MoviesDirectorsController : ControllerBase
+public sealed class MoviesDirectorsController : CrudControllerBase<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>
 {
-    private readonly IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> _moviesDirectorsRepository;
-
-    public MoviesDirectorsController(IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> moviesDirectorsRepository)
+    public MoviesDirectorsController(IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> moviesDirectorsRepository) : base(moviesDirectorsRepository)
     {
-        _moviesDirectorsRepository = moviesDirectorsRepository;
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<MovieDirector>> GetAllAsync()
-    {
-        try
-        {
-            var moviesDirectors = await _moviesDirectorsRepository.GetAllAsync();
-            return Ok(moviesDirectors);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-    }
-
-    [HttpGet("{id:long}")]
-    public async Task<ActionResult<MovieDirector>> GetAsync(long id)
-    {
-        try
-        {
-            var movieDirector = await _moviesDirectorsRepository.GetAsync(id);
-            if (movieDirector is null)
-            {
-                return NotFound();
-            }
-            return Ok(movieDirector);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-    }
-
-    [HttpPost]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<MovieDirector>> AddAsync(AddMovieDirectorModel addMovieDirectorModel)
-    {
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                var insertedId = await _moviesDirectorsRepository.AddAsync(addMovieDirectorModel);
-
-                var insertedMovieDirector = await _moviesDirectorsRepository.GetAsync(insertedId);
-
-                return Created($"/api/movies/moviesdirectors/{insertedId}", insertedMovieDirector);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex);
-            }
-        }
-
-        return BadRequest();
-    }
-
-    [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<MovieDirector>> UpdateAsync(long id, UpdateMovieDirectorModel updateMovieDirectorModel)
-    {
-        var movieDirectorToUpdate = await _moviesDirectorsRepository.GetAsync(id);
-
-        if (movieDirectorToUpdate is null)
-            return NotFound();
-
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                var updatedMovieDirector = await _moviesDirectorsRepository.UpdateAsync(updateMovieDirectorModel, id);
-
-                return Ok(updatedMovieDirector);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex);
-            }
-        }
-
-        return BadRequest();
-    }
-
-    [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<MovieDirector>> UpdateAsync(long id)
-    {
-        var movieDirectorToUpdate = await _moviesDirectorsRepository.GetAsync(id);
-
-        if (movieDirectorToUpdate is null)
-            return NotFound();
-
-        await _moviesDirectorsRepository.RemoveAsync(id);
-
-        return NoContent();
     }
 }

@@ -4,7 +4,7 @@ using Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Backend;
 
 namespace Data.Repositories.Classes.Derived.Movies;
 
-public sealed class MoviesViewersReviewsShiftsRepository : Repository, IRepository<MovieViewerReviewShift, AddMovieViewerReviewShiftModel, UpdateMovieViewerReviewShiftModel>
+public sealed class MoviesViewersReviewsShiftsRepository : Repository<MovieViewerReviewShift, AddMovieViewerReviewShiftModel, UpdateMovieViewerReviewShiftModel>
 {
     private const string SelectColumns = "Id, ViewerMovieReviewId AS MovieViewerReviewId, ShifterId, Direction";
 
@@ -12,9 +12,9 @@ public sealed class MoviesViewersReviewsShiftsRepository : Repository, IReposito
     {
     }
 
-    public async Task<long> AddAsync(AddMovieViewerReviewShiftModel entity)
+    public override async Task<long> AddAsync(AddMovieViewerReviewShiftModel entity)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             long id = await connection.QuerySingleOrDefaultAsync<long>(@"INSERT INTO ViewersMoviesReviewsShifts(ViewerMovieReviewId, ShifterId, Direction) VALUES(@MovieViewerReviewId, @ShifterId, (@Direction::int)::bit) RETURNING Id;", new
             {
@@ -27,15 +27,9 @@ public sealed class MoviesViewersReviewsShiftsRepository : Repository, IReposito
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddMovieViewerReviewShiftModel> entities)
+    public override async Task<IEnumerable<MovieViewerReviewShift>> GetAllAsync()
     {
-        foreach (AddMovieViewerReviewShiftModel movieViewerReviewShift in entities)
-            await AddAsync(movieViewerReviewShift);
-    }
-
-    public async Task<IEnumerable<MovieViewerReviewShift>> GetAllAsync()
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             IEnumerable<MovieViewerReviewShift> movieViewerReviewShifts = await connection.QueryAsync<MovieViewerReviewShift>($@"SELECT {SelectColumns}
 FROM ViewersMoviesReviewsShifts;");
@@ -44,9 +38,9 @@ FROM ViewersMoviesReviewsShifts;");
         }
     }
 
-    public async Task<MovieViewerReviewShift> GetAsync(long id)
+    public override async Task<MovieViewerReviewShift> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             MovieViewerReviewShift movieViewerReviewShift = await connection.QuerySingleAsync<MovieViewerReviewShift>($@"SELECT {SelectColumns}
 FROM ViewersMoviesReviewsShifts
@@ -58,7 +52,7 @@ WHERE Id=@Id;", new { Id = id });
 
     public async Task<MovieViewerReviewShift> GetByShifterIdAsync(long shifterId, long movieViewerReviewId)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             MovieViewerReviewShift movieViewerReviewShift = await connection.QuerySingleOrDefaultAsync<MovieViewerReviewShift>($@"SELECT {SelectColumns}
 FROM ViewersMoviesReviewsShifts
@@ -73,9 +67,9 @@ AND ViewerMovieReviewId=@MovieViewerReviewId;", new
         }
     }
 
-    public async Task<IEnumerable<MovieViewerReviewShift>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<MovieViewerReviewShift>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             IEnumerable<MovieViewerReviewShift> movieViewerReviewShifts = await connection.QueryAsync<MovieViewerReviewShift>($@"SELECT {SelectColumns}
 FROM ViewersMoviesReviewsShifts
@@ -85,25 +79,25 @@ OFFSET @Offset LIMIT @Limit;", new { Offset = offset, Limit = limit });
         }
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             await connection.ExecuteAsync("DELETE FROM ViewersMoviesReviewsShifts WHERE Id=@Id", new { Id = id });
         }
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task RemoveRangeAsync(IEnumerable<long> ids)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             await connection.ExecuteAsync("DELETE FROM ViewersMoviesReviewsShifts WHERE Id = ANY(@Ids)", new { Ids = ids.ToArray() });
         }
     }
 
-    public async Task<MovieViewerReviewShift> UpdateAsync(UpdateMovieViewerReviewShiftModel entity, long id)
+    public override async Task<MovieViewerReviewShift> UpdateAsync(UpdateMovieViewerReviewShiftModel entity, long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             MovieViewerReviewShift movieViewerReviewShift = await connection.QuerySingleOrDefaultAsync<MovieViewerReviewShift>($@"UPDATE ViewersMoviesReviewsShifts
 SET ViewerMovieReviewId=@MovieViewerReviewId,

@@ -9,15 +9,15 @@ using Dapper;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>
+public sealed class GamesCollectionsRepository : Repository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>
 {
     public GamesCollectionsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddGamesCollectionModel entity)
+    public override async Task<long> AddAsync(AddGamesCollectionModel entity)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
 
         const string sql = @"
             INSERT INTO GamesCollections(Name, Description, ImageSource) 
@@ -32,9 +32,9 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCo
         });
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddGamesCollectionModel> entities)
+    public override async Task AddRangeAsync(IEnumerable<AddGamesCollectionModel> entities)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
 
         const string sql = @"
             INSERT INTO GamesCollections(Name, Description, ImageSource) 
@@ -43,9 +43,9 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCo
         await connection.ExecuteAsync(sql, entities);
     }
 
-    public async Task<IEnumerable<GamesCollection>> GetAllAsync()
+    public override async Task<IEnumerable<GamesCollection>> GetAllAsync()
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
 
         var gamesCollections = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GameReview, ApplicationUser, GamesCollection>(
             @"
@@ -96,9 +96,9 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCo
         return gamesCollections.DistinctBy(gc => gc.Id);
     }
 
-    public async Task<GamesCollection?> GetAsync(long id)
+    public override async Task<GamesCollection?> GetAsync(long id)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
 
         var gamesCollection = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GameReview, ApplicationUser, GamesCollection>(
             @"
@@ -174,9 +174,9 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCo
         return result;
     }
 
-    public async Task<IEnumerable<GamesCollection>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<GamesCollection>> GetAsync(long offset, long limit)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
 
         var gamesCollectionsDictionary = new Dictionary<long, GamesCollection>();
 
@@ -239,21 +239,21 @@ public sealed class GamesCollectionsRepository : Repository, IRepository<GamesCo
         return gamesCollectionsDictionary.Values;
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
         await connection.ExecuteAsync("DELETE FROM GamesCollections WHERE Id = @Id", new { Id = id });
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task RemoveRangeAsync(IEnumerable<long> ids)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
         await connection.ExecuteAsync("DELETE FROM GamesCollections WHERE Id = ANY(@Ids)", new { Ids = ids });
     }
 
-    public async Task<GamesCollection> UpdateAsync(UpdateGamesCollectionModel entity, long id)
+    public override async Task<GamesCollection> UpdateAsync(UpdateGamesCollectionModel entity, long id)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
 
         const string sql = @"
             UPDATE GamesCollections 

@@ -1,105 +1,13 @@
-﻿using Data.Repositories.Interfaces;
+using Data.Repositories.Interfaces;
 using Domain.Games;
 using Domain.RequestsModels.Games.Platforms;
 
 namespace API.Controllers.Games;
 
-[ApiController]
 [Route("api/games/[controller]")]
-public sealed class PlatformsController : ControllerBase
+public sealed class PlatformsController : CrudControllerBase<Platform, AddPlatformModel, UpdatePlatformModel>
 {
-    private readonly IRepository<Platform, AddPlatformModel, UpdatePlatformModel> _platformsRepository;
-
-    public PlatformsController(IRepository<Platform, AddPlatformModel, UpdatePlatformModel> platformsRepository)
+    public PlatformsController(IRepository<Platform, AddPlatformModel, UpdatePlatformModel> platformsRepository) : base(platformsRepository)
     {
-        _platformsRepository = platformsRepository;
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Platform>>> GetAllAsync()
-    {
-        IEnumerable<Platform> developers = await _platformsRepository.GetAllAsync();
-
-        return Ok(developers);
-    }
-
-    [HttpPost]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<Platform>> AddAsync(AddPlatformModel addPlatformModel)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        long insertedPlatformId = await _platformsRepository.AddAsync(addPlatformModel);
-
-        Platform insertedPlatform = await _platformsRepository.GetAsync(insertedPlatformId);
-
-        return Created($"api/games/platforms/{insertedPlatform.Id}", insertedPlatform);
-    }
-
-    [HttpGet("{id:long}")]
-    public async Task<ActionResult<Platform>> GetAsync(long id)
-    {
-        Platform? platform = await _platformsRepository.GetAsync(id);
-        if (platform is null)
-            return NotFound();
-        else
-            return Ok(platform);
-    }
-
-    [HttpGet("{offset:long}/{limit:long}")]
-    public async Task<ActionResult<IEnumerable<Platform>>> GetAsync(long offset, long limit)
-    {
-        try
-        {
-            IEnumerable<Platform>? platforms = await _platformsRepository.GetAsync(offset, limit);
-            return Ok(platforms);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, new { ex.Message, ex.StackTrace });
-        }
-    }
-
-    [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult> DeleteAsync(long id)
-    {
-        Platform? platform = await _platformsRepository.GetAsync(id);
-        if (platform is null)
-            return NotFound();
-        else
-        {
-            try
-            {
-                await _platformsRepository.RemoveAsync(platform.Id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex);
-            }
-        }
-    }
-
-    [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<Platform>> UpdateAsync(long id, UpdatePlatformModel updatePlatformModel)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        Platform? platformToUpdate = await _platformsRepository.GetAsync(id);
-        if (platformToUpdate is null)
-            return NotFound();
-
-        // Update and return the updated entity
-        Platform updatedPlatform = await _platformsRepository.UpdateAsync(updatePlatformModel, id);
-
-        return Ok(updatedPlatform);
     }
 }

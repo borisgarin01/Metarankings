@@ -1,4 +1,4 @@
-using Domain.Waitings;
+﻿using Domain.Waitings;
 using System.Text.RegularExpressions;
 
 namespace Data.Repositories.Classes.Derived.Waitings;
@@ -40,7 +40,7 @@ public abstract class WaitingsRepository : Repository
     /// </summary>
     public async Task<bool?> IsReleasedAsync(long entityId)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<bool?>(
             $"SELECT ({_releaseDateColumn} IS NOT NULL AND {_releaseDateColumn} <= CURRENT_DATE) FROM {_entitiesTable} WHERE Id = @EntityId;",
             new { EntityId = entityId });
@@ -52,7 +52,7 @@ public abstract class WaitingsRepository : Repository
     /// </summary>
     public async Task<WaitingStatistics> VoteAsync(long entityId, long userId, bool isWaiting)
     {
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
         await connection.OpenAsync();
         using NpgsqlTransaction transaction = await connection.BeginTransactionAsync();
 
@@ -95,7 +95,7 @@ ON CONFLICT ({_entityColumn}, UserId) DO UPDATE SET IsWaiting = EXCLUDED.IsWaiti
         if (entitiesIds.Length == 0)
             return Enumerable.Empty<WaitingStatistics>();
 
-        using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+        using NpgsqlConnection connection = CreateConnection();
 
         IEnumerable<WaitingStatistics> statistics = await connection.QueryAsync<WaitingStatistics>($@"SELECT
 ids.Id AS EntityId,

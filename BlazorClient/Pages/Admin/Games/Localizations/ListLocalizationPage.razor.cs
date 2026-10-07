@@ -1,4 +1,6 @@
-﻿using Domain.Games;
+﻿using Domain.RequestsModels.Games.Localizations;
+using WebManagers;
+using Domain.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Localizations;
 
@@ -7,10 +9,10 @@ public partial class ListLocalizationPage : ComponentBase
     public IEnumerable<Localization> Localizations { get; private set; }
 
     [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; }
+    public IWebManager<Localization, AddLocalizationModel, UpdateLocalizationModel> WebManager { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        Localizations = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Localization>>(@"/api/Games/Localizations");
+        Localizations = await WebManager.GetAllAsync();
     }
 }

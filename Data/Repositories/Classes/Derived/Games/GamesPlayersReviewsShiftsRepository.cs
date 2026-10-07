@@ -4,15 +4,15 @@ using Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Backend;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesPlayersReviewsShiftsRepository : Repository, IRepository<GamePlayerReviewShift, AddGamePlayerReviewShiftModel, UpdateGamePlayerReviewShiftModel>
+public sealed class GamesPlayersReviewsShiftsRepository : Repository<GamePlayerReviewShift, AddGamePlayerReviewShiftModel, UpdateGamePlayerReviewShiftModel>
 {
     public GamesPlayersReviewsShiftsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddGamePlayerReviewShiftModel entity)
+    public override async Task<long> AddAsync(AddGamePlayerReviewShiftModel entity)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             long id = await connection.QuerySingleOrDefaultAsync<long>(@"INSERT INTO GamesPlayersReviewsShifts(GamePlayerReviewId, ShifterId, Direction) VALUES(@GamePlayerReviewId, @ShifterId, (@Direction::int)::bit) RETURNING Id;", new
             {
@@ -25,15 +25,9 @@ public sealed class GamesPlayersReviewsShiftsRepository : Repository, IRepositor
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddGamePlayerReviewShiftModel> entities)
+    public override async Task<IEnumerable<GamePlayerReviewShift>> GetAllAsync()
     {
-        foreach (AddGamePlayerReviewShiftModel gamePlayerReviewShift in entities)
-            await AddAsync(gamePlayerReviewShift);
-    }
-
-    public async Task<IEnumerable<GamePlayerReviewShift>> GetAllAsync()
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             IEnumerable<GamePlayerReviewShift> gamePlayerReviewShifts = await connection.QueryAsync<GamePlayerReviewShift>(@"SELECT Id, GamePlayerReviewId, ShifterId, Direction 
 FROM GamesPlayersReviewsShifts;");
@@ -42,9 +36,9 @@ FROM GamesPlayersReviewsShifts;");
         }
     }
 
-    public async Task<GamePlayerReviewShift> GetAsync(long id)
+    public override async Task<GamePlayerReviewShift> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             GamePlayerReviewShift gamePlayerReviewShifts = await connection.QuerySingleAsync<GamePlayerReviewShift>(@"SELECT Id, GamePlayerReviewId, ShifterId, Direction 
 FROM GamesPlayersReviewsShifts
@@ -56,7 +50,7 @@ WHERE Id=@Id;", new { Id = id });
 
     public async Task<GamePlayerReviewShift> GetByShifterIdAsync(long shifterId, long gamePlayerReviewId)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             GamePlayerReviewShift gamePlayerReviewShift = await connection.QuerySingleOrDefaultAsync<GamePlayerReviewShift>(@"SELECT Id, GamePlayerReviewId, ShifterId, Direction 
 FROM GamesPlayersReviewsShifts
@@ -71,9 +65,9 @@ AND GamePlayerReviewId=@GamePlayerReviewId;", new
         }
     }
 
-    public async Task<IEnumerable<GamePlayerReviewShift>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<GamePlayerReviewShift>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             IEnumerable<GamePlayerReviewShift> gamePlayerReviewShifts = await connection.QueryAsync<GamePlayerReviewShift>(@"SELECT Id, GamePlayerReviewId, ShifterId, Direction 
 FROM GamesPlayersReviewsShifts
@@ -83,25 +77,25 @@ OFFSET @Offset LIMIT @Limit;", new { Offset = offset, Limit = limit });
         }
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             await connection.ExecuteAsync("DELETE FROM GamesPlayersReviewsShifts WHERE Id=@Id", new { Id = id });
         }
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task RemoveRangeAsync(IEnumerable<long> ids)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             await connection.ExecuteAsync("DELETE FROM GamesPlayersReviewsShifts WHERE Id in @Ids", new { Ids = ids });
         }
     }
 
-    public async Task<GamePlayerReviewShift> UpdateAsync(UpdateGamePlayerReviewShiftModel entity, long id)
+    public override async Task<GamePlayerReviewShift> UpdateAsync(UpdateGamePlayerReviewShiftModel entity, long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             GamePlayerReviewShift gamePlayerReviewShift = await connection.QuerySingleOrDefaultAsync<GamePlayerReviewShift>(@"UPDATE GamesPlayersReviewsShifts 
 SET GamePlayerReviewId=@GamePlayerReviewId,

@@ -5,15 +5,15 @@ using IdentityLibrary.DTOs;
 namespace Data.Repositories.Classes.Derived;
 
 public sealed class NewsRepository
-    : Repository, IRepository<NewsItem, AddNewsItemDbModel, UpdateNewsItemDbModel>
+    : Repository<NewsItem, AddNewsItemDbModel, UpdateNewsItemDbModel>
 {
     public NewsRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddNewsItemDbModel entity)
+    public override async Task<long> AddAsync(AddNewsItemDbModel entity)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
         var id = await connection.QueryFirstAsync<long>(@"INSERT INTO News
 (Title, UserId, TextContent, ImageSource, PublishTimestamp)
 VALUES (@Title, @UserId, @TextContent, @ImageSource, @PublishTimestamp)
@@ -29,17 +29,9 @@ RETURNING Id;",
         return id;
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddNewsItemDbModel> entities)
+    public override async Task<IEnumerable<NewsItem>> GetAllAsync()
     {
-        foreach (var entity in entities)
-        {
-            await AddAsync(entity);
-        }
-    }
-
-    public async Task<IEnumerable<NewsItem>> GetAllAsync()
-    {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
         var news = await connection.QueryAsync<NewsItem>(@"
             SELECT Id, Title, UserId, TextContent, ImageSource, PublishTimestamp
             FROM News
@@ -47,9 +39,9 @@ RETURNING Id;",
         return news;
     }
 
-    public async Task<NewsItem?> GetAsync(long id)
+    public override async Task<NewsItem?> GetAsync(long id)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
 
         const string sql = @"
         SELECT  n.Id,
@@ -85,9 +77,9 @@ RETURNING Id;",
         return result.FirstOrDefault();
     }
 
-    public async Task<IEnumerable<NewsItem>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<NewsItem>> GetAsync(long offset, long limit)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
         var news = await connection.QueryAsync<NewsItem>(@"
             SELECT Id, Title, UserId, TextContent, ImageSource, PublishTimestamp
             FROM News
@@ -97,23 +89,23 @@ RETURNING Id;",
         return news;
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
         await connection.ExecuteAsync(@"DELETE FROM News WHERE Id=@id", new { id });
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task RemoveRangeAsync(IEnumerable<long> ids)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
         await connection.ExecuteAsync(
             @"DELETE FROM News WHERE Id = ANY(@ids)",
             new { ids = ids.ToArray() });
     }
 
-    public async Task<NewsItem?> UpdateAsync(UpdateNewsItemDbModel entity, long id)
+    public override async Task<NewsItem?> UpdateAsync(UpdateNewsItemDbModel entity, long id)
     {
-        using var connection = new NpgsqlConnection(ConnectionString);
+        using var connection = CreateConnection();
         var updatedNews = await connection.QueryFirstOrDefaultAsync<NewsItem>(@"
             UPDATE News
             SET Title=@Title,

@@ -1,18 +1,21 @@
 ﻿@page "/admin/movies/movies-studios/remove-movie-studio/{Id:long}"
+@using Domain.Movies
+@using Domain.RequestsModels.Movies.MoviesStudios
+@inherits RemoveEntityPageBase<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>
 
 <AuthorizeView Policy="Admin">
     <Authorized>
         <a href="/admin">К странице админа</a>
-        @if (MovieStudio is null)
+        @if (Entity is null)
         {
             <p>Загружается...</p>
         }
         else
         {
-            <h3>Удалить @MovieStudio.Name</h3>
+            <h3>Удалить @Entity.Name</h3>
             <p>Вы уверены, что хотите удалить эту киностудию?</p>
             <p>
-                <button type="button" @onclick="RemoveMovieStudioAsync">Удалить</button>
+                <button type="button" @onclick="RemoveAsync">Удалить</button>
             </p>
         }
     </Authorized>

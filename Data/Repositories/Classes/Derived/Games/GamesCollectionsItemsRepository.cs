@@ -5,11 +5,11 @@ using Domain.RequestsModels.Games.Collections;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesCollectionsItemsRepository(string connectionString) : Repository(connectionString), IRepository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>
+public sealed class GamesCollectionsItemsRepository(string connectionString) : Repository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>(connectionString)
 {
-    public async Task<long> AddAsync(AddGamesCollectionItemModel entity)
+    public override async Task<long> AddAsync(AddGamesCollectionItemModel entity)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var insertedGameCollectionItemId = await connection.QuerySingleAsync<long>(@"
 INSERT INTO GamesCollectionsItems (GameId, GameCollectionId)
@@ -21,17 +21,9 @@ new { entity.GameId, entity.GameCollectionId });
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddGamesCollectionItemModel> entities)
+    public override async Task<IEnumerable<GamesCollectionItem>> GetAllAsync()
     {
-        foreach (var entity in entities)
-        {
-            await AddAsync(entity);
-        }
-    }
-
-    public async Task<IEnumerable<GamesCollectionItem>> GetAllAsync()
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollection, GamesCollectionItem>(@"
 SELECT gci.Id, gci.GameId, gci.GameCollectionId,
@@ -59,9 +51,9 @@ ON gc.Id=gci.GameCollectionId;", (gameCollectionItem, game, gameCollection) =>
         }
     }
 
-    public async Task<GamesCollectionItem> GetAsync(long id)
+    public override async Task<GamesCollectionItem> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollectionItem>(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId
@@ -87,9 +79,9 @@ WHERE gci.Id=@Id;", (gameCollectionItem, game) =>
         }
     }
 
-    public async Task<IEnumerable<GamesCollectionItem>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<GamesCollectionItem>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollectionItem>(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId
@@ -116,24 +108,16 @@ OFFSET @Offset LIMIT @Limit;", (gameCollectionItem, game) =>
         }
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             await connection.ExecuteAsync(@"DELETE FROM GamesCollectionsItems
 WHERE Id=@Id;", new { Id = id });
         }
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
-    {
-        foreach (var id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<GamesCollectionItem> UpdateAsync(UpdateGamesCollectionItemModel entity, long id)
+    public override async Task<GamesCollectionItem> UpdateAsync(UpdateGamesCollectionItemModel entity, long id)
     {
         throw new NotImplementedException();
     }

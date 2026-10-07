@@ -8,12 +8,10 @@ using IdentityLibrary.Services.Interfaces;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Settings;
 using System.Net;
-using System.Net.Http;
 
 namespace API.Controllers.Auth;
 
@@ -969,7 +967,7 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("setTwoFactorEnabled")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult> SetTwoFactorEnabled(Domain.Auth.SetTwoFactorEnabledModel setTwoFactorEnabledModel)
+    public async Task<ActionResult> SetTwoFactorEnabled(SetTwoFactorEnabledModel setTwoFactorEnabledModel)
     {
         string? userId = GetCurrentUserId();
         if (string.IsNullOrEmpty(userId))
@@ -1039,7 +1037,7 @@ public sealed class AuthController : ControllerBase
     // ============================================================
 
     [HttpPost("resetPassword")]
-    public async Task<ActionResult> ResetPassword(Domain.Auth.ResetPasswordModel resetPasswordModel)
+    public async Task<ActionResult> ResetPassword(ResetPasswordModel resetPasswordModel)
     {
         ApplicationUser? user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
         if (user is null)
@@ -1068,7 +1066,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("resetPasswordConfirm")]
-    public async Task<ActionResult> ResetPasswordConfirm(Domain.Auth.ResetPasswordConfirmModel resetPasswordModel)
+    public async Task<ActionResult> ResetPasswordConfirm(ResetPasswordConfirmModel resetPasswordModel)
     {
         ApplicationUser? user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
         if (user is null)

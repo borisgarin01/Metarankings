@@ -4,15 +4,15 @@ using Domain.RequestsModels.Games.Genres;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesGenresRepository : Repository, IRepository<Genre, AddGameGenreModel, UpdateGameGenreModel>
+public sealed class GamesGenresRepository : Repository<Genre, AddGameGenreModel, UpdateGameGenreModel>
 {
     public GamesGenresRepository(string connectionString) : base(connectionString)
     {
     }
 
-    public async Task<long> AddAsync(AddGameGenreModel genre)
+    public override async Task<long> AddAsync(AddGameGenreModel genre)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var id = await connection.QueryFirstAsync<long>(@"
 INSERT INTO Genres
@@ -27,17 +27,9 @@ RETURNING Id;"
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<AddGameGenreModel> genres)
+    public override async Task<IEnumerable<Genre>> GetAllAsync()
     {
-        foreach (var genre in genres)
-        {
-            await AddAsync(genre);
-        }
-    }
-
-    public async Task<IEnumerable<Genre>> GetAllAsync()
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var genres = await connection.QueryAsync<Genre, Game, Genre>(@"
 SELECT Genres.Id, Genres.Name, 
@@ -71,9 +63,9 @@ Genres
         }
     }
 
-    public async Task<Genre> GetAsync(long id)
+    public override async Task<Genre> GetAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var genres = await connection.QueryAsync<Genre, Game, Genre>(@"
 SELECT Genres.Id, Genres.Name, 
@@ -109,9 +101,9 @@ WHERE Genres.Id = @Id", (genre, game) =>
         }
     }
 
-    public async Task<IEnumerable<Genre>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<Genre>> GetAsync(long offset, long limit)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var genres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
 FROM 
@@ -124,26 +116,18 @@ LIMIT @limit;", new { offset, limit });
         }
     }
 
-    public async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id)
     {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             await connection.ExecuteAsync(@"DELETE FROM 
 Genres WHERE Id=@id", new { id });
         }
     }
 
-    public async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task<Genre> UpdateAsync(UpdateGameGenreModel genre, long id)
     {
-        foreach (var id in ids)
-        {
-            await RemoveAsync(id);
-        }
-    }
-
-    public async Task<Genre> UpdateAsync(UpdateGameGenreModel genre, long id)
-    {
-        using (var connection = new NpgsqlConnection(ConnectionString))
+        using (var connection = CreateConnection())
         {
             var updatedGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE Genres SET Name=@Name 
 where Id=@id

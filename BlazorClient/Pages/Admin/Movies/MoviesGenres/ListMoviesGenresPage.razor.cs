@@ -1,4 +1,6 @@
-﻿using Domain.Movies;
+﻿using Domain.RequestsModels.Movies.MoviesGenres;
+using WebManagers;
+using Domain.Movies;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesGenres;
 
@@ -7,10 +9,10 @@ public partial class ListMoviesGenresPage : ComponentBase
     public IEnumerable<Genre> Genres { get; private set; }
 
     [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; }
+    public IWebManager<Genre, AddMovieGenreModel, UpdateMovieGenreModel> WebManager { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        Genres = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Genre>>("/api/movies/Genres");
+        Genres = await WebManager.GetAllAsync();
     }
 }
