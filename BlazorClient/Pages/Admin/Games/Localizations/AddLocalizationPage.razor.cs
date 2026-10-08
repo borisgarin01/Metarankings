@@ -7,7 +7,7 @@ using WebManagers;
 namespace BlazorClient.Pages.Admin.Games.Localizations;
 
 [Authorize(Policy = "Admin")]
-public partial class AddLocalizationPage : ComponentBase
+public partial class AddLocalizationPage : CancellableComponentBase
 {
     [Inject]
     public IWebManager<Localization, AddLocalizationModel, UpdateLocalizationModel> LocalizationsWebManager { get; set; }
@@ -22,11 +22,11 @@ public partial class AddLocalizationPage : ComponentBase
 
     public async Task AddLocalizationAsync()
     {
-        HttpResponseMessage httpResponseMessage = await LocalizationsWebManager.AddAsync(AddLocalizationModel);
+        HttpResponseMessage httpResponseMessage = await LocalizationsWebManager.AddAsync(AddLocalizationModel, DisposalToken);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/games/localizations/list-localizations");
         else
             if (httpResponseMessage is not null)
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 }

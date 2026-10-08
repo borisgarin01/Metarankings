@@ -12,10 +12,10 @@ public sealed class GamesPlayersReviewsRepository : Repository<GameReview, AddGa
     {
     }
 
-    public override async Task<long> AddAsync(AddGamePlayerReviewWithUserIdAndDateModel gameReview)
+    public override async Task<long> AddAsync(AddGamePlayerReviewWithUserIdAndDateModel gameReview, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        long insertedGameReviewId = await connection.QueryFirstAsync<long>(@"
+        long insertedGameReviewId = await connection.QueryFirstAsync<long>(new CommandDefinition(@"
 INSERT INTO GamesPlayersReviews (GameId, UserId, TextContent, Score, Date)
 VALUES(@GameId, @UserId, @TextContent, @Score, @TimeStamp::DATE)
 RETURNING Id;", new
@@ -25,15 +25,15 @@ RETURNING Id;", new
             gameReview.TextContent,
             gameReview.Score,
             gameReview.TimeStamp  // Pass DateTime, cast in SQL
-        });
+        }, cancellationToken: cancellationToken));
 
         return insertedGameReviewId;
     }
 
-    public async Task<GameReview> GetUserReviewForGameAsync(long userId, long gameId)
+    public async Task<GameReview> GetUserReviewForGameAsync(long userId, long gameId, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        IEnumerable<GameReview> gameReviewToCheckExistance = await connection.QueryAsync<GameReview, Game, GamePlayerReviewShift, ApplicationUser, GameReview>(@"
+        IEnumerable<GameReview> gameReviewToCheckExistance = await connection.QueryAsync<GameReview, Game, GamePlayerReviewShift, ApplicationUser, GameReview>(new CommandDefinition(@"
 SELECT gpr.Id, gpr.GameId, gpr.UserId, gpr.TextContent, gpr.Score, gpr.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 gprs.Id, gprs.GamePlayerReviewId, gprs.ShifterId, gprs.Direction,
@@ -44,7 +44,7 @@ on gpr.GameId=Games.Id
 INNER JOIN ApplicationUsers au
 on gpr.UserId=au.Id
 LEFT JOIN GamesPlayersReviewsShifts gprs on gprs.GamePlayerReviewId=gpr.Id
-WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, shift, applicationUser) =>
+WHERE UserId=@userId and GameId=@gameId;", new { userId, gameId }, cancellationToken: cancellationToken), (gameReview, game, shift, applicationUser) =>
         {
             gameReview = gameReview with
             {
@@ -59,15 +59,15 @@ WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, shift, application
 
             return gameReview;
 
-        }, new { userId, gameId });
+        });
 
         return gameReviewToCheckExistance.FirstOrDefault();
     }
 
-    public override async Task<IEnumerable<GameReview>> GetAllAsync()
+    public override async Task<IEnumerable<GameReview>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        IEnumerable<GameReview> gamesReviews = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+        IEnumerable<GameReview> gamesReviews = await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(new CommandDefinition(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
@@ -76,7 +76,7 @@ INNER JOIN Games
 on GamesPlayersReviews.GameId=Games.Id
 INNER JOIN ApplicationUsers
 on GamesPlayersReviews.UserId=ApplicationUsers.Id
-WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, applicationUser) =>
+WHERE UserId=@userId and GameId=@gameId;", cancellationToken: cancellationToken), (gameReview, game, applicationUser) =>
         {
             gameReview = gameReview with
             {
@@ -89,10 +89,10 @@ WHERE UserId=@userId and GameId=@gameId;", (gameReview, game, applicationUser) =
         return gamesReviews;
     }
 
-    public override async Task<GameReview> GetAsync(long id)
+    public override async Task<GameReview> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        IEnumerable<GameReview> gamesReviews = await connection.QueryAsync<GameReview, GamePlayerReviewShift, Game, ApplicationUser, GameReview>(@"
+        IEnumerable<GameReview> gamesReviews = await connection.QueryAsync<GameReview, GamePlayerReviewShift, Game, ApplicationUser, GameReview>(new CommandDefinition(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
     gprs.Id, gprs.GamePlayerReviewId, gprs.ShifterId, gprs.Direction,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
@@ -103,7 +103,7 @@ INNER JOIN Games
 on GamesPlayersReviews.GameId=Games.Id
 INNER JOIN ApplicationUsers
 on GamesPlayersReviews.UserId=ApplicationUsers.Id
-WHERE GamesPlayersReviews.Id = @id;", (gameReview, gamePlayerReviewShift, game, applicationUser) =>
+WHERE GamesPlayersReviews.Id = @id;", new { id }, cancellationToken: cancellationToken), (gameReview, gamePlayerReviewShift, game, applicationUser) =>
         {
             gameReview = gameReview with
             {
@@ -113,15 +113,15 @@ WHERE GamesPlayersReviews.Id = @id;", (gameReview, gamePlayerReviewShift, game, 
             if (!gameReview.GamePlayerReviewShifts.Any(b => b.GamePlayerReviewId == gamePlayerReviewShift.GamePlayerReviewId && b.ShifterId == gamePlayerReviewShift.ShifterId))
                 gameReview.GamePlayerReviewShifts.Add(gamePlayerReviewShift);
             return gameReview;
-        }, new { id });
+        });
 
         return gamesReviews.SingleOrDefault();
     }
 
-    public override async Task<IEnumerable<GameReview>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<GameReview>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+        return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(new CommandDefinition(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
@@ -131,7 +131,7 @@ on GamesPlayersReviews.GameId=Games.Id
 INNER JOIN ApplicationUsers
 on GamesPlayersReviews.UserId=ApplicationUsers.Id
 ORDER BY GamesPlayersReviews.Id desc
-OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", (gameReview, game, applicationUser) =>
+OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", new { offset, limit }, cancellationToken: cancellationToken), (gameReview, game, applicationUser) =>
         {
             gameReview = gameReview with
             {
@@ -139,19 +139,19 @@ OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", (gameReview, game, application
                 ApplicationUser = applicationUser
             };
             return gameReview;
-        }, new { offset, limit });
+        });
     }
 
-    public override async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        await connection.ExecuteAsync(@"DELETE FROM GamesPlayersReviews WHERE Id=@id", new { id });
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM GamesPlayersReviews WHERE Id=@id", new { id }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<GameReview> UpdateAsync(UpdateGamePlayerReviewModel gameReview, long id)
+    public override async Task<GameReview> UpdateAsync(UpdateGamePlayerReviewModel gameReview, long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        GameReview? updatedGamePlayerReview = await connection.QueryFirstOrDefaultAsync<GameReview>(@"UPDATE GamesPlayersReviews 
+        GameReview? updatedGamePlayerReview = await connection.QueryFirstOrDefaultAsync<GameReview>(new CommandDefinition(@"UPDATE GamesPlayersReviews 
 SET TextContent=@TextContent, Score=@Score, Date=@TimeStamp
 WHERE Id=@id", new
         {
@@ -159,15 +159,15 @@ WHERE Id=@id", new
             gameReview.Score,
             TimeStamp = DateTime.Now,
             id
-        });
+        }, cancellationToken: cancellationToken));
 
         return updatedGamePlayerReview;
     }
 
-    public async Task<IEnumerable<GameReview>> GetGameReviewsAsync(long gameId)
+    public async Task<IEnumerable<GameReview>> GetGameReviewsAsync(long gameId, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+        return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(new CommandDefinition(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
@@ -177,7 +177,7 @@ on GamesPlayersReviews.GameId=Games.Id
 INNER JOIN ApplicationUsers
 on GamesPlayersReviews.UserId=ApplicationUsers.Id
 WHERE GameId = @gameId
-ORDER BY GamesPlayersReviews.Id;", (gameReview, game, applicationUser) =>
+ORDER BY GamesPlayersReviews.Id;", new { gameId }, cancellationToken: cancellationToken), (gameReview, game, applicationUser) =>
         {
             gameReview = gameReview with
             {
@@ -185,13 +185,13 @@ ORDER BY GamesPlayersReviews.Id;", (gameReview, game, applicationUser) =>
                 ApplicationUser = applicationUser
             };
             return gameReview;
-        }, new { gameId });
+        });
     }
 
-    public async Task<IEnumerable<GameReview>> GetUserReviewsAsync(long userId)
+    public async Task<IEnumerable<GameReview>> GetUserReviewsAsync(long userId, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(@"
+        return await connection.QueryAsync<GameReview, Game, ApplicationUser, GameReview>(new CommandDefinition(@"
 SELECT GamesPlayersReviews.Id, GamesPlayersReviews.GameId, GamesPlayersReviews.UserId, GamesPlayersReviews.TextContent, GamesPlayersReviews.Score, GamesPlayersReviews.Date,
 Games.Id, Games.Name, Games.Image, Games.ReleaseDate, Games.Description, Games.Trailer, Games.LocalizationId,
 ApplicationUsers.Id, ApplicationUsers.UserName, ApplicationUsers.NormalizedUserName, ApplicationUsers.Email, ApplicationUsers.NormalizedEmail, ApplicationUsers.EmailConfirmed, ApplicationUsers.PasswordHash, ApplicationUsers.PhoneNumber, ApplicationUsers.PhoneNumberConfirmed, ApplicationUsers.TwoFactorEnabled
@@ -200,7 +200,7 @@ INNER JOIN Games
 on GamesPlayersReviews.GameId=Games.Id
 INNER JOIN ApplicationUsers
 on GamesPlayersReviews.UserId=ApplicationUsers.Id
-WHERE UserId = @userId;", (gameReview, game, applicationUser) =>
+WHERE UserId = @userId;", new { userId }, cancellationToken: cancellationToken), (gameReview, game, applicationUser) =>
         {
             gameReview = gameReview with
             {
@@ -208,6 +208,6 @@ WHERE UserId = @userId;", (gameReview, game, applicationUser) =>
                 ApplicationUser = applicationUser
             };
             return gameReview;
-        }, new { userId });
+        });
     }
 }

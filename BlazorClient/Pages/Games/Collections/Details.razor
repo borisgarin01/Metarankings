@@ -1,10 +1,15 @@
 ﻿@page "/games/collections/{GameCollectionId:long}"
+@inherits CancellableComponentBase
 @inject IConfiguration Configuration
 @using Domain.Games
 @using Domain.Games.Collections
 @using Microsoft.Extensions.Configuration
 
-@if (GameCollection is null)
+@if (IsNotFound)
+{
+    <p>Подборка не найдена.</p>
+}
+else if (GameCollection is null)
 {
     <p>Loading...</p>
 }
@@ -34,7 +39,7 @@ else
                     <div class="specials post single clear">
                         <div class="post-meta">
                             <div class="breadcrumbs news-meta">
-                                <a href="/meta/collections/">Подборки</a> → <a href="/meta/collections/films-games/">Контент</a>
+                                <a href="/collections">Подборки</a>
                             </div>
                             <h1><span>@GameCollection.Name</span></h1>
                         </div>

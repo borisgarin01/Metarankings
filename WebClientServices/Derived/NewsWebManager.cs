@@ -9,8 +9,8 @@ public sealed class NewsWebManager : CrudWebManager<NewsItem, AddNewsItemModel, 
     {
     }
 
-    public override async Task<IEnumerable<NewsItem>> GetFirstAsync(long offset, long limit)
+    public override async Task<IEnumerable<NewsItem>> GetFirstAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
-        return await Client.GetFromJsonAsync<IEnumerable<NewsItem>>($"{BasePath}?offset={offset}&limit={limit}");
+        return await Client.GetFromJsonAsync<IEnumerable<NewsItem>>($"{BasePath}?offset={offset}&limit={limit}", cancellationToken);
     }
 }

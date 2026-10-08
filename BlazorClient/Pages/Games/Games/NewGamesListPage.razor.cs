@@ -5,7 +5,7 @@ using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Games.Games;
 
-public partial class NewGamesListPage : ComponentBase
+public partial class NewGamesListPage : CancellableComponentBase
 {
     [Inject]
     public GamesWebManager GamesWebManager { get; set; }
@@ -25,6 +25,6 @@ public partial class NewGamesListPage : ComponentBase
         if (PageSize < 1 || !PageSize.HasValue)
             PageSize = 5;
         // Fetch data based on the current PageSize and PageNumber
-        Games = await GamesWebManager.GetLastAsync((PageNumber.Value - 1) * PageSize.Value, PageSize.Value);
+        Games = await GamesWebManager.GetLastAsync((PageNumber.Value - 1) * PageSize.Value, PageSize.Value, DisposalToken);
     }
 }

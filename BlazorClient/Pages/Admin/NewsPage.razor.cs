@@ -3,7 +3,7 @@ using WebManagers.Derived;
 
 namespace BlazorClient.Pages.Admin;
 
-public partial class NewsPage : ComponentBase
+public partial class NewsPage : CancellableComponentBase
 {
     [Inject]
     public NewsWebManager NewsWebManager { get; set; } = default!;
@@ -34,9 +34,9 @@ public partial class NewsPage : ComponentBase
     {
         try
         {
-            NewsItems = await NewsWebManager.GetAllAsync() ?? new List<NewsItem>();
+            NewsItems = await NewsWebManager.GetAllAsync(DisposalToken) ?? new List<NewsItem>();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ShowError($"Ошибка загрузки: {ex.Message}");
         }
@@ -58,7 +58,7 @@ public partial class NewsPage : ComponentBase
                     ImageSource = _form.ImageSource
                 };
 
-                var response = await NewsWebManager.AddAsync(addModel);
+                var response = await NewsWebManager.AddAsync(addModel, DisposalToken);
                 if (!response.IsSuccessStatusCode)
                 {
                     ShowError($"Не удалось добавить: {response.StatusCode}");
@@ -75,7 +75,7 @@ public partial class NewsPage : ComponentBase
                     ImageSource = _form.ImageSource
                 };
 
-                var updated = await NewsWebManager.UpdateAsync(_editingId!.Value, updateModel);
+                var updated = await NewsWebManager.UpdateAsync(_editingId!.Value, updateModel, DisposalToken);
                 if (updated is null)
                 {
                     ShowError("Не удалось обновить новость.");
@@ -87,7 +87,7 @@ public partial class NewsPage : ComponentBase
             ShowSuccess(wasEditing ? "Новость обновлена." : "Новость добавлена.");
             await LoadNewsAsync();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ShowError($"Ошибка: {ex.Message}");
         }
@@ -123,7 +123,7 @@ public partial class NewsPage : ComponentBase
 
         try
         {
-            var response = await NewsWebManager.DeleteAsync(id);
+            var response = await NewsWebManager.DeleteAsync(id, DisposalToken);
             if (!response.IsSuccessStatusCode)
             {
                 ShowError($"Не удалось удалить: {response.StatusCode}");
@@ -135,7 +135,7 @@ public partial class NewsPage : ComponentBase
             ShowSuccess("Новость удалена.");
             await LoadNewsAsync();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ShowError($"Ошибка удаления: {ex.Message}");
         }

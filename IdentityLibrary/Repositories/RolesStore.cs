@@ -18,9 +18,9 @@ public sealed class RolesStore : IRoleStore<ApplicationRole>
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
-            role.Id = await connection.QuerySingleAsync<string>($@"INSERT INTO [ApplicationRoles] ([Name])
+            role.Id = await connection.QuerySingleAsync<string>(new CommandDefinition($@"INSERT INTO [ApplicationRoles] ([Name])
 output str(id)
-                    VALUES (@Name);", role);
+                    VALUES (@Name);", role, cancellationToken: cancellationToken));
         }
 
         return IdentityResult.Success;
@@ -33,7 +33,7 @@ output str(id)
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
-            await connection.ExecuteAsync($"DELETE FROM [ApplicationRoles] WHERE str(Id) = @Id", role.Id);
+            await connection.ExecuteAsync(new CommandDefinition($"DELETE FROM [ApplicationRoles] WHERE str(Id) = @Id", role.Id, cancellationToken: cancellationToken));
         }
 
         return IdentityResult.Success;
@@ -50,8 +50,8 @@ output str(id)
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
-            return await connection.QuerySingleOrDefaultAsync<ApplicationRole>($@"SELECT * FROM [ApplicationRoles]
-                    WHERE str(Id) = @roleId", new { roleId });
+            return await connection.QuerySingleOrDefaultAsync<ApplicationRole>(new CommandDefinition($@"SELECT * FROM [ApplicationRoles]
+                    WHERE str(Id) = @roleId", new { roleId }, cancellationToken: cancellationToken));
         }
     }
 
@@ -62,8 +62,8 @@ output str(id)
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
-            return await connection.QuerySingleOrDefaultAsync<ApplicationRole>($@"SELECT * FROM [ApplicationRoles]
-                    WHERE [NormalizedName] = @normalizedRoleName", new { normalizedRoleName });
+            return await connection.QuerySingleOrDefaultAsync<ApplicationRole>(new CommandDefinition($@"SELECT * FROM [ApplicationRoles]
+                    WHERE [NormalizedName] = @normalizedRoleName", new { normalizedRoleName }, cancellationToken: cancellationToken));
         }
     }
 
@@ -101,7 +101,7 @@ output str(id)
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
-            await connection.ExecuteAsync($@"UPDATE [ApplicationRoles] SET
+            await connection.ExecuteAsync(new CommandDefinition($@"UPDATE [ApplicationRoles] SET
                     [Name] = @Name,
                     [NormalizedName] = @NormalizedName,
                     ConcurrencyStamp=@ConcurrencyStamp
@@ -111,7 +111,7 @@ output str(id)
                 role.NormalizedName,
                 role.ConcurrencyStamp,
                 role.Id
-            });
+            }, cancellationToken: cancellationToken));
         }
 
         return IdentityResult.Success;

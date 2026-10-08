@@ -4,7 +4,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Movies.Movies;
 
-public partial class MoviesDirectorsListPage : ComponentBase
+public partial class MoviesDirectorsListPage : CancellableComponentBase
 {
     [Inject]
     public IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel> MoviesDirectorsManager { get; set; }
@@ -13,6 +13,6 @@ public partial class MoviesDirectorsListPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        MoviesDirectors = await MoviesDirectorsManager.GetAllAsync();
+        MoviesDirectors = await MoviesDirectorsManager.GetAllAsync(DisposalToken);
     }
 }

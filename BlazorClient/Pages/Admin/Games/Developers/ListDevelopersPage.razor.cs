@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace BlazorClient.Pages.Admin.Games.Developers;
 
 [Authorize(Policy = "Admin")]
-public partial class ListDevelopersPage : ComponentBase
+public partial class ListDevelopersPage : CancellableComponentBase
 {
     public IEnumerable<Developer> Developers { get; set; }
 
@@ -15,6 +15,6 @@ public partial class ListDevelopersPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Developers = await WebManager.GetAllAsync();
+        Developers = await WebManager.GetAllAsync(DisposalToken);
     }
 }

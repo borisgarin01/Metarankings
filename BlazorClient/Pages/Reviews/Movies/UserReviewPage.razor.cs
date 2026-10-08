@@ -4,7 +4,7 @@ using WebManagers.Derived;
 
 namespace BlazorClient.Pages.Reviews.Movies;
 
-public partial class UserReviewPage : ComponentBase
+public partial class UserReviewPage : CancellableComponentBase
 {
     private MovieViewerReview movieViewerReview;
     private IEnumerable<NewsItem> news;
@@ -46,9 +46,9 @@ public partial class UserReviewPage : ComponentBase
         var httpClient = HttpClientFactory.CreateClient("AuthorizedClient");
 
         Task<MovieViewerReview> reviewGettingTask = httpClient.GetFromJsonAsync<MovieViewerReview>(
-                $"/api/Movies/MoviesViewersReviews/{ReviewId}");
+                $"/api/Movies/MoviesViewersReviews/{ReviewId}", DisposalToken);
 
-        Task<IEnumerable<NewsItem>> newsGettingTask = NewsWebManager.GetFirstAsync(0, 4);
+        Task<IEnumerable<NewsItem>> newsGettingTask = NewsWebManager.GetFirstAsync(0, 4, DisposalToken);
 
         await Task.WhenAll(reviewGettingTask, newsGettingTask);
 

@@ -2,5 +2,5 @@
 
 public interface IByNameSearchingManager<T>
 {
-    public Task<IEnumerable<T>> SearchByName(string name);
+    public Task<IEnumerable<T>> SearchByName(string name, CancellationToken cancellationToken = default);
 }

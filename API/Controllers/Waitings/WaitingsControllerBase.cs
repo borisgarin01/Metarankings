@@ -23,18 +23,18 @@ public abstract class WaitingsControllerBase : ControllerBase
     }
 
     [HttpGet("{entityId:long}")]
-    public async Task<ActionResult<WaitingStatistics>> GetAsync(long entityId)
+    public async Task<ActionResult<WaitingStatistics>> GetAsync(long entityId, CancellationToken cancellationToken = default)
     {
-        return Ok(await _waitingsRepository.GetStatisticsAsync(entityId, User.GetUserId()));
+        return Ok(await _waitingsRepository.GetStatisticsAsync(entityId, User.GetUserId(), cancellationToken));
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<WaitingStatistics>>> GetAsync([FromQuery] long[] ids)
+    public async Task<ActionResult<IEnumerable<WaitingStatistics>>> GetAsync([FromQuery] long[] ids, CancellationToken cancellationToken = default)
     {
         if (ids.Length > MaxIdsPerRequest)
             return BadRequest($"Нельзя запросить больше {MaxIdsPerRequest} элементов за раз");
 
-        return Ok(await _waitingsRepository.GetStatisticsAsync(ids, User.GetUserId()));
+        return Ok(await _waitingsRepository.GetStatisticsAsync(ids, User.GetUserId(), cancellationToken));
     }
 
     /// <summary>
@@ -43,13 +43,13 @@ public abstract class WaitingsControllerBase : ControllerBase
     /// </summary>
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<WaitingStatistics>> VoteAsync(AddWaitingVoteModel addWaitingVoteModel)
+    public async Task<ActionResult<WaitingStatistics>> VoteAsync(AddWaitingVoteModel addWaitingVoteModel, CancellationToken cancellationToken = default)
     {
         long? userId = User.GetUserId();
         if (userId is null)
             return Unauthorized();
 
-        bool? isReleased = await _waitingsRepository.IsReleasedAsync(addWaitingVoteModel.EntityId);
+        bool? isReleased = await _waitingsRepository.IsReleasedAsync(addWaitingVoteModel.EntityId, cancellationToken);
         if (isReleased is null)
             return NotFound();
 
@@ -58,7 +58,7 @@ public abstract class WaitingsControllerBase : ControllerBase
 
         try
         {
-            return Ok(await _waitingsRepository.VoteAsync(addWaitingVoteModel.EntityId, userId.Value, addWaitingVoteModel.IsWaiting));
+            return Ok(await _waitingsRepository.VoteAsync(addWaitingVoteModel.EntityId, userId.Value, addWaitingVoteModel.IsWaiting, cancellationToken));
         }
         catch (Exception ex)
         {

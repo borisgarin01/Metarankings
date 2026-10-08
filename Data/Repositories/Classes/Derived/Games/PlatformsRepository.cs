@@ -10,27 +10,26 @@ public sealed class PlatformsRepository : Repository<Platform, AddPlatformModel,
     {
     }
 
-    public override async Task<long> AddAsync(AddPlatformModel platform)
+    public override async Task<long> AddAsync(AddPlatformModel platform, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        long id = await connection.QueryFirstAsync<long>(@"INSERT INTO Platforms
+        long id = await connection.QueryFirstAsync<long>(new CommandDefinition(@"INSERT INTO Platforms
 (Name)
 VALUES (@Name)
-RETURNING Id;"
-, new
+RETURNING Id;", new
 {
     platform.Name
-});
+}, cancellationToken: cancellationToken));
         return id;
     }
 
-    public override async Task<IEnumerable<Platform>> GetAllAsync()
+    public override async Task<IEnumerable<Platform>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Platform> platformDictionary = new Dictionary<long, Platform>();
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
-        await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+        await connection.QueryAsync<Platform, Game, Platform, Platform>(new CommandDefinition(@"
             SELECT 
                 p1.Id, p1.Name,
                 g.Id, g.Name, g.Image, g.LocalizationId,
@@ -40,7 +39,7 @@ RETURNING Id;"
             LEFT JOIN GamesPlatforms gp ON gp.PlatformId = p1.Id
             LEFT JOIN Games g ON g.Id = gp.GameId
             LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
-            LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId",
+            LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId", cancellationToken: cancellationToken),
             (platform, game, gamePlatform) =>
             {
                 // Get or create the platform
@@ -82,13 +81,13 @@ RETURNING Id;"
         return platformDictionary.Values;
     }
 
-    public override async Task<Platform> GetAsync(long id)
+    public override async Task<Platform> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Platform> platformDictionary = new Dictionary<long, Platform>();
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
-        await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+        await connection.QueryAsync<Platform, Game, Platform, Platform>(new CommandDefinition(@"
         SELECT 
             p1.Id, p1.Name,
             g.Id, g.Name, g.Image, g.LocalizationId,
@@ -103,7 +102,7 @@ RETURNING Id;"
         LEFT JOIN Games g ON g.Id = gp.GameId
         LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
         LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId
-        WHERE p1.Id = @id",
+        WHERE p1.Id = @id", new { id }, cancellationToken: cancellationToken),
             (platform, game, gamePlatform) =>
             {
                 if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
@@ -135,20 +134,19 @@ RETURNING Id;"
 
                 return platformEntry;
             },
-            new { id },
             splitOn: "Id,Id,Id"
         );
 
         return platformDictionary.Values.FirstOrDefault();
     }
 
-    public override async Task<IEnumerable<Platform>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<Platform>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Platform> platformDictionary = new Dictionary<long, Platform>();
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
-        await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+        await connection.QueryAsync<Platform, Game, Platform, Platform>(new CommandDefinition(@"
             SELECT 
                 p1.Id, p1.Name,
                 g.Id, g.Name, g.Image, g.LocalizationId,
@@ -163,7 +161,7 @@ RETURNING Id;"
             LEFT JOIN GamesPlatforms gp ON gp.PlatformId = p1.Id
             LEFT JOIN Games g ON g.Id = gp.GameId
             LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
-            LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId",
+            LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId", new { offset, limit }, cancellationToken: cancellationToken),
             (platform, game, gamePlatform) =>
             {
                 // Get or create the platform
@@ -196,30 +194,29 @@ RETURNING Id;"
 
                 return platformEntry;
             },
-            new { offset, limit },
             splitOn: "Id,Id"
         );
 
         return platformDictionary.Values;
     }
 
-    public override async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        await connection.ExecuteAsync(@"DELETE FROM 
-Platforms WHERE Id=@id", new { id });
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM 
+Platforms WHERE Id=@id", new { id }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<Platform> UpdateAsync(UpdatePlatformModel platform, long id)
+    public override async Task<Platform> UpdateAsync(UpdatePlatformModel platform, long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(@"UPDATE Platforms set Name=@Name 
+        var updatedPlatform = await connection.QueryFirstOrDefaultAsync<Platform>(new CommandDefinition(@"UPDATE Platforms set Name=@Name 
 WHERE Id=@Id
 RETURNING Name, Href, Id;", new
         {
             platform.Name,
             id
-        });
+        }, cancellationToken: cancellationToken));
 
         return updatedPlatform;
     }

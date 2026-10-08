@@ -1,4 +1,5 @@
 ﻿@page "/movies/genres/{GenreId:long}"
+@inherits CancellableComponentBase
 @using BlazorClient.Components.PagesComponents.MoviesList
 
 @if (Genre is null)

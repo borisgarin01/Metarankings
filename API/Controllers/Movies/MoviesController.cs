@@ -30,14 +30,14 @@ public sealed class MoviesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Movie>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        IEnumerable<Movie> moviesModels = await _moviesModelsRepository.GetAllAsync();
+        IEnumerable<Movie> moviesModels = await _moviesModelsRepository.GetAllAsync(cancellationToken);
         return Ok(moviesModels);
     }
 
     [HttpGet("{id:long}")]
     public async Task<ActionResult<IEnumerable<Movie>>> GetAsync(long id, CancellationToken cancellationToken = default)
     {
-        Movie? movieModel = await _moviesModelsRepository.GetAsync(id);
+        Movie? movieModel = await _moviesModelsRepository.GetAsync(id, cancellationToken);
 
         if (movieModel is null)
             return NotFound();
@@ -47,19 +47,19 @@ public sealed class MoviesController : ControllerBase
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<long>> AddAsync(AddMovieModel movieModel)
+    public async Task<ActionResult<long>> AddAsync(AddMovieModel movieModel, CancellationToken cancellationToken = default)
     {
-        long insertedMovie = await _moviesModelsRepository.AddAsync(movieModel);
+        long insertedMovie = await _moviesModelsRepository.AddAsync(movieModel, cancellationToken);
         return Ok(insertedMovie);
     }
 
     [HttpPut("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<Movie>> UpdateAsync(long id, UpdateMovieModel updateMovieModel)
+    public async Task<ActionResult<Movie>> UpdateAsync(long id, UpdateMovieModel updateMovieModel, CancellationToken cancellationToken = default)
     {
         try
         {
-            Movie? updatedMovie = await _moviesModelsRepository.UpdateAsync(updateMovieModel, id);
+            Movie? updatedMovie = await _moviesModelsRepository.UpdateAsync(updateMovieModel, id, cancellationToken);
 
             if (updatedMovie is null)
                 return NotFound();
@@ -74,29 +74,29 @@ public sealed class MoviesController : ControllerBase
     }
 
     [HttpGet("{dateFrom:datetime}/{dateTo:datetime}")]
-    public async Task<ActionResult<IEnumerable<Movie>>> GetAsync(DateTime dateFrom, DateTime dateTo)
+    public async Task<ActionResult<IEnumerable<Movie>>> GetAsync(DateTime dateFrom, DateTime dateTo, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Movie> movies = await _moviesModelsRepository.GetAsync(dateFrom, dateTo);
+        IEnumerable<Movie> movies = await _moviesModelsRepository.GetAsync(dateFrom, dateTo, cancellationToken);
         return Ok(movies);
     }
 
     [HttpGet("{pageNumber:long}/{pageSize:long}")]
     public async Task<ActionResult<IEnumerable<Movie>>> GetAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Movie> movies = await _moviesModelsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
+        IEnumerable<Movie> movies = await _moviesModelsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize, cancellationToken);
         return Ok(movies);
     }
 
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<long>> RemoveAsync(long id)
+    public async Task<ActionResult<long>> RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
-        Movie movie = await _moviesModelsRepository.GetAsync(id);
+        Movie movie = await _moviesModelsRepository.GetAsync(id, cancellationToken);
         if (movie is null)
             return NotFound();
         try
         {
-            await _moviesModelsRepository.RemoveAsync(id);
+            await _moviesModelsRepository.RemoveAsync(id, cancellationToken);
             return NoContent();
         }
         catch (Exception ex)
@@ -107,35 +107,36 @@ public sealed class MoviesController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<Movie>>> Search([FromQuery] string name)
+    public async Task<ActionResult<IEnumerable<Movie>>> Search([FromQuery] string name, CancellationToken cancellationToken = default)
     {
-        return Ok(await _moviesModelsRepository.GetByNameAsync(name));
+        return Ok(await _moviesModelsRepository.GetByNameAsync(name, cancellationToken));
     }
 
     [HttpGet("most-waiting/{offset:int}/{limit:int}")]
     public async Task<ActionResult<IEnumerable<Movie>>> GetMostWaitingAsync(
         int offset,
         int limit,
-        [FromQuery] long[]? genresIds = null)
+        [FromQuery] long[]? genresIds = null,
+        CancellationToken cancellationToken = default)
     {
         if (offset < 0 || limit <= 0)
             return BadRequest();
 
-        return Ok(await _moviesModelsRepository.GetMostWaitingAsync(genresIds, offset, limit));
+        return Ok(await _moviesModelsRepository.GetMostWaitingAsync(genresIds, offset, limit, cancellationToken));
     }
 
     [HttpGet("most-waiting/count")]
-    public async Task<ActionResult<int>> GetMostWaitingCountAsync([FromQuery] long[]? genresIds = null)
+    public async Task<ActionResult<int>> GetMostWaitingCountAsync([FromQuery] long[]? genresIds = null, CancellationToken cancellationToken = default)
     {
-        return Ok(await _moviesModelsRepository.GetMostWaitingCountAsync(genresIds));
+        return Ok(await _moviesModelsRepository.GetMostWaitingCountAsync(genresIds, cancellationToken));
     }
 
     [HttpPost("byParameters")]
-    public async Task<IActionResult> GetByParameters([FromBody] MovieFilterRequest filter)
+    public async Task<IActionResult> GetByParameters([FromBody] MovieFilterRequest filter, CancellationToken cancellationToken = default)
     {
-        var movies = await _moviesModelsRepository.GetByParametersAsync(filter);
+        var movies = await _moviesModelsRepository.GetByParametersAsync(filter, cancellationToken);
 
-        int totalCount = await _moviesModelsRepository.GetCountByParametersAsync(filter);
+        int totalCount = await _moviesModelsRepository.GetCountByParametersAsync(filter, cancellationToken);
 
         return Ok(new PagedResponse<Movie>
         {

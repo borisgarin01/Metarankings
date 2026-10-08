@@ -25,35 +25,35 @@ public sealed class GamesController : ControllerBase
     [HttpGet("First/{offset:int}/{limit:int}")]
     public async Task<ActionResult<IEnumerable<Game>>> GetFirstAsync(int offset = 0, int limit = 25, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Game> games = await _gamesRepository.GetFirstAsync(offset, limit);
+        IEnumerable<Game> games = await _gamesRepository.GetFirstAsync(offset, limit, cancellationToken);
         return Ok(games);
     }
 
     [HttpGet("Last/{offset:int}/{limit:int}")]
     public async Task<ActionResult<IEnumerable<Game>>> GetLastAsync(int offset = 0, int limit = 25, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Game> games = await _gamesRepository.GetLastAsync(offset, limit);
+        IEnumerable<Game> games = await _gamesRepository.GetLastAsync(offset, limit, cancellationToken);
         return Ok(games);
     }
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<long>> AddAsync(AddGameModel addGameModel)
+    public async Task<ActionResult<long>> AddAsync(AddGameModel addGameModel, CancellationToken cancellationToken = default)
     {
-        long createdGameId = await _gamesRepository.AddAsync(addGameModel);
+        long createdGameId = await _gamesRepository.AddAsync(addGameModel, cancellationToken);
 
-        Game createdGame = await _gamesRepository.GetAsync(createdGameId);
+        Game createdGame = await _gamesRepository.GetAsync(createdGameId, cancellationToken);
 
         return Created($"api/games/{createdGame.Id}", createdGame);
     }
 
     [HttpPut("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<Game>> UpdateAsync(long id, UpdateGameModel updateGameModel)
+    public async Task<ActionResult<Game>> UpdateAsync(long id, UpdateGameModel updateGameModel, CancellationToken cancellationToken = default)
     {
         try
         {
-            Game? updatedGame = await _gamesRepository.UpdateAsync(updateGameModel, id);
+            Game? updatedGame = await _gamesRepository.UpdateAsync(updateGameModel, id, cancellationToken);
 
             if (updatedGame is null)
                 return NotFound();
@@ -69,14 +69,14 @@ public sealed class GamesController : ControllerBase
 
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<long>> RemoveAsync(long id)
+    public async Task<ActionResult<long>> RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
-        Game game = await _gamesRepository.GetAsync(id);
+        Game game = await _gamesRepository.GetAsync(id, cancellationToken);
         if (game is null)
             return NotFound();
         try
         {
-            await _gamesRepository.RemoveAsync(id);
+            await _gamesRepository.RemoveAsync(id, cancellationToken);
             return NoContent();
         }
         catch (Exception ex)
@@ -89,16 +89,16 @@ public sealed class GamesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Game>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        IEnumerable<Game> games = await _gamesRepository.GetAllAsync();
+        IEnumerable<Game> games = await _gamesRepository.GetAllAsync(cancellationToken);
         return Ok(games);
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<Game>> GetAsync(long id)
+    public async Task<ActionResult<Game>> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         try
         {
-            Game? game = await _gamesRepository.GetAsync(id);
+            Game? game = await _gamesRepository.GetAsync(id, cancellationToken);
 
             if (game is null)
                 return NotFound();
@@ -113,7 +113,7 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpPost("byParameters")]
-    public async Task<ActionResult<PagedResponse<Game>>> GetByParametersAsync(GameFilterRequest filter)
+    public async Task<ActionResult<PagedResponse<Game>>> GetByParametersAsync(GameFilterRequest filter, CancellationToken cancellationToken = default)
     {
         // Получаем общее количество
         int totalCount = await _gamesRepository.GetCountByParametersAsync(
@@ -122,7 +122,8 @@ public sealed class GamesController : ControllerBase
             filter.Years,
             filter.DevelopersIds,
             filter.PublishersIds,
-            filter.LocalizationIds
+            filter.LocalizationIds,
+            cancellationToken
         );
 
         // Получаем элементы для текущей страницы
@@ -134,7 +135,8 @@ public sealed class GamesController : ControllerBase
             filter.PublishersIds,
             filter.LocalizationIds,
             filter.Skip,
-            filter.Take
+            filter.Take,
+            cancellationToken
         );
 
         int page = (filter.Skip / filter.Take) + 1;
@@ -151,9 +153,9 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<Game>>> Search([FromQuery] string name)
+    public async Task<ActionResult<IEnumerable<Game>>> Search([FromQuery] string name, CancellationToken cancellationToken = default)
     {
-        return Ok(await _gamesRepository.GetByNameAsync(name));
+        return Ok(await _gamesRepository.GetByNameAsync(name, cancellationToken));
     }
 
     [HttpGet("games-releases-dates/{offset}/{limit}")]
@@ -161,23 +163,25 @@ public sealed class GamesController : ControllerBase
     short offset,
     short limit,
     [FromQuery] long[]? genresIds = null,
-    [FromQuery] long[]? platformsIds = null)
+    [FromQuery] long[]? platformsIds = null,
+    CancellationToken cancellationToken = default)
     {
         if (genresIds?.Length > 0 || platformsIds?.Length > 0)
         {
             return Ok(await _gamesRepository.GetNearestByParametersAsync(
-                genresIds, platformsIds, offset, limit));
+                genresIds, platformsIds, offset, limit, cancellationToken));
         }
 
-        return Ok(await _gamesRepository.GetNearestAsync(offset, limit));
+        return Ok(await _gamesRepository.GetNearestAsync(offset, limit, cancellationToken));
     }
 
     [HttpGet("games-releases-dates/count")]
     public async Task<ActionResult<int>> GamesReleasesDatesCount(
         [FromQuery] long[]? genresIds = null,
-        [FromQuery] long[]? platformsIds = null)
+        [FromQuery] long[]? platformsIds = null,
+        CancellationToken cancellationToken = default)
     {
-        return Ok(await _gamesRepository.GetNearestCountByParametersAsync(genresIds, platformsIds));
+        return Ok(await _gamesRepository.GetNearestCountByParametersAsync(genresIds, platformsIds, cancellationToken));
     }
 
     [HttpGet("most-waiting/{offset:int}/{limit:int}")]
@@ -185,19 +189,21 @@ public sealed class GamesController : ControllerBase
         int offset,
         int limit,
         [FromQuery] long[]? genresIds = null,
-        [FromQuery] long[]? platformsIds = null)
+        [FromQuery] long[]? platformsIds = null,
+        CancellationToken cancellationToken = default)
     {
         if (offset < 0 || limit <= 0)
             return BadRequest();
 
-        return Ok(await _gamesRepository.GetMostWaitingAsync(genresIds, platformsIds, offset, limit));
+        return Ok(await _gamesRepository.GetMostWaitingAsync(genresIds, platformsIds, offset, limit, cancellationToken));
     }
 
     [HttpGet("most-waiting/count")]
     public async Task<ActionResult<int>> GetMostWaitingCountAsync(
         [FromQuery] long[]? genresIds = null,
-        [FromQuery] long[]? platformsIds = null)
+        [FromQuery] long[]? platformsIds = null,
+        CancellationToken cancellationToken = default)
     {
-        return Ok(await _gamesRepository.GetMostWaitingCountAsync(genresIds, platformsIds));
+        return Ok(await _gamesRepository.GetMostWaitingCountAsync(genresIds, platformsIds, cancellationToken));
     }
 }

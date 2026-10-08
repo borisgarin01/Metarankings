@@ -1,8 +1,9 @@
 ﻿@page "/user-reviews/games/{ReviewId:long}"
+@inherits CancellableComponentBase
 @using BlazorClient.Components.PagesComponents.Common
 @using Domain.Common.News
 
-<GameMenu Year="@((GameGamerReview.Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
+<GameMenu Year="@((GameGamerReview?.Game?.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
 
 @if (GameGamerReview is null || News is null)
 {
@@ -31,12 +32,6 @@ else
                     @GameGamerReview.Date.ToString("dd.MM.yyyy")
                 </div>
                 <p>@GameGamerReview.TextContent</p>
-                <div class="rew-menu">
-                    <span class="menu-dot"></span><span class="menu-dot"></span><span class="menu-dot"></span>
-                    <ul>
-                        <li><a class="complain" rel="nofollow" href="/zhaloba/?r=18045">Пожаловаться</a></li>
-                    </ul>
-                </div>
             </div>
         </div>
         <div class="news-module">

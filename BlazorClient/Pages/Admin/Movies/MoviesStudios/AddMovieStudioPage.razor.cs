@@ -5,7 +5,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesStudios;
 
-public partial class AddMovieStudioPage : ComponentBase
+public partial class AddMovieStudioPage : CancellableComponentBase
 {
     public string Name { get; set; }
 
@@ -20,7 +20,7 @@ public partial class AddMovieStudioPage : ComponentBase
 
     public async Task AddMovieStudioAsync()
     {
-        await MoviesStudiosManager.AddAsync(new AddMovieStudioModel(Name));
+        await MoviesStudiosManager.AddAsync(new AddMovieStudioModel(Name), DisposalToken);
 
         NavigationManager.NavigateTo("/movies/movies-studios/movies-studios-list");
     }

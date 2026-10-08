@@ -26,27 +26,27 @@ public abstract class Repository<T, TAdd, TUpdate> : Repository, IRepository<T, 
     {
     }
 
-    public abstract Task<IEnumerable<T>> GetAllAsync();
+    public abstract Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default);
 
-    public abstract Task<T> GetAsync(long id);
+    public abstract Task<T> GetAsync(long id, CancellationToken cancellationToken = default);
 
-    public abstract Task<IEnumerable<T>> GetAsync(long offset, long limit);
+    public abstract Task<IEnumerable<T>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default);
 
-    public abstract Task<long> AddAsync(TAdd entity);
+    public abstract Task<long> AddAsync(TAdd entity, CancellationToken cancellationToken = default);
 
-    public abstract Task<T> UpdateAsync(TUpdate entity, long id);
+    public abstract Task<T> UpdateAsync(TUpdate entity, long id, CancellationToken cancellationToken = default);
 
-    public abstract Task RemoveAsync(long id);
+    public abstract Task RemoveAsync(long id, CancellationToken cancellationToken = default);
 
-    public virtual async Task AddRangeAsync(IEnumerable<TAdd> entities)
+    public virtual async Task AddRangeAsync(IEnumerable<TAdd> entities, CancellationToken cancellationToken = default)
     {
         foreach (TAdd entity in entities)
-            await AddAsync(entity);
+            await AddAsync(entity, cancellationToken);
     }
 
-    public virtual async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public virtual async Task RemoveRangeAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default)
     {
         foreach (long id in ids)
-            await RemoveAsync(id);
+            await RemoveAsync(id, cancellationToken);
     }
 }

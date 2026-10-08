@@ -31,34 +31,34 @@ public sealed class ContentRequestsController : ControllerBase
     // GET: api/ContentRequests?status=0
     [HttpGet]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    public async Task<ActionResult<IEnumerable<ContentRequest>>> GetAllAsync([FromQuery] ContentRequestStatus? status)
+    public async Task<ActionResult<IEnumerable<ContentRequest>>> GetAllAsync([FromQuery] ContentRequestStatus? status, CancellationToken cancellationToken = default)
     {
         if (status is not null && !Enum.IsDefined(status.Value))
             return BadRequest("Неизвестный статус заявки");
 
-        return Ok(await _contentRequestsRepository.GetAllAsync(status));
+        return Ok(await _contentRequestsRepository.GetAllAsync(status, cancellationToken));
     }
 
     // GET: api/ContentRequests/my
     [HttpGet("my")]
-    public async Task<ActionResult<IEnumerable<ContentRequest>>> GetMineAsync()
+    public async Task<ActionResult<IEnumerable<ContentRequest>>> GetMineAsync(CancellationToken cancellationToken = default)
     {
         long? userId = User.GetUserId();
         if (userId is null)
             return Unauthorized();
 
-        return Ok(await _contentRequestsRepository.GetByUserAsync(userId.Value));
+        return Ok(await _contentRequestsRepository.GetByUserAsync(userId.Value, cancellationToken));
     }
 
     // GET: api/ContentRequests/5
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<ContentRequest>> GetAsync(long id)
+    public async Task<ActionResult<ContentRequest>> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         long? userId = User.GetUserId();
         if (userId is null)
             return Unauthorized();
 
-        ContentRequest? contentRequest = await _contentRequestsRepository.GetAsync(id);
+        ContentRequest? contentRequest = await _contentRequestsRepository.GetAsync(id, cancellationToken);
 
         // Чужую заявку не показываем и не раскрываем, что она существует
         if (contentRequest is null || (contentRequest.UserId != userId && !User.IsInRole("Admin")))
@@ -69,7 +69,7 @@ public sealed class ContentRequestsController : ControllerBase
 
     // POST: api/ContentRequests
     [HttpPost]
-    public async Task<ActionResult<ContentRequest>> AddAsync(AddContentRequestModel addContentRequestModel)
+    public async Task<ActionResult<ContentRequest>> AddAsync(AddContentRequestModel addContentRequestModel, CancellationToken cancellationToken = default)
     {
         long? userId = User.GetUserId();
         if (userId is null)
@@ -78,13 +78,13 @@ public sealed class ContentRequestsController : ControllerBase
         if (string.IsNullOrWhiteSpace(addContentRequestModel.Title))
             return BadRequest("Укажите название");
 
-        if (await _contentRequestsRepository.CountPendingByUserAsync(userId.Value) >= MaxPendingRequestsPerUser)
+        if (await _contentRequestsRepository.CountPendingByUserAsync(userId.Value, cancellationToken) >= MaxPendingRequestsPerUser)
             return StatusCode(StatusCodes.Status429TooManyRequests, $"У вас уже {MaxPendingRequestsPerUser} заявок на рассмотрении. Дождитесь ответа администратора.");
 
         try
         {
-            long id = await _contentRequestsRepository.AddAsync(addContentRequestModel, userId.Value);
-            ContentRequest? created = await _contentRequestsRepository.GetAsync(id);
+            long id = await _contentRequestsRepository.AddAsync(addContentRequestModel, userId.Value, cancellationToken);
+            ContentRequest? created = await _contentRequestsRepository.GetAsync(id, cancellationToken);
             return Created($"/api/ContentRequests/{id}", created);
         }
         catch (Exception ex)
@@ -97,9 +97,9 @@ public sealed class ContentRequestsController : ControllerBase
     // PUT: api/ContentRequests/5/status
     [HttpPut("{id:long}/status")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    public async Task<ActionResult<ContentRequest>> UpdateStatusAsync(long id, UpdateContentRequestStatusModel updateContentRequestStatusModel)
+    public async Task<ActionResult<ContentRequest>> UpdateStatusAsync(long id, UpdateContentRequestStatusModel updateContentRequestStatusModel, CancellationToken cancellationToken = default)
     {
-        ContentRequest? updated = await _contentRequestsRepository.UpdateStatusAsync(id, updateContentRequestStatusModel);
+        ContentRequest? updated = await _contentRequestsRepository.UpdateStatusAsync(id, updateContentRequestStatusModel, cancellationToken);
         if (updated is null)
             return NotFound();
 
@@ -111,13 +111,13 @@ public sealed class ContentRequestsController : ControllerBase
     /// </summary>
     // DELETE: api/ContentRequests/5
     [HttpDelete("{id:long}")]
-    public async Task<IActionResult> DeleteAsync(long id)
+    public async Task<IActionResult> DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
         long? userId = User.GetUserId();
         if (userId is null)
             return Unauthorized();
 
-        ContentRequest? contentRequest = await _contentRequestsRepository.GetAsync(id);
+        ContentRequest? contentRequest = await _contentRequestsRepository.GetAsync(id, cancellationToken);
         bool isAdmin = User.IsInRole("Admin");
 
         if (contentRequest is null || (contentRequest.UserId != userId && !isAdmin))
@@ -126,7 +126,7 @@ public sealed class ContentRequestsController : ControllerBase
         if (!isAdmin && contentRequest.Status != ContentRequestStatus.Pending)
             return BadRequest("Рассмотренную заявку отозвать нельзя");
 
-        await _contentRequestsRepository.RemoveAsync(id);
+        await _contentRequestsRepository.RemoveAsync(id, cancellationToken);
         return NoContent();
     }
 }

@@ -13,7 +13,7 @@ using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Pages.Admin.Movies.Movies;
 
-public sealed partial class EditMoviePage : ComponentBase
+public sealed partial class EditMoviePage : CancellableComponentBase
 {
     const int MAX_FILESIZE = 5000 * 1024;
 
@@ -72,14 +72,14 @@ public sealed partial class EditMoviePage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Task<IEnumerable<MovieDirector>> moviesDirectorsGettingTask = MoviesDirectorsWebManager.GetAllAsync();
-        Task<IEnumerable<Genre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
-        Task<IEnumerable<MovieStudio>> moviesStudiosGettingTask = MoviesStudiosWebManager.GetAllAsync();
-        Task<IEnumerable<MovieCountry>> moviesCountriesGettingTask = MoviesCountriesWebManager.GetAllAsync();
+        Task<IEnumerable<MovieDirector>> moviesDirectorsGettingTask = MoviesDirectorsWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<Genre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<MovieStudio>> moviesStudiosGettingTask = MoviesStudiosWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<MovieCountry>> moviesCountriesGettingTask = MoviesCountriesWebManager.GetAllAsync(DisposalToken);
 
         try
         {
-            Movie = await MoviesWebManager.GetAsync(Id);
+            Movie = await MoviesWebManager.GetAsync(Id, DisposalToken);
         }
         catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
@@ -155,10 +155,10 @@ public sealed partial class EditMoviePage : ComponentBase
                 string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
                 string url = $"/api/movies/Images/{PremierDate!.Value.Year}/{PremierDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
 
-                HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content);
+                HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content, DisposalToken);
                 if (!response.IsSuccessStatusCode)
                 {
-                    ToastService.ShowError(await response.Content.ReadAsStringAsync());
+                    ToastService.ShowError(await response.Content.ReadAsStringAsync(DisposalToken));
                     return;
                 }
 
@@ -178,7 +178,7 @@ public sealed partial class EditMoviePage : ComponentBase
                 MoviesCountriesIds: SelectedMoviesCountriesIds,
                 MoviesCrew: MovieCrewEditor.ToModels(CrewTexts));
 
-            Movie? updatedMovie = await MoviesWebManager.UpdateAsync(Id, updateMovieModel);
+            Movie? updatedMovie = await MoviesWebManager.UpdateAsync(Id, updateMovieModel, DisposalToken);
 
             if (updatedMovie is null)
             {
@@ -189,7 +189,7 @@ public sealed partial class EditMoviePage : ComponentBase
             ToastService.ShowSuccess("Фильм сохранён");
             NavigationManager.NavigateTo("/admin/movies/list-movies");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError(ex.Message);
         }

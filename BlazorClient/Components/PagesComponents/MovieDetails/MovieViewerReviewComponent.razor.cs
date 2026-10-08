@@ -4,7 +4,7 @@ using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Components.PagesComponents.MovieDetails;
 
-public partial class MovieViewerReviewComponent : ComponentBase
+public partial class MovieViewerReviewComponent : CancellableComponentBase
 {
     [Parameter, EditorRequired]
     public long Id { get; set; }
@@ -65,7 +65,7 @@ public partial class MovieViewerReviewComponent : ComponentBase
 
     private async Task ShiftAsync(bool direction)
     {
-        HttpResponseMessage response = await MoviesViewersReviewsShiftsWebManager.AddAsync(new AddMovieViewerReviewShiftModel(Id, direction));
+        HttpResponseMessage response = await MoviesViewersReviewsShiftsWebManager.AddAsync(new AddMovieViewerReviewShiftModel(Id, direction), DisposalToken);
 
         if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
         {
@@ -75,7 +75,7 @@ public partial class MovieViewerReviewComponent : ComponentBase
 
         if (!response.IsSuccessStatusCode)
         {
-            ToastService.ShowError(await response.Content.ReadAsStringAsync());
+            ToastService.ShowError(await response.Content.ReadAsStringAsync(DisposalToken));
             return;
         }
 

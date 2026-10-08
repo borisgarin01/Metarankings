@@ -18,11 +18,11 @@ public sealed class ContentRequestsWebManager : WebManager
     /// <summary>
     /// Все заявки, только для администраторов.
     /// </summary>
-    public async Task<IEnumerable<ContentRequest>> GetAllAsync(ContentRequestStatus? status = null)
+    public async Task<IEnumerable<ContentRequest>> GetAllAsync(ContentRequestStatus? status = null, CancellationToken cancellationToken = default)
     {
         string url = status is null ? BasePath : $"{BasePath}?status={(short)status.Value}";
 
-        IEnumerable<ContentRequest>? contentRequests = await Client.GetFromJsonAsync<IEnumerable<ContentRequest>>(url);
+        IEnumerable<ContentRequest>? contentRequests = await Client.GetFromJsonAsync<IEnumerable<ContentRequest>>(url, cancellationToken);
 
         return contentRequests ?? Enumerable.Empty<ContentRequest>();
     }
@@ -30,25 +30,25 @@ public sealed class ContentRequestsWebManager : WebManager
     /// <summary>
     /// Заявки текущего пользователя.
     /// </summary>
-    public async Task<IEnumerable<ContentRequest>> GetMineAsync()
+    public async Task<IEnumerable<ContentRequest>> GetMineAsync(CancellationToken cancellationToken = default)
     {
-        IEnumerable<ContentRequest>? contentRequests = await Client.GetFromJsonAsync<IEnumerable<ContentRequest>>($"{BasePath}/my");
+        IEnumerable<ContentRequest>? contentRequests = await Client.GetFromJsonAsync<IEnumerable<ContentRequest>>($"{BasePath}/my", cancellationToken);
 
         return contentRequests ?? Enumerable.Empty<ContentRequest>();
     }
 
-    public async Task<HttpResponseMessage> AddAsync(AddContentRequestModel addContentRequestModel)
+    public async Task<HttpResponseMessage> AddAsync(AddContentRequestModel addContentRequestModel, CancellationToken cancellationToken = default)
     {
-        return await Client.PostAsJsonAsync(BasePath, addContentRequestModel);
+        return await Client.PostAsJsonAsync(BasePath, addContentRequestModel, cancellationToken);
     }
 
-    public async Task<HttpResponseMessage> UpdateStatusAsync(long id, UpdateContentRequestStatusModel updateContentRequestStatusModel)
+    public async Task<HttpResponseMessage> UpdateStatusAsync(long id, UpdateContentRequestStatusModel updateContentRequestStatusModel, CancellationToken cancellationToken = default)
     {
-        return await Client.PutAsJsonAsync($"{BasePath}/{id}/status", updateContentRequestStatusModel);
+        return await Client.PutAsJsonAsync($"{BasePath}/{id}/status", updateContentRequestStatusModel, cancellationToken);
     }
 
-    public async Task<HttpResponseMessage> DeleteAsync(long id)
+    public async Task<HttpResponseMessage> DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        return await Client.DeleteAsync($"{BasePath}/{id}");
+        return await Client.DeleteAsync($"{BasePath}/{id}", cancellationToken);
     }
 }

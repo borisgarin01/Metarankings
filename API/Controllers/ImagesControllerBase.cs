@@ -36,7 +36,7 @@ public abstract class ImagesControllerBase : ControllerBase
     /// </summary>
     [HttpPost("{year:int}/{month:int}/{name}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int year, int month, string name)
+    public async Task<ActionResult> UploadImageAsync(IFormFile formFile, int year, int month, string name, CancellationToken cancellationToken = default)
     {
         string fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
 
@@ -66,7 +66,7 @@ public abstract class ImagesControllerBase : ControllerBase
 
             await using (FileStream fileStream = new(fullPath, FileMode.Create))
             {
-                await formFile.CopyToAsync(fileStream);
+                await formFile.CopyToAsync(fileStream, cancellationToken);
             }
 
             string imageUrl = $"{_baseUrl}/{year}/{month}/{fileName}";

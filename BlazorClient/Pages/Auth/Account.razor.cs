@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace BlazorClient.Pages.Auth;
 
 [Authorize]
-public partial class Account : ComponentBase
+public partial class Account : CancellableComponentBase
 {
     private bool twoFactorEnabled;
     private string newPassword;
@@ -163,10 +163,10 @@ public partial class Account : ComponentBase
             }
             else
             {
-                ToastService.ShowError($"Ошибка: {await httpResponseMessage.Content.ReadAsStringAsync()}");
+                ToastService.ShowError($"Ошибка: {await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken)}");
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError($"Ошибка: {ex.Message}{ex.StackTrace}");
         }

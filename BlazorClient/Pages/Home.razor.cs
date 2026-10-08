@@ -7,7 +7,7 @@ using ViewModels;
 
 namespace BlazorClient.Pages;
 
-public partial class Home : ComponentBase
+public partial class Home : CancellableComponentBase
 {
     private IEnumerable<Game> games;
     private IEnumerable<GameReview> gamesReviews;
@@ -125,14 +125,14 @@ public partial class Home : ComponentBase
         var httpClient = HttpClientFactory.CreateClient("AuthorizedClient");
 
         // Fetch data based on the current PageSize and PageNumber
-        Task<IEnumerable<Game>?> gamesGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/First/{PageNumber}/{PageSize}");
-        Task<IEnumerable<GameReview>?> gamesGamersReviewsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<GameReview>>($"/api/Games/GamesGamersReviews/{GamesGamersReviewsOffset}/{GamesGamersReviewsLimit}");
-        Task<IEnumerable<Movie>?> moviesGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/movies/{PageNumber}/{PageSize}");
-        Task<IEnumerable<MovieViewerReview>?> moviesViewersReviewsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<MovieViewerReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}");
-        Task<IEnumerable<CollectionsItemComponent>> collectionsItemsComponents = httpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>($"/api/home/collections/{PageNumber}/{PageSize}");
-        Task<IEnumerable<SoonAtCinemasItemComponent>> soonAtCinemasItemComponents = httpClient.GetFromJsonAsync<IEnumerable<SoonAtCinemasItemComponent>>($"/api/home/soon-at-cinemas");
-        Task<IEnumerable<GamesReleaseDateItemViewModel>> gamesReleaseDateItemComponents = httpClient.GetFromJsonAsync<IEnumerable<GamesReleaseDateItemViewModel>>($"/api/home/games-release-dates/{PageNumber}/{PageSize}");
-        Task<IEnumerable<Domain.Movies.Genre>> moviesGenresGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Domain.Movies.Genre>>($"/api/home/games-release-dates/{PageNumber}/{PageSize}");
+        Task<IEnumerable<Game>?> gamesGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Game>>($"/api/Games/Games/First/{PageNumber}/{PageSize}", DisposalToken);
+        Task<IEnumerable<GameReview>?> gamesGamersReviewsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<GameReview>>($"/api/Games/GamesGamersReviews/{GamesGamersReviewsOffset}/{GamesGamersReviewsLimit}", DisposalToken);
+        Task<IEnumerable<Movie>?> moviesGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Movie>>($"/api/movies/{PageNumber}/{PageSize}", DisposalToken);
+        Task<IEnumerable<MovieViewerReview>?> moviesViewersReviewsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<MovieViewerReview>>($"/api/Movies/MoviesViewersReviews/{MoviesViewersReviewsOffset}/{MoviesViewersReviewsLimit}", DisposalToken);
+        Task<IEnumerable<CollectionsItemComponent>> collectionsItemsComponents = httpClient.GetFromJsonAsync<IEnumerable<CollectionsItemComponent>>($"/api/home/collections/{PageNumber}/{PageSize}", DisposalToken);
+        Task<IEnumerable<SoonAtCinemasItemComponent>> soonAtCinemasItemComponents = httpClient.GetFromJsonAsync<IEnumerable<SoonAtCinemasItemComponent>>($"/api/home/soon-at-cinemas", DisposalToken);
+        Task<IEnumerable<GamesReleaseDateItemViewModel>> gamesReleaseDateItemComponents = httpClient.GetFromJsonAsync<IEnumerable<GamesReleaseDateItemViewModel>>($"/api/home/games-release-dates/{PageNumber}/{PageSize}", DisposalToken);
+        Task<IEnumerable<Domain.Movies.Genre>> moviesGenresGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Domain.Movies.Genre>>($"/api/home/games-release-dates/{PageNumber}/{PageSize}", DisposalToken);
 
         // Wait for ALL tasks to complete
         await Task.WhenAll(

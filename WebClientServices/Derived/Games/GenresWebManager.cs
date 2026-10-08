@@ -10,13 +10,13 @@ public sealed class GenresWebManager : CrudWebManager<Genre, AddGameGenreModel, 
     {
     }
 
-    public override Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile)
+    public override Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile, CancellationToken cancellationToken = default)
     {
-        return PostAsync("genres-excel-upload", formFile);
+        return PostAsync("genres-excel-upload", formFile, cancellationToken);
     }
 
-    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddGameGenreModel> addGenresModels)
+    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddGameGenreModel> addGenresModels, CancellationToken cancellationToken = default)
     {
-        return PostAsync("upload-genres-from-json", addGenresModels);
+        return PostAsync("upload-genres-from-json", addGenresModels, cancellationToken);
     }
 }

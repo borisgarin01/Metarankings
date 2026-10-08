@@ -11,7 +11,7 @@ namespace BlazorClient.Pages.Admin;
 /// <summary>
 /// Управление рецензиями критиков игры или фильма.
 /// </summary>
-public partial class CriticsReviewsPage : ComponentBase
+public partial class CriticsReviewsPage : CancellableComponentBase
 {
     private bool isLoaded;
     private bool isSaving;
@@ -77,13 +77,13 @@ public partial class CriticsReviewsPage : ComponentBase
         try
         {
             EntityName = Target == CriticReviewTarget.Game
-                ? (await GamesWebManager.GetAsync(EntityId))?.Name
-                : (await MoviesWebManager.GetAsync(EntityId))?.Name;
+                ? (await GamesWebManager.GetAsync(EntityId, DisposalToken))?.Name
+                : (await MoviesWebManager.GetAsync(EntityId, DisposalToken))?.Name;
 
             if (EntityName is not null)
                 await LoadReviewsAsync();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ShowError($"Ошибка загрузки: {ex.Message}");
         }
@@ -95,7 +95,7 @@ public partial class CriticsReviewsPage : ComponentBase
 
     private async Task LoadReviewsAsync()
     {
-        CriticsReviews = (await WebManager.GetByEntityAsync(EntityId)).ToList();
+        CriticsReviews = (await WebManager.GetByEntityAsync(EntityId, DisposalToken)).ToList();
     }
 
     private async Task SaveAsync()
@@ -107,14 +107,14 @@ public partial class CriticsReviewsPage : ComponentBase
             form.EntityId = EntityId;
 
             HttpResponseMessage response = wasEditing
-                ? await WebManager.UpdateAsync(editingId!.Value, form)
-                : await WebManager.AddAsync(form);
+                ? await WebManager.UpdateAsync(editingId!.Value, form, DisposalToken)
+                : await WebManager.AddAsync(form, DisposalToken);
 
             if (!response.IsSuccessStatusCode)
             {
                 ShowError(response.StatusCode == HttpStatusCode.Conflict
                     ? "Рецензия этого издания уже добавлена."
-                    : $"Не удалось сохранить: {(int)response.StatusCode} {await response.Content.ReadAsStringAsync()}");
+                    : $"Не удалось сохранить: {(int)response.StatusCode} {await response.Content.ReadAsStringAsync(DisposalToken)}");
                 return;
             }
 
@@ -122,7 +122,7 @@ public partial class CriticsReviewsPage : ComponentBase
             ShowSuccess(wasEditing ? "Рецензия обновлена." : "Рецензия добавлена.");
             await LoadReviewsAsync();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ShowError($"Ошибка: {ex.Message}");
         }
@@ -161,7 +161,7 @@ public partial class CriticsReviewsPage : ComponentBase
 
         try
         {
-            HttpResponseMessage response = await WebManager.DeleteAsync(criticReview.Id);
+            HttpResponseMessage response = await WebManager.DeleteAsync(criticReview.Id, DisposalToken);
             if (!response.IsSuccessStatusCode)
             {
                 ShowError($"Не удалось удалить: {(int)response.StatusCode}");
@@ -174,7 +174,7 @@ public partial class CriticsReviewsPage : ComponentBase
             ShowSuccess("Рецензия удалена.");
             await LoadReviewsAsync();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ShowError($"Ошибка удаления: {ex.Message}");
         }

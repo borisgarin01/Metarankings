@@ -6,7 +6,7 @@ using System.Net;
 namespace BlazorClient.Pages.Admin;
 
 [Authorize(Policy = "Admin")]
-public partial class AdminPage : ComponentBase
+public partial class AdminPage : CancellableComponentBase
 {
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
@@ -23,7 +23,7 @@ public partial class AdminPage : ComponentBase
     {
         UserAssignToRoleModel userAssignToRoleModel = new UserAssignToRoleModel(FutureAdminEmail);
 
-        var response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Auth/AssignToAdmin", userAssignToRoleModel);
+        var response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsJsonAsync("/api/Auth/AssignToAdmin", userAssignToRoleModel, DisposalToken);
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {

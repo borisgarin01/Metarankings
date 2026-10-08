@@ -6,7 +6,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Movies.Collections;
 
-public partial class CollectionsList : ComponentBase
+public partial class CollectionsList : CancellableComponentBase
 {
     private IEnumerable<MoviesCollection> moviesCollections;
 
@@ -25,12 +25,12 @@ public partial class CollectionsList : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        MoviesCollections = await MoviesCollectionsWebManager.GetAllAsync();
+        MoviesCollections = await MoviesCollectionsWebManager.GetAllAsync(DisposalToken);
     }
 
     public async Task DeleteCollectionAsync(long id)
     {
-        await MoviesCollectionsWebManager.DeleteAsync(id);
-        MoviesCollections = await MoviesCollectionsWebManager.GetAllAsync();
+        await MoviesCollectionsWebManager.DeleteAsync(id, DisposalToken);
+        MoviesCollections = await MoviesCollectionsWebManager.GetAllAsync(DisposalToken);
     }
 }

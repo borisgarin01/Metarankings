@@ -9,7 +9,7 @@ using WebManagers.Derived.Games;
 namespace BlazorClient.Pages.Admin.Games.Games;
 
 [Authorize(Policy = "Admin")]
-public partial class EditGamePage : ComponentBase
+public partial class EditGamePage : CancellableComponentBase
 {
     const int MAX_FILESIZE = 5000 * 1024;
 
@@ -57,15 +57,15 @@ public partial class EditGamePage : ComponentBase
     {
         HttpClient httpClient = HttpClientFactory.CreateClient("AuthorizedClient");
 
-        Task<IEnumerable<Developer>> developersGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Developer>>("/api/Games/Developers");
-        Task<IEnumerable<Genre>> genresGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Genre>>("/api/Games/Genres");
-        Task<IEnumerable<Localization>> localizationsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Localization>>("/api/Games/Localizations");
-        Task<IEnumerable<Platform>> platformsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Platform>>("/api/Games/Platforms");
-        Task<IEnumerable<Publisher>> publishersGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Publisher>>("/api/Games/Publishers");
+        Task<IEnumerable<Developer>> developersGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Developer>>("/api/Games/Developers", DisposalToken);
+        Task<IEnumerable<Genre>> genresGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Genre>>("/api/Games/Genres", DisposalToken);
+        Task<IEnumerable<Localization>> localizationsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Localization>>("/api/Games/Localizations", DisposalToken);
+        Task<IEnumerable<Platform>> platformsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Platform>>("/api/Games/Platforms", DisposalToken);
+        Task<IEnumerable<Publisher>> publishersGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Publisher>>("/api/Games/Publishers", DisposalToken);
 
         try
         {
-            Game = await GamesWebManager.GetAsync(Id);
+            Game = await GamesWebManager.GetAsync(Id, DisposalToken);
         }
         catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
@@ -145,10 +145,10 @@ public partial class EditGamePage : ComponentBase
                 string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
                 string url = $"/api/games/images/{ReleaseDate!.Value.Year}/{ReleaseDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
 
-                HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content);
+                HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content, DisposalToken);
                 if (!response.IsSuccessStatusCode)
                 {
-                    ToastService.ShowError(await response.Content.ReadAsStringAsync());
+                    ToastService.ShowError(await response.Content.ReadAsStringAsync(DisposalToken));
                     return;
                 }
 
@@ -167,7 +167,7 @@ public partial class EditGamePage : ComponentBase
                 Trailer: Trailer,
                 PlatformsIds: SelectedPlatformsIds);
 
-            Game? updatedGame = await GamesWebManager.UpdateAsync(Id, updateGameModel);
+            Game? updatedGame = await GamesWebManager.UpdateAsync(Id, updateGameModel, DisposalToken);
 
             if (updatedGame is null)
             {
@@ -178,7 +178,7 @@ public partial class EditGamePage : ComponentBase
             ToastService.ShowSuccess("Игра сохранена");
             NavigationManager.NavigateTo("/admin/games/games/list-games");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError(ex.Message);
         }

@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Pages.Games.Platforms;
 
-public partial class PlatformGamesListPage : ComponentBase
+public partial class PlatformGamesListPage : CancellableComponentBase
 {
     [Parameter]
     public int PlatformId { get; set; }
@@ -14,6 +14,6 @@ public partial class PlatformGamesListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Platform = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Platform>($"/api/Games/Platforms/{PlatformId}");
+        Platform = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Platform>($"/api/Games/Platforms/{PlatformId}", DisposalToken);
     }
 }

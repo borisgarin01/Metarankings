@@ -1,4 +1,5 @@
 ﻿@page "/publishers/{PublisherId:int}"
+@inherits CancellableComponentBase
 
 @using BlazorClient.Components.PagesComponents.GamesList
 @using Domain.Games
@@ -25,7 +26,9 @@ else
                 }
             </div>
         </div>
-        <BestGamesOfYearsComponent Year="@DateTime.Today.Year" />
+        <CascadingValue Name="Year" TValue="int?" Value="@DateTime.Today.Year">
+            <BestGamesOfYearsComponent />
+        </CascadingValue>
         <BestGamesOfPlatformsComponent Platforms="@Platforms" />
         <h2>Новые игры</h2>
     </div>

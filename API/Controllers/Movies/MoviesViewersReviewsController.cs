@@ -29,16 +29,16 @@ public sealed class MoviesViewersReviewsController : ControllerBase
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult> AddMovieViewerReviewAsync(AddMovieViewerReviewModel addMovieViewerReviewModel)
+    public async Task<ActionResult> AddMovieViewerReviewAsync(AddMovieViewerReviewModel addMovieViewerReviewModel, CancellationToken cancellationToken = default)
     {
         if (User.GetUserId() is not long userId)
             return Unauthorized();
 
-        MovieViewerReview? existingReview = await _moviesViewersReviewsRepository.GetUserReviewForMovieAsync(userId, addMovieViewerReviewModel.MovieId);
+        MovieViewerReview? existingReview = await _moviesViewersReviewsRepository.GetUserReviewForMovieAsync(userId, addMovieViewerReviewModel.MovieId, cancellationToken);
         if (existingReview is not null)
             return BadRequest($"У пользователя {userId} уже есть отзыв на фильм {addMovieViewerReviewModel.MovieId}");
 
-        Movie? movie = await _moviesRepository.GetAsync(addMovieViewerReviewModel.MovieId);
+        Movie? movie = await _moviesRepository.GetAsync(addMovieViewerReviewModel.MovieId, cancellationToken);
         if (movie is null)
             return NotFound("Movie not found");
 
@@ -47,21 +47,21 @@ public sealed class MoviesViewersReviewsController : ControllerBase
 
         AddMovieViewerReviewWithUserIdAndDateModel addMovieReviewWithUserIdAndDateModel = new(addMovieViewerReviewModel.MovieId, addMovieViewerReviewModel.TextContent, addMovieViewerReviewModel.Score, userId, DateTime.Now);
 
-        long movieReviewId = await _moviesViewersReviewsRepository.AddAsync(addMovieReviewWithUserIdAndDateModel);
-        MovieViewerReview createdMovieReview = await _moviesViewersReviewsRepository.GetAsync(movieReviewId);
+        long movieReviewId = await _moviesViewersReviewsRepository.AddAsync(addMovieReviewWithUserIdAndDateModel, cancellationToken);
+        MovieViewerReview createdMovieReview = await _moviesViewersReviewsRepository.GetAsync(movieReviewId, cancellationToken);
         return Created($"api/MoviesViewersReviews/{createdMovieReview.Id}", createdMovieReview);
     }
 
     [HttpGet("{offset:long}/{limit:long}")]
-    public async Task<ActionResult<IEnumerable<MovieViewerReview>>> GetReviewsAsync(long offset, long limit)
+    public async Task<ActionResult<IEnumerable<MovieViewerReview>>> GetReviewsAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
-        return Ok(await _moviesViewersReviewsRepository.GetAsync(offset, limit));
+        return Ok(await _moviesViewersReviewsRepository.GetAsync(offset, limit, cancellationToken));
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<MovieViewerReview>> GetReview(long id)
+    public async Task<ActionResult<MovieViewerReview>> GetReview(long id, CancellationToken cancellationToken = default)
     {
-        MovieViewerReview? movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
+        MovieViewerReview? movieReview = await _moviesViewersReviewsRepository.GetAsync(id, cancellationToken);
         if (movieReview is null)
             return NotFound();
 
@@ -70,63 +70,63 @@ public sealed class MoviesViewersReviewsController : ControllerBase
 
     [HttpPut("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<MovieViewerReview>> UpdateReview(long id, UpdateMovieViewerReviewModel updateMovieViewerReviewModel)
+    public async Task<ActionResult<MovieViewerReview>> UpdateReview(long id, UpdateMovieViewerReviewModel updateMovieViewerReviewModel, CancellationToken cancellationToken = default)
     {
-        MovieViewerReview? movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
+        MovieViewerReview? movieReview = await _moviesViewersReviewsRepository.GetAsync(id, cancellationToken);
         if (movieReview is null)
             return NotFound();
 
         if (User.GetUserId() != movieReview.ViewerId)
             return BadRequest("User are not a review author");
 
-        Movie? movie = await _moviesRepository.GetAsync(movieReview.MovieId);
+        Movie? movie = await _moviesRepository.GetAsync(movieReview.MovieId, cancellationToken);
         if (movie is null || !movie.IsReleased)
             return BadRequest("Оценки и отзывы можно оставлять только после выхода фильма");
 
-        return Ok(await _moviesViewersReviewsRepository.UpdateAsync(updateMovieViewerReviewModel, id));
+        return Ok(await _moviesViewersReviewsRepository.UpdateAsync(updateMovieViewerReviewModel, id, cancellationToken));
     }
 
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<MovieViewerReview>> RemoveReview(long id)
+    public async Task<ActionResult<MovieViewerReview>> RemoveReview(long id, CancellationToken cancellationToken = default)
     {
-        MovieViewerReview? movieReview = await _moviesViewersReviewsRepository.GetAsync(id);
+        MovieViewerReview? movieReview = await _moviesViewersReviewsRepository.GetAsync(id, cancellationToken);
         if (movieReview is null)
             return NotFound();
 
         if (User.GetUserId() != movieReview.ViewerId && !User.HasClaim(ClaimTypes.Role, "Admin"))
             return BadRequest("User are not a review author");
 
-        await _moviesViewersReviewsRepository.RemoveAsync(id);
+        await _moviesViewersReviewsRepository.RemoveAsync(id, cancellationToken);
         return NoContent();
     }
 
     [HttpPost("shift")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<long>> Shift(FrontendShift.AddMovieViewerReviewShiftModel addMovieViewerReviewShiftModel)
+    public async Task<ActionResult<long>> Shift(FrontendShift.AddMovieViewerReviewShiftModel addMovieViewerReviewShiftModel, CancellationToken cancellationToken = default)
     {
         if (User.GetUserId() is not long shifterId)
             return Unauthorized();
 
         _logger.LogInformation("MovieViewerReviewId - {MovieViewerReviewId}, Direction - {Direction}, ShifterId - {ShifterId}", addMovieViewerReviewShiftModel.MovieViewerReviewId, addMovieViewerReviewShiftModel.Direction, shifterId);
 
-        MovieViewerReview? movieReview = await _moviesViewersReviewsRepository.GetAsync(addMovieViewerReviewShiftModel.MovieViewerReviewId);
+        MovieViewerReview? movieReview = await _moviesViewersReviewsRepository.GetAsync(addMovieViewerReviewShiftModel.MovieViewerReviewId, cancellationToken);
         if (movieReview is null)
             return NotFound("Отзыв не найден");
 
         if (shifterId == movieReview.ViewerId)
             return BadRequest("Нельзя голосовать за свои обзоры");
 
-        MovieViewerReviewShift? shift = await _moviesViewersReviewsShiftsRepository.GetByShifterIdAsync(shifterId, movieReview.Id);
+        MovieViewerReviewShift? shift = await _moviesViewersReviewsShiftsRepository.GetByShifterIdAsync(shifterId, movieReview.Id, cancellationToken);
         if (shift is null)
         {
-            long insertedShiftId = await _moviesViewersReviewsShiftsRepository.AddAsync(new BackendShift.AddMovieViewerReviewShiftModel(movieReview.Id, shifterId, addMovieViewerReviewShiftModel.Direction));
+            long insertedShiftId = await _moviesViewersReviewsShiftsRepository.AddAsync(new BackendShift.AddMovieViewerReviewShiftModel(movieReview.Id, shifterId, addMovieViewerReviewShiftModel.Direction), cancellationToken);
             return Ok(insertedShiftId);
         }
 
         if (shift.Direction != addMovieViewerReviewShiftModel.Direction)
         {
-            MovieViewerReviewShift updatedShift = await _moviesViewersReviewsShiftsRepository.UpdateAsync(new BackendShift.UpdateMovieViewerReviewShiftModel(shift.MovieViewerReviewId, shift.ShifterId, addMovieViewerReviewShiftModel.Direction), shift.Id);
+            MovieViewerReviewShift updatedShift = await _moviesViewersReviewsShiftsRepository.UpdateAsync(new BackendShift.UpdateMovieViewerReviewShiftModel(shift.MovieViewerReviewId, shift.ShifterId, addMovieViewerReviewShiftModel.Direction), shift.Id, cancellationToken);
             return Ok(updatedShift.Id);
         }
 

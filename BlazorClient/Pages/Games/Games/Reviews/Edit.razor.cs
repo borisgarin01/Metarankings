@@ -6,7 +6,7 @@ using System.Net.Http.Json;
 
 namespace BlazorClient.Pages.Games.Games.Reviews;
 
-public partial class Edit : ComponentBase
+public partial class Edit : CancellableComponentBase
 {
     private int hoverScore = 0;
 
@@ -65,7 +65,7 @@ public partial class Edit : ComponentBase
         try
         {
             var client = HttpClientFactory.CreateClient("AuthorizedClient");
-            var gameReview = await client.GetFromJsonAsync<GameReview>($"/api/Games/GamesGamersReviews/{Id}");
+            var gameReview = await client.GetFromJsonAsync<GameReview>($"/api/Games/GamesGamersReviews/{Id}", DisposalToken);
 
             if (gameReview is not null)
             {
@@ -83,7 +83,7 @@ public partial class Edit : ComponentBase
                 NavigationManager.NavigateTo("/games");
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError($"Failed to load review: {ex.Message}");
             NavigationManager.NavigateTo("/games");
@@ -95,7 +95,7 @@ public partial class Edit : ComponentBase
         try
         {
             var client = HttpClientFactory.CreateClient("AuthorizedClient");
-            var response = await client.PutAsJsonAsync($"/api/Games/gamesGamersReviews/{Id}", UpdateGamePlayerReviewModel);
+            var response = await client.PutAsJsonAsync($"/api/Games/gamesGamersReviews/{Id}", UpdateGamePlayerReviewModel, DisposalToken);
 
             if (response.IsSuccessStatusCode)
             {
@@ -104,11 +104,11 @@ public partial class Edit : ComponentBase
             }
             else
             {
-                var error = await response.Content.ReadAsStringAsync();
+                var error = await response.Content.ReadAsStringAsync(DisposalToken);
                 ToastService.ShowError($"Failed to update: {error}");
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError($"Error: {ex.Message}");
         }

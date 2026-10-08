@@ -3,7 +3,7 @@ using Domain.Movies;
 
 namespace BlazorClient.Pages.Movies.Movies;
 
-public partial class MovieGenreMoviesListPage : ComponentBase
+public partial class MovieGenreMoviesListPage : CancellableComponentBase
 {
     [Parameter]
     public long GenreId { get; set; }
@@ -15,6 +15,6 @@ public partial class MovieGenreMoviesListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Genre = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Domain.Movies.Genre>($"/api/Movies/Genres/{GenreId}");
+        Genre = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Domain.Movies.Genre>($"/api/Movies/Genres/{GenreId}", DisposalToken);
     }
 }

@@ -6,7 +6,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Games.Publishers;
 
-public partial class PublisherGamesListPage : ComponentBase
+public partial class PublisherGamesListPage : CancellableComponentBase
 {
     private Publisher publisher;
     private IEnumerable<Platform> platforms;
@@ -54,15 +54,13 @@ public partial class PublisherGamesListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Task<Publisher> publisherGettingTask = PublishersWebManager.GetAsync(PublisherId);
-        Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetFirstAsync(0, 5);
-        Task<IEnumerable<Developer>> developersGettingTask = DevelopersWebManager.GetFirstAsync(0, 5);
+        Task<Publisher> publisherGettingTask = PublishersWebManager.GetAsync(PublisherId, DisposalToken);
+        Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetFirstAsync(0, 5, DisposalToken);
+        Task<IEnumerable<Developer>> developersGettingTask = DevelopersWebManager.GetFirstAsync(0, 5, DisposalToken);
 
-        await Task.WhenAll(publisherGettingTask, platformsGettingTask, developersGettingTask).ContinueWith(b =>
-        {
-            Publisher = publisherGettingTask.Result;
-            Platforms = platformsGettingTask.Result;
-            Developers = developersGettingTask.Result;
-        });
+        await Task.WhenAll(publisherGettingTask, platformsGettingTask, developersGettingTask);
+        Publisher = publisherGettingTask.Result;
+        Platforms = platformsGettingTask.Result;
+        Developers = developersGettingTask.Result;
     }
 }

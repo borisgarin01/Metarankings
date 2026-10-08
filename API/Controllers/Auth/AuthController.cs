@@ -65,7 +65,7 @@ public sealed class AuthController : ControllerBase
     // HELPERS
     // ============================================================
 
-    private async Task<AuthResponseDto> IssueTokensAsync(ApplicationUser user)
+    private async Task<AuthResponseDto> IssueTokensAsync(ApplicationUser user, CancellationToken cancellationToken = default)
     {
         // Old tokens are NOT revoked: each device keeps its own refresh token,
         // so logging in on one device doesn't log the user out on the others.
@@ -78,7 +78,7 @@ public sealed class AuthController : ControllerBase
             refreshTokenValue,
             false,
             DateTime.UtcNow);
-        await _refreshTokensRepo.CreateAsync(refreshToken);
+        await _refreshTokensRepo.CreateAsync(refreshToken, cancellationToken);
 
         return new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue);
     }
@@ -93,7 +93,7 @@ public sealed class AuthController : ControllerBase
     // ============================================================
 
     [HttpGet("external-providers")]
-    public async Task<ActionResult<IEnumerable<Domain.Auth.AuthenticationScheme>>> GetExternalProviders()
+    public async Task<ActionResult<IEnumerable<Domain.Auth.AuthenticationScheme>>> GetExternalProviders(CancellationToken cancellationToken = default)
     {
         IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalProviders =
             await _signInManager.GetExternalAuthenticationSchemesAsync();
@@ -106,7 +106,7 @@ public sealed class AuthController : ControllerBase
     // ============================================================
 
     [HttpPost("login")]
-    public async Task<ActionResult> Login(LoginModel loginModel)
+    public async Task<ActionResult> Login(LoginModel loginModel, CancellationToken cancellationToken = default)
     {
         if (loginModel is null)
             return BadRequest("Неверный логин");
@@ -129,12 +129,12 @@ public sealed class AuthController : ControllerBase
             return Ok(new AuthResponseDto(false, true, "2FA required", string.Empty, string.Empty));
         }
 
-        AuthResponseDto response = await IssueTokensAsync(user);
+        AuthResponseDto response = await IssueTokensAsync(user, cancellationToken);
         return Ok(response);
     }
 
     [HttpPost("ConfirmLoginViaEmail")]
-    public async Task<ActionResult> ConfirmLoginViaEmail(ConfirmLoginModel model)
+    public async Task<ActionResult> ConfirmLoginViaEmail(ConfirmLoginModel model, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(model.UserId) || string.IsNullOrWhiteSpace(model.TwoFactorToken))
             return BadRequest("User ID and token are required");
@@ -147,12 +147,12 @@ public sealed class AuthController : ControllerBase
         if (!isValidTwoFactorToken)
             return BadRequest("Invalid 2FA token");
 
-        AuthResponseDto response = await IssueTokensAsync(user);
+        AuthResponseDto response = await IssueTokensAsync(user, cancellationToken);
         return Ok(response);
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<string>> Register(RegisterModel registerModel)
+    public async Task<ActionResult<string>> Register(RegisterModel registerModel, CancellationToken cancellationToken = default)
     {
         ApplicationUser? userToCheckExistance = await _usersManager.FindByEmailAsync(registerModel.UserEmail);
         if (userToCheckExistance is not null)
@@ -226,7 +226,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpGet("ConfirmEmail")]
-    public async Task<IActionResult> ConfirmEmail(string userId, string code)
+    public async Task<IActionResult> ConfirmEmail(string userId, string code, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
             return BadRequest("UserId and code are required");
@@ -246,7 +246,8 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("logout")]
     public async Task<ActionResult> Logout(
-        [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] RefreshTokenRequest? request)
+        [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] RefreshTokenRequest? request,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -254,9 +255,9 @@ public sealed class AuthController : ControllerBase
             // so this works even when the access token has already expired.
             if (!string.IsNullOrEmpty(request?.RefreshToken))
             {
-                IdentityLibrary.DTOs.RefreshToken? storedToken = await _refreshTokensRepo.GetByValueAsync(request.RefreshToken);
+                IdentityLibrary.DTOs.RefreshToken? storedToken = await _refreshTokensRepo.GetByValueAsync(request.RefreshToken, cancellationToken);
                 if (storedToken is not null)
-                    await _refreshTokensRepo.RevokeAsync(storedToken.Id);
+                    await _refreshTokensRepo.RevokeAsync(storedToken.Id, cancellationToken);
 
                 // Always OK: the client clears its tokens anyway, and an unknown token is already unusable.
                 return Ok("Logged out successfully");
@@ -268,7 +269,7 @@ public sealed class AuthController : ControllerBase
             if (!auth.Succeeded || userId is null)
                 return Unauthorized();
 
-            await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(userId));
+            await _refreshTokensRepo.RevokeAllByUserIdAsync(Convert.ToInt64(userId), cancellationToken);
             return Ok("Logged out successfully");
         }
         catch (Exception ex)
@@ -279,14 +280,14 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("refresh-token")]
-    public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(request.RefreshToken))
             return BadRequest("Refresh token is required");
 
         try
         {
-            IdentityLibrary.DTOs.RefreshToken? storedToken = await _refreshTokensRepo.GetByValueAsync(request.RefreshToken);
+            IdentityLibrary.DTOs.RefreshToken? storedToken = await _refreshTokensRepo.GetByValueAsync(request.RefreshToken, cancellationToken);
             if (storedToken is null)
             {
                 _logger.LogWarning("Invalid refresh token");
@@ -297,7 +298,7 @@ public sealed class AuthController : ControllerBase
             if (storedToken.CreatedAt.AddDays(refreshTokenLifetime) < DateTime.UtcNow)
             {
                 _logger.LogWarning("Refresh token expired for user {UserId}", storedToken.UserId);
-                await _refreshTokensRepo.RevokeAsync(storedToken.Id);
+                await _refreshTokensRepo.RevokeAsync(storedToken.Id, cancellationToken);
                 return BadRequest("Refresh token expired");
             }
 
@@ -317,7 +318,7 @@ public sealed class AuthController : ControllerBase
             // Rotate only this token: revoking all of the user's tokens here would
             // log out other tabs/devices that refresh concurrently.
             // Atomic: if a parallel request already rotated this token, don't issue a second pair.
-            if (!await _refreshTokensRepo.TryRevokeAsync(storedToken.Id))
+            if (!await _refreshTokensRepo.TryRevokeAsync(storedToken.Id, cancellationToken))
             {
                 _logger.LogWarning("Refresh token was already used for user {UserId}", storedToken.UserId);
                 return BadRequest("Invalid refresh token");
@@ -330,7 +331,7 @@ public sealed class AuthController : ControllerBase
                 storedToken.UserId,
                 refreshTokenValue,
                 false,
-                DateTime.UtcNow));
+                DateTime.UtcNow), cancellationToken);
 
             return Ok(new AuthResponseDto(true, false, string.Empty, accessToken, refreshTokenValue));
         }
@@ -418,7 +419,7 @@ public sealed class AuthController : ControllerBase
     // ============================================================
 
     [HttpGet("vkid-callback")]
-    public async Task<ActionResult> VKIDCallback()
+    public async Task<ActionResult> VKIDCallback(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -506,7 +507,7 @@ public sealed class AuthController : ControllerBase
             }
 
             // SCENARIO 3: VK ID linked — login
-            AuthResponseDto response = await IssueTokensAsync(user);
+            AuthResponseDto response = await IssueTokensAsync(user, cancellationToken);
 
             return Redirect(
                 $"{Request.Scheme}://{Request.Host}/auth/vkid-callback" +
@@ -523,7 +524,8 @@ public sealed class AuthController : ControllerBase
     public async Task<ActionResult> VKIDLinkCallback(
     [FromQuery] string code,
     [FromQuery] string state,
-    [FromQuery(Name = "device_id")] string deviceId)
+    [FromQuery(Name = "device_id")] string deviceId,
+    CancellationToken cancellationToken = default)
     {
         try
         {
@@ -644,7 +646,7 @@ public sealed class AuthController : ControllerBase
     // ============================================================
 
     [HttpGet("yandexid-callback")]
-    public async Task<ActionResult> YandexIDCallback()
+    public async Task<ActionResult> YandexIDCallback(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -732,7 +734,7 @@ public sealed class AuthController : ControllerBase
             }
 
             // SCENARIO 3: VK ID linked — login
-            AuthResponseDto response = await IssueTokensAsync(user);
+            AuthResponseDto response = await IssueTokensAsync(user, cancellationToken);
 
             return Redirect(
                 $"{Request.Scheme}://{Request.Host}/auth/yandexid-callback" +
@@ -797,7 +799,8 @@ public sealed class AuthController : ControllerBase
     [HttpGet("yandexid-link-callback")]
     public async Task<ActionResult> YandexIDLinkCallback(
     [FromQuery] string code,
-    [FromQuery] string state)
+    [FromQuery] string state,
+    CancellationToken cancellationToken = default)
     {
         try
         {
@@ -885,7 +888,7 @@ public sealed class AuthController : ControllerBase
 
     [HttpGet("current-user")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<ApplicationUser>> GetCurrentUserAsync()
+    public async Task<ActionResult<ApplicationUser>> GetCurrentUserAsync(CancellationToken cancellationToken = default)
     {
         string? userId = GetCurrentUserId();
         if (string.IsNullOrEmpty(userId))
@@ -900,7 +903,7 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("set-password")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult> ChangePassword(ChangePasswordModel changePasswordModel)
+    public async Task<ActionResult> ChangePassword(ChangePasswordModel changePasswordModel, CancellationToken cancellationToken = default)
     {
         string? userId = GetCurrentUserId();
         if (string.IsNullOrEmpty(userId))
@@ -936,7 +939,7 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("addPassword/{password}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult> AddPasswordAsync(string password)
+    public async Task<ActionResult> AddPasswordAsync(string password, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("addPassword");
 
@@ -967,7 +970,7 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("setTwoFactorEnabled")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult> SetTwoFactorEnabled(SetTwoFactorEnabledModel setTwoFactorEnabledModel)
+    public async Task<ActionResult> SetTwoFactorEnabled(SetTwoFactorEnabledModel setTwoFactorEnabledModel, CancellationToken cancellationToken = default)
     {
         string? userId = GetCurrentUserId();
         if (string.IsNullOrEmpty(userId))
@@ -988,7 +991,7 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("assignToAdmin")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult> AssignToAdmin(string humanToAssignToAdminEmail)
+    public async Task<ActionResult> AssignToAdmin(string humanToAssignToAdminEmail, CancellationToken cancellationToken = default)
     {
         ApplicationUser? humanToAssignToAdmin = await _usersManager.FindByEmailAsync(humanToAssignToAdminEmail);
         if (humanToAssignToAdmin is null)
@@ -1005,7 +1008,7 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("addExternalLogin")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult> AddExternalLogin()
+    public async Task<ActionResult> AddExternalLogin(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -1037,7 +1040,7 @@ public sealed class AuthController : ControllerBase
     // ============================================================
 
     [HttpPost("resetPassword")]
-    public async Task<ActionResult> ResetPassword(ResetPasswordModel resetPasswordModel)
+    public async Task<ActionResult> ResetPassword(ResetPasswordModel resetPasswordModel, CancellationToken cancellationToken = default)
     {
         ApplicationUser? user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
         if (user is null)
@@ -1066,7 +1069,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("resetPasswordConfirm")]
-    public async Task<ActionResult> ResetPasswordConfirm(ResetPasswordConfirmModel resetPasswordModel)
+    public async Task<ActionResult> ResetPasswordConfirm(ResetPasswordConfirmModel resetPasswordModel, CancellationToken cancellationToken = default)
     {
         ApplicationUser? user = await _usersManager.FindByEmailAsync(resetPasswordModel.Email);
         if (user is null)

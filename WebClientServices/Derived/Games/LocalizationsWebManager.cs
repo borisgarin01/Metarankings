@@ -10,13 +10,13 @@ public sealed class LocalizationsWebManager : CrudWebManager<Localization, AddLo
     {
     }
 
-    public override Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile)
+    public override Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile, CancellationToken cancellationToken = default)
     {
-        return PostAsync("localizations-excel-upload", formFile);
+        return PostAsync("localizations-excel-upload", formFile, cancellationToken);
     }
 
-    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddLocalizationModel> addLocalizationsModels)
+    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddLocalizationModel> addLocalizationsModels, CancellationToken cancellationToken = default)
     {
-        return PostAsync("upload-localizations-from-json", addLocalizationsModels);
+        return PostAsync("upload-localizations-from-json", addLocalizationsModels, cancellationToken);
     }
 }
