@@ -17,6 +17,6 @@ public partial class OtherNumberOfDevelopersComponent : CancellableComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        OtherNumberOfDevelopers = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Developer>>($"/api/Games//Developers/{DevelopersGettingOffset}/{DevelopersGettingLimit}", DisposalToken);
+        OtherNumberOfDevelopers = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Developer>>($"/api/Games/Developers/{DevelopersGettingOffset}/{DevelopersGettingLimit}", DisposalToken);
     }
 }
