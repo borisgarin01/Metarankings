@@ -44,26 +44,15 @@ public partial class GameReviewComponent : CancellableComponentBase
     protected override async Task OnInitializedAsync()
     {
         AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        ClaimsPrincipal? user = authState?.User;
 
-        if (authState is not null
-            && authState.User is not null)
-        {
-            foreach (Claim claim in authState.User.Claims)
-            {
-                Console.WriteLine($"{claim.Type}\t{claim.Value}");
-            }
+        // У анонимного пользователя нет NameIdentifier — он не автор и не администратор
+        bool isAuthor = long.TryParse(user?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out long userId)
+            && userId == AuthorId;
+        bool isAdmin = user?.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin") == true;
 
-            if (authState.User.Claims.FirstOrDefault(b => b.Type == ClaimTypes.Role
-            && b.Value == "Admin") is not null
-            || Convert.ToInt64(authState.User.Claims.FirstOrDefault(b => b.Type == ClaimTypes.NameIdentifier).Value) == AuthorId)
-            {
-                IsAbleToRemove = true;
-            }
-            if (Convert.ToInt64(authState.User.Claims.FirstOrDefault(b => b.Type == ClaimTypes.NameIdentifier).Value) == AuthorId)
-            {
-                IsAbleToEdit = true;
-            }
-        }
+        IsAbleToEdit = isAuthor;
+        IsAbleToRemove = isAuthor || isAdmin;
     }
 
     public async Task Like()

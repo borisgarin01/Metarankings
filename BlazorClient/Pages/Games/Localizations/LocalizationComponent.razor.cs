@@ -13,10 +13,10 @@ public partial class LocalizationComponent : CancellableComponentBase
     [Inject]
     public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> PlatformsWebManager { get; set; }
 
-    public IEnumerable<Platform> Platforms { get; set; }
+    public IEnumerable<Platform> Platforms { get; set; } = Enumerable.Empty<Platform>();
 
     protected override async Task OnInitializedAsync()
     {
-        Platforms = await PlatformsWebManager.GetAllAsync(DisposalToken);
+        Platforms = await PlatformsWebManager.GetAllAsync(DisposalToken) ?? Enumerable.Empty<Platform>();
     }
 }

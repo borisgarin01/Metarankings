@@ -3,7 +3,7 @@
 @using BlazorClient.Components.PagesComponents.Common
 @using Domain.Common.News
 
-<MovieMenu Year="@((MovieViewerReview.Movie.PremierDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
+<MovieMenu Year="@((MovieViewerReview?.Movie?.PremierDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
 
 @if (MovieViewerReview is null || News is null)
 {

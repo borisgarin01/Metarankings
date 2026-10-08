@@ -10,7 +10,7 @@ namespace BlazorClient.Pages.Admin.Movies.Collections;
 
 public partial class AddCollectionItemPage : CancellableComponentBase
 {
-    public IEnumerable<Movie> MoviesToSelectFrom { get; set; }
+    public IEnumerable<Movie> MoviesToSelectFrom { get; set; } = Enumerable.Empty<Movie>();
 
     public long SelectedMovieId { get; private set; }
 
@@ -31,7 +31,7 @@ public partial class AddCollectionItemPage : CancellableComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        MoviesToSelectFrom = await MoviesWebManager.GetAllAsync(DisposalToken);
+        MoviesToSelectFrom = await MoviesWebManager.GetAllAsync(DisposalToken) ?? Enumerable.Empty<Movie>();
     }
 
     public Task SelectMovie(ChangeEventArgs e)

@@ -6,7 +6,7 @@
 @using BlazorClient.Pages.Games.Games.Reviews
 @using Domain.Reviews
 
-<GameMenu Year="@((Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
+<GameMenu Year="@((Game?.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
 
 @if (Game is null)
 {

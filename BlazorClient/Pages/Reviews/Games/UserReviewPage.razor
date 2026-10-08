@@ -3,7 +3,7 @@
 @using BlazorClient.Components.PagesComponents.Common
 @using Domain.Common.News
 
-<GameMenu Year="@((GameGamerReview.Game.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
+<GameMenu Year="@((GameGamerReview?.Game?.ReleaseDate ?? DateOnly.FromDateTime(DateTime.Now)).Year)" />
 
 @if (GameGamerReview is null || News is null)
 {

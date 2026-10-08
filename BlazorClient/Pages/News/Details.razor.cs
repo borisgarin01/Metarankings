@@ -25,6 +25,8 @@ public partial class Details : CancellableComponentBase
     [Inject]
     public TextTruncater TextTruncater { get; set; }
 
+    protected bool IsLoading { get; private set; } = true;
+
     private long _loadedId = -1;
 
     protected override async Task OnParametersSetAsync()
@@ -41,6 +43,8 @@ public partial class Details : CancellableComponentBase
 
     private async Task LoadAsync()
     {
+        IsLoading = true;
+
         try
         {
             var newsItemTask = NewsWebManager.GetAsync(Id, DisposalToken);
@@ -59,6 +63,10 @@ public partial class Details : CancellableComponentBase
             NewsItem = null;
             NewsItems = Enumerable.Empty<NewsItem>();
             SimilarGames = Enumerable.Empty<Game>();
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
 }
