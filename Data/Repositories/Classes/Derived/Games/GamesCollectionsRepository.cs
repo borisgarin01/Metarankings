@@ -40,7 +40,10 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
             INSERT INTO GamesCollections(Name, Description, ImageSource) 
             VALUES(@Name, @Description, @ImageSource)";
 
-        await connection.ExecuteAsync(new CommandDefinition(sql, entities, cancellationToken: cancellationToken));
+        // Dapper выполняет команду для каждого элемента отдельно и без транзакции,
+        // поэтому отмена учитывается только до начала вставки
+        cancellationToken.ThrowIfCancellationRequested();
+        await connection.ExecuteAsync(new CommandDefinition(sql, entities, cancellationToken: CancellationToken.None));
     }
 
     public override async Task<IEnumerable<GamesCollection>> GetAllAsync(CancellationToken cancellationToken = default)

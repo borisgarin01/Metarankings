@@ -38,15 +38,27 @@ public abstract class Repository<T, TAdd, TUpdate> : Repository, IRepository<T, 
 
     public abstract Task RemoveAsync(long id, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Поэлементная вставка без общей транзакции: отмена учитывается только до начала,
+    /// иначе прерывание посередине оставило бы в базе часть элементов.
+    /// </summary>
     public virtual async Task AddRangeAsync(IEnumerable<TAdd> entities, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         foreach (TAdd entity in entities)
-            await AddAsync(entity, cancellationToken);
+            await AddAsync(entity, CancellationToken.None);
     }
 
+    /// <summary>
+    /// Поэлементное удаление без общей транзакции: отмена учитывается только до начала,
+    /// иначе прерывание посередине удалило бы часть элементов.
+    /// </summary>
     public virtual async Task RemoveRangeAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         foreach (long id in ids)
-            await RemoveAsync(id, cancellationToken);
+            await RemoveAsync(id, CancellationToken.None);
     }
 }
