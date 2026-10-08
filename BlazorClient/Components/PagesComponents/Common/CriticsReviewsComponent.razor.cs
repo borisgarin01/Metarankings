@@ -7,7 +7,7 @@ namespace BlazorClient.Components.PagesComponents.Common;
 /// <summary>
 /// Блок "Оценки": рецензии критиков на игру или фильм и общий рейтинг критиков.
 /// </summary>
-public partial class CriticsReviewsComponent : ComponentBase
+public partial class CriticsReviewsComponent : CancellableComponentBase
 {
     private bool isLoaded;
     private long? loadedEntityId;
@@ -57,9 +57,9 @@ public partial class CriticsReviewsComponent : ComponentBase
 
         try
         {
-            CriticsReviews = (await WebManager.GetByEntityAsync(EntityId)).ToList();
+            CriticsReviews = (await WebManager.GetByEntityAsync(EntityId, DisposalToken)).ToList();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Failed to load critics reviews: {ex.Message}");
         }

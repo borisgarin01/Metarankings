@@ -4,7 +4,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesPersons;
 
-public partial class ListMoviesPersonsPage : ComponentBase
+public partial class ListMoviesPersonsPage : CancellableComponentBase
 {
     public IEnumerable<MoviePerson>? Entities { get; private set; }
 
@@ -19,6 +19,6 @@ public partial class ListMoviesPersonsPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Entities = await WebManager.GetAllAsync();
+        Entities = await WebManager.GetAllAsync(DisposalToken);
     }
 }

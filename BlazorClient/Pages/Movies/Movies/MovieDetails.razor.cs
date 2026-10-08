@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Pages.Movies.Movies;
 
-public partial class MovieDetails : ComponentBase
+public partial class MovieDetails : CancellableComponentBase
 {
     private bool isAbleToWriteComments = false;
 
@@ -52,7 +52,7 @@ public partial class MovieDetails : ComponentBase
 
     private async Task LoadMovieAsync()
     {
-        Movie = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Movie>($"/api/movies/{Id}");
+        Movie = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Movie>($"/api/movies/{Id}", DisposalToken);
     }
 
     // Вызывается из MovieViewerReviewComponent после лайка/дизлайка

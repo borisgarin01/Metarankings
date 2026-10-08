@@ -4,7 +4,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Games.Collections;
 
-public partial class CollectionsList : ComponentBase
+public partial class CollectionsList : CancellableComponentBase
 {
     private IEnumerable<GamesCollection> gamesCollections;
 
@@ -23,12 +23,12 @@ public partial class CollectionsList : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        GamesCollections = await GamesCollectionsWebManager.GetAllAsync();
+        GamesCollections = await GamesCollectionsWebManager.GetAllAsync(DisposalToken);
     }
 
     public async Task DeleteCollectionAsync(long id)
     {
-        await GamesCollectionsWebManager.DeleteAsync(id);
-        GamesCollections = await GamesCollectionsWebManager.GetAllAsync();
+        await GamesCollectionsWebManager.DeleteAsync(id, DisposalToken);
+        GamesCollections = await GamesCollectionsWebManager.GetAllAsync(DisposalToken);
     }
 }

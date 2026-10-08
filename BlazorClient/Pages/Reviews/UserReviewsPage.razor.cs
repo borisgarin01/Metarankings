@@ -4,7 +4,7 @@ using WebManagers.Derived;
 
 namespace BlazorClient.Pages.Reviews;
 
-public partial class UserReviewsPage : ComponentBase
+public partial class UserReviewsPage : CancellableComponentBase
 {
     private IEnumerable<GameReview> gamesReviews;
     private IEnumerable<MovieViewerReview> movieViewersReviews;
@@ -67,12 +67,12 @@ public partial class UserReviewsPage : ComponentBase
         try
         {
             var gamesTask = httpClient.GetFromJsonAsync<IEnumerable<GameReview>>(
-                $"/api/Games/GamesGamersReviews/{(PageNumber - 1) * PageSize}/{PageSize}");
+                $"/api/Games/GamesGamersReviews/{(PageNumber - 1) * PageSize}/{PageSize}", DisposalToken);
 
             var moviesTask = httpClient.GetFromJsonAsync<IEnumerable<MovieViewerReview>>(
-                $"/api/movies/moviesViewersReviews/{(PageNumber - 1) * PageSize}/{PageSize}");
+                $"/api/movies/moviesViewersReviews/{(PageNumber - 1) * PageSize}/{PageSize}", DisposalToken);
 
-            var newsTask = NewsWebManager.GetFirstAsync(0, 4);
+            var newsTask = NewsWebManager.GetFirstAsync(0, 4, DisposalToken);
 
             await Task.WhenAll(gamesTask, moviesTask, newsTask);
 
@@ -80,7 +80,7 @@ public partial class UserReviewsPage : ComponentBase
             MovieViewersReviews = await moviesTask ?? Enumerable.Empty<MovieViewerReview>();
             News = await newsTask ?? Enumerable.Empty<NewsItem>();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             // логируем, но не роняем страницу
             GamesReviews ??= Enumerable.Empty<GameReview>();

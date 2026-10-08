@@ -5,7 +5,7 @@ using WebManagers.Derived;
 
 namespace BlazorClient.Pages;
 
-public partial class AddContentRequestPage : ComponentBase, IDisposable
+public partial class AddContentRequestPage : CancellableComponentBase
 {
     [Inject]
     public ContentRequestsWebManager ContentRequestsWebManager { get; set; } = default!;
@@ -49,9 +49,9 @@ public partial class AddContentRequestPage : ComponentBase, IDisposable
         IsLoading = true;
         try
         {
-            MyRequests = await ContentRequestsWebManager.GetMineAsync();
+            MyRequests = await ContentRequestsWebManager.GetMineAsync(DisposalToken);
         }
-        catch (Exception)
+        catch (Exception) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError("Не удалось загрузить ваши заявки");
         }
@@ -66,7 +66,7 @@ public partial class AddContentRequestPage : ComponentBase, IDisposable
         IsSubmitting = true;
         try
         {
-            HttpResponseMessage response = await ContentRequestsWebManager.AddAsync(Form);
+            HttpResponseMessage response = await ContentRequestsWebManager.AddAsync(Form, DisposalToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -78,7 +78,7 @@ public partial class AddContentRequestPage : ComponentBase, IDisposable
             Form = new AddContentRequestModel();
             await LoadMyRequestsAsync();
         }
-        catch (Exception)
+        catch (Exception) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError("Не удалось отправить заявку");
         }
@@ -94,7 +94,7 @@ public partial class AddContentRequestPage : ComponentBase, IDisposable
         if (!confirmed)
             return;
 
-        HttpResponseMessage response = await ContentRequestsWebManager.DeleteAsync(contentRequest.Id);
+        HttpResponseMessage response = await ContentRequestsWebManager.DeleteAsync(contentRequest.Id, DisposalToken);
         if (!response.IsSuccessStatusCode)
         {
             ToastService.ShowWarning("Не удалось отозвать заявку");
@@ -129,8 +129,9 @@ public partial class AddContentRequestPage : ComponentBase, IDisposable
         });
     }
 
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
         AuthenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+        base.Dispose(disposing);
     }
 }

@@ -1,4 +1,5 @@
 ﻿@page "/games/{PageSize:int}/{PageNumber:int}"
+@inherits CancellableComponentBase
 
 <BlazorClient.Components.PagesComponents.Common.GameMenu Year="@DateTime.Today.Year" />
 

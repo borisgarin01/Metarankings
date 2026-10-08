@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Pages.Games.Localizations;
 
-public partial class LocalizationGamesListPage : ComponentBase
+public partial class LocalizationGamesListPage : CancellableComponentBase
 {
     [Parameter]
     public long LocalizationId { get; set; }
@@ -19,11 +19,11 @@ public partial class LocalizationGamesListPage : ComponentBase
     {
         if (PlatformId is null)
         {
-            Localization = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Localization>($"/api/Games/Localizations/{LocalizationId}");
+            Localization = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Localization>($"/api/Games/Localizations/{LocalizationId}", DisposalToken);
         }
         else
         {
-            Localization = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Localization>($"/api/Games/Localizations/{LocalizationId}/{PlatformId}");
+            Localization = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Localization>($"/api/Games/Localizations/{LocalizationId}/{PlatformId}", DisposalToken);
         }
     }
 }

@@ -9,17 +9,17 @@ using WebManagers.Derived.Games;
 namespace BlazorClient.Pages.Admin.Games.Games;
 
 [Authorize(Policy = "Admin")]
-public partial class AddGamePage : ComponentBase
+public partial class AddGamePage : CancellableComponentBase
 {
     protected override async Task OnInitializedAsync()
     {
         HttpClient httpClient = HttpClientFactory.CreateClient("AuthorizedClient");
 
-        Task<IEnumerable<Developer>> developersGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Developer>>("/api/Games/Developers");
-        Task<IEnumerable<Genre>> genresGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Genre>>("/api/Games/Genres");
-        Task<IEnumerable<Localization>> localizationsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Localization>>("/api/Games/Localizations");
-        Task<IEnumerable<Platform>> platformsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Platform>>("/api/Games/Platforms");
-        Task<IEnumerable<Publisher>> publishersGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Publisher>>("/api/Games/Publishers");
+        Task<IEnumerable<Developer>> developersGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Developer>>("/api/Games/Developers", DisposalToken);
+        Task<IEnumerable<Genre>> genresGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Genre>>("/api/Games/Genres", DisposalToken);
+        Task<IEnumerable<Localization>> localizationsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Localization>>("/api/Games/Localizations", DisposalToken);
+        Task<IEnumerable<Platform>> platformsGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Platform>>("/api/Games/Platforms", DisposalToken);
+        Task<IEnumerable<Publisher>> publishersGettingTask = httpClient.GetFromJsonAsync<IEnumerable<Publisher>>("/api/Games/Publishers", DisposalToken);
 
         await Task.WhenAll(developersGettingTask, genresGettingTask, localizationsGettingTask, platformsGettingTask, publishersGettingTask);
 
@@ -80,24 +80,24 @@ public partial class AddGamePage : ComponentBase
                 string url = $"/api/games/images/{ReleaseDate.Value.Year}/{ReleaseDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
 
                 // Send the request with authentication token
-                HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content);
+                HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content, DisposalToken);
 
                 if (response.IsSuccessStatusCode)
                 {
                     // Extract the URL from the response
-                    string responseContent = await response.Content.ReadAsStringAsync();
+                    string responseContent = await response.Content.ReadAsStringAsync(DisposalToken);
 
                     AddGameModel addGameModel = new AddGameModel(Name, url, SelectedDevelopersIds, SelectedPublishersIds, SelectedGenresIds, SelectedLocalizationId.Value, ReleaseDate, Description, Trailer, SelectedPlatformsIds);
 
-                    HttpResponseMessage addingGameResponseMessage = await GetWebManager.AddAsync(addGameModel);
+                    HttpResponseMessage addingGameResponseMessage = await GetWebManager.AddAsync(addGameModel, DisposalToken);
 
                     if (addingGameResponseMessage.IsSuccessStatusCode)
                         NavigationManager.NavigateTo("/admin/games/games/list-games");
                 }
                 else
-                    ToastService.ShowError(await response.Content.ReadAsStringAsync());
+                    ToastService.ShowError(await response.Content.ReadAsStringAsync(DisposalToken));
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
             {
                 ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
             }

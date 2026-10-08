@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Components.PagesComponents.DeveloperDetails;
 
-public partial class OtherNumberOfDevelopersComponent : ComponentBase
+public partial class OtherNumberOfDevelopersComponent : CancellableComponentBase
 {
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
@@ -17,6 +17,6 @@ public partial class OtherNumberOfDevelopersComponent : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        OtherNumberOfDevelopers = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Developer>>($"/api/Games//Developers/{DevelopersGettingOffset}/{DevelopersGettingLimit}");
+        OtherNumberOfDevelopers = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<IEnumerable<Developer>>($"/api/Games//Developers/{DevelopersGettingOffset}/{DevelopersGettingLimit}", DisposalToken);
     }
 }

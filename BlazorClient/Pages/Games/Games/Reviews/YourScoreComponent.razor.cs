@@ -4,7 +4,7 @@ using Domain.RequestsModels.Games.GamesGamersReviews;
 
 namespace BlazorClient.Pages.Games.Games.Reviews;
 
-public partial class YourScoreComponent : ComponentBase
+public partial class YourScoreComponent : CancellableComponentBase
 {
     private YourScoreComponentModel YourScoreComponentModel { get; } = new();
 
@@ -50,7 +50,7 @@ public partial class YourScoreComponent : ComponentBase
 
             var response = await HttpClientFactory
                 .CreateClient("AuthorizedClient")
-                .PostAsJsonAsync("/api/Games/GamesGamersReviews", addGamePlayerReviewModel);
+                .PostAsJsonAsync("/api/Games/GamesGamersReviews", addGamePlayerReviewModel, DisposalToken);
 
             if (response.IsSuccessStatusCode)
             {
@@ -59,11 +59,11 @@ public partial class YourScoreComponent : ComponentBase
             }
             else
             {
-                var error = await response.Content.ReadAsStringAsync();
+                var error = await response.Content.ReadAsStringAsync(DisposalToken);
                 ToastService.ShowError($"Failed to add review: {error}");
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError($"Error: {ex.Message}");
         }

@@ -4,7 +4,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.Collections;
 
-public partial class ManageCollectionPage : ComponentBase
+public partial class ManageCollectionPage : CancellableComponentBase
 {
     [Inject]
     public IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> MoviesCollectionWebManager { get; set; }
@@ -35,18 +35,18 @@ public partial class ManageCollectionPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        MoviesCollection = await MoviesCollectionWebManager.GetAsync(Id);
+        MoviesCollection = await MoviesCollectionWebManager.GetAsync(Id, DisposalToken);
     }
 
     public async Task DeleteGameCollectionAsync(long id)
     {
-        await MoviesCollectionWebManager.DeleteAsync(id);
+        await MoviesCollectionWebManager.DeleteAsync(id, DisposalToken);
         NavigationManager.NavigateTo("/admin");
     }
 
     public async Task DeleteMovieFromCollectionAsync(long id)
     {
-        await MoviesCollectionsItemsWebManager.DeleteAsync(id);
-        MoviesCollection = await MoviesCollectionWebManager.GetAsync(MoviesCollection.Id);
+        await MoviesCollectionsItemsWebManager.DeleteAsync(id, DisposalToken);
+        MoviesCollection = await MoviesCollectionWebManager.GetAsync(MoviesCollection.Id, DisposalToken);
     }
 }

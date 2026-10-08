@@ -6,7 +6,7 @@ namespace BlazorClient.Pages.Admin;
 /// <summary>
 /// Страница подтверждения удаления сущности: загружает её по Id, удаляет и возвращает к списку.
 /// </summary>
-public abstract class RemoveEntityPageBase<T, TAdd, TUpdate> : ComponentBase where T : class
+public abstract class RemoveEntityPageBase<T, TAdd, TUpdate> : CancellableComponentBase where T : class
 {
     [Parameter]
     public long Id { get; set; }
@@ -29,15 +29,15 @@ public abstract class RemoveEntityPageBase<T, TAdd, TUpdate> : ComponentBase whe
 
     protected override async Task OnInitializedAsync()
     {
-        Entity = await WebManager.GetAsync(Id);
+        Entity = await WebManager.GetAsync(Id, DisposalToken);
     }
 
     public async Task RemoveAsync()
     {
-        HttpResponseMessage httpResponseMessage = await WebManager.DeleteAsync(Id);
+        HttpResponseMessage httpResponseMessage = await WebManager.DeleteAsync(Id, DisposalToken);
         if (httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo(ListUrl);
         else
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 }

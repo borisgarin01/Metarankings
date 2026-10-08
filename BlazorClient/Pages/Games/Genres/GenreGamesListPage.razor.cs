@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Pages.Games.Genres;
 
-public partial class GenreGamesListPage : ComponentBase
+public partial class GenreGamesListPage : CancellableComponentBase
 {
     [Parameter]
     public long GenreId { get; set; }
@@ -14,6 +14,6 @@ public partial class GenreGamesListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Genre = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Genre>($"/api/Games/Genres/{GenreId}");
+        Genre = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Genre>($"/api/Games/Genres/{GenreId}", DisposalToken);
     }
 }

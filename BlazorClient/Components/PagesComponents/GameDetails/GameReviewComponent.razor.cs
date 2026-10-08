@@ -3,7 +3,7 @@ using WebManagers.Derived.Games;
 
 namespace BlazorClient.Components.PagesComponents.GameDetails;
 
-public partial class GameReviewComponent : ComponentBase
+public partial class GameReviewComponent : CancellableComponentBase
 {
     [Parameter, EditorRequired]
     public long Id { get; set; }
@@ -68,14 +68,14 @@ public partial class GameReviewComponent : ComponentBase
 
     public async Task Like()
     {
-        await GamesPlayersReviewsShiftsWebManager.AddAsync(new AddGamePlayerReviewShiftModel(Id, true));
+        await GamesPlayersReviewsShiftsWebManager.AddAsync(new AddGamePlayerReviewShiftModel(Id, true), DisposalToken);
         await OnUpdate.InvokeAsync(); // Вызываем обновление родителя
         StateHasChanged();
     }
 
     public async Task Dislike()
     {
-        await GamesPlayersReviewsShiftsWebManager.AddAsync(new AddGamePlayerReviewShiftModel(Id, false));
+        await GamesPlayersReviewsShiftsWebManager.AddAsync(new AddGamePlayerReviewShiftModel(Id, false), DisposalToken);
         await OnUpdate.InvokeAsync(); // Вызываем обновление родителя
         StateHasChanged();
     }

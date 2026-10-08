@@ -5,7 +5,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Games.Platforms;
 
-public partial class AddPlatformPage : ComponentBase
+public partial class AddPlatformPage : CancellableComponentBase
 {
     [Inject]
     public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> PlatformsWebManager { get; set; }
@@ -20,11 +20,11 @@ public partial class AddPlatformPage : ComponentBase
 
     public async Task AddPlatformAsync()
     {
-        HttpResponseMessage httpResponseMessage = await PlatformsWebManager.AddAsync(AddPlatformModel);
+        HttpResponseMessage httpResponseMessage = await PlatformsWebManager.AddAsync(AddPlatformModel, DisposalToken);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/Games/platforms/list-platforms");
         else
             if (httpResponseMessage is not null)
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 }

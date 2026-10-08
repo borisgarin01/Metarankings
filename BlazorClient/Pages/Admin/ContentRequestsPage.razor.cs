@@ -6,7 +6,7 @@ using WebManagers.Derived;
 
 namespace BlazorClient.Pages.Admin;
 
-public partial class ContentRequestsPage : ComponentBase
+public partial class ContentRequestsPage : CancellableComponentBase
 {
     [Inject]
     public ContentRequestsWebManager ContentRequestsWebManager { get; set; } = default!;
@@ -47,10 +47,10 @@ public partial class ContentRequestsPage : ComponentBase
         IsLoading = true;
         try
         {
-            Requests = (await ContentRequestsWebManager.GetAllAsync(StatusFilter)).ToList();
+            Requests = (await ContentRequestsWebManager.GetAllAsync(StatusFilter, DisposalToken)).ToList();
             Comments = Requests.ToDictionary(contentRequest => contentRequest.Id, contentRequest => contentRequest.AdminComment);
         }
-        catch (Exception)
+        catch (Exception) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError("Не удалось загрузить заявки");
         }
@@ -85,7 +85,7 @@ public partial class ContentRequestsPage : ComponentBase
             {
                 Status = status,
                 AdminComment = Comments.GetValueOrDefault(contentRequest.Id)
-            });
+            }, DisposalToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -96,7 +96,7 @@ public partial class ContentRequestsPage : ComponentBase
             ToastService.ShowSuccess(successMessage);
             await LoadAsync();
         }
-        catch (Exception)
+        catch (Exception) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError("Не удалось обновить заявку");
         }
@@ -112,7 +112,7 @@ public partial class ContentRequestsPage : ComponentBase
         if (!confirmed)
             return;
 
-        HttpResponseMessage response = await ContentRequestsWebManager.DeleteAsync(contentRequest.Id);
+        HttpResponseMessage response = await ContentRequestsWebManager.DeleteAsync(contentRequest.Id, DisposalToken);
         if (!response.IsSuccessStatusCode)
         {
             ToastService.ShowWarning("Не удалось удалить заявку");

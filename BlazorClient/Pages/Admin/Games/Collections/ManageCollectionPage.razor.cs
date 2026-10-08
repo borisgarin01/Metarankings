@@ -4,7 +4,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Games.Collections;
 
-public partial class ManageCollectionPage : ComponentBase
+public partial class ManageCollectionPage : CancellableComponentBase
 {
     private GamesCollection gameCollection;
     
@@ -32,18 +32,18 @@ public partial class ManageCollectionPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        GameCollection = await GamesCollectionsWebManager.GetAsync(Id);
+        GameCollection = await GamesCollectionsWebManager.GetAsync(Id, DisposalToken);
     }
 
     public async Task DeleteGameCollectionAsync(long id)
     {
-        await GamesCollectionsWebManager.DeleteAsync(id);
+        await GamesCollectionsWebManager.DeleteAsync(id, DisposalToken);
         NavigationManager.NavigateTo("/admin");
     }
 
     public async Task DeleteGameFromCollectionAsync(long id)
     {
-        await GamesCollectionsItemsWebManager.DeleteAsync(id);
-        GameCollection = await GamesCollectionsWebManager.GetAsync(GameCollection.Id);
+        await GamesCollectionsItemsWebManager.DeleteAsync(id, DisposalToken);
+        GameCollection = await GamesCollectionsWebManager.GetAsync(GameCollection.Id, DisposalToken);
     }
 }

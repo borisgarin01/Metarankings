@@ -13,7 +13,7 @@ using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Pages.Admin.Movies.Movies;
 
-public sealed partial class AddMoviePage : ComponentBase
+public sealed partial class AddMoviePage : CancellableComponentBase
 {
     const int MAX_FILESIZE = 5000 * 1024;
 
@@ -76,18 +76,16 @@ public sealed partial class AddMoviePage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Task<IEnumerable<MovieDirector>> moviesDirectorsGetttingTask = MoviesDirectorsWebManager.GetAllAsync();
-        Task<IEnumerable<Genre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
-        Task<IEnumerable<MovieStudio>> moviesStudiosGettingTask = MoviesStudiosWebManager.GetAllAsync();
-        Task<IEnumerable<MovieCountry>> moviesCountriesGettingTask = MoviesCountriesWebManager.GetAllAsync();
+        Task<IEnumerable<MovieDirector>> moviesDirectorsGetttingTask = MoviesDirectorsWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<Genre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<MovieStudio>> moviesStudiosGettingTask = MoviesStudiosWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<MovieCountry>> moviesCountriesGettingTask = MoviesCountriesWebManager.GetAllAsync(DisposalToken);
 
-        await Task.WhenAll(moviesDirectorsGetttingTask, moviesGenresGettingTask, moviesStudiosGettingTask, moviesCountriesGettingTask).ContinueWith(a =>
-        {
-            MoviesDirectorsToSelectFrom = moviesDirectorsGetttingTask.Result;
-            MoviesGenresToSelectFrom = moviesGenresGettingTask.Result;
-            MoviesStudiosToSelectFrom = moviesStudiosGettingTask.Result;
-            MoviesCountriesToSelectFrom = moviesCountriesGettingTask.Result;
-        });
+        await Task.WhenAll(moviesDirectorsGetttingTask, moviesGenresGettingTask, moviesStudiosGettingTask, moviesCountriesGettingTask);
+        MoviesDirectorsToSelectFrom = moviesDirectorsGetttingTask.Result;
+        MoviesGenresToSelectFrom = moviesGenresGettingTask.Result;
+        MoviesStudiosToSelectFrom = moviesStudiosGettingTask.Result;
+        MoviesCountriesToSelectFrom = moviesCountriesGettingTask.Result;
     }
 
     private Task SelectMovieDirector(ChangeEventArgs e)
@@ -152,7 +150,7 @@ public sealed partial class AddMoviePage : ComponentBase
                 string url = $"/api/movies/Images/{PremierDate.Value.Year}/{PremierDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
 
                 // Send the request with authentication token
-                var response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content);
+                var response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content, DisposalToken);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -181,7 +179,7 @@ public sealed partial class AddMoviePage : ComponentBase
                         MoviesCrew: MovieCrewEditor.ToModels(CrewTexts)
                     );
 
-                    HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addMovieModel);
+                    HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addMovieModel, DisposalToken);
 
                     if (addingMovieResponseMessage.IsSuccessStatusCode)
                     {
@@ -189,17 +187,17 @@ public sealed partial class AddMoviePage : ComponentBase
                     }
                     else
                     {
-                        string error = await addingMovieResponseMessage.Content.ReadAsStringAsync();
+                        string error = await addingMovieResponseMessage.Content.ReadAsStringAsync(DisposalToken);
                         ToastService.ShowError($"Failed to add movie: {error}");
                     }
                 }
                 else
                 {
-                    string problemDetails = await response.Content.ReadAsStringAsync();
+                    string problemDetails = await response.Content.ReadAsStringAsync(DisposalToken);
                     ToastService.ShowError(problemDetails);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
             {
                 ToastService.ShowError(ex.Message);
             }

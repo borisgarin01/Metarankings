@@ -5,7 +5,7 @@ using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.News;
 
-public partial class Details : ComponentBase
+public partial class Details : CancellableComponentBase
 {
     [Parameter, EditorRequired]
     public long Id { get; set; }
@@ -43,9 +43,9 @@ public partial class Details : ComponentBase
     {
         try
         {
-            var newsItemTask = NewsWebManager.GetAsync(Id);
-            var newsItemsTask = NewsWebManager.GetAllAsync();
-            var similarGamesTask = GamesWebManager.GetLastAsync(0, 3);
+            var newsItemTask = NewsWebManager.GetAsync(Id, DisposalToken);
+            var newsItemsTask = NewsWebManager.GetAllAsync(DisposalToken);
+            var similarGamesTask = GamesWebManager.GetLastAsync(0, 3, DisposalToken);
 
             await Task.WhenAll(newsItemTask, newsItemsTask, similarGamesTask);
 
@@ -53,7 +53,7 @@ public partial class Details : ComponentBase
             NewsItems = await newsItemsTask ?? Enumerable.Empty<NewsItem>();
             SimilarGames = await similarGamesTask ?? Enumerable.Empty<Game>();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"[Details] Failed to load news Id={Id}: {ex}");
             NewsItem = null;

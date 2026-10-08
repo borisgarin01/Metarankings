@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Pages.Movies.Collections;
 
-public partial class Details : ComponentBase
+public partial class Details : CancellableComponentBase
 {
     private MoviesCollection moviesCollection;
 
@@ -23,6 +23,6 @@ public partial class Details : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        MoviesCollection = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<MoviesCollection>($"/api/movies/collections/{MovieCollectionId}");
+        MoviesCollection = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<MoviesCollection>($"/api/movies/collections/{MovieCollectionId}", DisposalToken);
     }
 }

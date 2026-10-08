@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Pages.Games.Collections;
 
-public partial class Details : ComponentBase
+public partial class Details : CancellableComponentBase
 {
     private GamesCollection gameCollection;
 
@@ -24,6 +24,6 @@ public partial class Details : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        GameCollection = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<GamesCollection>($"/api/games/collections/{GameCollectionId}");
+        GameCollection = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<GamesCollection>($"/api/games/collections/{GameCollectionId}", DisposalToken);
     }
 }

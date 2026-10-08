@@ -6,7 +6,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesPersons;
 
-public partial class AddMoviePersonPage : ComponentBase
+public partial class AddMoviePersonPage : CancellableComponentBase
 {
     [Required(ErrorMessage = "Name is required")]
     public string Name { get; set; } = string.Empty;
@@ -22,11 +22,11 @@ public partial class AddMoviePersonPage : ComponentBase
 
     public async Task AddAsync()
     {
-        HttpResponseMessage httpResponseMessage = await WebManager.AddAsync(new AddMoviePersonModel(Name.Trim()));
+        HttpResponseMessage httpResponseMessage = await WebManager.AddAsync(new AddMoviePersonModel(Name.Trim()), DisposalToken);
 
         if (httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/movies/movies-persons/movies-persons-list");
         else
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 }

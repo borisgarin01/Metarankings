@@ -4,7 +4,7 @@ using Domain.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Localizations;
 
-public partial class ListLocalizationPage : ComponentBase
+public partial class ListLocalizationPage : CancellableComponentBase
 {
     public IEnumerable<Localization> Localizations { get; private set; }
 
@@ -13,6 +13,6 @@ public partial class ListLocalizationPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Localizations = await WebManager.GetAllAsync();
+        Localizations = await WebManager.GetAllAsync(DisposalToken);
     }
 }

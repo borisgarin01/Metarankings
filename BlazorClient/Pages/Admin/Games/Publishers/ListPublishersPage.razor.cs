@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace BlazorClient.Pages.Admin.Games.Publishers;
 
 [Authorize(Policy = "Admin")]
-public partial class ListPublishersPage : ComponentBase
+public partial class ListPublishersPage : CancellableComponentBase
 {
     private IEnumerable<Publisher> publishers;
 
@@ -25,6 +25,6 @@ public partial class ListPublishersPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Publishers = await WebManager.GetAllAsync();
+        Publishers = await WebManager.GetAllAsync(DisposalToken);
     }
 }

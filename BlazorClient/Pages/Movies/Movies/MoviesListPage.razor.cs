@@ -10,7 +10,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Movies.Movies;
 
-public partial class MoviesListPage : ComponentBase
+public partial class MoviesListPage : CancellableComponentBase
 {
     private IEnumerable<MovieStudio> movieStudios = Enumerable.Empty<MovieStudio>();
     private IEnumerable<Movie> movies = Enumerable.Empty<Movie>();
@@ -106,11 +106,11 @@ public partial class MoviesListPage : ComponentBase
 
             HttpResponseMessage response = await HttpClientFactory
                 .CreateClient("AuthorizedClient")
-                .PostAsJsonAsync("/api/movies/byParameters", filter);
+                .PostAsJsonAsync("/api/movies/byParameters", filter, DisposalToken);
 
             if (response.IsSuccessStatusCode)
             {
-                PagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<Movie>>();
+                PagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<Movie>>(DisposalToken);
                 Movies = PagedResponse?.Items ?? Enumerable.Empty<Movie>();
             }
             else
@@ -120,7 +120,7 @@ public partial class MoviesListPage : ComponentBase
                 Console.WriteLine($"Failed to load movies: {response.ReasonPhrase}");
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Error loading movies: {ex.Message}");
             Movies = Enumerable.Empty<Movie>();
@@ -134,8 +134,8 @@ public partial class MoviesListPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Task<IEnumerable<MovieStudio>> studiosTask = MovieStudiosWebManager.GetAllAsync();
-        Task<IEnumerable<Domain.Movies.Genre>> genresTask = GenresWebManager.GetAllAsync();
+        Task<IEnumerable<MovieStudio>> studiosTask = MovieStudiosWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<Domain.Movies.Genre>> genresTask = GenresWebManager.GetAllAsync(DisposalToken);
 
         await Task.WhenAll(studiosTask, genresTask);
 

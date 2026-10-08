@@ -5,7 +5,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesDirectors;
 
-public partial class AddMovieDirectorPage : ComponentBase
+public partial class AddMovieDirectorPage : CancellableComponentBase
 {
     public string Name { get; set; }
 
@@ -18,12 +18,12 @@ public partial class AddMovieDirectorPage : ComponentBase
 
     public async Task AddMovieDirectorAsync()
     {
-        HttpResponseMessage httpResponseMessage = await MoviesDirectorsManager.AddAsync(new AddMovieDirectorModel(Name));
+        HttpResponseMessage httpResponseMessage = await MoviesDirectorsManager.AddAsync(new AddMovieDirectorModel(Name), DisposalToken);
 
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/movies/movies-directors/movies-directors-list");
         else
             if (httpResponseMessage is not null)
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 }

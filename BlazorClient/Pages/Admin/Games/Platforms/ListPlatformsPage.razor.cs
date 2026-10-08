@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace BlazorClient.Pages.Admin.Games.Platforms;
 
 [Authorize(Policy = "Admin")]
-public partial class ListPlatformsPage : ComponentBase
+public partial class ListPlatformsPage : CancellableComponentBase
 {
     public IEnumerable<Platform> Platforms { get; private set; }
 
@@ -15,6 +15,6 @@ public partial class ListPlatformsPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Platforms = await WebManager.GetAllAsync();
+        Platforms = await WebManager.GetAllAsync(DisposalToken);
     }
 }

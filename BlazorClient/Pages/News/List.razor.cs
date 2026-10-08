@@ -7,7 +7,7 @@ using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.News;
 
-public partial class List
+public partial class List : CancellableComponentBase
 {
     private const int PageSize = 15;
 
@@ -63,7 +63,7 @@ public partial class List
         try
         {
             long offset = (CurrentPage - 1) * PageSize;
-            var items = await NewsWebManager.GetFirstAsync(offset, PageSize);
+            var items = await NewsWebManager.GetFirstAsync(offset, PageSize, DisposalToken);
 
             News.Clear();
             News.AddRange(items ?? Enumerable.Empty<NewsItem>());
@@ -76,7 +76,7 @@ public partial class List
 
     private async Task LoadPlatformsAsync()
     {
-        var platforms = await PlatformsWebManager.GetAllAsync();
+        var platforms = await PlatformsWebManager.GetAllAsync(DisposalToken);
         Platforms.Clear();
         Platforms.AddRange(platforms ?? Enumerable.Empty<Platform>());
     }

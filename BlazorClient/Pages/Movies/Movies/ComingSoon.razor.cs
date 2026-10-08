@@ -3,7 +3,7 @@ using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Pages.Movies.Movies;
 
-public partial class ComingSoon : ComponentBase
+public partial class ComingSoon : CancellableComponentBase
 {
     private IEnumerable<Movie> movies;
 
@@ -22,6 +22,6 @@ public partial class ComingSoon : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Movies = await MoviesWebManager.GetAllAsync();
+        Movies = await MoviesWebManager.GetAllAsync(DisposalToken);
     }
 }

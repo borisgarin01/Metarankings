@@ -7,7 +7,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Games.Games;
 
-public partial class BestGamesListPage : ComponentBase
+public partial class BestGamesListPage : CancellableComponentBase
 {
     private IEnumerable<Platform> platforms;
     private IEnumerable<Game> games;
@@ -119,11 +119,11 @@ public partial class BestGamesListPage : ComponentBase
                 filter.LocalizationIds = new[] { LocalizationId.Value };
 
             HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient")
-                .PostAsJsonAsync("/api/games/games/byParameters", filter);
+                .PostAsJsonAsync("/api/games/games/byParameters", filter, DisposalToken);
 
             if (response.IsSuccessStatusCode)
             {
-                PagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<Game>>();
+                PagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<Game>>(DisposalToken);
                 Games = PagedResponse?.Items ?? Enumerable.Empty<Game>();
             }
             else
@@ -133,7 +133,7 @@ public partial class BestGamesListPage : ComponentBase
                 Console.WriteLine($"Failed to load games: {response.ReasonPhrase}");
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Error loading games: {ex.Message}");
             Games = Enumerable.Empty<Game>();
@@ -147,14 +147,12 @@ public partial class BestGamesListPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetAllAsync();
-        Task<IEnumerable<Genre>> gamesGenresGettingTask = GenresWebManager.GetAllAsync();
+        Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<Genre>> gamesGenresGettingTask = GenresWebManager.GetAllAsync(DisposalToken);
 
-        await Task.WhenAll(platformsGettingTask, gamesGenresGettingTask).ContinueWith(b =>
-        {
-            Platforms = platformsGettingTask.Result;
-            Genres = gamesGenresGettingTask.Result;
-        });
+        await Task.WhenAll(platformsGettingTask, gamesGenresGettingTask);
+        Platforms = platformsGettingTask.Result;
+        Genres = gamesGenresGettingTask.Result;
     }
 
     private string BuildQueryString(int? page = null, int? year = null, long? genreId = null, long? platformId = null, long? localizationId = null)

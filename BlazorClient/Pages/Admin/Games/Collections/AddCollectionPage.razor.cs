@@ -7,7 +7,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Games.Collections;
 
-public partial class AddCollectionPage : ComponentBase
+public partial class AddCollectionPage : CancellableComponentBase
 {
     const int MAX_FILESIZE = 5000 * 1024;
 
@@ -37,10 +37,10 @@ public partial class AddCollectionPage : ComponentBase
     {
         var addGameCollectionModel = new AddGamesCollectionModel(CollectionName, Description, ImageSource);
 
-        HttpResponseMessage gameCreationHttpResponseMessage = await GamesCollectionsWebManager.AddAsync(addGameCollectionModel);
+        HttpResponseMessage gameCreationHttpResponseMessage = await GamesCollectionsWebManager.AddAsync(addGameCollectionModel, DisposalToken);
 
         if (!gameCreationHttpResponseMessage.IsSuccessStatusCode)
-            ToastService.ShowError(await gameCreationHttpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await gameCreationHttpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
 
         else
         {

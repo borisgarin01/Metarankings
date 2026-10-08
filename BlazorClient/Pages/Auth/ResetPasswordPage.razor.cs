@@ -4,7 +4,7 @@ using Blazored.Toast.Services;
 
 namespace BlazorClient.Pages.Auth;
 
-public partial class ResetPasswordPage : ComponentBase
+public partial class ResetPasswordPage : CancellableComponentBase
 {
     [Inject]
     public IToastService ToastService { get; set; }
@@ -29,10 +29,10 @@ public partial class ResetPasswordPage : ComponentBase
             }
             else
             {
-                ToastService.ShowError(await resetPasswordHttpResponseMessage.Content.ReadAsStringAsync());
+                ToastService.ShowError(await resetPasswordHttpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
         }

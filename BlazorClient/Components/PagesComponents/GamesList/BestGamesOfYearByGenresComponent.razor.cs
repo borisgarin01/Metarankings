@@ -4,7 +4,7 @@ using WebManagers;
 
 namespace BlazorClient.Components.PagesComponents.GamesList;
 
-public partial class BestGamesOfYearByGenresComponent : ComponentBase
+public partial class BestGamesOfYearByGenresComponent : CancellableComponentBase
 {
     [CascadingParameter(Name = "Year")]
     public int? Year { get; set; }
@@ -25,7 +25,7 @@ public partial class BestGamesOfYearByGenresComponent : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Genres = await GenresWebManager.GetAllAsync();
+        Genres = await GenresWebManager.GetAllAsync(DisposalToken);
     }
 
     private string BuildUrl(long? genreId = null)

@@ -4,7 +4,7 @@ using Domain.Reviews;
 
 namespace BlazorClient.Pages.Movies.Movies.Reviews;
 
-public partial class MovieReviewEdit : ComponentBase
+public partial class MovieReviewEdit : CancellableComponentBase
 {
     private int hoverScore = 0;
 
@@ -56,7 +56,7 @@ public partial class MovieReviewEdit : ComponentBase
         try
         {
             var client = HttpClientFactory.CreateClient("AuthorizedClient");
-            var movieReview = await client.GetFromJsonAsync<MovieViewerReview>($"/api/movies/MoviesViewersReviews/{Id}");
+            var movieReview = await client.GetFromJsonAsync<MovieViewerReview>($"/api/movies/MoviesViewersReviews/{Id}", DisposalToken);
 
             if (movieReview is not null)
             {
@@ -74,7 +74,7 @@ public partial class MovieReviewEdit : ComponentBase
                 NavigationManager.NavigateTo("/");
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError($"Failed to load review: {ex.Message}");
             NavigationManager.NavigateTo("/");
@@ -86,7 +86,7 @@ public partial class MovieReviewEdit : ComponentBase
         try
         {
             var client = HttpClientFactory.CreateClient("AuthorizedClient");
-            var response = await client.PutAsJsonAsync($"/api/movies/MoviesViewersReviews/{Id}", UpdateMovieViewerReviewModel);
+            var response = await client.PutAsJsonAsync($"/api/movies/MoviesViewersReviews/{Id}", UpdateMovieViewerReviewModel, DisposalToken);
 
             if (response.IsSuccessStatusCode)
             {
@@ -95,11 +95,11 @@ public partial class MovieReviewEdit : ComponentBase
             }
             else
             {
-                var error = await response.Content.ReadAsStringAsync();
+                var error = await response.Content.ReadAsStringAsync(DisposalToken);
                 ToastService.ShowError($"Failed to update: {error}");
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError($"Error: {ex.Message}");
         }

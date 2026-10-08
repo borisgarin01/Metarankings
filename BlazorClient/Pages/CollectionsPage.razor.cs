@@ -6,7 +6,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages
 {
-    public partial class CollectionsPage : ComponentBase
+    public partial class CollectionsPage : CancellableComponentBase
     {
         private IEnumerable<GamesCollection> gamesCollections;
         private IEnumerable<MoviesCollection> moviesCollections;
@@ -39,21 +39,18 @@ namespace BlazorClient.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            Task<IEnumerable<GamesCollection>> gamesCollectionsGettingTask = GamesCollectionsWebManager.GetFirstAsync(0, 5);
-            Task<IEnumerable<MoviesCollection>> moviesCollectionsGettingTask = MoviesCollectionsWebManager.GetFirstAsync(0, 5);
+            Task<IEnumerable<GamesCollection>> gamesCollectionsGettingTask = GamesCollectionsWebManager.GetFirstAsync(0, 5, DisposalToken);
+            Task<IEnumerable<MoviesCollection>> moviesCollectionsGettingTask = MoviesCollectionsWebManager.GetFirstAsync(0, 5, DisposalToken);
 
-            await Task.WhenAll(gamesCollectionsGettingTask, moviesCollectionsGettingTask)
-                .ContinueWith(b =>
-                {
-                    GamesCollections = gamesCollectionsGettingTask.Result;
-                    MoviesCollections = moviesCollectionsGettingTask.Result;
-                });
+            await Task.WhenAll(gamesCollectionsGettingTask, moviesCollectionsGettingTask);
+            GamesCollections = gamesCollectionsGettingTask.Result;
+            MoviesCollections = moviesCollectionsGettingTask.Result;
         }
 
         public async Task DeleteCollectionAsync(long id)
         {
-            await GamesCollectionsWebManager.DeleteAsync(id);
-            GamesCollections = await GamesCollectionsWebManager.GetAllAsync();
+            await GamesCollectionsWebManager.DeleteAsync(id, DisposalToken);
+            GamesCollections = await GamesCollectionsWebManager.GetAllAsync(DisposalToken);
         }
     }
 }

@@ -5,7 +5,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesGenres;
 
-public partial class AddMovieGenrePage : ComponentBase
+public partial class AddMovieGenrePage : CancellableComponentBase
 {
     public string Name { get; set; }
 
@@ -20,11 +20,11 @@ public partial class AddMovieGenrePage : ComponentBase
 
     public async Task AddMovieGenreAsync()
     {
-        HttpResponseMessage httpResponseMessage = await MoviesGenresManager.AddAsync(new AddMovieGenreModel(Name));
+        HttpResponseMessage httpResponseMessage = await MoviesGenresManager.AddAsync(new AddMovieGenreModel(Name), DisposalToken);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/movies/movies-genres/movies-genres-list");
         else
             if (httpResponseMessage is not null)
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 }

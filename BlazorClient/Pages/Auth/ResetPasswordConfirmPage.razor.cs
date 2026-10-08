@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BlazorClient.Pages.Auth;
 
-public partial class ResetPasswordConfirmPage : ComponentBase
+public partial class ResetPasswordConfirmPage : CancellableComponentBase
 {
     [Inject]
     public IAuthService AuthService { get; set; }
@@ -34,10 +34,10 @@ public partial class ResetPasswordConfirmPage : ComponentBase
             }
             else
             {
-                ToastService.ShowError(await resetPasswordHttpResponseMessage.Content.ReadAsStringAsync());
+                ToastService.ShowError(await resetPasswordHttpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             ToastService.ShowError($"{ex.Message}\t{ex.StackTrace}");
         }
