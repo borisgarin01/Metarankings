@@ -9,4 +9,6 @@ public sealed record AddMovieModel(
     [property: JsonPropertyName("moviesDirectorsNames")] IEnumerable<string> MoviesDirectorsNames,
     [property: JsonPropertyName("moviesGenresNames")] IEnumerable<string> MoviesGenresNames,
     [property: JsonPropertyName("moviesStudiosNames")] IEnumerable<string> MoviesStudiosNames,
-    [property: JsonPropertyName("trailer")] string? Trailer = null);
+    [property: JsonPropertyName("trailer")] string? Trailer = null,
+    [property: JsonPropertyName("moviesCountriesNames")] IEnumerable<string>? MoviesCountriesNames = null,
+    [property: JsonPropertyName("moviesCrew")] IEnumerable<MovieCrewMemberModel>? MoviesCrew = null);

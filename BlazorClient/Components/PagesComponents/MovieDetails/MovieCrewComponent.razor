@@ -1,0 +1,40 @@
+@using Domain.Movies
+
+@if (Directors.Any() || Crew.Any())
+{
+    <div class="movie-crew">
+        <h2>Съёмочная группа</h2>
+        @if (Directors.Any())
+        {
+            <div class="crew-role">
+                <h3>Режиссёр</h3>
+                <p>
+                    @foreach ((MovieDirector director, int index) in Directors.Select((d, i) => (d, i)))
+                    {
+                        @if (index > 0)
+                        {
+                            <text>, </text>
+                        }
+                        <a href="/movies/best-movies?MovieDirectorId=@director.Id" itemprop="director">@director.Name</a>
+                    }
+                </p>
+            </div>
+        }
+        @foreach (IGrouping<MovieCrewRole, MovieCrewMember> roleGroup in Crew.GroupBy(c => c.Role).OrderBy(g => g.Key))
+        {
+            <div class="crew-role">
+                <h3>@MovieCrewLabels.GetRoleLabel(roleGroup.Key)</h3>
+                <p>
+                    @foreach ((MovieCrewMember member, int index) in roleGroup.Select((m, i) => (m, i)))
+                    {
+                        @if (index > 0)
+                        {
+                            <text>, </text>
+                        }
+                        <a href="/movies/best-movies?MoviePersonId=@member.Id" itemprop="@ItemProp(member.Role)">@member.Name</a>
+                    }
+                </p>
+            </div>
+        }
+    </div>
+}

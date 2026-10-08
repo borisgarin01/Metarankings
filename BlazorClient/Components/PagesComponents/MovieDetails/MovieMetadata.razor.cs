@@ -1,4 +1,3 @@
-﻿using Domain.Games;
 using Domain.Movies;
 
 namespace BlazorClient.Components.PagesComponents.MovieDetails;
@@ -7,6 +6,9 @@ public partial class MovieMetadata : ComponentBase
 {
     [Parameter]
     public string OriginalName { get; set; }
+
+    [Parameter]
+    public IEnumerable<MovieCountry>? Countries { get; set; }
 
     [Parameter, EditorRequired]
     public IEnumerable<Domain.Movies.Genre> Genres { get; set; }
