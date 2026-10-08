@@ -10,13 +10,13 @@ public sealed class DevelopersWebManager : CrudWebManager<Developer, AddDevelope
     {
     }
 
-    public override Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile)
+    public override Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile, CancellationToken cancellationToken = default)
     {
-        return PostAsync("developers-excel-upload", formFile);
+        return PostAsync("developers-excel-upload", formFile, cancellationToken);
     }
 
-    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddDeveloperModel> addDevelopersModels)
+    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddDeveloperModel> addDevelopersModels, CancellationToken cancellationToken = default)
     {
-        return PostAsync("upload-developers-from-json", addDevelopersModels);
+        return PostAsync("upload-developers-from-json", addDevelopersModels, cancellationToken);
     }
 }

@@ -9,8 +9,8 @@ public sealed class GamesPlayersReviewsShiftsWebManager : WebManager
     {
     }
 
-    public Task<HttpResponseMessage> AddAsync(AddGamePlayerReviewShiftModel addGamePlayerReviewShiftModel)
+    public Task<HttpResponseMessage> AddAsync(AddGamePlayerReviewShiftModel addGamePlayerReviewShiftModel, CancellationToken cancellationToken = default)
     {
-        return Client.PostAsJsonAsync("/api/games/GamesGamersReviews/shift", addGamePlayerReviewShiftModel);
+        return Client.PostAsJsonAsync("/api/games/GamesGamersReviews/shift", addGamePlayerReviewShiftModel, cancellationToken);
     }
 }

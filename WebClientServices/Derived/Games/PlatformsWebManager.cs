@@ -10,8 +10,8 @@ public sealed class PlatformsWebManager : CrudWebManager<Platform, AddPlatformMo
     {
     }
 
-    public override Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile)
+    public override Task<HttpResponseMessage> AddFromExcelAsync(IFormFile formFile, CancellationToken cancellationToken = default)
     {
-        return PostAsync("platforms-excel-upload", formFile);
+        return PostAsync("platforms-excel-upload", formFile, cancellationToken);
     }
 }

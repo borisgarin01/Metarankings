@@ -9,8 +9,8 @@ public sealed class MoviesViewersReviewsShiftsWebManager : WebManager
     {
     }
 
-    public Task<HttpResponseMessage> AddAsync(AddMovieViewerReviewShiftModel addMovieViewerReviewShiftModel)
+    public Task<HttpResponseMessage> AddAsync(AddMovieViewerReviewShiftModel addMovieViewerReviewShiftModel, CancellationToken cancellationToken = default)
     {
-        return Client.PostAsJsonAsync("/api/movies/MoviesViewersReviews/shift", addMovieViewerReviewShiftModel);
+        return Client.PostAsJsonAsync("/api/movies/MoviesViewersReviews/shift", addMovieViewerReviewShiftModel, cancellationToken);
     }
 }
