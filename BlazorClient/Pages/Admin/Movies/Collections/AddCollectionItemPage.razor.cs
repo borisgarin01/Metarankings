@@ -8,9 +8,9 @@ using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Pages.Admin.Movies.Collections;
 
-public partial class AddCollectionItemPage : ComponentBase
+public partial class AddCollectionItemPage : CancellableComponentBase
 {
-    public IEnumerable<Movie> MoviesToSelectFrom { get; set; }
+    public IEnumerable<Movie> MoviesToSelectFrom { get; set; } = Enumerable.Empty<Movie>();
 
     public long SelectedMovieId { get; private set; }
 
@@ -31,7 +31,7 @@ public partial class AddCollectionItemPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        MoviesToSelectFrom = await MoviesWebManager.GetAllAsync();
+        MoviesToSelectFrom = await MoviesWebManager.GetAllAsync(DisposalToken) ?? Enumerable.Empty<Movie>();
     }
 
     public Task SelectMovie(ChangeEventArgs e)
@@ -43,10 +43,10 @@ public partial class AddCollectionItemPage : ComponentBase
 
     public async Task AddMovieCollectionItemAsync()
     {
-        HttpResponseMessage httpResponseMessage = await MoviesCollectionsItemsWebManager.AddAsync(new AddMoviesCollectionItemModel(SelectedMovieId, Id));
+        HttpResponseMessage httpResponseMessage = await MoviesCollectionsItemsWebManager.AddAsync(new AddMoviesCollectionItemModel(SelectedMovieId, Id), DisposalToken);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo($"/admin/movies/collections/{Id}/manage-collection");
         else
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 }

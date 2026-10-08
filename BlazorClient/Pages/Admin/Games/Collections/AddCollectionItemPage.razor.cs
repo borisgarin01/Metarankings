@@ -8,7 +8,7 @@ using WebManagers.Derived.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Collections;
 
-public partial class AddCollectionItemPage : ComponentBase
+public partial class AddCollectionItemPage : CancellableComponentBase
 {
     private string searchTerm = string.Empty;
     private List<Game> filteredGames = new();
@@ -47,19 +47,19 @@ public partial class AddCollectionItemPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        GamesToSelectFrom = await GamesWebManager.GetAllAsync();
+        GamesToSelectFrom = await GamesWebManager.GetAllAsync(DisposalToken);
         filteredGames = GamesToSelectFrom.ToList();
     }
 
     public async Task AddGameCollectionItemAsync()
     {
         HttpResponseMessage httpResponseMessage =
-            await GamesCollectionsItemsWebManager.AddAsync(new AddGamesCollectionItemModel(SelectedGameId, Id));
+            await GamesCollectionsItemsWebManager.AddAsync(new AddGamesCollectionItemModel(SelectedGameId, Id), DisposalToken);
 
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo($"/admin/games/collections/{Id}/manage-collection");
         else
-            ToastService.ShowWarning(await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowWarning(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 
     private void FilterGames()

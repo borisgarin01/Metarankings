@@ -2,7 +2,7 @@
 
 namespace BlazorClient.Pages.Games.Developers;
 
-public partial class DeveloperGamesListPage : ComponentBase
+public partial class DeveloperGamesListPage : CancellableComponentBase
 {
     [Parameter]
     public int DeveloperId { get; set; }
@@ -14,6 +14,6 @@ public partial class DeveloperGamesListPage : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        Developer = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Developer>($"/api/Games/Developers/{DeveloperId}");
+        Developer = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<Developer>($"/api/Games/Developers/{DeveloperId}", DisposalToken);
     }
 }

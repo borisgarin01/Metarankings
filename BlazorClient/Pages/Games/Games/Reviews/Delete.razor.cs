@@ -3,7 +3,7 @@ using Domain.Reviews;
 
 namespace BlazorClient.Pages.Games.Games.Reviews
 {
-    public partial class Delete : ComponentBase
+    public partial class Delete : CancellableComponentBase
     {
         [Parameter]
         public long Id { get; set; }
@@ -21,16 +21,16 @@ namespace BlazorClient.Pages.Games.Games.Reviews
 
         protected override async Task OnInitializedAsync()
         {
-            GameReview = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<GameReview>(@$"/api/Games/GamesGamersReviews/{Id}");
+            GameReview = await HttpClientFactory.CreateClient("AuthorizedClient").GetFromJsonAsync<GameReview>(@$"/api/Games/GamesGamersReviews/{Id}", DisposalToken);
         }
 
         public async Task DeleteAsync()
         {
-            HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").DeleteAsync($"/api/Games/GamesGamersReviews/{Id}");
+            HttpResponseMessage httpResponseMessage = await HttpClientFactory.CreateClient("AuthorizedClient").DeleteAsync($"/api/Games/GamesGamersReviews/{Id}", DisposalToken);
             if (httpResponseMessage.IsSuccessStatusCode)
                 NavigationManager.NavigateTo($"/games/Details/{GameReview.GameId}", true);
             else
-                ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+                ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
         }
     }
 }

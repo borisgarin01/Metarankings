@@ -1,4 +1,5 @@
 ﻿@page "/games/{PageSize:int}/{PageNumber:int}"
+@inherits CancellableComponentBase
 
 <BlazorClient.Components.PagesComponents.Common.GameMenu Year="@DateTime.Today.Year" />
 
@@ -25,10 +26,10 @@ else
     }
     @if (PageNumber > 1)
     {
-        <a href="/@(PageSize)/@(PageNumber - 1)">Пред.</a>
+        <a href="/games/@(PageSize)/@(PageNumber - 1)">Пред.</a>
     }
     @if (Games.Count() == PageSize)
     {
-        <a href="/@(PageSize)/@(PageNumber + 1)">След.</a>
+        <a href="/games/@(PageSize)/@(PageNumber + 1)">След.</a>
     }
 }

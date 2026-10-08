@@ -14,7 +14,7 @@ public class RefreshTokensRepository : IRefreshTokensRepository
 
     private NpgsqlConnection CreateConnection() => new(_connectionString);
 
-    public async Task<RefreshToken> CreateAsync(RefreshToken token)
+    public async Task<RefreshToken> CreateAsync(RefreshToken token, CancellationToken cancellationToken = default)
     {
         // Полностью соответствует вашему CREATE TABLE
         const string sql = @"
@@ -23,10 +23,10 @@ public class RefreshTokensRepository : IRefreshTokensRepository
             RETURNING Id, UserId, Value, IsRevoked, CreatedAt;";
 
         using var connection = CreateConnection();
-        return await connection.QuerySingleAsync<RefreshToken>(sql, token);
+        return await connection.QuerySingleAsync<RefreshToken>(new CommandDefinition(sql, token, cancellationToken: cancellationToken));
     }
 
-    public async Task<RefreshToken?> GetByValueAsync(string value)
+    public async Task<RefreshToken?> GetByValueAsync(string value, CancellationToken cancellationToken = default)
     {
         // Ищем по значению, не проверяем срок годности (у вас его нет)
         const string sql = @"
@@ -37,10 +37,10 @@ public class RefreshTokensRepository : IRefreshTokensRepository
             LIMIT 1;";
 
         using var connection = CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<RefreshToken>(sql, new { Value = value });
+        return await connection.QueryFirstOrDefaultAsync<RefreshToken>(new CommandDefinition(sql, new { Value = value }, cancellationToken: cancellationToken));
     }
 
-    public async Task<IEnumerable<RefreshToken>> GetByUserIdAsync(long userId)
+    public async Task<IEnumerable<RefreshToken>> GetByUserIdAsync(long userId, CancellationToken cancellationToken = default)
     {
         const string sql = @"
             SELECT Id, UserId, Value, IsRevoked, CreatedAt
@@ -49,10 +49,10 @@ public class RefreshTokensRepository : IRefreshTokensRepository
             ORDER BY CreatedAt DESC;";
 
         using var connection = CreateConnection();
-        return await connection.QueryAsync<RefreshToken>(sql, new { UserId = userId });
+        return await connection.QueryAsync<RefreshToken>(new CommandDefinition(sql, new { UserId = userId }, cancellationToken: cancellationToken));
     }
 
-    public async Task<RefreshToken?> GetLastActiveByUserIdAsync(long userId)
+    public async Task<RefreshToken?> GetLastActiveByUserIdAsync(long userId, CancellationToken cancellationToken = default)
     {
         // Получаем последний активный (неотозванный) токен пользователя
         const string sql = @"
@@ -64,10 +64,10 @@ public class RefreshTokensRepository : IRefreshTokensRepository
             LIMIT 1;";
 
         using var connection = CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<RefreshToken>(sql, new { UserId = userId });
+        return await connection.QueryFirstOrDefaultAsync<RefreshToken>(new CommandDefinition(sql, new { UserId = userId }, cancellationToken: cancellationToken));
     }
 
-    public async Task RevokeAsync(long tokenId)
+    public async Task RevokeAsync(long tokenId, CancellationToken cancellationToken = default)
     {
         const string sql = @"
             UPDATE RefreshTokens
@@ -75,10 +75,10 @@ public class RefreshTokensRepository : IRefreshTokensRepository
             WHERE Id = @TokenId;";
 
         using var connection = CreateConnection();
-        await connection.ExecuteAsync(sql, new { TokenId = tokenId });
+        await connection.ExecuteAsync(new CommandDefinition(sql, new { TokenId = tokenId }, cancellationToken: cancellationToken));
     }
 
-    public async Task<bool> TryRevokeAsync(long tokenId)
+    public async Task<bool> TryRevokeAsync(long tokenId, CancellationToken cancellationToken = default)
     {
         const string sql = @"
             UPDATE RefreshTokens
@@ -87,10 +87,10 @@ public class RefreshTokensRepository : IRefreshTokensRepository
               AND IsRevoked = false;";
 
         using var connection = CreateConnection();
-        return await connection.ExecuteAsync(sql, new { TokenId = tokenId }) > 0;
+        return await connection.ExecuteAsync(new CommandDefinition(sql, new { TokenId = tokenId }, cancellationToken: cancellationToken)) > 0;
     }
 
-    public async Task RevokeAllByUserIdAsync(long userId)
+    public async Task RevokeAllByUserIdAsync(long userId, CancellationToken cancellationToken = default)
     {
         const string sql = @"
             UPDATE RefreshTokens
@@ -99,10 +99,10 @@ public class RefreshTokensRepository : IRefreshTokensRepository
               AND IsRevoked = false;";
 
         using var connection = CreateConnection();
-        await connection.ExecuteAsync(sql, new { UserId = userId });
+        await connection.ExecuteAsync(new CommandDefinition(sql, new { UserId = userId }, cancellationToken: cancellationToken));
     }
 
-    public async Task DeleteRevokedAsync()
+    public async Task DeleteRevokedAsync(CancellationToken cancellationToken = default)
     {
         // Чистим отозванные токены
         const string sql = @"
@@ -110,6 +110,6 @@ public class RefreshTokensRepository : IRefreshTokensRepository
             WHERE IsRevoked = true;";
 
         using var connection = CreateConnection();
-        await connection.ExecuteAsync(sql);
+        await connection.ExecuteAsync(new CommandDefinition(sql, cancellationToken: cancellationToken));
     }
 }

@@ -10,7 +10,7 @@ using Domain.Waitings;
 
 namespace BlazorClient.Pages.Games.Games;
 
-public partial class MostWaitingGames : ComponentBase
+public partial class MostWaitingGames : CancellableComponentBase
 {
     private const int PageSize = 25;
     private const string BasePath = "/games/most-waiting-games";
@@ -61,9 +61,9 @@ public partial class MostWaitingGames : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Task<IEnumerable<Genre>> genresTask = GamesGenresWebManager.GetAllAsync();
-        Task<IEnumerable<Platform>> platformsTask = GamesPlatformsWebManager.GetAllAsync();
-        Task<IEnumerable<NewsItem>> newsItemsTask = NewsWebManager.GetAllAsync();
+        Task<IEnumerable<Genre>> genresTask = GamesGenresWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<Platform>> platformsTask = GamesPlatformsWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<NewsItem>> newsItemsTask = NewsWebManager.GetAllAsync(DisposalToken);
 
         try
         {
@@ -72,7 +72,7 @@ public partial class MostWaitingGames : ComponentBase
             GamesPlatforms = platformsTask.Result ?? Enumerable.Empty<Platform>();
             NewsItems = newsItemsTask.Result ?? Enumerable.Empty<NewsItem>();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Failed to load filters: {ex.Message}");
             GamesGenres = Enumerable.Empty<Genre>();
@@ -97,10 +97,10 @@ public partial class MostWaitingGames : ComponentBase
             int offset = (currentPage - 1) * PageSize;
 
             Task<IEnumerable<Game>> gamesTask = GamesWebManager.GetMostWaitingAsync(
-                offset, PageSize, genresIds, platformsIds);
+                offset, PageSize, genresIds, platformsIds, DisposalToken);
 
             Task<int> countTask = GamesWebManager.GetMostWaitingCountAsync(
-                genresIds, platformsIds);
+                genresIds, platformsIds, DisposalToken);
 
             await Task.WhenAll(gamesTask, countTask);
 
@@ -109,7 +109,7 @@ public partial class MostWaitingGames : ComponentBase
 
             await LoadUserVotesAsync();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Failed to load future games: {ex.Message}");
             FutureGames = Enumerable.Empty<Game>();
@@ -133,10 +133,10 @@ public partial class MostWaitingGames : ComponentBase
 
         try
         {
-            IEnumerable<WaitingStatistics> statistics = await GamesWaitingsWebManager.GetAsync(FutureGames.Select(g => g.Id));
+            IEnumerable<WaitingStatistics> statistics = await GamesWaitingsWebManager.GetAsync(FutureGames.Select(g => g.Id), DisposalToken);
             userVotes = statistics.ToDictionary(s => s.EntityId, s => s.UserVote);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Failed to load user waiting votes: {ex.Message}");
         }

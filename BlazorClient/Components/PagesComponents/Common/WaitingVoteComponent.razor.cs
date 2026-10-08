@@ -9,7 +9,7 @@ namespace BlazorClient.Components.PagesComponents.Common;
 /// Кнопки "жду / не жду" для игры или фильма.
 /// Счетчики можно передать снаружи (списки) или загрузить самостоятельно (LoadStatistics = true).
 /// </summary>
-public partial class WaitingVoteComponent : ComponentBase
+public partial class WaitingVoteComponent : CancellableComponentBase
 {
     private int waitingCount;
     private int notWaitingCount;
@@ -80,9 +80,9 @@ public partial class WaitingVoteComponent : ComponentBase
         {
             try
             {
-                Apply(await WebManager.GetAsync(EntityId));
+                Apply(await WebManager.GetAsync(EntityId, DisposalToken));
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
             {
                 Console.WriteLine($"Failed to load waiting statistics: {ex.Message}");
             }
@@ -101,16 +101,16 @@ public partial class WaitingVoteComponent : ComponentBase
         isSending = true;
         try
         {
-            HttpResponseMessage response = await WebManager.VoteAsync(EntityId, isWaiting);
+            HttpResponseMessage response = await WebManager.VoteAsync(EntityId, isWaiting, DisposalToken);
 
             if (response.IsSuccessStatusCode)
-                Apply(await response.Content.ReadFromJsonAsync<WaitingStatistics>());
+                Apply(await response.Content.ReadFromJsonAsync<WaitingStatistics>(DisposalToken));
             else if (response.StatusCode == HttpStatusCode.Unauthorized)
                 ToastService.ShowInfo("Войдите на сайт, чтобы отметить ожидание");
             else
                 ToastService.ShowError("Не удалось сохранить голос");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Failed to vote: {ex.Message}");
             ToastService.ShowError("Не удалось сохранить голос");

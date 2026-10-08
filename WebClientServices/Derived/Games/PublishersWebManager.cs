@@ -9,8 +9,8 @@ public sealed class PublishersWebManager : CrudWebManager<Publisher, AddPublishe
     {
     }
 
-    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddPublisherModel> addPublishersModels)
+    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddPublisherModel> addPublishersModels, CancellationToken cancellationToken = default)
     {
-        return PostAsync("upload-publishers-from-json", addPublishersModels);
+        return PostAsync("upload-publishers-from-json", addPublishersModels, cancellationToken);
     }
 }

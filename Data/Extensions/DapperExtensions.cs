@@ -1,10 +1,24 @@
 ﻿using System.Data;
+using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Data.Extensions;
 
 public static class DapperExtensions
 {
+    /// <summary>
+    /// Dapper не принимает CancellationToken в multi-mapping через Type[], поэтому отмена
+    /// учитывается при открытии соединения и проверяется после выполнения запроса.
+    /// </summary>
+    private static async Task OpenIfClosedAsync(IDbConnection cnn, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (cnn is DbConnection dbConnection && dbConnection.State == ConnectionState.Closed)
+            await dbConnection.OpenAsync(cancellationToken);
+    }
+
     public static async Task<IEnumerable<TReturn>> QueryAsync<T1, T2, T3, T4, T5, T6, T7, T8, TReturn>(
         this IDbConnection cnn,
         string sql,
@@ -14,8 +28,11 @@ public static class DapperExtensions
         bool buffered = true,
         string splitOn = "Id",
         int? commandTimeout = null,
-        CommandType? commandType = null)
+        CommandType? commandType = null,
+        CancellationToken cancellationToken = default)
     {
+        await OpenIfClosedAsync(cnn, cancellationToken);
+
         var result = await cnn.QueryAsync(sql, new[] {
             typeof(T1), typeof(T2), typeof(T3), typeof(T4),
             typeof(T5), typeof(T6), typeof(T7), typeof(T8)
@@ -26,6 +43,8 @@ public static class DapperExtensions
                 (T5)objects[4], (T6)objects[5], (T7)objects[6], (T8)objects[7]
             );
         }, param, transaction, buffered, splitOn, commandTimeout, commandType);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         return result;
     }
@@ -39,8 +58,11 @@ public static class DapperExtensions
         bool buffered = true,
         string splitOn = "Id",
         int? commandTimeout = null,
-        CommandType? commandType = null)
+        CommandType? commandType = null,
+        CancellationToken cancellationToken = default)
     {
+        await OpenIfClosedAsync(cnn, cancellationToken);
+
         var result = await cnn.QueryAsync(sql, new[] {
             typeof(T1), typeof(T2), typeof(T3), typeof(T4),
             typeof(T5), typeof(T6), typeof(T7), typeof(T8),
@@ -52,6 +74,8 @@ public static class DapperExtensions
                 (T5)objects[4], (T6)objects[5], (T7)objects[6], (T8)objects[7], (T9)objects[8]
             );
         }, param, transaction, buffered, splitOn, commandTimeout, commandType);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         return result;
     }
@@ -65,8 +89,11 @@ public static class DapperExtensions
         bool buffered = true,
         string splitOn = "Id",
         int? commandTimeout = null,
-        CommandType? commandType = null)
+        CommandType? commandType = null,
+        CancellationToken cancellationToken = default)
     {
+        await OpenIfClosedAsync(cnn, cancellationToken);
+
         var result = await cnn.QueryAsync(sql, new[] {
             typeof(T1), typeof(T2), typeof(T3), typeof(T4),
             typeof(T5), typeof(T6), typeof(T7), typeof(T8),
@@ -80,6 +107,8 @@ public static class DapperExtensions
             );
         }, param, transaction, buffered, splitOn, commandTimeout, commandType);
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         return result;
     }
 
@@ -92,8 +121,11 @@ public static class DapperExtensions
         bool buffered = true,
         string splitOn = "Id",
         int? commandTimeout = null,
-        CommandType? commandType = null)
+        CommandType? commandType = null,
+        CancellationToken cancellationToken = default)
     {
+        await OpenIfClosedAsync(cnn, cancellationToken);
+
         var result = await cnn.QueryAsync(sql, new[] {
             typeof(T1), typeof(T2), typeof(T3), typeof(T4),
             typeof(T5), typeof(T6), typeof(T7), typeof(T8),
@@ -106,6 +138,8 @@ public static class DapperExtensions
                 (T9)objects[8], (T10)objects[9], (T11)objects[10]
             );
         }, param, transaction, buffered, splitOn, commandTimeout, commandType);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         return result;
     }

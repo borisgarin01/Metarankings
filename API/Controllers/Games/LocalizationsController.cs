@@ -15,9 +15,9 @@ public sealed class LocalizationsController : CrudControllerBase<Localization, A
     }
 
     [HttpGet("{id:long}/{platformId:long}")]
-    public async Task<ActionResult<Localization>> GetByPlatformAsync(long id, long platformId)
+    public async Task<ActionResult<Localization>> GetByPlatformAsync(long id, long platformId, CancellationToken cancellationToken = default)
     {
-        Localization? localization = await _localizationsRepository.GetByPlatformAsync(id, platformId);
+        Localization? localization = await _localizationsRepository.GetByPlatformAsync(id, platformId, cancellationToken);
         if (localization is null)
             return NotFound();
 

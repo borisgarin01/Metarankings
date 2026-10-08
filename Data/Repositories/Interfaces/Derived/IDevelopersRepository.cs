@@ -5,5 +5,5 @@ namespace Data.Repositories.Interfaces.Derived;
 
 public interface IDevelopersRepository : IRepository<Developer, AddDeveloperModel, UpdateDeveloperModel>
 {
-    public Task<Developer> GetByNameAsync(string name);
+    public Task<Developer> GetByNameAsync(string name, CancellationToken cancellationToken = default);
 }

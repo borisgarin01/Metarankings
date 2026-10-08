@@ -9,53 +9,53 @@ public sealed class MoviesCountriesRepository : Repository<MovieCountry, AddMovi
     {
     }
 
-    public override async Task<long> AddAsync(AddMovieCountryModel entity)
+    public override async Task<long> AddAsync(AddMovieCountryModel entity, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryFirstAsync<long>(@"INSERT INTO MoviesCountries (Name)
+        return await connection.QueryFirstAsync<long>(new CommandDefinition(@"INSERT INTO MoviesCountries (Name)
 VALUES (@Name)
-RETURNING Id;", new { entity.Name });
+RETURNING Id;", new { entity.Name }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<IEnumerable<MovieCountry>> GetAllAsync()
+    public override async Task<IEnumerable<MovieCountry>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryAsync<MovieCountry>(@"SELECT Id, Name
+        return await connection.QueryAsync<MovieCountry>(new CommandDefinition(@"SELECT Id, Name
 FROM MoviesCountries
-ORDER BY Name;");
+ORDER BY Name;", cancellationToken: cancellationToken));
     }
 
-    public override async Task<MovieCountry> GetAsync(long id)
+    public override async Task<MovieCountry> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<MovieCountry>(@"SELECT Id, Name
+        return await connection.QueryFirstOrDefaultAsync<MovieCountry>(new CommandDefinition(@"SELECT Id, Name
 FROM MoviesCountries
-WHERE Id=@id;", new { id });
+WHERE Id=@id;", new { id }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<IEnumerable<MovieCountry>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<MovieCountry>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryAsync<MovieCountry>(@"SELECT Id, Name
+        return await connection.QueryAsync<MovieCountry>(new CommandDefinition(@"SELECT Id, Name
 FROM MoviesCountries
 ORDER BY Name
 OFFSET @offset
-LIMIT @limit;", new { offset, limit });
+LIMIT @limit;", new { offset, limit }, cancellationToken: cancellationToken));
     }
 
-    public override async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        await connection.ExecuteAsync(@"DELETE FROM MoviesCountries
-WHERE Id=@id;", new { id });
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM MoviesCountries
+WHERE Id=@id;", new { id }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<MovieCountry> UpdateAsync(UpdateMovieCountryModel entity, long id)
+    public override async Task<MovieCountry> UpdateAsync(UpdateMovieCountryModel entity, long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<MovieCountry>(@"UPDATE MoviesCountries
+        return await connection.QueryFirstOrDefaultAsync<MovieCountry>(new CommandDefinition(@"UPDATE MoviesCountries
 SET Name=@Name
 WHERE Id=@id
-RETURNING Id, Name;", new { entity.Name, id });
+RETURNING Id, Name;", new { entity.Name, id }, cancellationToken: cancellationToken));
     }
 }

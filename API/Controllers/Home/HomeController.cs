@@ -38,11 +38,11 @@ public sealed class HomeController : ControllerBase
     }
 
     [HttpGet("collections/{pageNumber:int}/{pageSize:int}")]
-    public async Task<ActionResult<IEnumerable<CollectionsItemComponent>>> GetCollectionsComponents(int pageNumber, int pageSize)
+    public async Task<ActionResult<IEnumerable<CollectionsItemComponent>>> GetCollectionsComponents(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
         IEnumerable
-            <GamesCollection> gamesCollections = await _gamesCollectionsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
-        IEnumerable<MoviesCollection> moviesCollections = await _moviesCollectionsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
+            <GamesCollection> gamesCollections = await _gamesCollectionsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize, cancellationToken);
+        IEnumerable<MoviesCollection> moviesCollections = await _moviesCollectionsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize, cancellationToken);
 
         IEnumerable<CollectionsItemComponent> collectionsItemComponent = gamesCollections
             .Select(x => new CollectionsItemComponent
@@ -65,9 +65,9 @@ public sealed class HomeController : ControllerBase
     }
 
     [HttpGet("soon-at-cinemas")]
-    public async Task<ActionResult<IEnumerable<SoonAtCinemasItemComponent>>> GetSoonAtCinemasItemsComponents()
+    public async Task<ActionResult<IEnumerable<SoonAtCinemasItemComponent>>> GetSoonAtCinemasItemsComponents(CancellationToken cancellationToken = default)
     {
-        IEnumerable<Movie> movies = await _moviesRepository.GetAsync(DateTime.Today, DateTime.Today.AddMonths(1));
+        IEnumerable<Movie> movies = await _moviesRepository.GetAsync(DateTime.Today, DateTime.Today.AddMonths(1), cancellationToken);
 
         return Ok(movies.Select(m => new SoonAtCinemasItemComponent
         {
@@ -82,19 +82,19 @@ public sealed class HomeController : ControllerBase
     }
 
     [HttpGet("movies-reviews")]
-    public async Task<ActionResult<IEnumerable<MovieReviewListViewModel>>> GetMoviesReviews()
+    public async Task<ActionResult<IEnumerable<MovieReviewListViewModel>>> GetMoviesReviews(CancellationToken cancellationToken = default)
     {
-        IEnumerable<MovieViewerReview> moviesReviews = await _moviesViewersReviewsRepository.GetByTimespanAsync(DateTime.Today.AddDays(-30), DateTime.Today);
+        IEnumerable<MovieViewerReview> moviesReviews = await _moviesViewersReviewsRepository.GetByTimespanAsync(DateTime.Today.AddDays(-30), DateTime.Today, cancellationToken);
 
         return Ok(moviesReviews.Select(b => new MovieReviewListViewModel(b.Id, b.Movie.Name)));
     }
 
     [HttpGet("games-reviews/{pageNumber:long}/{pageSize:long}")]
-    public async Task<ActionResult<IEnumerable<GameReviewListViewModel>>> GetGamesReviewsAsync(long pageNumber, long pageSize)
+    public async Task<ActionResult<IEnumerable<GameReviewListViewModel>>> GetGamesReviewsAsync(long pageNumber, long pageSize, CancellationToken cancellationToken = default)
     {
         try
         {
-            IEnumerable<GameReview> gamesReviews = await _gamesPlayersReviewsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize);
+            IEnumerable<GameReview> gamesReviews = await _gamesPlayersReviewsRepository.GetAsync((pageNumber - 1) * pageSize, pageSize, cancellationToken);
 
             return Ok(gamesReviews.Select(b => new GameReviewListViewModel(b.GameId, b.Game.Name)));
         }
@@ -106,9 +106,9 @@ public sealed class HomeController : ControllerBase
     }
 
     [HttpGet("games-release-dates/{pageNumber}/{pageSize}")]
-    public async Task<ActionResult<IEnumerable<GamesReleaseDateItemComponent>>> GetGamesReleasesDatesAsync(int pageNumber, int pageSize)
+    public async Task<ActionResult<IEnumerable<GamesReleaseDateItemComponent>>> GetGamesReleasesDatesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Game> nearestNextReleaseDatesGames = await _gamesRepository.GetLastAsync((pageNumber - 1) * pageSize, pageSize);
+        IEnumerable<Game> nearestNextReleaseDatesGames = await _gamesRepository.GetLastAsync((pageNumber - 1) * pageSize, pageSize, cancellationToken);
 
         IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemsComponents = nearestNextReleaseDatesGames
             .Select(b => new GamesReleaseDateItemViewModel($"/games/Details/{b.Id}", b.Name, b.Image, b.Name, b.Name, b.Platforms.Select(a => new Link(a.Name, $"/platforms/{a.Id}")).ToArray(), b.Genres.Select(a => new Link(a.Name, $"/games/genres/{a.Id}")).ToArray(), b.ReleaseDate.HasValue ? b.ReleaseDate.Value : default));

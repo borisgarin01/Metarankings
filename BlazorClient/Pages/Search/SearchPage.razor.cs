@@ -5,7 +5,7 @@ using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Pages.Search;
 
-public partial class SearchPage : ComponentBase
+public partial class SearchPage : CancellableComponentBase
 {
     private IEnumerable<Movie> movies = Enumerable.Empty<Movie>();
     private IEnumerable<Game> games = Enumerable.Empty<Game>();
@@ -96,15 +96,15 @@ public partial class SearchPage : ComponentBase
 
         try
         {
-            Task<IEnumerable<Movie>> moviesTask = MoviesWebManager.SearchByName(SearchText);
-            Task<IEnumerable<Game>> gamesTask = GamesWebManager.SearchByName(SearchText);
+            Task<IEnumerable<Movie>> moviesTask = MoviesWebManager.SearchByName(SearchText, DisposalToken);
+            Task<IEnumerable<Game>> gamesTask = GamesWebManager.SearchByName(SearchText, DisposalToken);
 
             await Task.WhenAll(moviesTask, gamesTask);
 
             Movies = moviesTask.Result ?? Enumerable.Empty<Movie>();
             Games = gamesTask.Result ?? Enumerable.Empty<Game>();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Search error: {ex.Message}");
             Movies = Enumerable.Empty<Movie>();

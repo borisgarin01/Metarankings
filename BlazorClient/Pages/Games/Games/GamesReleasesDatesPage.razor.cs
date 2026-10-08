@@ -6,7 +6,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Games.Games;
 
-public partial class GamesReleasesDatesPage : ComponentBase
+public partial class GamesReleasesDatesPage : CancellableComponentBase
 {
     private IEnumerable<Platform> platforms;
     private IEnumerable<Game> games;
@@ -100,21 +100,21 @@ public partial class GamesReleasesDatesPage : ComponentBase
             // Загружаем игры
             HttpResponseMessage gamesResponse = await HttpClientFactory
                 .CreateClient("AuthorizedClient")
-                .GetAsync($"/api/games/games/games-releases-dates/{offset}/{limit}{queryString}");
+                .GetAsync($"/api/games/games/games-releases-dates/{offset}/{limit}{queryString}", DisposalToken);
 
             // Загружаем общее количество для пагинации
             HttpResponseMessage countResponse = await HttpClientFactory
                 .CreateClient("AuthorizedClient")
-                .GetAsync($"/api/games/games/games-releases-dates/count{queryString}");
+                .GetAsync($"/api/games/games/games-releases-dates/count{queryString}", DisposalToken);
 
             if (gamesResponse.IsSuccessStatusCode)
             {
-                var gamesList = await gamesResponse.Content.ReadFromJsonAsync<IEnumerable<Game>>();
+                var gamesList = await gamesResponse.Content.ReadFromJsonAsync<IEnumerable<Game>>(DisposalToken);
                 FutureGames = gamesList ?? Enumerable.Empty<Game>();
 
                 if (countResponse.IsSuccessStatusCode)
                 {
-                    int totalCount = await countResponse.Content.ReadFromJsonAsync<int>();
+                    int totalCount = await countResponse.Content.ReadFromJsonAsync<int>(DisposalToken);
 
                     PagedResponse = new PagedResponse<Game>
                     {
@@ -132,7 +132,7 @@ public partial class GamesReleasesDatesPage : ComponentBase
                 Console.WriteLine($"Failed to load games: {gamesResponse.ReasonPhrase}");
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Error loading games: {ex.Message}");
             FutureGames = Enumerable.Empty<Game>();
@@ -146,14 +146,12 @@ public partial class GamesReleasesDatesPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetAllAsync();
-        Task<IEnumerable<Genre>> gamesGenresGettingTask = GenresWebManager.GetAllAsync();
+        Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<Genre>> gamesGenresGettingTask = GenresWebManager.GetAllAsync(DisposalToken);
 
-        await Task.WhenAll(platformsGettingTask, gamesGenresGettingTask).ContinueWith(b =>
-        {
-            Platforms = platformsGettingTask.Result;
-            Genres = gamesGenresGettingTask.Result;
-        });
+        await Task.WhenAll(platformsGettingTask, gamesGenresGettingTask);
+        Platforms = platformsGettingTask.Result;
+        Genres = gamesGenresGettingTask.Result;
     }
 
     private string BuildQueryString(int? page = null, long? genreId = null, long? platformId = null)

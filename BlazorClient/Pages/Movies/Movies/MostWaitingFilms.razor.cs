@@ -10,7 +10,7 @@ using Domain.Waitings;
 
 namespace BlazorClient.Pages.Movies.Movies;
 
-public partial class MostWaitingFilms : ComponentBase
+public partial class MostWaitingFilms : CancellableComponentBase
 {
     private const int PageSize = 25;
     private const string BasePath = "/movies/most-waiting-movies";
@@ -53,8 +53,8 @@ public partial class MostWaitingFilms : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Task<IEnumerable<Genre>> genresTask = MoviesGenresWebManager.GetAllAsync();
-        Task<IEnumerable<NewsItem>> newsItemsTask = NewsWebManager.GetAllAsync();
+        Task<IEnumerable<Genre>> genresTask = MoviesGenresWebManager.GetAllAsync(DisposalToken);
+        Task<IEnumerable<NewsItem>> newsItemsTask = NewsWebManager.GetAllAsync(DisposalToken);
 
         try
         {
@@ -62,7 +62,7 @@ public partial class MostWaitingFilms : ComponentBase
             MoviesGenres = genresTask.Result ?? Enumerable.Empty<Genre>();
             NewsItems = newsItemsTask.Result ?? Enumerable.Empty<NewsItem>();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Failed to load filters: {ex.Message}");
             MoviesGenres = Enumerable.Empty<Genre>();
@@ -83,8 +83,8 @@ public partial class MostWaitingFilms : ComponentBase
             long[]? genresIds = GenreId.HasValue ? new[] { GenreId.Value } : null;
             int offset = (currentPage - 1) * PageSize;
 
-            Task<IEnumerable<Movie>> moviesTask = MoviesWebManager.GetMostWaitingAsync(offset, PageSize, genresIds);
-            Task<int> countTask = MoviesWebManager.GetMostWaitingCountAsync(genresIds);
+            Task<IEnumerable<Movie>> moviesTask = MoviesWebManager.GetMostWaitingAsync(offset, PageSize, genresIds, DisposalToken);
+            Task<int> countTask = MoviesWebManager.GetMostWaitingCountAsync(genresIds, DisposalToken);
 
             await Task.WhenAll(moviesTask, countTask);
 
@@ -93,7 +93,7 @@ public partial class MostWaitingFilms : ComponentBase
 
             await LoadUserVotesAsync();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Failed to load most waiting movies: {ex.Message}");
             MostWaitingMovies = Enumerable.Empty<Movie>();
@@ -115,10 +115,10 @@ public partial class MostWaitingFilms : ComponentBase
 
         try
         {
-            IEnumerable<WaitingStatistics> statistics = await MoviesWaitingsWebManager.GetAsync(MostWaitingMovies.Select(m => m.Id));
+            IEnumerable<WaitingStatistics> statistics = await MoviesWaitingsWebManager.GetAsync(MostWaitingMovies.Select(m => m.Id), DisposalToken);
             userVotes = statistics.ToDictionary(s => s.EntityId, s => s.UserVote);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!DisposalToken.IsCancellationRequested)
         {
             Console.WriteLine($"Failed to load user waiting votes: {ex.Message}");
         }

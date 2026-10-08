@@ -10,27 +10,26 @@ public sealed class LocalizationsRepository : Repository<Localization, AddLocali
     {
     }
 
-    public override async Task<long> AddAsync(AddLocalizationModel localization)
+    public override async Task<long> AddAsync(AddLocalizationModel localization, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        long id = await connection.QueryFirstAsync<long>(@"INSERT INTO Localizations
+        long id = await connection.QueryFirstAsync<long>(new CommandDefinition(@"INSERT INTO Localizations
 (Name)
 VALUES (@Name)
-RETURNING Id;"
-, new
+RETURNING Id;", new
 {
     localization.Name,
-});
+}, cancellationToken: cancellationToken));
         return id;
     }
 
-    public override async Task<IEnumerable<Localization>> GetAllAsync()
+    public override async Task<IEnumerable<Localization>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         Dictionary<string, Localization> localizationsDictionary = new Dictionary<string, Localization>();
         Dictionary<long, Game> gamesDictionary = new Dictionary<long, Game>();
 
-        await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
+        await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(new CommandDefinition(@"
             SELECT 
                 Localizations.Id, Localizations.Name,
                 Games.Id, Games.Name, Games.Image, Games.LocalizationId,
@@ -45,7 +44,7 @@ RETURNING Id;"
                 LEFT JOIN GamesDevelopers ON GamesDevelopers.GameId = Games.Id
                 LEFT JOIN Developers ON Developers.Id = GamesDevelopers.DeveloperId
                 LEFT JOIN GamesPublishers gp ON gp.GameId = Games.Id
-                LEFT JOIN Publishers on Publishers.Id = gp.PublisherId",
+                LEFT JOIN Publishers on Publishers.Id = gp.PublisherId", cancellationToken: cancellationToken),
             (localization, game, platform, developer, publisher) =>
             {
                 // Get or create the localization entry
@@ -100,7 +99,7 @@ RETURNING Id;"
         return localizationsDictionary.Values;
     }
 
-    public override async Task<Localization> GetAsync(long id)
+    public override async Task<Localization> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Localization> localizationDictionary = new Dictionary<long, Localization>();
@@ -109,7 +108,7 @@ RETURNING Id;"
         Dictionary<long, Developer> developersDictionary = new Dictionary<long, Developer>();
         Dictionary<long, Publisher> publishersDictionary = new Dictionary<long, Publisher>();
 
-        IEnumerable<Localization> localization = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
+        IEnumerable<Localization> localization = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(new CommandDefinition(@"
             SELECT 
 loc.Id, loc.Name,
 g.Id, g.Name, g.Image, g.LocalizationId, g.ReleaseDate, g.Description, g.Trailer,                 
@@ -124,7 +123,7 @@ LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
 LEFT JOIN Developers d ON d.Id = gd.DeveloperId
 LEFT JOIN GamesPublishers gpubl ON gpubl.GameId = g.Id
 LEFT JOIN Publishers publ on publ.Id = gpubl.PublisherId
-WHERE loc.Id = @id",
+WHERE loc.Id = @id", new { id }, cancellationToken: cancellationToken),
             (loc, game, platform, developer, publisher) =>
             {
                 // Get or create localization
@@ -168,14 +167,13 @@ WHERE loc.Id = @id",
 
                 return locEntry;
             },
-            new { id },
             splitOn: "Id,Id,Id,Id"
         );
 
         return localizationDictionary.Values.FirstOrDefault();
     }
 
-    public async Task<Localization> GetByPlatformAsync(long id, long platformId)
+    public async Task<Localization> GetByPlatformAsync(long id, long platformId, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Localization> localizationDictionary = new Dictionary<long, Localization>();
@@ -184,7 +182,7 @@ WHERE loc.Id = @id",
         Dictionary<long, Developer> developersDictionary = new Dictionary<long, Developer>();
         Dictionary<long, Publisher> publishersDictionary = new Dictionary<long, Publisher>();
 
-        IEnumerable<Localization> result = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
+        IEnumerable<Localization> result = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(new CommandDefinition(@"
             SELECT 
                 loc.Id, loc.Name,
                 g.Id, g.Name, g.Image, g.LocalizationId,
@@ -202,7 +200,7 @@ WHERE loc.Id = @id",
             LEFT JOIN Developers d ON d.Id = gd.DeveloperId
             LEFT JOIN GamesPublishers gpubl ON gpubl.GameId = g.Id
             LEFT JOIN Publishers publ on publ.Id = gpubl.PublisherId
-            WHERE loc.Id = @id",
+            WHERE loc.Id = @id", new { id, platformId }, cancellationToken: cancellationToken),
             (loc, game, platform, developer, publisher) =>
             {
                 // Get or create localization
@@ -247,14 +245,13 @@ WHERE loc.Id = @id",
 
                 return locEntry;
             },
-            new { id, platformId },
             splitOn: "Id,Id,Id,Id"
         );
 
         return localizationDictionary.Values.FirstOrDefault();
     }
 
-    public override async Task<IEnumerable<Localization>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<Localization>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         Dictionary<long, Localization> localizationDictionary = new Dictionary<long, Localization>();
@@ -263,7 +260,7 @@ WHERE loc.Id = @id",
         Dictionary<long, Developer> developersDictionary = new Dictionary<long, Developer>();
         Dictionary<long, Publisher> publishersDictionary = new Dictionary<long, Publisher>();
 
-        await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
+        await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(new CommandDefinition(@"
             SELECT 
                 loc.Id, loc.Name,
                 g.Id, g.Name, g.Image, g.LocalizationId,
@@ -283,7 +280,7 @@ WHERE loc.Id = @id",
             LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
             LEFT JOIN Developers d ON d.Id = gd.DeveloperId
             LEFT JOIN GamesPublishers gamesPub on gamesPub.GameId=g.Id
-            LEFT JOIN Publishers pub ON pub.Id = gamesPub.PublisherId",
+            LEFT JOIN Publishers pub ON pub.Id = gamesPub.PublisherId", new { offset, limit }, cancellationToken: cancellationToken),
             (loc, game, platform, developer, publisher) =>
             {
                 if (!localizationDictionary.TryGetValue(loc.Id, out Localization? locEntry))
@@ -322,30 +319,29 @@ WHERE loc.Id = @id",
 
                 return locEntry;
             },
-            new { offset, limit },
             splitOn: "Id,Id,Id,Id"
         );
 
         return localizationDictionary.Values;
     }
 
-    public override async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        await connection.ExecuteAsync(@"DELETE FROM 
-Localizations WHERE Id=@id", new { id });
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM 
+Localizations WHERE Id=@id", new { id }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<Localization> UpdateAsync(UpdateLocalizationModel localization, long id)
+    public override async Task<Localization> UpdateAsync(UpdateLocalizationModel localization, long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        dynamic? updatedLocalization = await connection.QueryFirstOrDefaultAsync(@"UPDATE Localizations set Name=@Name
+        dynamic? updatedLocalization = await connection.QueryFirstOrDefaultAsync(new CommandDefinition(@"UPDATE Localizations set Name=@Name
 WHERE Id=@Id
 RETURNING Name, Href, Id;", new
         {
             localization.Name,
             id
-        });
+        }, cancellationToken: cancellationToken));
 
         return updatedLocalization;
     }

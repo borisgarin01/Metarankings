@@ -15,13 +15,13 @@ public sealed class GamesRepository : Repository<Game, AddGameModel, UpdateGameM
     {
     }
 
-    public override async Task<long> AddAsync(AddGameModel entity)
+    public override async Task<long> AddAsync(AddGameModel entity, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         connection.Open();
 
         using NpgsqlTransaction transaction = connection.BeginTransaction();
-        Game insertedGame = await connection.QueryFirstAsync<Game>(@"INSERT INTO Games 
+        Game insertedGame = await connection.QueryFirstAsync<Game>(new CommandDefinition(@"INSERT INTO Games 
 (Name, Image, LocalizationId, ReleaseDate, Description, Trailer) 
 VALUES
 (@Name, @Image, @LocalizationId, CAST(@ReleaseDate AS DATE), @Description, @Trailer)
@@ -33,43 +33,43 @@ RETURNING Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer;", 
             ReleaseDate = entity.ReleaseDate.Value,
             entity.Description,
             Trailer = TrailerUrl.ToEmbed(entity.Trailer)
-        }, transaction: transaction);
+        }, transaction: transaction, cancellationToken: cancellationToken));
 
         foreach (long genreId in entity.GenresIds)
         {
-            GameGenre insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(@"INSERT INTO GamesGenres (GameId, GenreId) 
+            GameGenre insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(new CommandDefinition(@"INSERT INTO GamesGenres (GameId, GenreId) 
 VALUES (@GameId, @GenreId)
-RETURNING Id, GameId, GenreId;", new { GameId = insertedGame.Id, GenreId = genreId }, transaction: transaction);
+RETURNING Id, GameId, GenreId;", new { GameId = insertedGame.Id, GenreId = genreId }, transaction: transaction, cancellationToken: cancellationToken));
         }
 
         foreach (long publisherId in entity.PublishersIds)
         {
-            GamePublisher insertedGamePublisher = await connection.QueryFirstAsync<GamePublisher>(@"INSERT INTO GamesPublishers (GameId, PublisherId) 
+            GamePublisher insertedGamePublisher = await connection.QueryFirstAsync<GamePublisher>(new CommandDefinition(@"INSERT INTO GamesPublishers (GameId, PublisherId) 
 VALUES (@GameId, @PublisherId)
-RETURNING GameId, PublisherId;", new { GameId = insertedGame.Id, PublisherId = publisherId }, transaction: transaction);
+RETURNING GameId, PublisherId;", new { GameId = insertedGame.Id, PublisherId = publisherId }, transaction: transaction, cancellationToken: cancellationToken));
         }
 
         foreach (long platformId in entity.PlatformsIds)
         {
-            GamePlatform insertedGamePlatform = await connection.QueryFirstAsync<GamePlatform>(@"INSERT INTO GamesPlatforms 
+            GamePlatform insertedGamePlatform = await connection.QueryFirstAsync<GamePlatform>(new CommandDefinition(@"INSERT INTO GamesPlatforms 
 (GameId, PlatformId)
 VALUES (@GameId, @PlatformId)
-RETURNING GameId, PlatformId;", new { GameId = insertedGame.Id, PlatformId = platformId }, transaction: transaction);
+RETURNING GameId, PlatformId;", new { GameId = insertedGame.Id, PlatformId = platformId }, transaction: transaction, cancellationToken: cancellationToken));
         }
 
         foreach (long developerId in entity.DevelopersIds)
         {
-            IEnumerable<dynamic> insertedGameDeveloper = await connection.QueryAsync(@"INSERT INTO GamesDevelopers(GameId, DeveloperId)
+            IEnumerable<dynamic> insertedGameDeveloper = await connection.QueryAsync(new CommandDefinition(@"INSERT INTO GamesDevelopers(GameId, DeveloperId)
 VALUES(@GameId, @DeveloperId)
-RETURNING Id, GameId, DeveloperId;", new { GameId = insertedGame.Id, DeveloperId = developerId }, transaction: transaction);
+RETURNING Id, GameId, DeveloperId;", new { GameId = insertedGame.Id, DeveloperId = developerId }, transaction: transaction, cancellationToken: cancellationToken));
         }
 
-        await transaction.CommitAsync();
+        await transaction.CommitAsync(cancellationToken);
 
         return insertedGame.Id;
     }
 
-    public async Task<IEnumerable<Game>> GetFirstAsync(int offset, int limit)
+    public async Task<IEnumerable<Game>> GetFirstAsync(int offset, int limit, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
@@ -162,14 +162,14 @@ gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date
 
                 return gameEntry;
             }, new { offset, limit },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id"
+            splitOn: "Id,Id,Id,Id,Id,Id,Id", cancellationToken: cancellationToken
         );
 
         List<Game> result = gameDictionary.Values.ToList();
 
         return result;
     }
-    public async Task<IEnumerable<Game>> GetLastAsync(int offset, int limit)
+    public async Task<IEnumerable<Game>> GetLastAsync(int offset, int limit, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
@@ -241,7 +241,7 @@ gc.Id, gc.Name, gc.Description
                 return gameEntry;
             },
             new { offset, limit },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
+            splitOn: "Id,Id,Id,Id,Id,Id,Id", cancellationToken: cancellationToken // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
         );
 
         List<Game> result = gameDictionary.Values.ToList();
@@ -249,11 +249,11 @@ gc.Id, gc.Name, gc.Description
         return result;
     }
 
-    public async Task<IEnumerable<Game>> GetNearestAsync(short offset, short limit)
+    public async Task<IEnumerable<Game>> GetNearestAsync(short offset, short limit, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
 
-        IEnumerable<Game> games = await connection.QueryAsync<Game>(@"
+        IEnumerable<Game> games = await connection.QueryAsync<Game>(new CommandDefinition(@"
 WITH future_games AS (
     SELECT Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer
     FROM Games
@@ -262,16 +262,16 @@ WITH future_games AS (
     OFFSET @Offset
     LIMIT @Limit
 )
-SELECT * FROM future_games", new { Offset = offset, Limit = limit });
+SELECT * FROM future_games", new { Offset = offset, Limit = limit }, cancellationToken: cancellationToken));
 
         return games;
     }
 
-    public async Task<IEnumerable<Game>> GetNearestAsync()
+    public async Task<IEnumerable<Game>> GetNearestAsync(CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
 
-        IEnumerable<Game> games = await connection.QueryAsync<Game>(@"
+        IEnumerable<Game> games = await connection.QueryAsync<Game>(new CommandDefinition(@"
 WITH future_games AS (
     SELECT Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer
     FROM Games
@@ -286,12 +286,12 @@ SELECT * FROM future_games
 UNION ALL
 SELECT * FROM past_games
 WHERE NOT EXISTS (SELECT 1 FROM future_games)
-ORDER BY ReleaseDate ASC");
+ORDER BY ReleaseDate ASC", cancellationToken: cancellationToken));
 
         return games;
     }
 
-    public override async Task<IEnumerable<Game>> GetAllAsync()
+    public override async Task<IEnumerable<Game>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
@@ -362,7 +362,7 @@ gc.Id, gc.Name, gc.Description
 
                 return gameEntry;
             },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
+            splitOn: "Id,Id,Id,Id,Id,Id,Id", cancellationToken: cancellationToken // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
         );
 
         List<Game> result = gameDictionary.Values.ToList();
@@ -370,7 +370,7 @@ gc.Id, gc.Name, gc.Description
         return result;
     }
 
-    public override async Task<Game> GetAsync(long id)
+    public override async Task<Game> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
@@ -486,27 +486,27 @@ WHERE g.Id=@id";
                 return gameEntry;
             },
             new { id },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview, GamePlayerReviewShift
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id,Id", cancellationToken: cancellationToken // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview, GamePlayerReviewShift
         );
 
         return gameDictionary.Values.FirstOrDefault();
     }
 
-    public override async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        await connection.ExecuteAsync(@"DELETE FROM Games
-WHERE Id=@id", new { id });
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM Games
+WHERE Id=@id", new { id }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<Game> UpdateAsync(UpdateGameModel entity, long id)
+    public override async Task<Game> UpdateAsync(UpdateGameModel entity, long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         connection.Open();
 
         using NpgsqlTransaction transaction = connection.BeginTransaction();
 
-        int affectedRows = await connection.ExecuteAsync(@"UPDATE Games SET
+        int affectedRows = await connection.ExecuteAsync(new CommandDefinition(@"UPDATE Games SET
 Name=@Name, Image=@Image, LocalizationId=@LocalizationId, ReleaseDate=CAST(@ReleaseDate AS DATE),
 Description=@Description, Trailer=@Trailer
 WHERE Id=@Id;", new
@@ -518,38 +518,34 @@ WHERE Id=@Id;", new
             ReleaseDate = entity.ReleaseDate.Value,
             entity.Description,
             Trailer = TrailerUrl.ToEmbed(entity.Trailer)
-        }, transaction: transaction);
+        }, transaction: transaction, cancellationToken: cancellationToken));
 
         if (affectedRows == 0)
             return null;
 
-        await connection.ExecuteAsync(@"DELETE FROM GamesGenres WHERE GameId=@Id;
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM GamesGenres WHERE GameId=@Id;
 DELETE FROM GamesPublishers WHERE GameId=@Id;
 DELETE FROM GamesPlatforms WHERE GameId=@Id;
-DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: transaction);
+DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: transaction, cancellationToken: cancellationToken));
 
         foreach (long genreId in entity.GenresIds.Distinct())
-            await connection.ExecuteAsync("INSERT INTO GamesGenres (GameId, GenreId) VALUES (@GameId, @GenreId);",
-                new { GameId = id, GenreId = genreId }, transaction: transaction);
+            await connection.ExecuteAsync(new CommandDefinition("INSERT INTO GamesGenres (GameId, GenreId) VALUES (@GameId, @GenreId);", new { GameId = id, GenreId = genreId }, transaction: transaction, cancellationToken: cancellationToken));
 
         foreach (long publisherId in entity.PublishersIds.Distinct())
-            await connection.ExecuteAsync("INSERT INTO GamesPublishers (GameId, PublisherId) VALUES (@GameId, @PublisherId);",
-                new { GameId = id, PublisherId = publisherId }, transaction: transaction);
+            await connection.ExecuteAsync(new CommandDefinition("INSERT INTO GamesPublishers (GameId, PublisherId) VALUES (@GameId, @PublisherId);", new { GameId = id, PublisherId = publisherId }, transaction: transaction, cancellationToken: cancellationToken));
 
         foreach (long platformId in entity.PlatformsIds.Distinct())
-            await connection.ExecuteAsync("INSERT INTO GamesPlatforms (GameId, PlatformId) VALUES (@GameId, @PlatformId);",
-                new { GameId = id, PlatformId = platformId }, transaction: transaction);
+            await connection.ExecuteAsync(new CommandDefinition("INSERT INTO GamesPlatforms (GameId, PlatformId) VALUES (@GameId, @PlatformId);", new { GameId = id, PlatformId = platformId }, transaction: transaction, cancellationToken: cancellationToken));
 
         foreach (long developerId in entity.DevelopersIds.Distinct())
-            await connection.ExecuteAsync("INSERT INTO GamesDevelopers (GameId, DeveloperId) VALUES (@GameId, @DeveloperId);",
-                new { GameId = id, DeveloperId = developerId }, transaction: transaction);
+            await connection.ExecuteAsync(new CommandDefinition("INSERT INTO GamesDevelopers (GameId, DeveloperId) VALUES (@GameId, @DeveloperId);", new { GameId = id, DeveloperId = developerId }, transaction: transaction, cancellationToken: cancellationToken));
 
-        await transaction.CommitAsync();
+        await transaction.CommitAsync(cancellationToken);
 
-        return await GetAsync(id);
+        return await GetAsync(id, cancellationToken);
     }
 
-    public override Task<IEnumerable<Game>> GetAsync(long offset, long limit)
+    public override Task<IEnumerable<Game>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -562,7 +558,8 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
     long[]? publishersIds,
     long[]? localizationsIds,
     int skip,
-    int take)
+    int take,
+    CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
 
@@ -618,7 +615,7 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
         parameters.Add("Skip", skip);
         parameters.Add("Take", take);
 
-        var gameIdsWithNames = await connection.QueryAsync<(long Id, string Name)>(filterSql.ToString(), parameters);
+        var gameIdsWithNames = await connection.QueryAsync<(long Id, string Name)>(new CommandDefinition(filterSql.ToString(), parameters, cancellationToken: cancellationToken));
 
         if (!gameIdsWithNames.Any())
             return Enumerable.Empty<Game>();
@@ -699,13 +696,13 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
                 return gameEntry;
             },
             parameters,
-            splitOn: "Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
+            splitOn: "Id,Id,Id,Id,Id,Id,Id", cancellationToken: cancellationToken // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
         );
 
         return gameDictionary.Values.ToList();
     }
 
-    public async Task<IEnumerable<Game>> GetByNameAsync(string name)
+    public async Task<IEnumerable<Game>> GetByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
@@ -791,7 +788,7 @@ WHERE g.name ILIKE '%' || @name || '%'
                 return gameEntry;
             },
             new { name },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id", cancellationToken: cancellationToken // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview
         );
 
         return gameDictionary.Values;
@@ -803,7 +800,8 @@ WHERE g.name ILIKE '%' || @name || '%'
     int[]? years,
     long[]? developersIds,
     long[]? publishersIds,
-    long[]? localizationsIds)
+    long[]? localizationsIds,
+    CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
 
@@ -856,7 +854,7 @@ WHERE g.name ILIKE '%' || @name || '%'
             parameters.Add("LocalizationsIds", localizationsIds);
         }
 
-        int totalCount = await connection.ExecuteScalarAsync<int>(countSql.ToString(), parameters);
+        int totalCount = await connection.ExecuteScalarAsync<int>(new CommandDefinition(countSql.ToString(), parameters, cancellationToken: cancellationToken));
         return totalCount;
     }
 
@@ -864,7 +862,8 @@ WHERE g.name ILIKE '%' || @name || '%'
     long[]? genresIds,
     long[]? platformsIds,
     short offset,
-    short limit)
+    short limit,
+    CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
 
@@ -900,14 +899,15 @@ WHERE g.name ILIKE '%' || @name || '%'
         parameters.Add("Offset", offset);
         parameters.Add("Limit", limit);
 
-        IEnumerable<Game> games = await connection.QueryAsync<Game>(filterSql.ToString(), parameters);
+        IEnumerable<Game> games = await connection.QueryAsync<Game>(new CommandDefinition(filterSql.ToString(), parameters, cancellationToken: cancellationToken));
 
         return games;
     }
 
     public async Task<int> GetNearestCountByParametersAsync(
     long[]? genresIds,
-    long[]? platformsIds)
+    long[]? platformsIds,
+    CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
 
@@ -933,7 +933,7 @@ WHERE g.name ILIKE '%' || @name || '%'
             parameters.Add("PlatformsIds", platformsIds);
         }
 
-        int totalCount = await connection.ExecuteScalarAsync<int>(countSql.ToString(), parameters);
+        int totalCount = await connection.ExecuteScalarAsync<int>(new CommandDefinition(countSql.ToString(), parameters, cancellationToken: cancellationToken));
         return totalCount;
     }
 
@@ -946,11 +946,11 @@ WHERE (g.ReleaseDate IS NULL OR g.ReleaseDate > CURRENT_DATE)
         SELECT 1 FROM GamesPlatforms gp
         WHERE gp.GameId = g.Id AND gp.PlatformId = ANY(@PlatformsIds::bigint[])))";
 
-    public async Task<IEnumerable<Game>> GetMostWaitingAsync(long[]? genresIds, long[]? platformsIds, int skip, int take)
+    public async Task<IEnumerable<Game>> GetMostWaitingAsync(long[]? genresIds, long[]? platformsIds, int skip, int take, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
 
-        IEnumerable<Game> games = await connection.QueryAsync<Game>($@"
+        IEnumerable<Game> games = await connection.QueryAsync<Game>(new CommandDefinition($@"
 SELECT g.Id, g.Name, g.Image, g.LocalizationId, g.ReleaseDate, g.Description, g.Trailer,
     COALESCE(w.WaitingCount, 0) AS WaitingCount,
     COALESCE(w.NotWaitingCount, 0) AS NotWaitingCount
@@ -967,27 +967,25 @@ ORDER BY COALESCE(w.WaitingCount, 0) - COALESCE(w.NotWaitingCount, 0) DESC,
     COALESCE(w.WaitingCount, 0) DESC,
     g.ReleaseDate ASC NULLS LAST,
     g.Id DESC
-OFFSET @Skip LIMIT @Take;",
-            new
+OFFSET @Skip LIMIT @Take;", new
             {
                 GenresIds = genresIds is { Length: > 0 } ? genresIds : null,
                 PlatformsIds = platformsIds is { Length: > 0 } ? platformsIds : null,
                 Skip = skip,
                 Take = take
-            });
+            }, cancellationToken: cancellationToken));
 
         return games;
     }
 
-    public async Task<int> GetMostWaitingCountAsync(long[]? genresIds, long[]? platformsIds)
+    public async Task<int> GetMostWaitingCountAsync(long[]? genresIds, long[]? platformsIds, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
 
-        return await connection.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM Games g {MostWaitingGamesWhereSql};",
-            new
+        return await connection.ExecuteScalarAsync<int>(new CommandDefinition($"SELECT COUNT(*) FROM Games g {MostWaitingGamesWhereSql};", new
             {
                 GenresIds = genresIds is { Length: > 0 } ? genresIds : null,
                 PlatformsIds = platformsIds is { Length: > 0 } ? platformsIds : null
-            });
+            }, cancellationToken: cancellationToken));
     }
 }

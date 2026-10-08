@@ -13,25 +13,26 @@ public sealed class MoviesWebManager : CrudWebManager<Movie, AddMovieModel, Upda
     public async Task<IEnumerable<Movie>> GetMostWaitingAsync(
         int offset,
         int limit,
-        IEnumerable<long>? genresIds = null)
+        IEnumerable<long>? genresIds = null,
+        CancellationToken cancellationToken = default)
     {
         IEnumerable<Movie>? movies = await Client.GetFromJsonAsync<IEnumerable<Movie>>(
-            $"{BasePath}/most-waiting/{offset}/{limit}{BuildGenresQuery(genresIds)}");
+            $"{BasePath}/most-waiting/{offset}/{limit}{BuildGenresQuery(genresIds)}", cancellationToken);
 
         return movies ?? Enumerable.Empty<Movie>();
     }
 
-    public async Task<int> GetMostWaitingCountAsync(IEnumerable<long>? genresIds = null)
+    public async Task<int> GetMostWaitingCountAsync(IEnumerable<long>? genresIds = null, CancellationToken cancellationToken = default)
     {
-        return await Client.GetFromJsonAsync<int>($"{BasePath}/most-waiting/count{BuildGenresQuery(genresIds)}");
+        return await Client.GetFromJsonAsync<int>($"{BasePath}/most-waiting/count{BuildGenresQuery(genresIds)}", cancellationToken);
     }
 
-    public async Task<IEnumerable<Movie>> SearchByName(string name)
+    public async Task<IEnumerable<Movie>> SearchByName(string name, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return await GetAllAsync();
+            return await GetAllAsync(cancellationToken);
 
-        return await Client.GetFromJsonAsync<IEnumerable<Movie>>($"{BasePath}/Search?name={name}");
+        return await Client.GetFromJsonAsync<IEnumerable<Movie>>($"{BasePath}/Search?name={name}", cancellationToken);
     }
 
     private static string BuildGenresQuery(IEnumerable<long>? genresIds)

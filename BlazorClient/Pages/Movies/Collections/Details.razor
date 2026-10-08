@@ -1,9 +1,14 @@
 ﻿@page "/movies/collections/{MovieCollectionId:long}"
+@inherits CancellableComponentBase
 @using Domain.Movies.Collections
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 
-@if (MoviesCollection is null)
+@if (IsNotFound)
+{
+    <p>Подборка не найдена.</p>
+}
+else if (MoviesCollection is null)
 {
     <p>Loading...</p>
 }
@@ -15,7 +20,7 @@ else
             <div class="specials post single clear">
                 <div class="post-meta">
                     <div class="breadcrumbs news-meta">
-                        <a href="/meta/collections/">Подборки</a> → <a href="/meta/collections/films-games/">Контент</a>
+                        <a href="/collections">Подборки</a>
                     </div>
                     <h1><span>@MoviesCollection.Name</span></h1>
                 </div>

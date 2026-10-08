@@ -1,4 +1,5 @@
 ﻿@page "/news/{Id:long}"
+@inherits CancellableComponentBase
 @using BlazorClient.Components.PagesComponents.Common
 @using Domain.Common.News
 @using Domain.Games
@@ -20,6 +21,16 @@
                 <meta itemprop="url" content="https://rankings-meta.ru/">
             </div>
             <meta itemscope="" itemprop="mainEntityOfPage" itemtype="https://schema.org/WebPage" itemid="https://rankings-meta.ru/news/@Id">
+            @if (IsLoading)
+            {
+                <p>Загружается...</p>
+            }
+            else if (NewsItem is null)
+            {
+                <p>Новость не найдена.</p>
+            }
+            else
+            {
             <div class="post single clear">
                 <div class="post-meta">
                     <script type="application/ld+json">
@@ -36,7 +47,7 @@
                                                     "@@type": "ListItem",
                                                     "position": 2,
                                                     "name": "Новости игр",
-                                                    "item": "https://rankings-meta.ru/meta/news/igri/"
+                                                    "item": "https://rankings-meta.ru/news"
                                                 }
                                                 ,{
                                                     "@@type": "ListItem",
@@ -52,7 +63,7 @@
                     <h1><span itemprop="headline">@NewsItem.Title</span></h1>
                     <meta itemprop="datePublished" content="@NewsItem.PublishTimestamp.ToString("yyyy-MM-dd")">
                     <div class="postmeta" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-                        <span itemprop="name">@NewsItem.ApplicationUser.UserName</span> <span>@NewsItem.PublishTimestamp.ToString("dd.MM.yyyy HH:mm")</span>
+                        <span itemprop="name">@NewsItem.ApplicationUser?.UserName</span> <span>@NewsItem.PublishTimestamp.ToString("dd.MM.yyyy HH:mm")</span>
                     </div>
                 </div>
                 <div class="post-content">
@@ -95,6 +106,7 @@
                     }
                 </div>
             </div>
+            }
         </div>
     </div>
 </div>

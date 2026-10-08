@@ -6,7 +6,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.MoviesCountries;
 
-public partial class AddMovieCountryPage : ComponentBase
+public partial class AddMovieCountryPage : CancellableComponentBase
 {
     [Required(ErrorMessage = "Name is required")]
     public string Name { get; set; } = string.Empty;
@@ -22,11 +22,11 @@ public partial class AddMovieCountryPage : ComponentBase
 
     public async Task AddAsync()
     {
-        HttpResponseMessage httpResponseMessage = await WebManager.AddAsync(new AddMovieCountryModel(Name.Trim()));
+        HttpResponseMessage httpResponseMessage = await WebManager.AddAsync(new AddMovieCountryModel(Name.Trim()), DisposalToken);
 
         if (httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/movies/movies-countries/movies-countries-list");
         else
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 }

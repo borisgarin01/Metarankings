@@ -1,4 +1,5 @@
 ﻿@page "/user-reviews"
+@inherits CancellableComponentBase
 @using Domain.Common.News
 @using Domain.Reviews
 
@@ -55,7 +56,6 @@
                     </div>
                 </div>
             }
-            <div class="navi"><span>1</span><a href="https://metarankings.ru/user-reviews/?nav=2">2</a><a href="https://metarankings.ru/user-reviews/?nav=3">3</a><a href="https://metarankings.ru/user-reviews/?nav=4">4</a><a href="https://metarankings.ru/user-reviews/?nav=5">5</a><a href="https://metarankings.ru/user-reviews/?nav=6">6</a> <span>...</span> <a href="https://metarankings.ru/user-reviews/?nav=142">142</a></div>
         </div>
         <div class="news-module">
             @foreach (NewsItem newsItem in News)

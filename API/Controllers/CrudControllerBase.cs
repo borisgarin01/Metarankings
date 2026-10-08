@@ -28,27 +28,27 @@ public abstract class CrudControllerBase<T, TAdd, TUpdate> : ControllerBase
     /// Все сущности.
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<T>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<T>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return Ok(await Repository.GetAllAsync());
+        return Ok(await Repository.GetAllAsync(cancellationToken));
     }
 
     /// <summary>
     /// Страница сущностей.
     /// </summary>
     [HttpGet("{offset:long}/{limit:long}")]
-    public async Task<ActionResult<IEnumerable<T>>> GetAsync(long offset, long limit)
+    public async Task<ActionResult<IEnumerable<T>>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
-        return Ok(await Repository.GetAsync(offset, limit));
+        return Ok(await Repository.GetAsync(offset, limit, cancellationToken));
     }
 
     /// <summary>
     /// Сущность по идентификатору.
     /// </summary>
     [HttpGet("{id:long}")]
-    public virtual async Task<ActionResult<T>> GetAsync(long id)
+    public virtual async Task<ActionResult<T>> GetAsync(long id, CancellationToken cancellationToken = default)
     {
-        T? entity = await Repository.GetAsync(id);
+        T? entity = await Repository.GetAsync(id, cancellationToken);
         if (entity is null)
             return NotFound();
 
@@ -60,15 +60,15 @@ public abstract class CrudControllerBase<T, TAdd, TUpdate> : ControllerBase
     /// </summary>
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<T>> AddAsync(TAdd addModel)
+    public async Task<ActionResult<T>> AddAsync(TAdd addModel, CancellationToken cancellationToken = default)
     {
-        ActionResult? validationError = await ValidateAddAsync(addModel);
+        ActionResult? validationError = await ValidateAddAsync(addModel, cancellationToken);
         if (validationError is not null)
             return validationError;
 
-        long insertedId = await Repository.AddAsync(addModel);
+        long insertedId = await Repository.AddAsync(addModel, cancellationToken);
 
-        T insertedEntity = await Repository.GetAsync(insertedId);
+        T insertedEntity = await Repository.GetAsync(insertedId, cancellationToken);
 
         return Created($"{Request.Path}/{insertedId}", insertedEntity);
     }
@@ -78,13 +78,13 @@ public abstract class CrudControllerBase<T, TAdd, TUpdate> : ControllerBase
     /// </summary>
     [HttpPut("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<T>> UpdateAsync(long id, TUpdate updateModel)
+    public async Task<ActionResult<T>> UpdateAsync(long id, TUpdate updateModel, CancellationToken cancellationToken = default)
     {
-        T? entityToUpdate = await Repository.GetAsync(id);
+        T? entityToUpdate = await Repository.GetAsync(id, cancellationToken);
         if (entityToUpdate is null)
             return NotFound();
 
-        return Ok(await Repository.UpdateAsync(updateModel, id));
+        return Ok(await Repository.UpdateAsync(updateModel, id, cancellationToken));
     }
 
     /// <summary>
@@ -92,20 +92,20 @@ public abstract class CrudControllerBase<T, TAdd, TUpdate> : ControllerBase
     /// </summary>
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult> DeleteAsync(long id)
+    public async Task<ActionResult> DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        T? entity = await Repository.GetAsync(id);
+        T? entity = await Repository.GetAsync(id, cancellationToken);
         if (entity is null)
             return NotFound();
 
-        await Repository.RemoveAsync(id);
+        await Repository.RemoveAsync(id, cancellationToken);
         return NoContent();
     }
 
     /// <summary>
     /// Дополнительная проверка перед добавлением; null — проверка пройдена.
     /// </summary>
-    protected virtual Task<ActionResult?> ValidateAddAsync(TAdd addModel)
+    protected virtual Task<ActionResult?> ValidateAddAsync(TAdd addModel, CancellationToken cancellationToken = default)
     {
         return Task.FromResult<ActionResult?>(null);
     }
@@ -113,7 +113,7 @@ public abstract class CrudControllerBase<T, TAdd, TUpdate> : ControllerBase
     /// <summary>
     /// Массовое добавление из JSON-массива.
     /// </summary>
-    protected async Task<ActionResult> AddRangeFromJsonAsync(IEnumerable<TAdd>? addModels, string entitiesName)
+    protected async Task<ActionResult> AddRangeFromJsonAsync(IEnumerable<TAdd>? addModels, string entitiesName, CancellationToken cancellationToken = default)
     {
         if (addModels is null)
             return Problem($"{entitiesName} don't set", null, 400);
@@ -121,7 +121,7 @@ public abstract class CrudControllerBase<T, TAdd, TUpdate> : ControllerBase
         if (!addModels.Any())
             return Problem($"{entitiesName} array is empty", null, 400);
 
-        await Repository.AddRangeAsync(addModels);
+        await Repository.AddRangeAsync(addModels, cancellationToken);
 
         return Ok();
     }
@@ -129,7 +129,7 @@ public abstract class CrudControllerBase<T, TAdd, TUpdate> : ControllerBase
     /// <summary>
     /// Массовое добавление из загруженного Excel-файла (.xlsx).
     /// </summary>
-    protected async Task<ActionResult> AddRangeFromExcelAsync(IFormFile? excelFile, Func<string, IEnumerable<TAdd>> readExcelFile)
+    protected async Task<ActionResult> AddRangeFromExcelAsync(IFormFile? excelFile, Func<string, IEnumerable<TAdd>> readExcelFile, CancellationToken cancellationToken = default)
     {
         if (excelFile is null)
             return Problem("File hasn't set", null, 400);
@@ -144,12 +144,12 @@ public abstract class CrudControllerBase<T, TAdd, TUpdate> : ControllerBase
 
         await using (FileStream fileStream = new(filePath, FileMode.Create))
         {
-            await excelFile.CopyToAsync(fileStream);
+            await excelFile.CopyToAsync(fileStream, cancellationToken);
         }
 
         try
         {
-            await Repository.AddRangeAsync(readExcelFile(filePath));
+            await Repository.AddRangeAsync(readExcelFile(filePath), cancellationToken);
         }
         finally
         {

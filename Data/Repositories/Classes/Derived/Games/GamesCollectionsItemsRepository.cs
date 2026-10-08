@@ -7,25 +7,24 @@ namespace Data.Repositories.Classes.Derived.Games;
 
 public sealed class GamesCollectionsItemsRepository(string connectionString) : Repository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>(connectionString)
 {
-    public override async Task<long> AddAsync(AddGamesCollectionItemModel entity)
+    public override async Task<long> AddAsync(AddGamesCollectionItemModel entity, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var insertedGameCollectionItemId = await connection.QuerySingleAsync<long>(@"
+            var insertedGameCollectionItemId = await connection.QuerySingleAsync<long>(new CommandDefinition(@"
 INSERT INTO GamesCollectionsItems (GameId, GameCollectionId)
 VALUES (@GameId, @GameCollectionId)
-RETURNING Id;",
-new { entity.GameId, entity.GameCollectionId });
+RETURNING Id;", new { entity.GameId, entity.GameCollectionId }, cancellationToken: cancellationToken));
 
             return insertedGameCollectionItemId;
         }
     }
 
-    public override async Task<IEnumerable<GamesCollectionItem>> GetAllAsync()
+    public override async Task<IEnumerable<GamesCollectionItem>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollection, GamesCollectionItem>(@"
+            var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollection, GamesCollectionItem>(new CommandDefinition(@"
 SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId,
 gc.Id, gc.Name
@@ -33,7 +32,7 @@ FROM GamesCollectionsItems gci
 LEFT JOIN Games g
 on g.Id=gci.GameId
 LEFT JOIN GamesCollections gc 
-ON gc.Id=gci.GameCollectionId;", (gameCollectionItem, game, gameCollection) =>
+ON gc.Id=gci.GameCollectionId;", cancellationToken: cancellationToken), (gameCollectionItem, game, gameCollection) =>
             {
                 if (game is not null && gameCollection is not null && gameCollectionItem is not null && !gameCollection.GamesCollectionItems.Any(g => g.GameId == game.Id))
                 {
@@ -51,21 +50,21 @@ ON gc.Id=gci.GameCollectionId;", (gameCollectionItem, game, gameCollection) =>
         }
     }
 
-    public override async Task<GamesCollectionItem> GetAsync(long id)
+    public override async Task<GamesCollectionItem> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollectionItem>(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
+            var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollectionItem>(new CommandDefinition(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId
 FROM GamesCollectionsItems gci
 LEFT JOIN Games g
 on g.Id=gci.GameId
-WHERE gci.Id=@Id;", (gameCollectionItem, game) =>
+WHERE gci.Id=@Id;", new { Id = id }, cancellationToken: cancellationToken), (gameCollectionItem, game) =>
             {
                 gameCollectionItem.Game = game;
 
                 return gameCollectionItem;
-            }, new { Id = id });
+            });
 
             var gamesCollectionsItemsResult = gamesCollectionsItems
                 .GroupBy(b => new { b.GameId, b.GamesCollectionId })
@@ -79,23 +78,23 @@ WHERE gci.Id=@Id;", (gameCollectionItem, game) =>
         }
     }
 
-    public override async Task<IEnumerable<GamesCollectionItem>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<GamesCollectionItem>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollectionItem>(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
+            var gamesCollectionsItems = await connection.QueryAsync<GamesCollectionItem, Game, GamesCollectionItem>(new CommandDefinition(@"SELECT gci.Id, gci.GameId, gci.GameCollectionId,
 g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId
 FROM GamesCollectionsItems gci
 ON gc.Id=gci.GameCollectionId
 LEFT JOIN Games g
 on g.Id=gci.GameId
 ORDER BY gc.Id ASC
-OFFSET @Offset LIMIT @Limit;", (gameCollectionItem, game) =>
+OFFSET @Offset LIMIT @Limit;", new { Offset = offset, Limit = limit }, cancellationToken: cancellationToken), (gameCollectionItem, game) =>
             {
                 gameCollectionItem.Game = game;
 
                 return gameCollectionItem;
-            }, new { Offset = offset, Limit = limit });
+            });
 
             var gamesCollectionsItemsResult = gamesCollectionsItems
                 .GroupBy(b => new { b.GameId, b.GamesCollectionId })
@@ -108,16 +107,16 @@ OFFSET @Offset LIMIT @Limit;", (gameCollectionItem, game) =>
         }
     }
 
-    public override async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            await connection.ExecuteAsync(@"DELETE FROM GamesCollectionsItems
-WHERE Id=@Id;", new { Id = id });
+            await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM GamesCollectionsItems
+WHERE Id=@Id;", new { Id = id }, cancellationToken: cancellationToken));
         }
     }
 
-    public override async Task<GamesCollectionItem> UpdateAsync(UpdateGamesCollectionItemModel entity, long id)
+    public override async Task<GamesCollectionItem> UpdateAsync(UpdateGamesCollectionItemModel entity, long id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

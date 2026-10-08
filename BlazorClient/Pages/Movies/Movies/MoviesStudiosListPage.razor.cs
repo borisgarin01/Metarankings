@@ -4,7 +4,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Movies.Movies;
 
-public partial class MoviesStudiosListPage : ComponentBase
+public partial class MoviesStudiosListPage : CancellableComponentBase
 {
     public IEnumerable<MovieStudio> MoviesStudios { get; private set; }
 
@@ -16,6 +16,6 @@ public partial class MoviesStudiosListPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        MoviesStudios = await MoviesStudiosManager.GetAllAsync();
+        MoviesStudios = await MoviesStudiosManager.GetAllAsync(DisposalToken);
     }
 }

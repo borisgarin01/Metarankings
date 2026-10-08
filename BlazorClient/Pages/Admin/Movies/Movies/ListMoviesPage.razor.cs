@@ -3,7 +3,7 @@ using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Pages.Admin.Movies.Movies;
 
-public partial class ListMoviesPage : ComponentBase
+public partial class ListMoviesPage : CancellableComponentBase
 {
     public IEnumerable<Movie> Movies { get; private set; }
 
@@ -12,6 +12,6 @@ public partial class ListMoviesPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Movies = await MoviesWebManager.GetAllAsync();
+        Movies = await MoviesWebManager.GetAllAsync(DisposalToken);
     }
 }

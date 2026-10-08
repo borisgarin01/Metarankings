@@ -5,7 +5,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Games.Publishers;
 
-public partial class AddPublisherPage : ComponentBase
+public partial class AddPublisherPage : CancellableComponentBase
 {
 
     [Inject]
@@ -21,12 +21,12 @@ public partial class AddPublisherPage : ComponentBase
 
     public async Task AddPublisherAsync()
     {
-        HttpResponseMessage httpResponseMessage = await PublishersWebManager.AddAsync(AddPublisherModel);
+        HttpResponseMessage httpResponseMessage = await PublishersWebManager.AddAsync(AddPublisherModel, DisposalToken);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/Games/publishers/list-publishers");
         else
             if (httpResponseMessage is not null)
-                ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+                ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 
 }

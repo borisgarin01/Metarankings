@@ -8,7 +8,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Admin.Movies.Collections;
 
-public partial class AddCollectionPage : ComponentBase
+public partial class AddCollectionPage : CancellableComponentBase
 {
     [Inject]
     public IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> MoviesCollectionsWebManager { get; set; }
@@ -37,10 +37,10 @@ public partial class AddCollectionPage : ComponentBase
     {
         var addGameCollectionModel = new AddMoviesCollectionModel(CollectionName, Description, ImageSource);
 
-        HttpResponseMessage gameCreationHttpResponseMessage = await MoviesCollectionsWebManager.AddAsync(addGameCollectionModel);
+        HttpResponseMessage gameCreationHttpResponseMessage = await MoviesCollectionsWebManager.AddAsync(addGameCollectionModel, DisposalToken);
 
         if (!gameCreationHttpResponseMessage.IsSuccessStatusCode)
-            ToastService.ShowError(await gameCreationHttpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await gameCreationHttpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
 
         else
             NavigationManager.NavigateTo("/movies/collections");

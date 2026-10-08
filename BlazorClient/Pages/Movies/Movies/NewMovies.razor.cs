@@ -3,9 +3,9 @@ using WebManagers.Derived.Movies;
 
 namespace BlazorClient.Pages.Movies.Movies;
 
-public sealed partial class NewMovies : ComponentBase
+public sealed partial class NewMovies : CancellableComponentBase
 {
-    private IEnumerable<Movie> movies;
+    private IEnumerable<Movie> movies = Enumerable.Empty<Movie>();
 
     public IEnumerable<Movie> Movies
     {
@@ -22,6 +22,6 @@ public sealed partial class NewMovies : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Movies = await MoviesWebManager.GetAllAsync();
+        Movies = await MoviesWebManager.GetAllAsync(DisposalToken) ?? Enumerable.Empty<Movie>();
     }
 }

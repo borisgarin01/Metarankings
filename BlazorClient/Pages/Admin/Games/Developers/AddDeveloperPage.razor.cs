@@ -7,7 +7,7 @@ using WebManagers;
 namespace BlazorClient.Pages.Admin.Games.Developers;
 
 [Authorize(Policy = "Admin")]
-public partial class AddDeveloperPage : ComponentBase
+public partial class AddDeveloperPage : CancellableComponentBase
 {
     [Inject]
     public IWebManager<Developer, AddDeveloperModel, UpdateDeveloperModel> DevelopersWebManager { get; set; }
@@ -27,11 +27,11 @@ public partial class AddDeveloperPage : ComponentBase
 
     public async Task AddDeveloperAsync()
     {
-        HttpResponseMessage httpResponseMessage = await DevelopersWebManager.AddAsync(AddDeveloperModel);
+        HttpResponseMessage httpResponseMessage = await DevelopersWebManager.AddAsync(AddDeveloperModel, DisposalToken);
         if (httpResponseMessage is not null && httpResponseMessage.IsSuccessStatusCode)
             NavigationManager.NavigateTo("/admin/games/developers/list-developers");
         else
             if (httpResponseMessage is not null)
-            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync());
+            ToastService.ShowError(await httpResponseMessage.Content.ReadAsStringAsync(DisposalToken));
     }
 }

@@ -16,25 +16,25 @@ public abstract class CriticsReviewsWebManager : WebManager
         _basePath = basePath;
     }
 
-    public async Task<IEnumerable<CriticReview>> GetByEntityAsync(long entityId)
+    public async Task<IEnumerable<CriticReview>> GetByEntityAsync(long entityId, CancellationToken cancellationToken = default)
     {
-        IEnumerable<CriticReview>? criticsReviews = await Client.GetFromJsonAsync<IEnumerable<CriticReview>>($"{_basePath}/entity/{entityId}");
+        IEnumerable<CriticReview>? criticsReviews = await Client.GetFromJsonAsync<IEnumerable<CriticReview>>($"{_basePath}/entity/{entityId}", cancellationToken);
 
         return criticsReviews ?? Enumerable.Empty<CriticReview>();
     }
 
-    public async Task<HttpResponseMessage> AddAsync(CriticReviewModel criticReviewModel)
+    public async Task<HttpResponseMessage> AddAsync(CriticReviewModel criticReviewModel, CancellationToken cancellationToken = default)
     {
-        return await Client.PostAsJsonAsync(_basePath, criticReviewModel);
+        return await Client.PostAsJsonAsync(_basePath, criticReviewModel, cancellationToken);
     }
 
-    public async Task<HttpResponseMessage> UpdateAsync(long id, CriticReviewModel criticReviewModel)
+    public async Task<HttpResponseMessage> UpdateAsync(long id, CriticReviewModel criticReviewModel, CancellationToken cancellationToken = default)
     {
-        return await Client.PutAsJsonAsync($"{_basePath}/{id}", criticReviewModel);
+        return await Client.PutAsJsonAsync($"{_basePath}/{id}", criticReviewModel, cancellationToken);
     }
 
-    public async Task<HttpResponseMessage> DeleteAsync(long id)
+    public async Task<HttpResponseMessage> DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        return await Client.DeleteAsync($"{_basePath}/{id}");
+        return await Client.DeleteAsync($"{_basePath}/{id}", cancellationToken);
     }
 }

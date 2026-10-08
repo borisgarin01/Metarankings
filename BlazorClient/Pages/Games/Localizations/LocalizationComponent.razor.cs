@@ -5,7 +5,7 @@ using WebManagers;
 
 namespace BlazorClient.Pages.Games.Localizations;
 
-public partial class LocalizationComponent : ComponentBase
+public partial class LocalizationComponent : CancellableComponentBase
 {
     [Parameter, EditorRequired]
     public Localization Localization { get; set; }
@@ -13,10 +13,10 @@ public partial class LocalizationComponent : ComponentBase
     [Inject]
     public IWebManager<Platform, AddPlatformModel, UpdatePlatformModel> PlatformsWebManager { get; set; }
 
-    public IEnumerable<Platform> Platforms { get; set; }
+    public IEnumerable<Platform> Platforms { get; set; } = Enumerable.Empty<Platform>();
 
     protected override async Task OnInitializedAsync()
     {
-        Platforms = await PlatformsWebManager.GetAllAsync();
+        Platforms = await PlatformsWebManager.GetAllAsync(DisposalToken) ?? Enumerable.Empty<Platform>();
     }
 }

@@ -19,17 +19,18 @@ public sealed class NewsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<NewsItem>>> GetAll(
         [FromQuery] long? offset,
-        [FromQuery] long? limit)
+        [FromQuery] long? limit,
+        CancellationToken cancellationToken = default)
     {
         IEnumerable<NewsItem> items;
 
         if (offset.HasValue && limit.HasValue)
         {
-            items = await _newsRepository.GetAsync(offset.Value, limit.Value);
+            items = await _newsRepository.GetAsync(offset.Value, limit.Value, cancellationToken);
         }
         else
         {
-            items = await _newsRepository.GetAllAsync();
+            items = await _newsRepository.GetAllAsync(cancellationToken);
         }
 
         return Ok(items);
@@ -37,9 +38,9 @@ public sealed class NewsController : ControllerBase
 
     // GET: api/news/5
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<NewsItem>> GetById(long id)
+    public async Task<ActionResult<NewsItem>> GetById(long id, CancellationToken cancellationToken = default)
     {
-        NewsItem? item = await _newsRepository.GetAsync(id);
+        NewsItem? item = await _newsRepository.GetAsync(id, cancellationToken);
 
         if (item is null)
         {
@@ -52,7 +53,7 @@ public sealed class NewsController : ControllerBase
     // POST: api/news
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    public async Task<ActionResult<NewsItem>> Create([FromBody] AddNewsItemModel addNewsItemModel)
+    public async Task<ActionResult<NewsItem>> Create([FromBody] AddNewsItemModel addNewsItemModel, CancellationToken cancellationToken = default)
     {
         long userId = User.GetUserId() ?? throw new InvalidOperationException("User identifier claim is missing or invalid.");
 
@@ -69,7 +70,7 @@ public sealed class NewsController : ControllerBase
         long newId;
         try
         {
-            newId = await _newsRepository.AddAsync(dbModel);
+            newId = await _newsRepository.AddAsync(dbModel, cancellationToken);
         }
         catch (Npgsql.PostgresException ex) when (ex.SqlState == "23505")
         {
@@ -80,7 +81,7 @@ public sealed class NewsController : ControllerBase
             return BadRequest(new { message = "Specified user does not exist." });
         }
 
-        NewsItem created = await _newsRepository.GetAsync(newId);
+        NewsItem created = await _newsRepository.GetAsync(newId, cancellationToken);
         return CreatedAtAction(nameof(GetById), new { id = newId }, created);
     }
 
@@ -89,7 +90,8 @@ public sealed class NewsController : ControllerBase
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<ActionResult<NewsItem>> Update(
         long id,
-        [FromBody] UpdateNewsItemModel request)
+        [FromBody] UpdateNewsItemModel request,
+        CancellationToken cancellationToken = default)
     {
         long userId = User.GetUserId() ?? throw new InvalidOperationException("User identifier claim is missing or invalid.");
 
@@ -105,7 +107,7 @@ public sealed class NewsController : ControllerBase
         NewsItem? updated;
         try
         {
-            updated = await _newsRepository.UpdateAsync(dbModel, id);
+            updated = await _newsRepository.UpdateAsync(dbModel, id, cancellationToken);
         }
         catch (Npgsql.PostgresException ex) when (ex.SqlState == "23505")
         {
@@ -127,23 +129,23 @@ public sealed class NewsController : ControllerBase
     // DELETE: api/news/5
     [HttpDelete("{id:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Delete(long id)
+    public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken = default)
     {
-        await _newsRepository.RemoveAsync(id);
+        await _newsRepository.RemoveAsync(id, cancellationToken);
         return NoContent();
     }
 
     // DELETE: api/news/batch
     [HttpDelete("batch")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> DeleteRange([FromBody] long[] ids)
+    public async Task<IActionResult> DeleteRange([FromBody] long[] ids, CancellationToken cancellationToken = default)
     {
         if (ids is null || ids.Length == 0)
         {
             return BadRequest(new { message = "Ids cannot be empty." });
         }
 
-        await _newsRepository.RemoveRangeAsync(ids);
+        await _newsRepository.RemoveRangeAsync(ids, cancellationToken);
         return NoContent();
     }
 }

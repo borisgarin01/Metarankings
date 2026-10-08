@@ -17,15 +17,15 @@ public sealed class PublishersController : CrudControllerBase<Publisher, AddPubl
 
     [HttpPost("publishers-excel-upload")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public Task<ActionResult> AddFromExcelAsync(IFormFile excelFileWithPublishers)
+    public Task<ActionResult> AddFromExcelAsync(IFormFile excelFileWithPublishers, CancellationToken cancellationToken = default)
     {
-        return AddRangeFromExcelAsync(excelFileWithPublishers, _publishersExcelDataReader.GetFromExcel);
+        return AddRangeFromExcelAsync(excelFileWithPublishers, _publishersExcelDataReader.GetFromExcel, cancellationToken);
     }
 
     [HttpPost("upload-publishers-from-json")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public Task<ActionResult> AddFromJsonAsync(IEnumerable<AddPublisherModel> publishers)
+    public Task<ActionResult> AddFromJsonAsync(IEnumerable<AddPublisherModel> publishers, CancellationToken cancellationToken = default)
     {
-        return AddRangeFromJsonAsync(publishers, "Publishers");
+        return AddRangeFromJsonAsync(publishers, "Publishers", cancellationToken);
     }
 }

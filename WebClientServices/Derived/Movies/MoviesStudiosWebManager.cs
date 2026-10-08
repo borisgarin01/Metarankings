@@ -10,8 +10,8 @@ public sealed class MoviesStudiosWebManager : CrudWebManager<MovieStudio, AddMov
     {
     }
 
-    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddMovieStudioModel> addMoviesStudiosModels)
+    public override Task<HttpResponseMessage> AddFromJsonAsync(IEnumerable<AddMovieStudioModel> addMoviesStudiosModels, CancellationToken cancellationToken = default)
     {
-        return Client.PostAsJsonAsync(BasePath, addMoviesStudiosModels);
+        return Client.PostAsJsonAsync(BasePath, addMoviesStudiosModels, cancellationToken);
     }
 }

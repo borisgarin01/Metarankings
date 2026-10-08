@@ -4,7 +4,7 @@ using Domain.Games;
 
 namespace BlazorClient.Pages.Admin.Games.Genres;
 
-public partial class ListGenresPage : ComponentBase
+public partial class ListGenresPage : CancellableComponentBase
 {
     public IEnumerable<Genre> Genres { get; private set; }
 
@@ -13,6 +13,6 @@ public partial class ListGenresPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Genres = await WebManager.GetAllAsync();
+        Genres = await WebManager.GetAllAsync(DisposalToken);
     }
 }

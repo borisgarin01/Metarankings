@@ -7,7 +7,7 @@ using WebManagers;
 
 namespace BlazorClient.Components.PagesComponents.Common;
 
-public partial class Headerer : ComponentBase
+public partial class Headerer : CancellableComponentBase
 {
 
     private bool isMenuOpen = false;
@@ -49,18 +49,15 @@ public partial class Headerer : ComponentBase
     {
         if (firstRender)
         {
-            Task<IEnumerable<Domain.Movies.Genre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
-            Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetAllAsync();
-            Task<IEnumerable<Domain.Games.Genre>> gamesGenresGettingTask = GamesGenresWebManager.GetAllAsync();
+            Task<IEnumerable<Domain.Movies.Genre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync(DisposalToken);
+            Task<IEnumerable<Platform>> platformsGettingTask = PlatformsWebManager.GetAllAsync(DisposalToken);
+            Task<IEnumerable<Domain.Games.Genre>> gamesGenresGettingTask = GamesGenresWebManager.GetAllAsync(DisposalToken);
 
-            await Task.WhenAll(moviesGenresGettingTask, platformsGettingTask, gamesGenresGettingTask)
-                .ContinueWith(b =>
-                {
-                    MoviesGenres = moviesGenresGettingTask.Result;
-                    Platforms = platformsGettingTask.Result;
-                    GamesGenres = gamesGenresGettingTask.Result;
-                    StateHasChanged();
-                });
+            await Task.WhenAll(moviesGenresGettingTask, platformsGettingTask, gamesGenresGettingTask);
+            MoviesGenres = moviesGenresGettingTask.Result;
+            Platforms = platformsGettingTask.Result;
+            GamesGenres = gamesGenresGettingTask.Result;
+            StateHasChanged();
 
             // Инициализируем скролл и клики
             await JS.InvokeVoidAsync("initHeader", headerBottomRef);
