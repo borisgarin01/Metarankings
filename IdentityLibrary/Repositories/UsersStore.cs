@@ -32,28 +32,28 @@ FROM ApplicationUsers;");
     public async Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"INSERT INTO ApplicationUsersRoles (UserId, RoleId)
+        await connection.ExecuteAsync(new CommandDefinition(@"INSERT INTO ApplicationUsersRoles (UserId, RoleId)
         SELECT @UserId, Id 
         FROM ApplicationRoles 
-        WHERE NormalizedName = UPPER(@roleName);", new { roleName, UserId = user.Id });
+        WHERE NormalizedName = UPPER(@roleName);", new { roleName, UserId = user.Id }, cancellationToken: cancellationToken));
     }
 
     public async Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"DELETE FROM ApplicationUsersRoles 
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM ApplicationUsersRoles 
 WHERE UserId=@UserId 
     AND RoleId = (SELECT Id 
         FROM ApplicationRoles
-            WHERE NormalizedName = UPPER (@roleName));", new { roleName });
+            WHERE NormalizedName = UPPER (@roleName));", new { roleName }, cancellationToken: cancellationToken));
     }
 
     public async Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"INSERT INTO ApplicationUsers (UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp) 
+        await connection.ExecuteAsync(new CommandDefinition(@"INSERT INTO ApplicationUsers (UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp) 
 VALUES
-(@UserName, @NormalizedUserName, @Email, @NormalizedEmail, @EmailConfirmed, @PasswordHash, @PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled, @SecurityStamp);", user);
+(@UserName, @NormalizedUserName, @Email, @NormalizedEmail, @EmailConfirmed, @PasswordHash, @PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled, @SecurityStamp);", user, cancellationToken: cancellationToken));
 
         return IdentityResult.Success;
     }
@@ -61,7 +61,7 @@ VALUES
     public async Task<IdentityResult> DeleteAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"DELETE FROM ApplicationUsers WHERE Id=@Id;", new { user.Id });
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM ApplicationUsers WHERE Id=@Id;", new { user.Id }, cancellationToken: cancellationToken));
 
         return IdentityResult.Success;
     }
@@ -69,9 +69,9 @@ VALUES
     public async Task<ApplicationUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
+        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(new CommandDefinition(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
 FROM ApplicationUsers 
-WHERE NormalizedEmail = @normalizedEmail;", new { normalizedEmail });
+WHERE NormalizedEmail = @normalizedEmail;", new { normalizedEmail }, cancellationToken: cancellationToken));
 
         return applicationUser;
     }
@@ -79,9 +79,9 @@ WHERE NormalizedEmail = @normalizedEmail;", new { normalizedEmail });
     public async Task<ApplicationUser?> FindByIdAsync(string userId, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
+        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(new CommandDefinition(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
 FROM ApplicationUsers 
-WHERE Id = @Id;", new { Id = Convert.ToInt64(userId) });
+WHERE Id = @Id;", new { Id = Convert.ToInt64(userId) }, cancellationToken: cancellationToken));
 
         return applicationUser;
     }
@@ -89,9 +89,9 @@ WHERE Id = @Id;", new { Id = Convert.ToInt64(userId) });
     public async Task<ApplicationUser?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
+        var applicationUser = await connection.QueryFirstOrDefaultAsync<ApplicationUser>(new CommandDefinition(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
 FROM ApplicationUsers 
-WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
+WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName }, cancellationToken: cancellationToken));
 
         return applicationUser;
     }
@@ -120,12 +120,12 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
     public async Task<IList<string>> GetRolesAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        return (await connection.QueryAsync<string>(@"SELECT Name 
+        return (await connection.QueryAsync<string>(new CommandDefinition(@"SELECT Name 
     FROM ApplicationRoles 
     WHERE Id in 
         (SELECT RoleId 
             FROM ApplicationUsersRoles 
-            WHERE UserId = @Id);", new { user.Id })).ToList();
+            WHERE UserId = @Id);", new { user.Id }, cancellationToken: cancellationToken))).ToList();
     }
 
     public Task<string?> GetSecurityStampAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -159,7 +159,7 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
     {
         using var connection = new NpgsqlConnection(_connectionString);
         var applicationUsers = await connection.QueryAsync<ApplicationUser>(
-            @"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, 
+            new CommandDefinition(@"SELECT Id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, 
                     PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
                 FROM ApplicationUsers
                     WHERE Id IN
@@ -168,7 +168,7 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
                             WHERE RoleId IN
                             (SELECT RoleId 
                                 FROM ApplicationRoles
-                                    WHERE NormalizedName = UPPER(@roleName);", new { roleName });
+                                    WHERE NormalizedName = UPPER(@roleName);", new { roleName }, cancellationToken: cancellationToken));
 
         return applicationUsers.ToList();
     }
@@ -181,13 +181,13 @@ WHERE NormalizedUserName = @normalizedUserName;", new { normalizedUserName });
     public async Task<bool> IsInRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        var givenApplicationUserGivenApplicationRolesCount = await connection.QueryFirstAsync<long>(@"SELECT COUNT(*)
+        var givenApplicationUserGivenApplicationRolesCount = await connection.QueryFirstAsync<long>(new CommandDefinition(@"SELECT COUNT(*)
 FROM ApplicationUsersRoles
 WHERE UserId = @UserId
     AND RoleId =
         (SELECT Id 
             FROM ApplicationRoles 
-                WHERE NormalizedName = UPPER(@roleName));", new { UserId = user.Id, RoleName = roleName });
+                WHERE NormalizedName = UPPER(@roleName));", new { UserId = user.Id, RoleName = roleName }, cancellationToken: cancellationToken));
 
         return givenApplicationUserGivenApplicationRolesCount > 0;
     }
@@ -195,7 +195,7 @@ WHERE UserId = @UserId
     public async Task<string?> GetTokenAsync(ApplicationUser user, string loginProvider, string name, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        string token = await connection.QueryFirstOrDefaultAsync<string>(@"SELECT Value 
+        string token = await connection.QueryFirstOrDefaultAsync<string>(new CommandDefinition(@"SELECT Value 
 FROM AccessTokens
 WHERE UserId=@UserId 
     AND LoginProvider=@LoginProvider
@@ -204,27 +204,26 @@ WHERE UserId=@UserId
             UserId = user.Id,
             LoginProvider = loginProvider,
             Name = name
-        });
+        }, cancellationToken: cancellationToken));
         return token;
     }
     public async Task SetTokenAsync(ApplicationUser user, string loginProvider, string name, string? value, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"INSERT INTO AccessTokens(UserId, LoginProvider, Name, Value)
-VALUES(@UserId, @LoginProvider, @Name, @Value);",
-new
+        await connection.ExecuteAsync(new CommandDefinition(@"INSERT INTO AccessTokens(UserId, LoginProvider, Name, Value)
+VALUES(@UserId, @LoginProvider, @Name, @Value);", new
 {
     UserId = user.Id,
     LoginProvider = loginProvider,
     Name = name,
     Value = value
-});
+}, cancellationToken: cancellationToken));
     }
 
     public async Task RemoveTokenAsync(ApplicationUser user, string loginProvider, string name, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"DELETE FROM AccessTokens 
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM AccessTokens 
 WHERE UserId = @UserId
 and LoginProvider=@LoginProvider
 and Name=@Name", new
@@ -232,7 +231,7 @@ and Name=@Name", new
             UserId = user.Id,
             LoginProvider = loginProvider,
             Name = name
-        });
+        }, cancellationToken: cancellationToken));
     }
 
     public Task<string?> GetEmailAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -268,7 +267,7 @@ and Name=@Name", new
     public async Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"UPDATE ApplicationUsers 
+        await connection.ExecuteAsync(new CommandDefinition(@"UPDATE ApplicationUsers 
 SET 
 UserName=@UserName, 
 NormalizedUserName=@NormalizedUserName, 
@@ -280,7 +279,7 @@ PhoneNumber=@PhoneNumber,
 PhoneNumberConfirmed=@PhoneNumberConfirmed,
 TwoFactorEnabled=@TwoFactorEnabled,
 SecurityStamp=@SecurityStamp 
-WHERE Id=@Id;", user);
+WHERE Id=@Id;", user, cancellationToken: cancellationToken));
 
         return IdentityResult.Success;
     }
@@ -299,40 +298,38 @@ WHERE Id=@Id;", user);
     public async Task AddLoginAsync(ApplicationUser user, UserLoginInfo login, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"INSERT INTO AspNetUserLogins 
+        await connection.ExecuteAsync(new CommandDefinition(@"INSERT INTO AspNetUserLogins 
 (LoginProvider, ProviderKey, ProviderDisplayName, UserId)
-VALUES(@LoginProvider, @ProviderKey, @ProviderDisplayName, @UserId);",
-new
+VALUES(@LoginProvider, @ProviderKey, @ProviderDisplayName, @UserId);", new
 {
     LoginProvider = login.LoginProvider,
     ProviderKey = login.ProviderKey,
     ProviderDisplayName = login.ProviderDisplayName,
     UserId = user.Id
-});
+}, cancellationToken: cancellationToken));
     }
 
     public async Task RemoveLoginAsync(ApplicationUser user, string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        await connection.ExecuteAsync(@"DELETE FROM AspNetUserLogins
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM AspNetUserLogins
 WHERE 
     UserId=@UserId 
     AND LoginProvider=@LoginProvider 
-    AND ProviderKey=@ProviderKey;",
-    new
+    AND ProviderKey=@ProviderKey;", new
     {
         UserId = user.Id,
         LoginProvider = loginProvider,
         ProviderKey = providerKey
-    });
+    }, cancellationToken: cancellationToken));
     }
 
     public async Task<IList<UserLoginInfo>> GetLoginsAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        var userLoginsInfos = await connection.QueryAsync<UserLoginInfo>(@"SELECT LoginProvider, ProviderKey, ProviderDisplayName, UserId
+        var userLoginsInfos = await connection.QueryAsync<UserLoginInfo>(new CommandDefinition(@"SELECT LoginProvider, ProviderKey, ProviderDisplayName, UserId
     FROM AspNetUserLogins 
-    WHERE UserId=@UserId;", new { UserId = user.Id });
+    WHERE UserId=@UserId;", new { UserId = user.Id }, cancellationToken: cancellationToken));
 
         return userLoginsInfos.ToList();
     }
@@ -340,11 +337,11 @@ WHERE
     public async Task<ApplicationUser?> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        var applicationUser = await connection.QuerySingleOrDefaultAsync<ApplicationUser>(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
+        var applicationUser = await connection.QuerySingleOrDefaultAsync<ApplicationUser>(new CommandDefinition(@"SELECT Id, UserName, NormalizedUserName, Email, EmailConfirmed, NormalizedEmail, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, SecurityStamp
     FROM ApplicationUsers
     INNER JOIN AspNetUserLogins ON AspNetUserLogins.UserId=ApplicationUsers.Id
     WHERE LoginProvider=@LoginProvider 
-        AND ProviderKey=@ProviderKey;", new { LoginProvider = loginProvider, ProviderKey = providerKey });
+        AND ProviderKey=@ProviderKey;", new { LoginProvider = loginProvider, ProviderKey = providerKey }, cancellationToken: cancellationToken));
 
         return applicationUser;
     }
@@ -374,20 +371,20 @@ WHERE
     public Task SetAuthenticatorKeyAsync(ApplicationUser user, string key, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        return connection.ExecuteAsync(@"INSERT INTO AspNetUserTokens (UserId, LoginProvider, Name, Value) VALUES (@UserId, @LoginProvider, @Name, @Value);", new
+        return connection.ExecuteAsync(new CommandDefinition(@"INSERT INTO AspNetUserTokens (UserId, LoginProvider, Name, Value) VALUES (@UserId, @LoginProvider, @Name, @Value);", new
         {
             UserId = user.Id,
             LoginProvider = "Google",
             Name = user.NormalizedUserName,
             Value = key,
-        });
+        }, cancellationToken: cancellationToken));
     }
 
     public async Task<string?> GetAuthenticatorKeyAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         using var connection = new NpgsqlConnection(_connectionString);
-        return await connection.QueryFirstOrDefaultAsync<string>(@"SELECT Value 
+        return await connection.QueryFirstOrDefaultAsync<string>(new CommandDefinition(@"SELECT Value 
 FROM AspNetUserTokens
-WHERE UserId=@UserId;", new { UserId = user.Id });
+WHERE UserId=@UserId;", new { UserId = user.Id }, cancellationToken: cancellationToken));
     }
 }

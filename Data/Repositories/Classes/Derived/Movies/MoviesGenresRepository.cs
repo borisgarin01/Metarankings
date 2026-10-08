@@ -10,34 +10,34 @@ public sealed class MoviesGenresRepository : Repository<Genre, AddMovieGenreMode
     {
     }
 
-    public override async Task<long> AddAsync(AddMovieGenreModel entity)
+    public override async Task<long> AddAsync(AddMovieGenreModel entity, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var insertedId = await connection.QueryFirstOrDefaultAsync<long>(@"INSERT INTO MoviesGenres(Name) 
+            var insertedId = await connection.QueryFirstOrDefaultAsync<long>(new CommandDefinition(@"INSERT INTO MoviesGenres(Name) 
 VALUES (@Name)
-RETURNING Id;", new { entity.Name });
+RETURNING Id;", new { entity.Name }, cancellationToken: cancellationToken));
 
             return insertedId;
         }
     }
 
-    public override async Task<IEnumerable<Genre>> GetAllAsync()
+    public override async Task<IEnumerable<Genre>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var moviesGenres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
-FROM MoviesGenres;");
+            var moviesGenres = await connection.QueryAsync<Genre>(new CommandDefinition(@"SELECT Id, Name 
+FROM MoviesGenres;", cancellationToken: cancellationToken));
 
             return moviesGenres;
         }
     }
 
-    public override async Task<Genre> GetAsync(long id)
+    public override async Task<Genre> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var moviesGenres = await connection.QueryAsync<Genre, Movie,Genre>(@"
+            var moviesGenres = await connection.QueryAsync<Genre, Movie,Genre>(new CommandDefinition(@"
 SELECT MoviesGenres.Id, MoviesGenres.Name, 
        Movies.Id, Movies.Name, Movies.OriginalName, Movies.ImageSource,
        Movies.PremierDate, Movies.Description,
@@ -48,11 +48,11 @@ SELECT MoviesGenres.Id, MoviesGenres.Name,
 FROM MoviesGenres 
 LEFT JOIN MoviesMoviesGenres ON MoviesMoviesGenres.MovieGenreId = MoviesGenres.Id
 LEFT JOIN Movies ON Movies.Id = MoviesMoviesGenres.MovieId
-WHERE MoviesGenres.Id = @Id", (genre, movie) =>
+WHERE MoviesGenres.Id = @Id", new { Id = id }, cancellationToken: cancellationToken), (genre, movie) =>
             {
                 genre.Movies.Add(movie);
                 return genre;
-            }, new { Id = id });
+            });
 
             var genresResult = moviesGenres
                             .GroupBy(d => d.Id)
@@ -70,36 +70,36 @@ WHERE MoviesGenres.Id = @Id", (genre, movie) =>
         }
     }
 
-    public override async Task<IEnumerable<Genre>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<Genre>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var moviesGenres = await connection.QueryAsync<Genre>(@"SELECT Id, Name 
+            var moviesGenres = await connection.QueryAsync<Genre>(new CommandDefinition(@"SELECT Id, Name 
 FROM MoviesGenres
 OFFSET @offset
-LIMIT @limit;", new { offset, limit });
+LIMIT @limit;", new { offset, limit }, cancellationToken: cancellationToken));
 
             return moviesGenres;
         }
     }
-    public override async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
-            await connection.ExecuteAsync(@"DELETE FROM MoviesGenres WHERE Id=@id", new { id });
+            await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM MoviesGenres WHERE Id=@id", new { id }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<Genre> UpdateAsync(UpdateMovieGenreModel movieGenre, long id)
+    public override async Task<Genre> UpdateAsync(UpdateMovieGenreModel movieGenre, long id, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<Genre>(@"UPDATE MoviesGenres 
+            var updatedMovieGenre = await connection.QueryFirstOrDefaultAsync<Genre>(new CommandDefinition(@"UPDATE MoviesGenres 
 SET Name=@Name
 WHERE Id=@Id
 RETURNING Name, Id;", new
             {
                 movieGenre.Name,
                 id
-            });
+            }, cancellationToken: cancellationToken));
 
             return updatedMovieGenre;
         }

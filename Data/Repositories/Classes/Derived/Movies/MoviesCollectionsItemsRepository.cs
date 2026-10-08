@@ -13,25 +13,24 @@ public sealed class MoviesCollectionsItemsRepository : Repository<MoviesCollecti
     {
     }
 
-    public override async Task<long> AddAsync(AddMoviesCollectionItemModel entity)
+    public override async Task<long> AddAsync(AddMoviesCollectionItemModel entity, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var insertedGameCollectionItemId = await connection.QuerySingleAsync<long>(@"
+            var insertedGameCollectionItemId = await connection.QuerySingleAsync<long>(new CommandDefinition(@"
 INSERT INTO MoviesCollectionsItems (MovieId, MovieCollectionId)
 VALUES (@MovieId, @MoviesCollectionId)
-RETURNING Id;",
-new { entity.MovieId, entity.MoviesCollectionId });
+RETURNING Id;", new { entity.MovieId, entity.MoviesCollectionId }, cancellationToken: cancellationToken));
 
             return insertedGameCollectionItemId;
         }
     }
 
-    public override async Task<IEnumerable<MoviesCollectionItem>> GetAllAsync()
+    public override async Task<IEnumerable<MoviesCollectionItem>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var moviesCollectionItems = await connection.QueryAsync<MoviesCollectionItem, Movie, MoviesCollection, MoviesCollectionItem>(@"
+            var moviesCollectionItems = await connection.QueryAsync<MoviesCollectionItem, Movie, MoviesCollection, MoviesCollectionItem>(new CommandDefinition(@"
 SELECT mci.Id, mci.MovieId, mci.MovieCollectionId,
 m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description, g.Trailer, g.LocalizationId,
 mc.Id, mc.Name, mc.Description, mc.ImageSource
@@ -39,7 +38,7 @@ FROM MoviesCollectionsItems mci
 LEFT JOIN Movies m
 on m.Id=mci.MovieId
 LEFT JOIN MoviesCollections mc 
-ON mc.Id=mci.MovieCollectionId;", (moviesCollectionItem, movie, moviesCollection) =>
+ON mc.Id=mci.MovieCollectionId;", cancellationToken: cancellationToken), (moviesCollectionItem, movie, moviesCollection) =>
             {
                 if (movie is not null && moviesCollection is not null && !moviesCollection.MoviesCollectionItems.Any(m => m.Id == moviesCollectionItem.Id))
                 {
@@ -57,46 +56,45 @@ ON mc.Id=mci.MovieCollectionId;", (moviesCollectionItem, movie, moviesCollection
         }
     }
 
-    public override async Task<MoviesCollectionItem> GetAsync(long id)
+    public override async Task<MoviesCollectionItem> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
             var result = await connection.QueryAsync<MoviesCollectionItem, Movie, MoviesCollectionItem>(
-                @"SELECT mci.Id, mci.MovieId, mci.MovieCollectionId,
+                new CommandDefinition(@"SELECT mci.Id, mci.MovieId, mci.MovieCollectionId,
                     m.Id, m.Name, m.OriginalName, m.ImageSource, 
                     m.PremierDate, m.Description
              FROM MoviesCollectionsItems mci
              LEFT JOIN Movies m ON m.Id = mci.MovieId
-             WHERE mci.Id = @Id;",
+             WHERE mci.Id = @Id;", new { Id = id }, cancellationToken: cancellationToken),
                 (moviesCollectionItem, movie) =>
                 {
                     moviesCollectionItem.Movie = movie;
                     return moviesCollectionItem;
                 },
-                new { Id = id },
                 splitOn: "Id"); // Add this to specify where the second object starts
 
             return result.FirstOrDefault();
         }
     }
 
-    public override async Task<IEnumerable<MoviesCollectionItem>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<MoviesCollectionItem>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            var moviesCollectionsItems = await connection.QueryAsync<MoviesCollectionItem, Movie, MoviesCollectionItem>(@"SELECT mci.Id, mci.MovieId, mci.MovieCollectionId,
+            var moviesCollectionsItems = await connection.QueryAsync<MoviesCollectionItem, Movie, MoviesCollectionItem>(new CommandDefinition(@"SELECT mci.Id, mci.MovieId, mci.MovieCollectionId,
 m.Id, m.Name, m.OriginalName, m.ImageSource, m.PremierDate, m.Description
 FROM MoviesCollectionsItems mci
 ON m.Id=mci.MovieCollectionId
 LEFT JOIN Movies m
 on m.Id=mci.MovieId
 ORDER BY mc.Id ASC
-OFFSET @Offset LIMIT @Limit;", (movieCollectionItem, movie) =>
+OFFSET @Offset LIMIT @Limit;", new { Offset = offset, Limit = limit }, cancellationToken: cancellationToken), (movieCollectionItem, movie) =>
             {
                 movieCollectionItem.Movie = movie;
 
                 return movieCollectionItem;
-            }, new { Offset = offset, Limit = limit });
+            });
 
             var moviesCollectionsItemsResult = moviesCollectionsItems
                 .GroupBy(b => new { b.MovieId, b.MovieCollectionId })
@@ -109,16 +107,16 @@ OFFSET @Offset LIMIT @Limit;", (movieCollectionItem, movie) =>
         }
     }
 
-    public override async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using (var connection = CreateConnection())
         {
-            await connection.ExecuteAsync(@"DELETE FROM MoviesCollectionsItems
-WHERE Id=@Id;", new { Id = id });
+            await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM MoviesCollectionsItems
+WHERE Id=@Id;", new { Id = id }, cancellationToken: cancellationToken));
         }
     }
 
-    public override async Task<MoviesCollectionItem> UpdateAsync(UpdateMoviesCollectionItemModel entity, long id)
+    public override async Task<MoviesCollectionItem> UpdateAsync(UpdateMoviesCollectionItemModel entity, long id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

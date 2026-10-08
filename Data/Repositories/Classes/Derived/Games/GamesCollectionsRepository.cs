@@ -15,7 +15,7 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
     {
     }
 
-    public override async Task<long> AddAsync(AddGamesCollectionModel entity)
+    public override async Task<long> AddAsync(AddGamesCollectionModel entity, CancellationToken cancellationToken = default)
     {
         using var connection = CreateConnection();
 
@@ -24,15 +24,15 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
             VALUES(@Name, @Description, @ImageSource)
             RETURNING Id;";
 
-        return await connection.QuerySingleAsync<long>(sql, new
+        return await connection.QuerySingleAsync<long>(new CommandDefinition(sql, new
         {
             entity.Name,
             entity.Description,
             entity.ImageSource
-        });
+        }, cancellationToken: cancellationToken));
     }
 
-    public override async Task AddRangeAsync(IEnumerable<AddGamesCollectionModel> entities)
+    public override async Task AddRangeAsync(IEnumerable<AddGamesCollectionModel> entities, CancellationToken cancellationToken = default)
     {
         using var connection = CreateConnection();
 
@@ -40,15 +40,15 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
             INSERT INTO GamesCollections(Name, Description, ImageSource) 
             VALUES(@Name, @Description, @ImageSource)";
 
-        await connection.ExecuteAsync(sql, entities);
+        await connection.ExecuteAsync(new CommandDefinition(sql, entities, cancellationToken: cancellationToken));
     }
 
-    public override async Task<IEnumerable<GamesCollection>> GetAllAsync()
+    public override async Task<IEnumerable<GamesCollection>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using var connection = CreateConnection();
 
         var gamesCollections = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GameReview, ApplicationUser, GamesCollection>(
-            @"
+            new CommandDefinition(@"
             SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
                    gci.Id, gci.GameId, gci.GameCollectionId,
                    g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer,
@@ -62,7 +62,7 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
             LEFT JOIN Games g ON g.Id = gci.GameId
             LEFT JOIN GamesPlayersReviews gpr ON gpr.GameId = g.Id
             LEFT JOIN ApplicationUsers au ON au.Id = gpr.UserId
-            ORDER BY gc.Id",
+            ORDER BY gc.Id", cancellationToken: cancellationToken),
             (gameCollection, gameCollectionItem, game, gamePlayerReview, applicationUser) =>
             {
                 if (game is not null && gameCollectionItem is not null)
@@ -96,12 +96,12 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
         return gamesCollections.DistinctBy(gc => gc.Id);
     }
 
-    public override async Task<GamesCollection?> GetAsync(long id)
+    public override async Task<GamesCollection?> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using var connection = CreateConnection();
 
         var gamesCollection = await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GameReview, ApplicationUser, GamesCollection>(
-            @"
+            new CommandDefinition(@"
         SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
                gci.Id, gci.GameId, gci.GameCollectionId,
                g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer,
@@ -115,7 +115,7 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
         LEFT JOIN Games g ON g.Id = gci.GameId
         LEFT JOIN GamesPlayersReviews gpr ON gpr.GameId = g.Id
         LEFT JOIN ApplicationUsers au ON au.Id = gpr.UserId
-        WHERE gc.Id = @Id",
+        WHERE gc.Id = @Id", new { Id = id }, cancellationToken: cancellationToken),
             (gameCollection, gameCollectionItem, game, gamePlayerReview, applicationUser) =>
             {
                 if (gameCollection is null)
@@ -153,7 +153,6 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
 
                 return gameCollection;
             },
-            new { Id = id },
             splitOn: "Id,Id,Id,Id");
 
         // Группировка результатов
@@ -174,14 +173,14 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
         return result;
     }
 
-    public override async Task<IEnumerable<GamesCollection>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<GamesCollection>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         using var connection = CreateConnection();
 
         var gamesCollectionsDictionary = new Dictionary<long, GamesCollection>();
 
         await connection.QueryAsync<GamesCollection, GamesCollectionItem, Game, GameReview, ApplicationUser, GamesCollection>(
-            @"
+            new CommandDefinition(@"
             SELECT gc.Id, gc.Name, gc.Description, gc.ImageSource,
                    gci.Id, gci.GameId, gci.GameCollectionId,
                    g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer,
@@ -201,7 +200,7 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
                 ORDER BY Id ASC 
                 OFFSET @offset LIMIT @limit
             )
-            ORDER BY gc.Id",
+            ORDER BY gc.Id", new { offset, limit }, cancellationToken: cancellationToken),
             (gameCollection, gameCollectionItem, game, gamePlayerReview, applicationUser) =>
             {
                 if (!gamesCollectionsDictionary.TryGetValue(gameCollection.Id, out var existingCollection))
@@ -233,25 +232,24 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
 
                 return existingCollection;
             },
-            new { offset, limit },
             splitOn: "Id");
 
         return gamesCollectionsDictionary.Values;
     }
 
-    public override async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using var connection = CreateConnection();
-        await connection.ExecuteAsync("DELETE FROM GamesCollections WHERE Id = @Id", new { Id = id });
+        await connection.ExecuteAsync(new CommandDefinition("DELETE FROM GamesCollections WHERE Id = @Id", new { Id = id }, cancellationToken: cancellationToken));
     }
 
-    public override async Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override async Task RemoveRangeAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default)
     {
         using var connection = CreateConnection();
-        await connection.ExecuteAsync("DELETE FROM GamesCollections WHERE Id = ANY(@Ids)", new { Ids = ids });
+        await connection.ExecuteAsync(new CommandDefinition("DELETE FROM GamesCollections WHERE Id = ANY(@Ids)", new { Ids = ids }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<GamesCollection> UpdateAsync(UpdateGamesCollectionModel entity, long id)
+    public override async Task<GamesCollection> UpdateAsync(UpdateGamesCollectionModel entity, long id, CancellationToken cancellationToken = default)
     {
         using var connection = CreateConnection();
 
@@ -262,11 +260,11 @@ public sealed class GamesCollectionsRepository : Repository<GamesCollection, Add
             WHERE Id = @Id
             RETURNING Id, Name, Description, ImageSource;";
 
-        return await connection.QuerySingleOrDefaultAsync<GamesCollection>(sql, new
+        return await connection.QuerySingleOrDefaultAsync<GamesCollection>(new CommandDefinition(sql, new
         {
             Name = entity.CollectionName,
             ImageSource = entity.ImageSource,
             Id = id
-        });
+        }, cancellationToken: cancellationToken));
     }
 }

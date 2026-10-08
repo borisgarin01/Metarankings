@@ -9,42 +9,42 @@ public sealed class TagsRepository : Repository<Tag, AddTagModel, UpdateTagModel
     {
     }
 
-    public override Task<long> AddAsync(AddTagModel entity)
+    public override Task<long> AddAsync(AddTagModel entity, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public override Task AddRangeAsync(IEnumerable<AddTagModel> entities)
+    public override Task AddRangeAsync(IEnumerable<AddTagModel> entities, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public override Task<IEnumerable<Tag>> GetAllAsync()
+    public override Task<IEnumerable<Tag>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public override Task<Tag> GetAsync(long id)
+    public override Task<Tag> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public override Task<IEnumerable<Tag>> GetAsync(long offset, long limit)
+    public override Task<IEnumerable<Tag>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public override Task RemoveAsync(long id)
+    public override Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public override Task RemoveRangeAsync(IEnumerable<long> ids)
+    public override Task RemoveRangeAsync(IEnumerable<long> ids, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public override Task<Tag> UpdateAsync(UpdateTagModel entity, long id)
+    public override Task<Tag> UpdateAsync(UpdateTagModel entity, long id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

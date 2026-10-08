@@ -39,29 +39,27 @@ FROM {_reviewsTable}";
     /// <summary>
     /// Рецензии на игру/фильм: сначала высокие оценки.
     /// </summary>
-    public async Task<IEnumerable<CriticReview>> GetByEntityAsync(long entityId)
+    public async Task<IEnumerable<CriticReview>> GetByEntityAsync(long entityId, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
         return await connection.QueryAsync<CriticReview>(
-            $"{SelectSql} WHERE {_entityColumn} = @EntityId ORDER BY Score DESC, Date DESC, Id;",
-            new { EntityId = entityId });
+            new CommandDefinition($"{SelectSql} WHERE {_entityColumn} = @EntityId ORDER BY Score DESC, Date DESC, Id;", new { EntityId = entityId }, cancellationToken: cancellationToken));
     }
 
-    public async Task<CriticReview?> GetAsync(long id)
+    public async Task<CriticReview?> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<CriticReview>($"{SelectSql} WHERE Id = @Id;", new { Id = id });
+        return await connection.QueryFirstOrDefaultAsync<CriticReview>(new CommandDefinition($"{SelectSql} WHERE Id = @Id;", new { Id = id }, cancellationToken: cancellationToken));
     }
 
     /// <param name="userId">Администратор, добавивший рецензию.</param>
-    public async Task<long> AddAsync(CriticReviewModel model, long userId)
+    public async Task<long> AddAsync(CriticReviewModel model, long userId, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryFirstAsync<long>($@"
+        return await connection.QueryFirstAsync<long>(new CommandDefinition($@"
 INSERT INTO {_reviewsTable} ({_entityColumn}, UserId, Publication, Author, Score, TextContent, SourceUrl, Date)
 VALUES (@EntityId, @UserId, @Publication, @Author, @Score, @TextContent, @SourceUrl, @Date)
-RETURNING Id;",
-            new
+RETURNING Id;", new
             {
                 model.EntityId,
                 UserId = userId,
@@ -71,18 +69,17 @@ RETURNING Id;",
                 TextContent = NullIfEmpty(model.TextContent),
                 SourceUrl = NullIfEmpty(model.SourceUrl),
                 Date = ToDbDate(model.Date)
-            });
+            }, cancellationToken: cancellationToken));
     }
 
-    public async Task<CriticReview?> UpdateAsync(CriticReviewModel model, long id)
+    public async Task<CriticReview?> UpdateAsync(CriticReviewModel model, long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<CriticReview>($@"
+        return await connection.QueryFirstOrDefaultAsync<CriticReview>(new CommandDefinition($@"
 UPDATE {_reviewsTable}
 SET Publication = @Publication, Author = @Author, Score = @Score, TextContent = @TextContent, SourceUrl = @SourceUrl, Date = @Date
 WHERE Id = @Id
-RETURNING Id, {_entityColumn} AS EntityId, Publication, Author, Score, TextContent, SourceUrl, Date;",
-            new
+RETURNING Id, {_entityColumn} AS EntityId, Publication, Author, Score, TextContent, SourceUrl, Date;", new
             {
                 Id = id,
                 Publication = model.Publication.Trim(),
@@ -91,13 +88,13 @@ RETURNING Id, {_entityColumn} AS EntityId, Publication, Author, Score, TextConte
                 TextContent = NullIfEmpty(model.TextContent),
                 SourceUrl = NullIfEmpty(model.SourceUrl),
                 Date = ToDbDate(model.Date)
-            });
+            }, cancellationToken: cancellationToken));
     }
 
-    public async Task RemoveAsync(long id)
+    public async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        await connection.ExecuteAsync($"DELETE FROM {_reviewsTable} WHERE Id = @Id;", new { Id = id });
+        await connection.ExecuteAsync(new CommandDefinition($"DELETE FROM {_reviewsTable} WHERE Id = @Id;", new { Id = id }, cancellationToken: cancellationToken));
     }
 
     // Dapper не умеет передавать DateOnly параметром, поэтому дата уходит как DateTime и приводится к date в Postgres

@@ -9,53 +9,53 @@ public sealed class MoviesPersonsRepository : Repository<MoviePerson, AddMoviePe
     {
     }
 
-    public override async Task<long> AddAsync(AddMoviePersonModel entity)
+    public override async Task<long> AddAsync(AddMoviePersonModel entity, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryFirstAsync<long>(@"INSERT INTO MoviesPersons (Name)
+        return await connection.QueryFirstAsync<long>(new CommandDefinition(@"INSERT INTO MoviesPersons (Name)
 VALUES (@Name)
-RETURNING Id;", new { entity.Name });
+RETURNING Id;", new { entity.Name }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<IEnumerable<MoviePerson>> GetAllAsync()
+    public override async Task<IEnumerable<MoviePerson>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryAsync<MoviePerson>(@"SELECT Id, Name
+        return await connection.QueryAsync<MoviePerson>(new CommandDefinition(@"SELECT Id, Name
 FROM MoviesPersons
-ORDER BY Name;");
+ORDER BY Name;", cancellationToken: cancellationToken));
     }
 
-    public override async Task<MoviePerson> GetAsync(long id)
+    public override async Task<MoviePerson> GetAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<MoviePerson>(@"SELECT Id, Name
+        return await connection.QueryFirstOrDefaultAsync<MoviePerson>(new CommandDefinition(@"SELECT Id, Name
 FROM MoviesPersons
-WHERE Id=@id;", new { id });
+WHERE Id=@id;", new { id }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<IEnumerable<MoviePerson>> GetAsync(long offset, long limit)
+    public override async Task<IEnumerable<MoviePerson>> GetAsync(long offset, long limit, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryAsync<MoviePerson>(@"SELECT Id, Name
+        return await connection.QueryAsync<MoviePerson>(new CommandDefinition(@"SELECT Id, Name
 FROM MoviesPersons
 ORDER BY Name
 OFFSET @offset
-LIMIT @limit;", new { offset, limit });
+LIMIT @limit;", new { offset, limit }, cancellationToken: cancellationToken));
     }
 
-    public override async Task RemoveAsync(long id)
+    public override async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        await connection.ExecuteAsync(@"DELETE FROM MoviesPersons
-WHERE Id=@id;", new { id });
+        await connection.ExecuteAsync(new CommandDefinition(@"DELETE FROM MoviesPersons
+WHERE Id=@id;", new { id }, cancellationToken: cancellationToken));
     }
 
-    public override async Task<MoviePerson> UpdateAsync(UpdateMoviePersonModel entity, long id)
+    public override async Task<MoviePerson> UpdateAsync(UpdateMoviePersonModel entity, long id, CancellationToken cancellationToken = default)
     {
         using NpgsqlConnection connection = CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<MoviePerson>(@"UPDATE MoviesPersons
+        return await connection.QueryFirstOrDefaultAsync<MoviePerson>(new CommandDefinition(@"UPDATE MoviesPersons
 SET Name=@Name
 WHERE Id=@id
-RETURNING Id, Name;", new { entity.Name, id });
+RETURNING Id, Name;", new { entity.Name, id }, cancellationToken: cancellationToken));
     }
 }
