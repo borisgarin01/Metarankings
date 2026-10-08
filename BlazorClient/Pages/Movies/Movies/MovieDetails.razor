@@ -64,6 +64,7 @@ else
 
                     <MovieMetadata Genres="@Movie.MovieGenres"
                                    OriginalName="@Movie.OriginalName"
+                                   Countries="@Movie.MoviesCountries"
                                    MoviesStudios="@Movie.MoviesStudios"
                                    PremierDate="@(Movie.PremierDate.HasValue ? Movie.PremierDate.Value:default)" />
 
@@ -76,6 +77,9 @@ else
                     }
 
                     <Description TextContent="@Movie.Description" />
+
+                    <MovieCrewComponent Directors="@Movie.MoviesDirectors"
+                                        Crew="@Movie.MoviesCrew" />
 
                     <MovieMedia MovieId="@Movie.Id"
                                 Trailer="@Movie.Trailer"

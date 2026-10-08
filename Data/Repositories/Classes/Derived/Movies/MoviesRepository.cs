@@ -1,6 +1,7 @@
 ﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Common;
 using Domain.Movies;
+using Domain.RequestsModels.Movies;
 using Domain.RequestsModels.Movies.Movies;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
@@ -16,72 +17,15 @@ public sealed class MoviesRepository : Repository<Movie, AddMovieModel, UpdateMo
     public override async Task<long> AddAsync(AddMovieModel entity)
     {
         using NpgsqlConnection connection = CreateConnection();
-        List<Domain.Movies.Genre> insertedMovieGenres = new List<Domain.Movies.Genre>();
-        List<MovieStudio> insertedMovieStudios = new List<MovieStudio>();
-        List<MovieDirector> insertedMovieDirectors = new List<MovieDirector>();
+        await connection.OpenAsync();
 
-        foreach (string movieGenreName in entity.MoviesGenresNames)
-        {
-            Domain.Movies.Genre? movieGenreToFind = await connection.QueryFirstOrDefaultAsync<Domain.Movies.Genre>(@"SELECT Id, Name
-FROM MoviesGenres
-WHERE Name=@Name;", new { Name = movieGenreName });
+        using NpgsqlTransaction transaction = await connection.BeginTransactionAsync();
 
-            if (movieGenreToFind is null)
-            {
-                Domain.Movies.Genre insertedMovieGenre = await connection.QueryFirstAsync<Domain.Movies.Genre>(@"INSERT INTO MoviesGenres 
-(Name)
-VALUES (@Name)
-RETURNING Id, Name;", new { Name = movieGenreName });
-                insertedMovieGenres.Add(insertedMovieGenre);
-            }
-            else
-                insertedMovieGenres.Add(movieGenreToFind);
-        }
-        foreach (string movieStudioName in entity.MoviesStudiosNames)
-        {
-            MovieStudio? moviesStudioToFind = await connection.QueryFirstOrDefaultAsync<MovieStudio>(@"SELECT Id, Name
-FROM MoviesStudios
-WHERE Name=@Name;", new { Name = movieStudioName });
-
-            if (moviesStudioToFind is null)
-            {
-                MovieStudio insertedMovieStudio = await connection.QueryFirstAsync<MovieStudio>(@"INSERT INTO MoviesStudios 
-(Name)
-VALUES (@Name)
-RETURNING Id, Name;", new { Name = movieStudioName });
-                insertedMovieStudios.Add(insertedMovieStudio);
-            }
-            else
-            {
-                insertedMovieStudios.Add(moviesStudioToFind);
-            }
-        }
-
-        foreach (string movieDirectorName in entity.MoviesDirectorsNames)
-        {
-            MovieDirector? moviesDirectorToFind = await connection.QueryFirstOrDefaultAsync<MovieDirector>(@"SELECT Id, Name
-FROM MoviesDirectors
-WHERE Name=@Name;", new { Name = movieDirectorName });
-
-            if (moviesDirectorToFind is null)
-            {
-                MovieDirector insertedMovieDirector = await connection.QueryFirstAsync<MovieDirector>(@"INSERT INTO MoviesDirectors 
-(Name)
-VALUES (@Name)
-RETURNING Id, Name;", new { Name = movieDirectorName });
-                insertedMovieDirectors.Add(insertedMovieDirector);
-            }
-            else
-            {
-                insertedMovieDirectors.Add(moviesDirectorToFind);
-            }
-        }
-
-        Movie insertedMovie = await connection.QueryFirstAsync<Movie>(@"INSERT INTO Movies 
+        long insertedMovieId = await connection.QueryFirstAsync<long>(@"INSERT INTO Movies
 (Name, OriginalName, ImageSource, PremierDate, Description, Trailer)
 VALUES
 (@Name, @OriginalName, @ImageSource, CAST(@PremierDate AS DATE), @Description, @Trailer)
-RETURNING Id, Name, OriginalName, ImageSource, PremierDate, Description, Trailer;", new
+RETURNING Id;", new
         {
             entity.Name,
             entity.OriginalName,
@@ -89,30 +33,99 @@ RETURNING Id, Name, OriginalName, ImageSource, PremierDate, Description, Trailer
             entity.PremierDate,
             entity.Description,
             Trailer = TrailerUrl.ToEmbed(entity.Trailer)
-        });
+        }, transaction: transaction);
 
-        foreach (Genre movieGenre in insertedMovieGenres)
+        foreach (long movieGenreId in await GetOrCreateIdsAsync(connection, transaction, "MoviesGenres", entity.MoviesGenresNames))
+            await connection.ExecuteAsync("INSERT INTO MoviesMoviesGenres (MovieId, MovieGenreId) VALUES (@MovieId, @MovieGenreId);",
+                new { MovieId = insertedMovieId, MovieGenreId = movieGenreId }, transaction: transaction);
+
+        foreach (long movieStudioId in await GetOrCreateIdsAsync(connection, transaction, "MoviesStudios", entity.MoviesStudiosNames))
+            await connection.ExecuteAsync("INSERT INTO MoviesMoviesStudios (MovieId, MovieStudioId) VALUES (@MovieId, @MovieStudioId);",
+                new { MovieId = insertedMovieId, MovieStudioId = movieStudioId }, transaction: transaction);
+
+        foreach (long movieDirectorId in await GetOrCreateIdsAsync(connection, transaction, "MoviesDirectors", entity.MoviesDirectorsNames))
+            await connection.ExecuteAsync("INSERT INTO MoviesMoviesDirectors (MovieId, MovieDirectorId) VALUES (@MovieId, @MovieDirectorId);",
+                new { MovieId = insertedMovieId, MovieDirectorId = movieDirectorId }, transaction: transaction);
+
+        if (entity.MoviesCountriesNames is not null)
+            await InsertCountriesAsync(connection, transaction, insertedMovieId,
+                await GetOrCreateIdsAsync(connection, transaction, "MoviesCountries", entity.MoviesCountriesNames));
+
+        if (entity.MoviesCrew is not null)
+            await InsertCrewAsync(connection, transaction, insertedMovieId, entity.MoviesCrew);
+
+        await transaction.CommitAsync();
+
+        return insertedMovieId;
+    }
+
+    /// <summary>
+    /// Идентификаторы справочника по именам (без повторов, в исходном порядке); отсутствующие записи создаются.
+    /// </summary>
+    /// <param name="table">Таблица справочника с колонками Id, Name; только константа из кода.</param>
+    private static async Task<List<long>> GetOrCreateIdsAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, string table, IEnumerable<string> names)
+    {
+        List<long> ids = new List<long>();
+
+        foreach (string name in names.Select(n => n.Trim()).Where(n => n.Length > 0).Distinct())
         {
-            await connection.ExecuteAsync(@"INSERT INTO MoviesMoviesGenres (MovieId, MovieGenreId)
-VALUES (@MovieId, @MovieGenreId);",
-new { MovieId = insertedMovie.Id, MovieGenreId = movieGenre.Id });
+            long? id = await connection.QueryFirstOrDefaultAsync<long?>($"SELECT Id FROM {table} WHERE Name=@Name;",
+                new { Name = name }, transaction: transaction);
+
+            id ??= await connection.QueryFirstAsync<long>($"INSERT INTO {table} (Name) VALUES (@Name) RETURNING Id;",
+                new { Name = name }, transaction: transaction);
+
+            if (!ids.Contains(id.Value))
+                ids.Add(id.Value);
         }
 
-        foreach (MovieStudio movieStudio in insertedMovieStudios)
-        {
-            await connection.ExecuteAsync(@"INSERT INTO MoviesMoviesStudios (MovieId, MovieStudioId)
-VALUES (@MovieId, @MovieStudioId);",
-new { MovieId = insertedMovie.Id, MovieStudioId = movieStudio.Id });
-        }
+        return ids;
+    }
 
-        foreach (MovieDirector insertedMovieDirector in insertedMovieDirectors)
-        {
-            await connection.ExecuteAsync(@"INSERT INTO MoviesMoviesDirectors (MovieId, MovieDirectorId)
-VALUES (@MovieId, @MovieDirectorId);",
-new { MovieId = insertedMovie.Id, MovieDirectorId = insertedMovieDirector.Id });
-        }
+    private static async Task InsertCountriesAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, long movieId, IEnumerable<long> countriesIds)
+    {
+        foreach (long movieCountryId in countriesIds.Distinct())
+            await connection.ExecuteAsync("INSERT INTO MoviesMoviesCountries (MovieId, MovieCountryId) VALUES (@MovieId, @MovieCountryId);",
+                new { MovieId = movieId, MovieCountryId = movieCountryId }, transaction: transaction);
+    }
 
-        return insertedMovie.Id;
+    /// <summary>
+    /// Связывает фильм с участниками съёмочной группы; персоны ищутся по имени и создаются при отсутствии.
+    /// Позиция — порядковый номер участника внутри своей роли.
+    /// </summary>
+    private static async Task InsertCrewAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, long movieId, IEnumerable<MovieCrewMemberModel> crew)
+    {
+        foreach (IGrouping<MovieCrewRole, MovieCrewMemberModel> roleGroup in crew.Where(c => Enum.IsDefined(c.Role)).GroupBy(c => c.Role))
+        {
+            List<long> personsIds = await GetOrCreateIdsAsync(connection, transaction, "MoviesPersons", roleGroup.Select(c => c.Name));
+
+            for (int position = 0; position < personsIds.Count; position++)
+                await connection.ExecuteAsync(@"INSERT INTO MoviesMoviesPersons (MovieId, MoviePersonId, Role, Position)
+VALUES (@MovieId, @MoviePersonId, @Role, @Position);",
+                    new { MovieId = movieId, MoviePersonId = personsIds[position], Role = (short)roleGroup.Key, Position = position }, transaction: transaction);
+        }
+    }
+
+    /// <summary>
+    /// Заполняет страны и съёмочную группу фильма отдельными запросами,
+    /// чтобы не умножать строки основного JOIN-а.
+    /// </summary>
+    private static async Task LoadCountriesAndCrewAsync(NpgsqlConnection connection, Movie movie)
+    {
+        using SqlMapper.GridReader grid = await connection.QueryMultipleAsync(@"SELECT mc.Id, mc.Name
+FROM MoviesMoviesCountries mmc
+JOIN MoviesCountries mc ON mc.Id = mmc.MovieCountryId
+WHERE mmc.MovieId=@Id
+ORDER BY mmc.Id;
+
+SELECT mp.Id, mp.Name, mmp.Role
+FROM MoviesMoviesPersons mmp
+JOIN MoviesPersons mp ON mp.Id = mmp.MoviePersonId
+WHERE mmp.MovieId=@Id
+ORDER BY mmp.Role, mmp.Position, mmp.Id;", new { movie.Id });
+
+        movie.MoviesCountries = (await grid.ReadAsync<MovieCountry>()).ToList();
+        movie.MoviesCrew = (await grid.ReadAsync<MovieCrewMember>()).ToList();
     }
 
     public override async Task<IEnumerable<Movie>> GetAllAsync()
@@ -249,6 +262,9 @@ WHERE m.id=@id";
         );
 
         Movie? result = moviesDictionary.Values.FirstOrDefault();
+
+        if (result is not null)
+            await LoadCountriesAndCrewAsync(connection, result);
 
         return result;
     }
@@ -464,8 +480,28 @@ md.id, md.name
         return moviesDictionary.Values;
     }
 
-    public async Task<IEnumerable<Movie>> GetByParametersAsync(long[]? genresIds, long[]? moviesStudiosIds, int[]? years, int skip, int take)
+    /// <summary>
+    /// Фильтры по режиссёрам, странам и участникам съёмочной группы; подставляются в WHERE подзапроса фильмов.
+    /// </summary>
+    private const string RelationsFilterSql = @"
+       AND (@MoviesDirectorsIds::bigint[] IS NULL OR EXISTS (
+            SELECT 1 FROM MoviesMoviesDirectors fmd
+            WHERE fmd.MovieId = m.Id AND fmd.MovieDirectorId = ANY(@MoviesDirectorsIds::bigint[])))
+       AND (@MoviesCountriesIds::bigint[] IS NULL OR EXISTS (
+            SELECT 1 FROM MoviesMoviesCountries fmc
+            WHERE fmc.MovieId = m.Id AND fmc.MovieCountryId = ANY(@MoviesCountriesIds::bigint[])))
+       AND (@MoviesPersonsIds::bigint[] IS NULL OR EXISTS (
+            SELECT 1 FROM MoviesMoviesPersons fmp
+            WHERE fmp.MovieId = m.Id AND fmp.MoviePersonId = ANY(@MoviesPersonsIds::bigint[])))";
+
+    public async Task<IEnumerable<Movie>> GetByParametersAsync(MovieFilterRequest filter)
     {
+        long[]? genresIds = filter.GenresIds;
+        long[]? moviesStudiosIds = filter.MoviesStudiosIds;
+        int[]? years = filter.Years;
+        int skip = filter.Skip;
+        int take = filter.Take;
+
         using NpgsqlConnection connection = CreateConnection();
 
         string sql = @"SELECT
@@ -485,7 +521,7 @@ FROM (
     WHERE 1=1
        AND (@GenresIds::bigint[] IS NULL OR mmg.MovieGenreId = ANY(@GenresIds::bigint[]))
        AND (@MoviesStudiosIds::bigint[] IS NULL OR mms.MovieStudioId = ANY(@MoviesStudiosIds::bigint[]))
-       AND (@Years::int[] IS NULL OR EXTRACT(YEAR FROM m.PremierDate) = ANY(@Years::int[]))
+       AND (@Years::int[] IS NULL OR EXTRACT(YEAR FROM m.PremierDate) = ANY(@Years::int[]))" + RelationsFilterSql + @"
     ORDER BY m.Id DESC
     OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY
 ) AS m
@@ -528,6 +564,9 @@ ORDER BY m.Id DESC;";
                 GenresIds = genresIds is { Length: > 0 } ? genresIds : null,
                 MoviesStudiosIds = moviesStudiosIds is { Length: > 0 } ? moviesStudiosIds : null,
                 Years = years is { Length: > 0 } ? years : null,
+                MoviesDirectorsIds = NullIfEmpty(filter.MoviesDirectorsIds),
+                MoviesCountriesIds = NullIfEmpty(filter.MoviesCountriesIds),
+                MoviesPersonsIds = NullIfEmpty(filter.MoviesPersonsIds),
                 Skip = skip,
                 Take = take
             },
@@ -537,8 +576,14 @@ ORDER BY m.Id DESC;";
         return moviesDictionary.Values.ToList();
     }
 
-    public async Task<int> GetCountByParametersAsync(long[]? genresIds, long[]? moviesStudiosIds, int[]? years)
+    private static long[]? NullIfEmpty(long[]? ids) => ids is { Length: > 0 } ? ids : null;
+
+    public async Task<int> GetCountByParametersAsync(MovieFilterRequest filter)
     {
+        long[]? genresIds = filter.GenresIds;
+        long[]? moviesStudiosIds = filter.MoviesStudiosIds;
+        int[]? years = filter.Years;
+
         using NpgsqlConnection connection = CreateConnection();
 
         string sql = @"SELECT COUNT(DISTINCT m.Id)
@@ -548,7 +593,7 @@ LEFT JOIN MoviesMoviesStudios mms ON mms.MovieId = m.Id
 WHERE 1=1
     AND (@GenresIds::bigint[] IS NULL OR mmg.MovieGenreId = ANY(@GenresIds))
     AND (@MoviesStudiosIds::bigint[] IS NULL OR mms.MovieStudioId = ANY(@MoviesStudiosIds))
-    AND (@Years::int[] IS NULL OR EXTRACT(YEAR FROM m.PremierDate) = ANY(@Years));";
+    AND (@Years::int[] IS NULL OR EXTRACT(YEAR FROM m.PremierDate) = ANY(@Years))" + RelationsFilterSql + ";";
 
         int count = await connection.ExecuteScalarAsync<int>(
             sql,
@@ -556,7 +601,10 @@ WHERE 1=1
             {
                 GenresIds = genresIds is { Length: > 0 } ? genresIds : null,
                 MoviesStudiosIds = moviesStudiosIds is { Length: > 0 } ? moviesStudiosIds : null,
-                Years = years is { Length: > 0 } ? years : null
+                Years = years is { Length: > 0 } ? years : null,
+                MoviesDirectorsIds = NullIfEmpty(filter.MoviesDirectorsIds),
+                MoviesCountriesIds = NullIfEmpty(filter.MoviesCountriesIds),
+                MoviesPersonsIds = NullIfEmpty(filter.MoviesPersonsIds)
             });
 
         return count;
@@ -709,6 +757,18 @@ DELETE FROM MoviesMoviesDirectors WHERE MovieId=@Id;", new { Id = id }, transact
         foreach (long movieDirectorId in entity.MoviesDirectorsIds.Distinct())
             await connection.ExecuteAsync("INSERT INTO MoviesMoviesDirectors (MovieId, MovieDirectorId) VALUES (@MovieId, @MovieDirectorId);",
                 new { MovieId = id, MovieDirectorId = movieDirectorId }, transaction: transaction);
+
+        if (entity.MoviesCountriesIds is not null)
+        {
+            await connection.ExecuteAsync("DELETE FROM MoviesMoviesCountries WHERE MovieId=@Id;", new { Id = id }, transaction: transaction);
+            await InsertCountriesAsync(connection, transaction, id, entity.MoviesCountriesIds);
+        }
+
+        if (entity.MoviesCrew is not null)
+        {
+            await connection.ExecuteAsync("DELETE FROM MoviesMoviesPersons WHERE MovieId=@Id;", new { Id = id }, transaction: transaction);
+            await InsertCrewAsync(connection, transaction, id, entity.MoviesCrew);
+        }
 
         await transaction.CommitAsync();
 

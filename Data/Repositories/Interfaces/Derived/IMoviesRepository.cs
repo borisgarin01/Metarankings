@@ -1,5 +1,6 @@
-﻿using Data.Repositories.Classes;
+using Data.Repositories.Classes;
 using Domain.Movies;
+using Domain.RequestsModels.Movies;
 using Domain.RequestsModels.Movies.Movies;
 
 namespace Data.Repositories.Interfaces.Derived;
@@ -9,19 +10,9 @@ public interface IMoviesRepository : IRepository<Movie, AddMovieModel, UpdateMov
     public Task<IEnumerable<Movie>> GetAsync(DateTime dateFrom, DateTime dateTo);
     Task<IEnumerable<Movie>> GetByNameAsync(string name);
     Task<IEnumerable<Movie>> GetByGenreAsync(long genreId);
-    Task<IEnumerable<Movie>> GetByParametersAsync(
-        long[]? genresIds,
-        long[]? moviesStudiosIds,
-        int[]? years,
-        int skip,
-        int take
-    );
+    Task<IEnumerable<Movie>> GetByParametersAsync(MovieFilterRequest filter);
 
-    Task<int> GetCountByParametersAsync(
-        long[]? genresIds,
-        long[]? moviesStudiosIds,
-        int[]? years
-    );
+    Task<int> GetCountByParametersAsync(MovieFilterRequest filter);
 
     Task<IEnumerable<Movie>> GetMostWaitingAsync(long[]? genresIds, int skip, int take);
 

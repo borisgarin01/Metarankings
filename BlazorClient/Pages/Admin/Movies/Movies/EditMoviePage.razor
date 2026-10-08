@@ -1,5 +1,6 @@
 @page "/admin/movies/edit-movie/{Id:long}"
 @using BlazorClient.Components.PagesComponents.Common
+@using BlazorClient.Components.PagesComponents.MovieDetails
 @using Domain.Movies
 
 <AuthorizeView Policy="Admin">
@@ -11,7 +12,7 @@
         {
             <p>Фильм не найден.</p>
         }
-        else if (Movie is null || MoviesDirectorsToSelectFrom is null || MoviesGenresToSelectFrom is null || MoviesStudiosToSelectFrom is null)
+        else if (Movie is null || MoviesDirectorsToSelectFrom is null || MoviesGenresToSelectFrom is null || MoviesStudiosToSelectFrom is null || MoviesCountriesToSelectFrom is null)
         {
             <p>Загружается...</p>
         }
@@ -92,6 +93,23 @@
                                  Placeholder="Select studios..."
                                  LabelPlural="studios" />
                 </p>
+                <p>
+                    <label>Страны:</label>
+                    @{
+                        var movieCountrySelector = (MovieCountry mc) => mc.Id;
+                        var movieCountryDisplay = (MovieCountry mc) => mc.Name;
+                    }
+                    <MultiSelect TItem="MovieCountry"
+                                 TId="long"
+                                 Items="MoviesCountriesToSelectFrom.ToList()"
+                                 @bind-SelectedIds="SelectedMoviesCountriesIds"
+                                 IdSelector="movieCountrySelector"
+                                 DisplaySelector="movieCountryDisplay"
+                                 Placeholder="Select countries..."
+                                 LabelPlural="countries" />
+                    <a href="/admin/movies/movies-countries/add-movie-country" target="_blank">Добавить страну</a>
+                </p>
+                <MovieCrewEditor Texts="CrewTexts" />
                 <p>
                     <label>
                         Постер (оставьте пустым, чтобы не менять):

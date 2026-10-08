@@ -1,0 +1,15 @@
+@using Domain.Movies
+
+<fieldset class="movie-crew-editor">
+    <legend>Съёмочная группа</legend>
+    <p class="hint">Имена через запятую или с новой строки, в порядке отображения на странице. Новые персоны создаются автоматически.</p>
+    @foreach (MovieCrewRole role in Enum.GetValues<MovieCrewRole>())
+    {
+        <p>
+            <label>
+                @MovieCrewLabels.GetRoleLabel(role):
+                <textarea rows="@(role == MovieCrewRole.Actor ? 4 : 2)" cols="80" @bind="Texts[role]"></textarea>
+            </label>
+        </p>
+    }
+</fieldset>

@@ -63,6 +63,16 @@ public sealed record Movie
     [JsonPropertyName("moviesDirectors")]
     public List<MovieDirector> MoviesDirectors { get; set; } = new List<MovieDirector>();
 
+    [JsonPropertyName("moviesCountries")]
+    public List<MovieCountry> MoviesCountries { get; set; } = new List<MovieCountry>();
+
+    /// <summary>
+    /// Съёмочная группа без режиссёров, упорядочена по роли и позиции внутри роли.
+    /// Заполняется только при выборке одного фильма.
+    /// </summary>
+    [JsonPropertyName("moviesCrew")]
+    public List<MovieCrewMember> MoviesCrew { get; set; } = new List<MovieCrewMember>();
+
     [JsonPropertyName("movieReviews")]
     public List<MovieViewerReview> MovieReviews { get; set; } = new List<MovieViewerReview>();
 }
