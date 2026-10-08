@@ -1,9 +1,24 @@
 ﻿@using BlazorClient.Components.PagesComponents.Common;
+@using Domain.Movies
 
 <div class="featured-movie">
     @if (!string.IsNullOrWhiteSpace(OriginalName))
     {
         <p><span class="label">Оригинальное название:</span> <span itemprop="alternativeHeadline">@OriginalName</span></p>
+    }
+    @if (Countries?.Any() == true)
+    {
+        <p>
+            <span class="label">Страна:</span>
+            @foreach ((MovieCountry country, int index) in Countries.Select((c, i) => (c, i)))
+            {
+                @if (index > 0)
+                {
+                    <text>, </text>
+                }
+                <a href="/movies/best-movies?MovieCountryId=@country.Id" itemprop="countryOfOrigin">@country.Name</a>
+            }
+        </p>
     }
     <GenresComponent Genres="@Genres" />
     <MoviesStudiosComponent MoviesStudios="@MoviesStudios" />

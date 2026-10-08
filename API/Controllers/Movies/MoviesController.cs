@@ -133,17 +133,9 @@ public sealed class MoviesController : ControllerBase
     [HttpPost("byParameters")]
     public async Task<IActionResult> GetByParameters([FromBody] MovieFilterRequest filter)
     {
-        var movies = await _moviesModelsRepository.GetByParametersAsync(
-            filter.GenresIds,
-            filter.MoviesStudiosIds,
-            filter.Years,
-            filter.Skip,
-            filter.Take);
+        var movies = await _moviesModelsRepository.GetByParametersAsync(filter);
 
-        int totalCount = await _moviesModelsRepository.GetCountByParametersAsync(
-            filter.GenresIds,
-            filter.MoviesStudiosIds,
-            filter.Years);
+        int totalCount = await _moviesModelsRepository.GetCountByParametersAsync(filter);
 
         return Ok(new PagedResponse<Movie>
         {

@@ -1,5 +1,6 @@
 ﻿@page "/admin/movies/add-movie"
 @using BlazorClient.Components.PagesComponents.Common
+@using BlazorClient.Components.PagesComponents.MovieDetails
 @using Domain.Movies
 
 <h3>Add movie page</h3>
@@ -9,7 +10,7 @@
 <AuthorizeView Roles="Admin">
     <Authorized>
         <a href="/admin">К странице админа</a>
-        @if (MoviesDirectorsToSelectFrom is null || MoviesGenresToSelectFrom is null || MoviesStudiosToSelectFrom is null)
+        @if (MoviesDirectorsToSelectFrom is null || MoviesGenresToSelectFrom is null || MoviesStudiosToSelectFrom is null || MoviesCountriesToSelectFrom is null)
         {
             <p>Загружается...</p>
         }
@@ -90,6 +91,23 @@
                                  Placeholder="Select studios..." />
                     <ValidationMessage For="() => SelectedMoviesStudios" />
                 </p>
+                <p>
+                    <label>Страны:</label>
+                    @{
+                        var movieCountrySelector = (MovieCountry mc) => mc.Id;
+                        var movieCountryDisplay = (MovieCountry mc) => mc.Name;
+                    }
+                    <MultiSelect TItem="MovieCountry"
+                                 TId="long"
+                                 Items="MoviesCountriesToSelectFrom.ToList()"
+                                 @bind-SelectedIds="SelectedMoviesCountriesIds"
+                                 IdSelector="movieCountrySelector"
+                                 DisplaySelector="movieCountryDisplay"
+                                 Placeholder="Select countries..."
+                                 LabelPlural="countries" />
+                    <a href="/admin/movies/movies-countries/add-movie-country" target="_blank">Добавить страну</a>
+                </p>
+                <MovieCrewEditor Texts="CrewTexts" />
                 <p>
                     <label>
                         Enter image:

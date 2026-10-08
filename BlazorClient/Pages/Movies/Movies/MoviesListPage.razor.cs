@@ -24,6 +24,8 @@ public partial class MoviesListPage : ComponentBase
     [SupplyParameterFromQuery] public long? GenreId { get; set; }
     [SupplyParameterFromQuery] public long? MovieStudioId { get; set; }
     [SupplyParameterFromQuery] public long? MovieDirectorId { get; set; }
+    [SupplyParameterFromQuery] public long? MovieCountryId { get; set; }
+    [SupplyParameterFromQuery] public long? MoviePersonId { get; set; }
     [SupplyParameterFromQuery] public int? Page { get; set; }
 
     public IEnumerable<Movie> Movies
@@ -96,6 +98,12 @@ public partial class MoviesListPage : ComponentBase
             if (MovieDirectorId.HasValue)
                 filter.MoviesDirectorsIds = new[] { MovieDirectorId.Value };
 
+            if (MovieCountryId.HasValue)
+                filter.MoviesCountriesIds = new[] { MovieCountryId.Value };
+
+            if (MoviePersonId.HasValue)
+                filter.MoviesPersonsIds = new[] { MoviePersonId.Value };
+
             HttpResponseMessage response = await HttpClientFactory
                 .CreateClient("AuthorizedClient")
                 .PostAsJsonAsync("/api/movies/byParameters", filter);
@@ -157,6 +165,12 @@ public partial class MoviesListPage : ComponentBase
 
         if (targetDirector.HasValue)
             parameters.Add($"MovieDirectorId={targetDirector}");
+
+        if (MovieCountryId.HasValue)
+            parameters.Add($"MovieCountryId={MovieCountryId}");
+
+        if (MoviePersonId.HasValue)
+            parameters.Add($"MoviePersonId={MoviePersonId}");
 
         if (targetPage > 1)
             parameters.Add($"Page={targetPage}");

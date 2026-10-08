@@ -1,0 +1,14 @@
+.movie-crew {
+    margin: 20px 0;
+    color: #111;
+}
+
+.movie-crew h3 {
+    margin: 10px 0 4px;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.movie-crew p {
+    margin: 0;
+}

@@ -1,9 +1,11 @@
 using Blazored.Toast.Services;
 using Domain.Movies;
 using Domain.RequestsModels.Movies.Movies;
+using Domain.RequestsModels.Movies.MoviesCountries;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Domain.RequestsModels.Movies.MoviesGenres;
 using Domain.RequestsModels.Movies.MoviesStudios;
+using BlazorClient.Components.PagesComponents.MovieDetails;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO;
 using WebManagers;
@@ -31,6 +33,9 @@ public sealed partial class EditMoviePage : ComponentBase
     public IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel> MoviesStudiosWebManager { get; set; }
 
     [Inject]
+    public IWebManager<MovieCountry, AddMovieCountryModel, UpdateMovieCountryModel> MoviesCountriesWebManager { get; set; }
+
+    [Inject]
     public MoviesWebManager MoviesWebManager { get; set; }
 
     [Inject]
@@ -46,6 +51,7 @@ public sealed partial class EditMoviePage : ComponentBase
     public IEnumerable<MovieDirector> MoviesDirectorsToSelectFrom { get; private set; }
     public IEnumerable<Genre> MoviesGenresToSelectFrom { get; private set; }
     public IEnumerable<MovieStudio> MoviesStudiosToSelectFrom { get; private set; }
+    public IEnumerable<MovieCountry> MoviesCountriesToSelectFrom { get; private set; }
 
     public string Name { get; set; }
     public string OriginalName { get; set; }
@@ -56,6 +62,9 @@ public sealed partial class EditMoviePage : ComponentBase
     public List<long> SelectedMoviesDirectorsIds { get; private set; } = new List<long>();
     public List<long> SelectedMoviesGenresIds { get; private set; } = new List<long>();
     public List<long> SelectedMoviesStudiosIds { get; private set; } = new List<long>();
+    public List<long> SelectedMoviesCountriesIds { get; private set; } = new List<long>();
+
+    public Dictionary<MovieCrewRole, string> CrewTexts { get; private set; } = MovieCrewEditor.CreateTexts();
 
     /// <summary>Data-url нового постера или текущий постер фильма.</summary>
     public string ImagePreview { get; private set; }
@@ -66,6 +75,7 @@ public sealed partial class EditMoviePage : ComponentBase
         Task<IEnumerable<MovieDirector>> moviesDirectorsGettingTask = MoviesDirectorsWebManager.GetAllAsync();
         Task<IEnumerable<Genre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
         Task<IEnumerable<MovieStudio>> moviesStudiosGettingTask = MoviesStudiosWebManager.GetAllAsync();
+        Task<IEnumerable<MovieCountry>> moviesCountriesGettingTask = MoviesCountriesWebManager.GetAllAsync();
 
         try
         {
@@ -76,11 +86,12 @@ public sealed partial class EditMoviePage : ComponentBase
             Movie = null;
         }
 
-        await Task.WhenAll(moviesDirectorsGettingTask, moviesGenresGettingTask, moviesStudiosGettingTask);
+        await Task.WhenAll(moviesDirectorsGettingTask, moviesGenresGettingTask, moviesStudiosGettingTask, moviesCountriesGettingTask);
 
         MoviesDirectorsToSelectFrom = moviesDirectorsGettingTask.Result;
         MoviesGenresToSelectFrom = moviesGenresGettingTask.Result;
         MoviesStudiosToSelectFrom = moviesStudiosGettingTask.Result;
+        MoviesCountriesToSelectFrom = moviesCountriesGettingTask.Result;
 
         if (Movie is null)
         {
@@ -98,6 +109,8 @@ public sealed partial class EditMoviePage : ComponentBase
         SelectedMoviesDirectorsIds = Movie.MoviesDirectors.Select(d => d.Id).ToList();
         SelectedMoviesGenresIds = Movie.MovieGenres.Select(g => g.Id).ToList();
         SelectedMoviesStudiosIds = Movie.MoviesStudios.Select(s => s.Id).ToList();
+        SelectedMoviesCountriesIds = Movie.MoviesCountries.Select(c => c.Id).ToList();
+        CrewTexts = MovieCrewEditor.CreateTexts(Movie.MoviesCrew);
     }
 
     private async Task FileUploaded(InputFileChangeEventArgs e)
@@ -161,7 +174,9 @@ public sealed partial class EditMoviePage : ComponentBase
                 MoviesDirectorsIds: SelectedMoviesDirectorsIds,
                 MoviesGenresIds: SelectedMoviesGenresIds,
                 MoviesStudiosIds: SelectedMoviesStudiosIds,
-                Trailer: Trailer);
+                Trailer: Trailer,
+                MoviesCountriesIds: SelectedMoviesCountriesIds,
+                MoviesCrew: MovieCrewEditor.ToModels(CrewTexts));
 
             Movie? updatedMovie = await MoviesWebManager.UpdateAsync(Id, updateMovieModel);
 

@@ -17,7 +17,9 @@ using Domain.RequestsModels.Games.Localizations;
 using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Games.Publishers;
 using Domain.RequestsModels.Movies.Collections;
+using Domain.RequestsModels.Movies.MoviesCountries;
 using Domain.RequestsModels.Movies.MoviesDirectors;
+using Domain.RequestsModels.Movies.MoviesPersons;
 using Domain.RequestsModels.Movies.MoviesGenres;
 using Domain.RequestsModels.Movies.MoviesStudios;
 
@@ -50,6 +52,10 @@ public static class RepositoriesRegistrator
         services.AddScoped<IRepository<Domain.Movies.Genre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresRepository>(instance => new MoviesGenresRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosRepository>(instance => new MoviesStudiosRepository(metarankingsConnectionString));
+
+        services.AddScoped<IRepository<MovieCountry, AddMovieCountryModel, UpdateMovieCountryModel>, MoviesCountriesRepository>(instance => new MoviesCountriesRepository(metarankingsConnectionString));
+
+        services.AddScoped<IRepository<MoviePerson, AddMoviePersonModel, UpdateMoviePersonModel>, MoviesPersonsRepository>(instance => new MoviesPersonsRepository(metarankingsConnectionString));
 
         services.AddScoped<IGamesPlayersReviewsRepository, GamesPlayersReviewsRepository>(instance => new GamesPlayersReviewsRepository(metarankingsConnectionString));
 

@@ -2,7 +2,9 @@
 using Domain.Movies.Collections;
 using Domain.RequestsModels.Movies.Collections;
 using Domain.RequestsModels.Movies.Movies;
+using Domain.RequestsModels.Movies.MoviesCountries;
 using Domain.RequestsModels.Movies.MoviesDirectors;
+using Domain.RequestsModels.Movies.MoviesPersons;
 using Domain.RequestsModels.Movies.MoviesGenres;
 using Domain.RequestsModels.Movies.MoviesStudios;
 using WebManagers;
@@ -19,6 +21,8 @@ public static class MoviesWebManagersRegistrator
         serviceCollection.AddSingleton<IWebManager<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsWebManager>()
             .AddSingleton<IWebManager<Genre, AddMovieGenreModel, UpdateMovieGenreModel>, MoviesGenresWebManager>()
             .AddSingleton<IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>, MoviesStudiosWebManager>()
+            .AddSingleton<IWebManager<MovieCountry, AddMovieCountryModel, UpdateMovieCountryModel>, MoviesCountriesWebManager>()
+            .AddSingleton<IWebManager<MoviePerson, AddMoviePersonModel, UpdateMoviePersonModel>, MoviesPersonsWebManager>()
             .AddSingleton<MoviesWebManager>()
             .AddSingleton<IWebManager<Movie, AddMovieModel, UpdateMovieModel>>(serviceProvider => serviceProvider.GetRequiredService<MoviesWebManager>())
             .AddSingleton<IWebManager<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel>, MoviesCollectionsWebManager>()

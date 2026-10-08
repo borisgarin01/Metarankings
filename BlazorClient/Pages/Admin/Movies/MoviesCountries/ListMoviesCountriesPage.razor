@@ -1,0 +1,29 @@
+@page "/admin/movies/movies-countries/movies-countries-list"
+@using Domain.Movies
+
+<AuthorizeView Policy="Admin">
+    <Authorized>
+        <a href="/admin">К странице админа</a>
+        <a href="/admin/movies/movies-countries/add-movie-country">Добавить</a>
+        <p>
+            <input type="search" placeholder="Поиск..." @bind="Filter" @bind:event="oninput" />
+        </p>
+        @if (Entities is null)
+        {
+            <p>Загружается...</p>
+        }
+        else
+        {
+            foreach (MovieCountry entity in FilteredEntities)
+            {
+                <div class="movie-country">
+                    <h4><a href="/movies/best-movies?MovieCountryId=@entity.Id">@entity.Name</a></h4>
+                    <a href="/admin/movies/movies-countries/remove-movie-country/@entity.Id">Удалить</a>
+                </div>
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <a href="/auth/login">Авторизируйся</a> или <a href="/auth/register">Зарегистрируйся</a> админом, чтобы управлять справочником
+    </NotAuthorized>
+</AuthorizeView>

@@ -1,9 +1,11 @@
 ﻿using Blazored.Toast.Services;
 using Domain.Movies;
 using Domain.RequestsModels.Movies.Movies;
+using Domain.RequestsModels.Movies.MoviesCountries;
 using Domain.RequestsModels.Movies.MoviesDirectors;
 using Domain.RequestsModels.Movies.MoviesGenres;
 using Domain.RequestsModels.Movies.MoviesStudios;
+using BlazorClient.Components.PagesComponents.MovieDetails;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO;
 using WebManagers;
@@ -28,6 +30,9 @@ public sealed partial class AddMoviePage : ComponentBase
     public IWebManager<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel> MoviesStudiosWebManager { get; set; }
 
     [Inject]
+    public IWebManager<MovieCountry, AddMovieCountryModel, UpdateMovieCountryModel> MoviesCountriesWebManager { get; set; }
+
+    [Inject]
     public MoviesWebManager MoviesWebManager { get; set; }
 
     [Inject]
@@ -39,6 +44,7 @@ public sealed partial class AddMoviePage : ComponentBase
     public IEnumerable<MovieDirector> MoviesDirectorsToSelectFrom { get; set; }
     public IEnumerable<Genre> MoviesGenresToSelectFrom { get; set; }
     public IEnumerable<MovieStudio> MoviesStudiosToSelectFrom { get; set; }
+    public IEnumerable<MovieCountry> MoviesCountriesToSelectFrom { get; set; }
 
     public List<MovieDirector> SelectedMoviesDirectors { get; set; } = new List<MovieDirector>();
     public List<Genre> SelectedMoviesGenres { get; set; } = new List<Genre>();
@@ -62,6 +68,9 @@ public sealed partial class AddMoviePage : ComponentBase
     public List<long> SelectedMoviesDirectorsIds { get; private set; } = new List<long>();
     public List<long> SelectedMoviesGenresIds { get; private set; } = new List<long>();
     public List<long> SelectedMoviesStudiosIds { get; private set; } = new List<long>();
+    public List<long> SelectedMoviesCountriesIds { get; private set; } = new List<long>();
+
+    public Dictionary<MovieCrewRole, string> CrewTexts { get; } = MovieCrewEditor.CreateTexts();
 
     public IBrowserFile ImageToUpload { get; private set; }
 
@@ -70,12 +79,14 @@ public sealed partial class AddMoviePage : ComponentBase
         Task<IEnumerable<MovieDirector>> moviesDirectorsGetttingTask = MoviesDirectorsWebManager.GetAllAsync();
         Task<IEnumerable<Genre>> moviesGenresGettingTask = MoviesGenresWebManager.GetAllAsync();
         Task<IEnumerable<MovieStudio>> moviesStudiosGettingTask = MoviesStudiosWebManager.GetAllAsync();
+        Task<IEnumerable<MovieCountry>> moviesCountriesGettingTask = MoviesCountriesWebManager.GetAllAsync();
 
-        await Task.WhenAll(moviesDirectorsGetttingTask, moviesGenresGettingTask, moviesStudiosGettingTask).ContinueWith(a =>
+        await Task.WhenAll(moviesDirectorsGetttingTask, moviesGenresGettingTask, moviesStudiosGettingTask, moviesCountriesGettingTask).ContinueWith(a =>
         {
             MoviesDirectorsToSelectFrom = moviesDirectorsGetttingTask.Result;
             MoviesGenresToSelectFrom = moviesGenresGettingTask.Result;
             MoviesStudiosToSelectFrom = moviesStudiosGettingTask.Result;
+            MoviesCountriesToSelectFrom = moviesCountriesGettingTask.Result;
         });
     }
 
@@ -162,7 +173,12 @@ public sealed partial class AddMoviePage : ComponentBase
                             .Where(s => SelectedMoviesStudiosIds.Contains(s.Id))
                             .Select(b => b.Name)
                             .ToList(),
-                        Trailer: Trailer
+                        Trailer: Trailer,
+                        MoviesCountriesNames: MoviesCountriesToSelectFrom
+                            .Where(c => SelectedMoviesCountriesIds.Contains(c.Id))
+                            .Select(c => c.Name)
+                            .ToList(),
+                        MoviesCrew: MovieCrewEditor.ToModels(CrewTexts)
                     );
 
                     HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addMovieModel);
