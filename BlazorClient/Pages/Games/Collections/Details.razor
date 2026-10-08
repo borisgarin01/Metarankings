@@ -5,7 +5,11 @@
 @using Domain.Games.Collections
 @using Microsoft.Extensions.Configuration
 
-@if (GameCollection is null)
+@if (IsNotFound)
+{
+    <p>Подборка не найдена.</p>
+}
+else if (GameCollection is null)
 {
     <p>Loading...</p>
 }

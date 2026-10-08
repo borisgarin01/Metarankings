@@ -4,7 +4,11 @@
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 
-@if (MoviesCollection is null)
+@if (IsNotFound)
+{
+    <p>Подборка не найдена.</p>
+}
+else if (MoviesCollection is null)
 {
     <p>Loading...</p>
 }
