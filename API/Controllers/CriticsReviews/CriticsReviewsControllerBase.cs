@@ -21,15 +21,15 @@ public abstract class CriticsReviewsControllerBase : ControllerBase
     }
 
     [HttpGet("entity/{entityId:long}")]
-    public async Task<ActionResult<IEnumerable<CriticReview>>> GetByEntityAsync(long entityId)
+    public async Task<ActionResult<IEnumerable<CriticReview>>> GetByEntityAsync(long entityId, CancellationToken cancellationToken = default)
     {
-        return Ok(await _criticsReviewsRepository.GetByEntityAsync(entityId));
+        return Ok(await _criticsReviewsRepository.GetByEntityAsync(entityId, cancellationToken));
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<CriticReview>> GetAsync(long id)
+    public async Task<ActionResult<CriticReview>> GetAsync(long id, CancellationToken cancellationToken = default)
     {
-        CriticReview? criticReview = await _criticsReviewsRepository.GetAsync(id);
+        CriticReview? criticReview = await _criticsReviewsRepository.GetAsync(id, cancellationToken);
         if (criticReview is null)
             return NotFound();
 
@@ -38,15 +38,15 @@ public abstract class CriticsReviewsControllerBase : ControllerBase
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<CriticReview>> AddAsync(CriticReviewModel criticReviewModel)
+    public async Task<ActionResult<CriticReview>> AddAsync(CriticReviewModel criticReviewModel, CancellationToken cancellationToken = default)
     {
         if (User.GetUserId() is not long userId)
             return Unauthorized();
 
         try
         {
-            long id = await _criticsReviewsRepository.AddAsync(criticReviewModel, userId);
-            return Created($"{Request.Path}/{id}", await _criticsReviewsRepository.GetAsync(id));
+            long id = await _criticsReviewsRepository.AddAsync(criticReviewModel, userId, cancellationToken);
+            return Created($"{Request.Path}/{id}", await _criticsReviewsRepository.GetAsync(id, cancellationToken));
         }
         catch (Npgsql.PostgresException ex) when (ex.SqlState == Npgsql.PostgresErrorCodes.UniqueViolation)
         {
@@ -65,11 +65,11 @@ public abstract class CriticsReviewsControllerBase : ControllerBase
 
     [HttpPut("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<CriticReview>> UpdateAsync(long id, CriticReviewModel criticReviewModel)
+    public async Task<ActionResult<CriticReview>> UpdateAsync(long id, CriticReviewModel criticReviewModel, CancellationToken cancellationToken = default)
     {
         try
         {
-            CriticReview? updatedCriticReview = await _criticsReviewsRepository.UpdateAsync(criticReviewModel, id);
+            CriticReview? updatedCriticReview = await _criticsReviewsRepository.UpdateAsync(criticReviewModel, id, cancellationToken);
             if (updatedCriticReview is null)
                 return NotFound();
 
@@ -88,12 +88,12 @@ public abstract class CriticsReviewsControllerBase : ControllerBase
 
     [HttpDelete("{id:long}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult> RemoveAsync(long id)
+    public async Task<ActionResult> RemoveAsync(long id, CancellationToken cancellationToken = default)
     {
-        if (await _criticsReviewsRepository.GetAsync(id) is null)
+        if (await _criticsReviewsRepository.GetAsync(id, cancellationToken) is null)
             return NotFound();
 
-        await _criticsReviewsRepository.RemoveAsync(id);
+        await _criticsReviewsRepository.RemoveAsync(id, cancellationToken);
         return NoContent();
     }
 }

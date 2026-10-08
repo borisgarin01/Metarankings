@@ -13,8 +13,8 @@ public sealed class MoviesStudiosController : CrudControllerBase<MovieStudio, Ad
 
     // Маршрут [HttpGet("{id:long}")] наследуется от базового метода.
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public override Task<ActionResult<MovieStudio>> GetAsync(long id)
+    public override Task<ActionResult<MovieStudio>> GetAsync(long id, CancellationToken cancellationToken = default)
     {
-        return base.GetAsync(id);
+        return base.GetAsync(id, cancellationToken);
     }
 }

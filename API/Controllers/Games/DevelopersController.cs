@@ -19,21 +19,21 @@ public sealed class DevelopersController : CrudControllerBase<Developer, AddDeve
 
     [HttpPost("upload-developers-from-json")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public Task<ActionResult> AddFromJsonAsync(IEnumerable<AddDeveloperModel> developers)
+    public Task<ActionResult> AddFromJsonAsync(IEnumerable<AddDeveloperModel> developers, CancellationToken cancellationToken = default)
     {
-        return AddRangeFromJsonAsync(developers, "Developers");
+        return AddRangeFromJsonAsync(developers, "Developers", cancellationToken);
     }
 
     [HttpPost("developers-excel-upload")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public Task<ActionResult> AddFromExcelAsync(IFormFile excelFileWithDevelopers)
+    public Task<ActionResult> AddFromExcelAsync(IFormFile excelFileWithDevelopers, CancellationToken cancellationToken = default)
     {
-        return AddRangeFromExcelAsync(excelFileWithDevelopers, _developersExcelDataReader.GetFromExcel);
+        return AddRangeFromExcelAsync(excelFileWithDevelopers, _developersExcelDataReader.GetFromExcel, cancellationToken);
     }
 
-    protected override async Task<ActionResult?> ValidateAddAsync(AddDeveloperModel addDeveloperModel)
+    protected override async Task<ActionResult?> ValidateAddAsync(AddDeveloperModel addDeveloperModel, CancellationToken cancellationToken = default)
     {
-        Developer? existingDeveloper = await _developersRepository.GetByNameAsync(addDeveloperModel.Name);
+        Developer? existingDeveloper = await _developersRepository.GetByNameAsync(addDeveloperModel.Name, cancellationToken);
 
         if (existingDeveloper is not null)
             return BadRequest($"Разраб с именем {existingDeveloper.Name} уже существует");
