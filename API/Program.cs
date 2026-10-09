@@ -218,6 +218,21 @@ internal class Program
             });
         });
 
+        // Redis как IDistributedCache; без строки подключения — in-memory кэш (локальная разработка)
+        string redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection");
+        if (string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            _ = builder.Services.AddDistributedMemoryCache();
+        }
+        else
+        {
+            _ = builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = redisConnectionString;
+                options.InstanceName = "metarankings:";
+            });
+        }
+
         _ = builder.Services.RegisterRepositories(builder.Configuration);
         _ = builder.Services.RegisterFilesDataReaders();
 

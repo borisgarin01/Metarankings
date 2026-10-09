@@ -7,6 +7,8 @@
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - "3000:3000"
     networks:
@@ -15,6 +17,7 @@
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: "http://0.0.0.0:3000"
       ConnectionStrings__PostgresConnection: Host=db; Port=5432; Database=${DB_NAME}; Trust Server Certificate=true; Username=${DB_USER}; Password=${DB_PASSWORD}
+      ConnectionStrings__RedisConnection: redis:6379,password=${REDIS_PASSWORD},abortConnect=false
     volumes:
       - ./Games:/app/Games
       - ./Movies:/app/Movies
@@ -39,6 +42,24 @@
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis:7.4-alpine
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes" ]
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep PONG" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+    volumes:
+      - redis_data:/data
+    networks:
+      - metarankings-api-network
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
   nginx:
     image: nginx:alpine
     ports:
@@ -61,3 +82,4 @@ networks:
 
 volumes:
   postgres_data:
+  redis_data:
