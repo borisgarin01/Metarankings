@@ -4,6 +4,7 @@ using Domain.RequestsModels.Movies.MoviesGenres;
 
 namespace API.Controllers.Movies;
 
+[OutputCache(PolicyName = CachePolicies.PublicRead, Tags = new[] { CacheTags.Movies })]
 [Route("api/movies/[controller]")]
 public sealed class GenresController : CrudControllerBase<Genre, AddMovieGenreModel, UpdateMovieGenreModel>
 {

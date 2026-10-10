@@ -8,6 +8,7 @@ using Domain.ResponsesModels;
 namespace API.Controllers.Games;
 
 [ApiController]
+[OutputCache(PolicyName = CachePolicies.PublicRead, Tags = new[] { CacheTags.Games })]
 [Route("api/games/[controller]")]
 public sealed class GamesController : ControllerBase
 {

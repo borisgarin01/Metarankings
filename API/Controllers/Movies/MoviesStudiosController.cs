@@ -4,6 +4,7 @@ using Domain.RequestsModels.Movies.MoviesStudios;
 
 namespace API.Controllers.Movies;
 
+[OutputCache(PolicyName = CachePolicies.PublicRead, Tags = new[] { CacheTags.Movies })]
 [Route("api/movies/[controller]")]
 public sealed class MoviesStudiosController : CrudControllerBase<MovieStudio, AddMovieStudioModel, UpdateMovieStudioModel>
 {

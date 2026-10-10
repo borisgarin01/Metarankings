@@ -10,6 +10,7 @@ using BackendShift = Domain.RequestsModels.Games.GamesGamersReviews.Shifts.Backe
 namespace API.Controllers.Movies;
 
 [ApiController]
+[OutputCache(PolicyName = CachePolicies.PublicRead, Tags = new[] { CacheTags.Movies })]
 [Route("api/movies/[controller]")]
 public sealed class MoviesViewersReviewsController : ControllerBase
 {

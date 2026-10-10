@@ -2,6 +2,7 @@ using Data.Repositories.Classes.Derived.Waitings;
 
 namespace API.Controllers.Waitings;
 
+[InvalidatesCache(CacheTags.Games)]
 [Route("api/games/[controller]")]
 public sealed class GamesWaitingsController : WaitingsControllerBase
 {

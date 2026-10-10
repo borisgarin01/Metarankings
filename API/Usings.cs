@@ -23,3 +23,5 @@ global using Microsoft.Extensions.Hosting;
 global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.Extensions.Logging;
 global using System.Linq;
+global using API.Caching;
+global using Microsoft.AspNetCore.OutputCaching;

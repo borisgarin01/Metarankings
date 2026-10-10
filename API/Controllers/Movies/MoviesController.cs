@@ -11,6 +11,7 @@ using Domain.ResponsesModels;
 namespace API.Controllers.Movies;
 
 [ApiController]
+[OutputCache(PolicyName = CachePolicies.PublicRead, Tags = new[] { CacheTags.Movies })]
 [Route("api/[controller]")]
 public sealed class MoviesController : ControllerBase
 {

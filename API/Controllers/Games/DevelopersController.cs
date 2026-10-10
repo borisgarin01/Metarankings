@@ -5,6 +5,7 @@ using ExcelProcessors;
 
 namespace API.Controllers.Games;
 
+[OutputCache(PolicyName = CachePolicies.PublicRead, Tags = new[] { CacheTags.Games })]
 [Route("api/games/[controller]")]
 public sealed class DevelopersController : CrudControllerBase<Developer, AddDeveloperModel, UpdateDeveloperModel>
 {

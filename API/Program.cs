@@ -1,4 +1,5 @@
 ﻿using API.Auth;
+using API.Caching;
 using API.Hubs;
 using API.IServiceCollectionExtensions;
 using AspNet.Security.OAuth.VkId;
@@ -184,7 +185,11 @@ internal class Program
         builder.Services.AddScoped<ITokensService, TokensService>();
 
 
-        _ = builder.Services.AddControllers(options => options.EnableEndpointRouting = false)
+        _ = builder.Services.AddControllers(options =>
+            {
+                options.EnableEndpointRouting = false;
+                _ = options.Filters.Add<OutputCacheInvalidationFilter>();
+            })
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -218,20 +223,8 @@ internal class Program
             });
         });
 
-        // Redis как IDistributedCache; без строки подключения — in-memory кэш (локальная разработка)
-        string redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection");
-        if (string.IsNullOrWhiteSpace(redisConnectionString))
-        {
-            _ = builder.Services.AddDistributedMemoryCache();
-        }
-        else
-        {
-            _ = builder.Services.AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = redisConnectionString;
-                options.InstanceName = "metarankings:";
-            });
-        }
+        // Redis (IDistributedCache + output-кэш ответов); без строки подключения — in-memory (локальная разработка)
+        _ = builder.Services.RegisterCaching(builder.Configuration);
 
         _ = builder.Services.RegisterRepositories(builder.Configuration);
         _ = builder.Services.RegisterFilesDataReaders();
@@ -278,6 +271,8 @@ internal class Program
         _ = app.UseCors("AllowBlazorFrontend");
         _ = app.UseAuthentication();
         _ = app.UseAuthorization();
+        // После авторизации: закэшированный ответ не отдаётся в обход [Authorize]
+        _ = app.UseOutputCache();
 
         _ = app.MapOpenApi();
         _ = app.MapScalarApiReference(options =>

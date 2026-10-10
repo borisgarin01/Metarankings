@@ -2,6 +2,7 @@ using Data.Repositories.Classes.Derived.CriticsReviews;
 
 namespace API.Controllers.CriticsReviews;
 
+[OutputCache(PolicyName = CachePolicies.PublicRead, Tags = new[] { CacheTags.Games })]
 [Route("api/games/[controller]")]
 public sealed class GamesCriticsReviewsController : CriticsReviewsControllerBase
 {

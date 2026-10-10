@@ -5,6 +5,7 @@ using Domain.Common.News;
 namespace API.Controllers;
 
 [ApiController]
+[OutputCache(PolicyName = CachePolicies.PublicRead, Tags = new[] { CacheTags.News })]
 [Route("api/[controller]")]
 public sealed class NewsController : ControllerBase
 {

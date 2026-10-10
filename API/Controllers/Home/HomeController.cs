@@ -14,6 +14,7 @@ using ViewModels;
 namespace API.Controllers.Home;
 
 [ApiController]
+[OutputCache(PolicyName = CachePolicies.PublicRead, Tags = new[] { CacheTags.Games, CacheTags.Movies })]
 [Route("api/[controller]")]
 public sealed class HomeController : ControllerBase
 {
