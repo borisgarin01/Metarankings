@@ -3,11 +3,12 @@ using Domain.Movies;
 using Domain.RequestsModels.Games.Genres;
 using Domain.RequestsModels.Games.Platforms;
 using Domain.RequestsModels.Movies.MoviesGenres;
+using Microsoft.AspNetCore.Components.Routing;
 using WebManagers;
 
 namespace BlazorClient.Components.PagesComponents.Common;
 
-public partial class Headerer : ComponentBase
+public partial class Headerer : ComponentBase, IDisposable
 {
 
     private bool isMenuOpen = false;
@@ -45,6 +46,11 @@ public partial class Headerer : ComponentBase
     public IWebManager<Domain.Games.Genre, AddGameGenreModel, UpdateGameGenreModel> GamesGenresWebManager { get; set; }
 
     // ===== ЖИЗНЕННЫЙ ЦИКЛ =====
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -81,6 +87,24 @@ public partial class Headerer : ComponentBase
         {
             await JS.InvokeVoidAsync("document.body.classList.remove", "menu-open");
         }
+    }
+
+    // Закрываем бургер-меню после навигации
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (isMenuOpen)
+        {
+            _ = InvokeAsync(async () =>
+            {
+                await ToggleMenu();
+                StateHasChanged();
+            });
+        }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
     }
 
     private void Logout() => NavigationManager.NavigateTo("/auth/logout");

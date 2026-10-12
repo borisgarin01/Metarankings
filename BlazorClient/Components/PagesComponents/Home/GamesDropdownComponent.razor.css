@@ -62,7 +62,7 @@
     background: #f1f1f1;
 }
 
-.nav ul li:hover .game-drop {
+.game-drop.show {
     padding: 5px;
     display: block;
 }

@@ -1,6 +1,6 @@
 ﻿@using Domain.Movies
 
-<li @onmouseenter="ShowMovies" @onmouseleave="HideMovies">
+<li @onmouseenter="ShowMovies" @onmouseleave="HideMovies" @onclick="HideMovies">
     <span><a href="/movies/best-movies/">Фильмы</a></span>
     <div class="movie-drop @(moviesDropdownClass)">
         <a href="/movies/new-movies/">Новинки</a>
