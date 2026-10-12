@@ -64,6 +64,8 @@ public partial class Headerer : ComponentBase
 
             // Инициализируем скролл и клики
             await JS.InvokeVoidAsync("initHeader", headerBottomRef);
+
+            await JS.InvokeVoidAsync("document.body.classList.remove", "menu-open");
         }
     }
 
