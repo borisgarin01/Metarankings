@@ -16,6 +16,23 @@
     height: 0;
 }
 
+.dropdown-menu.open {
+    z-index: 100;
+}
+
+.dropdown-menu.open ul {
+    border: 1px solid #999;
+    position: absolute;
+    opacity: 1;
+    visibility: visible;
+    height: auto;
+}
+
+.dropdown-menu.open .title::after {
+    border-bottom: 5px solid #555;
+    border-top: 0 none;
+}
+
 .dropdown-menu ul li {
     background: #fff;
     font-size: 14px;

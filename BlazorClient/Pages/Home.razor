@@ -37,7 +37,7 @@ else
                     <h3><a href="/movies/new-movies/">Новые фильмы</a></h3>
                     <MoviesListComponent Movies="@Movies" />
                     <div class="title-index">
-                        <div class="dropdown-menu genre" @onclick="ToggleDropdownMovies">
+                        <div class="dropdown-menu genre @(isMoviesDropdownOpen ? "open" : "")" @onclick="ToggleDropdownMovies">
                             <span class="title">Год</span>
                             @if (isMoviesDropdownOpen)
                             {
@@ -57,7 +57,7 @@ else
                     <h3><a href="/games/new-games/">Новые игры</a></h3>
                     <GamesListComponent Games="@Games" />
                     <div class="title-index">
-                        <div class="dropdown-menu genre" @onclick="ToggleDropdownGames">
+                        <div class="dropdown-menu genre @(isGamesDropdownOpen ? "open" : "")" @onclick="ToggleDropdownGames">
                             <span class="title">Год</span>
                             @if (isGamesDropdownOpen)
                             {
