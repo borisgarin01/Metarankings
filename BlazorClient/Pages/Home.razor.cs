@@ -18,6 +18,9 @@ public partial class Home : ComponentBase
     private IEnumerable<GamesReleaseDateItemViewModel> gamesReleaseDateItemComponents;
     private IEnumerable<Domain.Movies.Genre> moviesGenres;
 
+    private bool isMoviesDropdownOpen;
+    private bool isGamesDropdownOpen;
+
     [Inject]
     public IHttpClientFactory HttpClientFactory { get; set; }
 
@@ -114,6 +117,24 @@ public partial class Home : ComponentBase
 
     public int MoviesViewersReviewsOffset { get; } = 0;
     public int MoviesViewersReviewsLimit { get; } = 5;
+    public bool IsMoviesDropdownOpen
+    {
+        get => isMoviesDropdownOpen;
+        set
+        {
+            isMoviesDropdownOpen = value;
+            StateHasChanged();
+        }
+    }
+    public bool IsGamesDropdownOpen
+    {
+        get => isGamesDropdownOpen;
+        set
+        {
+            isGamesDropdownOpen = value;
+            StateHasChanged();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -163,5 +184,16 @@ public partial class Home : ComponentBase
     new SlideGroup("Игры",(Games ?? Enumerable.Empty<Game>())
             .Take(6)
             .Select(g => new SlideItem($"/games/details/{g.Id}", g.Name, g.Image, g.UsersScore))) };
+    }
+
+    public Task ToggleDropdownMovies()
+    {
+        IsMoviesDropdownOpen = !IsMoviesDropdownOpen;
+        return Task.CompletedTask;
+    }
+    public Task ToggleDropdownGames()
+    {
+        IsGamesDropdownOpen = !IsGamesDropdownOpen;
+        return Task.CompletedTask;
     }
 }
