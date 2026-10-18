@@ -1,5 +1,6 @@
 ﻿@page "/admin/movies/collections/{Id:long}/manage-collection"
 
+@using System.Globalization
 @using Domain.Movies.Collections
 
 @if (MoviesCollection is null)
@@ -35,7 +36,7 @@ else
                 <div class="p-meta">Студии:  @string.Join(", ", moviesCollectionItem.Movie.MoviesStudios.Select(d => d.Name))</div>
                 <div class="p-meta">Режиссеры:  @string.Join(", ", moviesCollectionItem.Movie.MoviesDirectors.Select(d => d.Name))</div>
                 <div class="p-meta">
-                    Дата премьеры:  @moviesCollectionItem.Movie.PremierDate.Value.ToString("dd MMMM yyyy")
+                    Дата премьеры:  @moviesCollectionItem.Movie.PremierDate.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
                 </div>
             </div>
         </div>

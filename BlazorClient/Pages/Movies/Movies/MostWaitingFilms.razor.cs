@@ -14,8 +14,6 @@ public partial class MostWaitingFilms : ComponentBase
 {
     private const int PageSize = 25;
     private const string BasePath = "/movies/most-waiting-movies";
-    private static readonly CultureInfo RussianCulture = new CultureInfo("ru-RU");
-
     private bool isLoading = false;
     private int currentPage = 1;
     private Dictionary<long, bool?> userVotes = new Dictionary<long, bool?>();

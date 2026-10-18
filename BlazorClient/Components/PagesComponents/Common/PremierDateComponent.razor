@@ -1,1 +1,2 @@
-﻿<p><span class="label">Дата премьеры:</span> <span>@PremierDate</span></p>
+﻿@using System.Globalization
+<p><span class="label">Дата премьеры:</span> <span>@PremierDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))</span></p>

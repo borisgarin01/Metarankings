@@ -18,6 +18,6 @@
         <a href="/platforms/@Game.Platforms[Game.Platforms.Count - 1].Id">@Game.Platforms[Game.Platforms.Count - 1].Name</a>
     </span>
     <span class="item-meta"><a rel="nofollow" href="/games/Details/@Game.Id/#reviews">Рецензии (@Game.CriticsReviewsCount)</a> <a rel="nofollow" href="/games/Details/@Game.Id/#comments">Отзывы (@Game.UsersReviewsCount)</a></span>
-    <span class="item-meta">@Game.ReleaseDate.Value.ToString("dd MMMM yyyy")</span>
+    <span class="item-meta">@Game.ReleaseDate.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))</span>
     <span class="item-description">@Game.Description</span>
 </div>

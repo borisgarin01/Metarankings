@@ -12,7 +12,7 @@
                 Новинка
             </div>
             <a class="name" href="@($"/movies/details/{movie.Id}")">@movie.Name</a>
-            <div class="post-meta">Премьера: @(movie.PremierDate.HasValue? movie.PremierDate.Value.ToString("dd MMMM yyyy"):"неизвестно")</div>
+            <div class="post-meta">Премьера: @(movie.PremierDate.HasValue? movie.PremierDate.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU")):"неизвестно")</div>
             <div class="post-meta">Жанр: @string.Join(", ", movie.MovieGenres.Select(b => b.Name))</div>
             <div class="post-meta">В ролях: Роман Курцын, Роман Постовалов, Алёна Михайлова, Андрей Андреев, Карина Разумовская, Альбина Кабалина, Алина Алексеева, Никита Тарасов, Юлия Сулес, Сэм Батаков</div>
             <div class="trailer" data-video="@($"/movies/details/{movie.Id}")/#content-trailer">Трейлер</div>

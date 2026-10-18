@@ -1,4 +1,5 @@
-﻿<div class="item">
+﻿@using System.Globalization
+<div class="item">
     <a href="@Href" title="@Title"><img class="post-image" src="@ImageSource" alt="@ImageAlt"></a>
     <span class="item-name"><a href="@Href">@ItemName</a></span>
     @if (Platforms is not null && Platforms.Any())
@@ -21,5 +22,5 @@
             <a href="@Genres[Genres.Length - 1].Url">@Genres[Genres.Length - 1].Title</a>
         </span>
     }
-    <span class="item-meta">@ReleaseDate.ToString("dd MMMM yyyy")</span>
+    <span class="item-meta">@ReleaseDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))</span>
 </div>

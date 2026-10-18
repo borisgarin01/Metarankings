@@ -109,7 +109,7 @@
                                     <a href="/movies/details/@movie.Id/#comments">Отзывы (@movie.MovieReviews.Count)</a>
                                 </span>
                                 <span class="item-meta" style="display: block;">
-                                    @(movie.PremierDate.HasValue ? movie.PremierDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU")) : "Нет даты премьеры")
+                                    @(movie.PremierDate.HasValue ? movie.PremierDate.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU")) : "Нет даты премьеры")
                                 </span>
                                 <span class="item-description">@string.Join(" ", movie.Description.Split(' ').Take(12))...</span>
                             </div>
@@ -139,7 +139,7 @@
                                 </span>
                                 <span class="item-meta"><a href="/games/details/@game.Id/#reviews">Рецензии (@game.CriticsReviewsCount)</a> <a href="/games/details/@game.Id/#comments">Отзывы (@game.UsersReviewsCount)</a></span>
                                 <span class="item-meta" style="display: block;">
-                                    @(game.ReleaseDate.HasValue ? game.ReleaseDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU")) : "Нет даты релиза")
+                                    @(game.ReleaseDate.HasValue ? game.ReleaseDate.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU")) : "Нет даты релиза")
                                 </span>
                                 <span class="item-description">@string.Join(" ", game.Description.Split(' ').Take(12))...</span>
                             </div>

@@ -1,4 +1,5 @@
 ﻿@page "/movies/collections/{MovieCollectionId:long}"
+@using System.Globalization
 @using Domain.Movies.Collections
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
@@ -37,7 +38,7 @@ else
                                 <link itemprop="image" href="@moviesCollectionItem.Movie.ImageSource">
                                 <meta itemprop="dateCreated" content="@moviesCollectionItem.Movie.PremierDate.Value.Year">
                                 <div itemprop="name"><a class="name" href="/games/details/@moviesCollectionItem.Movie.Id">@moviesCollectionItem.Movie.Name</a></div>
-                                <div class="post-meta">@moviesCollectionItem.Movie.PremierDate.Value.ToString("dd MMMM yyyy")</div>
+                                <div class="post-meta">@moviesCollectionItem.Movie.PremierDate.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))</div>
                             </div>
                             <div class="ratings-graph">
                                 <div class="graph">

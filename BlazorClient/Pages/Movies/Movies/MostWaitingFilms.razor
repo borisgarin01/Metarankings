@@ -1,4 +1,5 @@
 ﻿@page "/movies/most-waiting-movies"
+@using System.Globalization
 @using BlazorClient.Components.PagesComponents.Common
 @using Domain.Movies
 
@@ -70,7 +71,7 @@
                             }
                             <div class="post-meta">
                                 @(movie.PremierDate.HasValue
-                                    ? movie.PremierDate.Value.ToString("d MMMM yyyy", RussianCulture)
+                                    ? movie.PremierDate.Value.ToString("d MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
                                     : "Скоро")
                             </div>
                             <div class="post-meta">@TextTruncater.Truncate(movie.Description, 220)</div>

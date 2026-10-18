@@ -71,7 +71,7 @@
                             <a class="name" href="/games/details/@game.Id">@game.Name</a>
                             <div class="post-meta">
                                 @(game.ReleaseDate.HasValue
-                                    ? game.ReleaseDate.Value.ToString("dd MMMM yyyy", new CultureInfo("ru-RU"))
+                                    ? game.ReleaseDate.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
                                     : "Скоро")
                             </div>
                             <div class="post-meta">@game.Description</div>
