@@ -1,0 +1,76 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - "**.md"
+      - "docker-compose.yml"
+      - "docker-compose.dcproj"
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Группа хостов (db, redis, api, proxy); пусто — всё"
+        required: false
+        default: ""
+
+# Два деплоя одновременно не запускаются; новый ждёт окончания текущего
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment: production
+
+    env:
+      ANSIBLE_DEPRECATION_WARNINGS: "False"
+      ANSIBLE_PYTHON_INTERPRETER: auto_silent
+      ANSIBLE_FORCE_COLOR: "True"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Ansible
+        run: |
+          pip install ansible-core==2.17.*
+          ansible-galaxy install -r ansible/requirements.yml
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Write vault password
+        env:
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          printf '%s' "$ANSIBLE_VAULT_PASSWORD" > "$RUNNER_TEMP/vault-pass"
+          chmod 600 "$RUNNER_TEMP/vault-pass"
+
+      - name: Run deploy playbook
+        env:
+          LIMIT: ${{ github.event.inputs.limit }}
+        run: |
+          ansible-playbook ansible/deploy.yml \
+            -i ansible/inventory.ini \
+            --vault-password-file "$RUNNER_TEMP/vault-pass" \
+            ${LIMIT:+-l "$LIMIT"}
+
+      - name: Clean up secrets
+        if: always()
+        run: rm -f "$RUNNER_TEMP/vault-pass" ~/.ssh/id_ed25519
