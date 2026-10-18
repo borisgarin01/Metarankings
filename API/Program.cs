@@ -265,7 +265,22 @@ internal class Program
 
         _ = app.UseBlazorFrameworkFiles();
 
-        _ = app.UseStaticFiles();
+        // Без Cache-Control браузер эвристически кэширует нефингерпринтованные файлы
+        // (index.html, BlazorClient.styles.css, app.css, *.js) и после деплоя смешивает
+        // новую сборку со старыми стилями. no-cache = кэшировать, но перепроверять по ETag.
+        StaticFileOptions staticFileOptions = new()
+        {
+            OnPrepareResponse = ctx =>
+            {
+                string extension = Path.GetExtension(ctx.File.Name);
+                if (extension is ".html" or ".css" or ".js" or ".json")
+                {
+                    ctx.Context.Response.Headers.CacheControl = "no-cache";
+                }
+            }
+        };
+
+        _ = app.UseStaticFiles(staticFileOptions);
 
         _ = app.UseRouting();
         _ = app.UseCors("AllowBlazorFrontend");
@@ -295,7 +310,7 @@ internal class Program
 
         _ = app.MapHub<ChatHub>("/chathub");
 
-        _ = app.MapFallbackToFile("index.html");
+        _ = app.MapFallbackToFile("index.html", staticFileOptions);
 
         using (ServiceProvider serviceProvider = CreateServices(builder.Configuration))
         using (IServiceScope scope = serviceProvider.CreateScope())
