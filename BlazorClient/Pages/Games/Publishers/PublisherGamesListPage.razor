@@ -25,7 +25,9 @@ else
                 }
             </div>
         </div>
-        <BestGamesOfYearsComponent Year="@DateTime.Today.Year" />
+        <CascadingValue Name="Year" Value="@((int?)DateTime.Today.Year)">
+            <BestGamesOfYearsComponent />
+        </CascadingValue>
         <BestGamesOfPlatformsComponent Platforms="@Platforms" />
         <h2>Новые игры</h2>
     </div>

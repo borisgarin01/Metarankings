@@ -18,7 +18,9 @@ else
     <div id="filter">
         <OtherNumberOfDevelopersComponent DevelopersGettingLimit="11" DevelopersGettingOffset="0" />
 
-        <BestGamesOfYearsComponent Year="@DateTime.Today.Year" />
+        <CascadingValue Name="Year" Value="@((int?)DateTime.Today.Year)">
+            <BestGamesOfYearsComponent />
+        </CascadingValue>
 
         <h2>Новые игры</h2>
     </div>
