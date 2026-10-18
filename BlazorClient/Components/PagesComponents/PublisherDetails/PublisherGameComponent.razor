@@ -1,11 +1,12 @@
 ﻿@using Microsoft.Extensions.Configuration
+@using BlazorClient.Components.PagesComponents.Common
 @inject IConfiguration Configuration
 
 <div class="post clear">
     <a href="/games/details/@Game.Id" title="«@Game.Name»" class="thumb"><img class="post-image" src="@Game.Image" alt="@Game.Name"></a>
     <h3><a class="name" href="/games/details/@Game.Id">@Game.Name</a></h3>
 
-    <div class="trailer" data-video="/games/details/@Game.Id/#content-trailer"></div>
+    <TrailerButton Name="@Game.Name" Trailer="@Game.Trailer" />
     <div class="ratings-graph">
         <div class="graph">
             <div class="small-score mark-@Math.Round(Game.UsersScore)">@Math.Round(Game.UsersScore, 1)</div>

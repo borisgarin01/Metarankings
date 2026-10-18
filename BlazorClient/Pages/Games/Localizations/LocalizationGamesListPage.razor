@@ -1,5 +1,6 @@
 ﻿@page "/localizations/{LocalizationId:long}"
 @using Microsoft.Extensions.Configuration
+@using BlazorClient.Components.PagesComponents.Common
 @inject IConfiguration Configuration
 
 @if (Localization is null)
@@ -20,7 +21,7 @@ else
                 <div class="post-meta"><p>@string.Join(", ", game.Developers.Select(a => a.Name))</p></div>
                 <div class="post-meta"><p>@string.Join(", ", game.Publishers.Select(a => a.Name))</p></div>
                 <div class="post-content">@game.Description</div>
-                <div class="trailer" data-video="/games/details/@game.Id/#content-trailer"></div>
+                <TrailerButton Name="@game.Name" Trailer="@game.Trailer" />
             </div>
         }
     </div>

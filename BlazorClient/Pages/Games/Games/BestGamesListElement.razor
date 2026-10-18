@@ -1,4 +1,5 @@
 ﻿@using Microsoft.Extensions.Configuration
+@using BlazorClient.Components.PagesComponents.Common
 @inject IConfiguration Configuration
 
 <div class="post clear">
@@ -12,7 +13,7 @@
     <div class="post-meta"><p>Дата выхода: @Game.ReleaseDate.Value.ToString("dd MM yyyy") года</p></div>
     <div class="post-meta">Входит в лучшие по мнению 83% пользователей</div>
     <div class="post-content">@Game.Description</div>
-    <div class="trailer" data-video="@Game.Trailer"></div>
+    <TrailerButton Name="@Game.Name" Trailer="@Game.Trailer" />
     <div class="ratings-graph">
         <div class="graph-critic">
             <div class="graph">

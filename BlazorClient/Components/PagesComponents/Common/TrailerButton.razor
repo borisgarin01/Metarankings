@@ -1,0 +1,22 @@
+@if (HasTrailer)
+{
+    <div class="trailer" role="button" tabindex="0" title="Смотреть трейлер" aria-label="Смотреть трейлер @Name" @onclick="OpenTrailer" @onkeydown="OnTrailerKeyDown"></div>
+}
+
+@if (IsTrailerOpen)
+{
+    <div class="wbody" title="Закрыть" @onclick="CloseTrailer"></div>
+    <div class="window" role="dialog" aria-modal="true" aria-label="Трейлер @Name">
+        <div id="tcontent">
+            <div class="video-content">
+                <div id="content-trailer">
+                    <iframe title="Трейлер @Name"
+                            src="@AutoplayTrailerUrl"
+                            allow="clipboard-write; autoplay; encrypted-media; picture-in-picture"
+                            allowfullscreen
+                            style="border-width:0"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+}

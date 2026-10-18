@@ -39,4 +39,7 @@ public partial class GamePost : ComponentBase
 
     [Parameter, EditorRequired]
     public required string Description { get; set; }
+
+    [Parameter]
+    public string? Trailer { get; set; }
 }

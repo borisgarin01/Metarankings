@@ -627,7 +627,7 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
 
         string dataSql = @"
     SELECT 
-        g.Id, g.Name, g.Image, g.ReleaseDate, g.Description,
+        g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer,
         COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
         COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
         COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
