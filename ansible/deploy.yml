@@ -9,10 +9,21 @@
         update_cache: true
         cache_valid_time: 3600
 
+    - name: Ensure cron is installed
+      ansible.builtin.apt:
+        name: cron
+        state: present
+
+    - name: Ensure cron service is running
+      ansible.builtin.service:
+        name: cron
+        state: started
+        enabled: true
+
   roles:
-    - role: geerlingguy.docker
+    - role: borisgarin01.docker
       vars:
-        docker_users: ["{{ ansible_user }}"]
+        docker_users: ["{{ansible_user}}"]
 
 # DB
 - name: Deploy Postgres
@@ -33,13 +44,27 @@
         state: started
         restart_policy: unless-stopped
         ports:
-          - "{{ db_port }}:5432"
+          - "{{db_port}}:5432"
         volumes:
           - /srv/postgres/data:/var/lib/postgresql/data
         env:
-          POSTGRES_USER: "{{ db_user }}"
-          POSTGRES_PASSWORD: "{{ db_password }}"
-          POSTGRES_DB: "{{ db_name }}"
+          POSTGRES_USER: "{{db_user}}"
+          POSTGRES_PASSWORD: "{{db_password}}"
+          POSTGRES_DB: "{{db_name}}"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U {{db_user}} -d {{db_name}}"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+
+    # API при старте накатывает миграции, поэтому база должна быть готова раньше
+    - name: Wait for PostgreSQL to accept connections
+      ansible.builtin.command: docker exec postgres pg_isready -U {{db_user}} -d {{db_name}}
+      register: pg_ready
+      until: pg_ready.rc == 0
+      retries: 30
+      delay: 2
+      changed_when: false
 
 # REDIS
 - name: Deploy Redis
@@ -59,11 +84,18 @@
         image: redis:7.4-alpine
         state: started
         restart_policy: unless-stopped
-        command: ["redis-server", "--requirepass", "{{ redis_password }}", "--appendonly", "yes"]
+        command: ["redis-server", "--requirepass", "{{redis_password}}", "--appendonly", "yes"]
         ports:
-          - "{{ redis_bind_address }}:{{ redis_port }}:6379"
+          - "{{redis_port}}:6379"
         volumes:
           - /srv/redis/data:/data
+        env:
+          REDIS_PASSWORD: "{{redis_password}}"
+        healthcheck:
+          test: ["CMD-SHELL", "redis-cli -a \"$REDIS_PASSWORD\" --no-auth-warning ping | grep PONG"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
 
 # API
 - name: Deploy API
@@ -71,83 +103,145 @@
   become: true
 
   tasks:
-    - name: Create app directory
+    - name: Create app directories
       ansible.builtin.file:
-        path: "{{ app_dir }}/src"
+        path: "{{item}}"
         state: directory
         mode: "0755"
+      loop:
+        - "{{app_dir}}/src"
+        - "{{app_data_dir}}/Games"
+        - "{{app_data_dir}}/Movies"
 
+    - name: Ensure rsync is installed
+      ansible.builtin.apt:
+        name: rsync
+        state: present
+
+    # Код лежит в корне репозитория; передаётся только то, что нужно для сборки образа
     - name: Copy source code
       ansible.posix.synchronize:
-        src: ../src/
-        dest: "{{ app_dir }}/src/"
+        src: "{{playbook_dir}}/../"
+        dest: "{{app_dir}}/src/"
+        delete: true
         rsync_opts:
           - "--exclude=.git"
           - "--exclude=.vs"
-          - "--exclude=node_modules"
+          - "--exclude=.vscode"
+          - "--exclude=.github"
+          - "--exclude=.mimocode"
           - "--exclude=bin"
           - "--exclude=obj"
-        delete: yes
+          - "--exclude=node_modules"
+          - "--exclude=*.user"
+          - "--exclude=.env"
+          - "--exclude=.vaultpassword"
+          - "--exclude=ansible"
+          - "--exclude=**/ansible"
+          - "--exclude=/ansible"
+          - "--exclude=/certs"
+          - "--exclude=/ssl"
+          - "--exclude=/certbot"
+          - "--exclude=/Games"
+          - "--exclude=/Movies"
+          - "--exclude=/API/Games/Images"
+          - "--exclude=/API/Movies/Images"
+          - "--exclude=DvlErrLog.txt"
 
     - name: Build API image
-      community.docker.docker_image:
-        name: metarankings-api
-        source: build
-        build:
-          path: "{{ app_dir }}/src"
-        state: present
-        force_source: true
+      ansible.builtin.shell:
+        cmd: DOCKER_BUILDKIT=0 docker build -t metarankings-api:latest .
+        chdir: "{{ app_dir }}/src"
+      register: api_image
+      changed_when: "'Successfully tagged' in api_image.stdout or 'writing image' in api_image.stderr"
 
+    # Однократный перенос изображений из старого контейнера, созданного без volumes
+    - name: Copy existing images out of old API container
+      ansible.builtin.shell: |
+        docker cp metarankings-api:/app/Games/. {{app_data_dir}}/Games/ || true
+        docker cp metarankings-api:/app/Movies/. {{app_data_dir}}/Movies/ || true
+        touch {{app_data_dir}}/.images-migrated
+      args:
+        creates: "{{app_data_dir}}/.images-migrated"
+
+    # Контейнер пересоздаётся, если ID образа изменился
     - name: Run API container
       community.docker.docker_container:
         name: metarankings-api
-        image: metarankings-api
+        image: metarankings-api:latest
         state: started
-        recreate: yes
         restart_policy: unless-stopped
         ports:
-          - "{{ api_port }}:3000"
+          - "{{api_port}}:3000"
         etc_hosts:
           host.docker.internal: host-gateway
+        # Загруженные изображения хранятся вне контейнера и переживают передеплой
+        volumes:
+          - "{{app_data_dir}}/Games:/app/Games"
+          - "{{app_data_dir}}/Movies:/app/Movies"
         env:
           ASPNETCORE_ENVIRONMENT: Production
           ASPNETCORE_URLS: "http://0.0.0.0:3000"
-          ConnectionStrings__PostgresConnection: "Host={{ db_host }}; Port={{ db_port }}; Database={{ db_name }}; Username={{ db_user }}; Password={{ db_password }}"
-          ConnectionStrings__RedisConnection: "{{ redis_host }}:{{ redis_port }},password={{ redis_password }},abortConnect=false"
+          ConnectionStrings__PostgresConnection: Host={{db_host}}; Port={{db_port}}; Database={{db_name}}; Trust Server Certificate=true; Username={{db_user}}; Password={{db_password}}
+          ConnectionStrings__RedisConnection: "{{redis_host}}:{{redis_port}},password={{redis_password}},abortConnect=false"
+
+    - name: Wait for API to respond
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{api_port}}/"
+        status_code: 200
+      register: api_health
+      until: api_health.status == 200
+      retries: 30
+      delay: 5
+
+    - name: Remove dangling images
+      community.docker.docker_prune:
+        images: true
+        images_filters:
+          dangling: true
 
 # PROXY
-- name: Deploy Nginx proxy
+- name: Deploy Nginx PROXY
   hosts: proxy
   become: true
 
   tasks:
-    - name: Stop nginx before certbot
+    - name: Check if certificate already exists
+      ansible.builtin.stat:
+        path: "/etc/letsencrypt/live/{{domain}}/fullchain.pem"
+      register: cert_file
+
+    # Certbot в standalone-режиме занимает 80 порт; останавливаем nginx только при первичном выпуске
+    - name: Stop nginx before issuing certificate
       community.docker.docker_container:
         name: nginx
         state: stopped
-      ignore_errors: true
+      failed_when: false
+      when: not cert_file.stat.exists
 
-    - name: Install Certbot and generate certificate
+    - name: Install Certbot and generate Certificate
       ansible.builtin.include_role:
-        name: geerlingguy.certbot
+        name: borisgarin01.certbot
 
     - name: Create nginx directory
       ansible.builtin.file:
-        path: "{{ app_dir }}/nginx"
+        path: "{{app_dir}}/nginx"
         state: directory
         mode: "0755"
 
     - name: Generate nginx config
       ansible.builtin.template:
         src: templates/nginx.conf.j2
-        dest: "{{ app_dir }}/nginx/nginx.conf"
+        dest: "{{app_dir}}/nginx/nginx.conf"
         mode: "0644"
+      register: nginx_conf
 
     - name: Run Nginx
       community.docker.docker_container:
         name: nginx
         image: nginx:alpine
         state: started
+        restart: "{{nginx_conf.changed}}"
         restart_policy: unless-stopped
         ports:
           - "80:80"
@@ -155,5 +249,5 @@
         etc_hosts:
           host.docker.internal: host-gateway
         volumes:
-          - "{{ app_dir }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+          - "{{app_dir}}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
           - /etc/letsencrypt:/etc/letsencrypt:ro

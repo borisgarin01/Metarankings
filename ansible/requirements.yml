@@ -1,6 +1,14 @@
 ---
 roles:
-  - name: geerlingguy.docker
+  - name: borisgarin01.docker
+    src: https://github.com/borisgarin01/ansible-role-docker.git
+    scm: git
     version: 6.1.0
-  - name: geerlingguy.certbot
+  - name: borisgarin01.certbot
+    src: https://github.com/borisgarin01/ansible-role-certbot.git
+    scm: git
     version: 5.4.1
+
+collections:
+  - name: community.docker
+  - name: ansible.posix
