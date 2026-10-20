@@ -1,0 +1,39 @@
+---
+
+app_dir: /opt/metarankings-app_dir
+# Постоянные данные API (загруженные изображения)
+app_data_dir: "{{app_dir}}/data"
+
+domain: rankings-meta.ru
+certbot_email: boris.garin01@mail.ru
+
+db_host: host.docker.internal
+db_port: 5432
+db_name: metarankings
+db_user: borisgarin
+db_password: UmbracoFuse8_2023!
+
+redis_host: host.docker.internal
+redis_port: 6379
+
+api_host: host.docker.internal
+api_port: 3000
+
+docker_users:
+  - "{{ansible_user}}"
+
+certbot_install_method: snap
+certbot_auto_renew: true
+certbot_auto_renew_hour: "3"
+certbot_auto_renew_minute: "30"
+# Продление запускается от root; nginx работает в Docker, поэтому 80 порт освобождается через docker, а не systemctl
+certbot_auto_renew_user: root
+certbot_auto_renew_options: '--quiet --pre-hook "docker stop nginx" --post-hook "docker start nginx"'
+certbot_create_standalone_stop_services: []
+certbot_create_if_missing: true
+certbot_create_method: standalone
+certbot_admin_email: "{{certbot_email}}"
+certbot_certs:
+  - email: "{{certbot_email}}"
+    domains:
+      - "{{domain}}"

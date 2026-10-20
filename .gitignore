@@ -17,3 +17,6 @@ bin
 API/Movies/Images
 API/Games/Images
 certbot/conf/accounts/acme-v02.api.letsencrypt.org/directory
+
+# Ansible Vault password
+.vaultpassword
