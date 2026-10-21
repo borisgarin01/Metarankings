@@ -11,6 +11,7 @@ db_host: host.docker.internal
 db_port: 5432
 db_name: metarankings
 db_user: borisgarin
+db_password: UmbracoFuse8_2023!
 
 redis_host: host.docker.internal
 redis_port: 6379
