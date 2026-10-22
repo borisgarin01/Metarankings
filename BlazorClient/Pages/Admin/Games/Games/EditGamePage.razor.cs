@@ -1,4 +1,5 @@
 using Blazored.Toast.Services;
+using Domain.Common;
 using Domain.Games;
 using Domain.RequestsModels.Games;
 using Microsoft.AspNetCore.Authorization;
@@ -13,20 +14,12 @@ public partial class EditGamePage : ComponentBase
 {
     const int MAX_FILESIZE = 5000 * 1024;
 
-    [Parameter]
-    public long Id { get; set; }
+    [Parameter] public long Id { get; set; }
 
-    [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; }
-
-    [Inject]
-    public IToastService ToastService { get; set; }
-
-    [Inject]
-    public GamesWebManager GamesWebManager { get; private set; }
-
-    [Inject]
-    public NavigationManager NavigationManager { get; private set; }
+    [Inject] public IHttpClientFactory HttpClientFactory { get; set; }
+    [Inject] public IToastService ToastService { get; set; }
+    [Inject] public GamesWebManager GamesWebManager { get; private set; }
+    [Inject] public NavigationManager NavigationManager { get; private set; }
 
     public Game? Game { get; private set; }
     public bool IsNotFound { get; private set; }
@@ -43,13 +36,14 @@ public partial class EditGamePage : ComponentBase
     public IEnumerable<Platform> PlatformsToSelectFrom { get; private set; }
     public IEnumerable<Publisher> PublishersToSelectFrom { get; private set; }
 
-    public List<long> SelectedDevelopersIds { get; private set; } = new List<long>();
-    public List<long> SelectedGenresIds { get; private set; } = new List<long>();
-    public long? SelectedLocalizationId { get; private set; }
-    public List<long> SelectedPlatformsIds { get; private set; } = new List<long>();
-    public List<long> SelectedPublishersIds { get; private set; } = new List<long>();
+    // Упорядоченные списки выбранных элементов — порядок в списке = Position.
+    public IReadOnlyList<Developer> SelectedDevelopers { get; set; } = Array.Empty<Developer>();
+    public IReadOnlyList<Genre> SelectedGenres { get; set; } = Array.Empty<Genre>();
+    public IReadOnlyList<Platform> SelectedPlatforms { get; set; } = Array.Empty<Platform>();
+    public IReadOnlyList<Publisher> SelectedPublishers { get; set; } = Array.Empty<Publisher>();
 
-    /// <summary>Data-url новой обложки или текущая обложка игры.</summary>
+    public long? SelectedLocalizationId { get; private set; }
+
     public string ImagePreview { get; private set; }
     public IBrowserFile? ImageToUpload { get; private set; }
 
@@ -92,10 +86,11 @@ public partial class EditGamePage : ComponentBase
         Trailer = Game.Trailer;
         ImagePreview = Game.Image;
 
-        SelectedDevelopersIds = Game.Developers.Select(d => d.Id).ToList();
-        SelectedGenresIds = Game.Genres.Select(g => g.Id).ToList();
-        SelectedPlatformsIds = Game.Platforms.Select(p => p.Id).ToList();
-        SelectedPublishersIds = Game.Publishers.Select(p => p.Id).ToList();
+        // Порядок уже приходит из репозитория (ORDER BY Position в SQL).
+        SelectedDevelopers = Game.Developers.ToList();
+        SelectedGenres = Game.Genres.ToList();
+        SelectedPlatforms = Game.Platforms.ToList();
+        SelectedPublishers = Game.Publishers.ToList();
         SelectedLocalizationId = Game.Localization?.Id ?? (Game.LocalizationId > 0 ? Game.LocalizationId : null);
     }
 
@@ -112,11 +107,11 @@ public partial class EditGamePage : ComponentBase
     {
         if (string.IsNullOrWhiteSpace(Name)) return "Укажите название";
         if (!ReleaseDate.HasValue) return "Укажите дату выхода";
-        if (!SelectedDevelopersIds.Any()) return "Выберите разработчиков";
-        if (!SelectedGenresIds.Any()) return "Выберите жанры";
+        if (SelectedDevelopers.Count == 0) return "Выберите разработчиков";
+        if (SelectedGenres.Count == 0) return "Выберите жанры";
         if (!SelectedLocalizationId.HasValue) return "Выберите локализацию";
-        if (!SelectedPlatformsIds.Any()) return "Выберите платформы";
-        if (!SelectedPublishersIds.Any()) return "Выберите издателей";
+        if (SelectedPlatforms.Count == 0) return "Выберите платформы";
+        if (SelectedPublishers.Count == 0) return "Выберите издателей";
         return null;
     }
 
@@ -137,7 +132,7 @@ public partial class EditGamePage : ComponentBase
             if (ImageToUpload is not null)
             {
                 MultipartFormDataContent content = new MultipartFormDataContent();
-                StreamContent fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024)); // 50MB max
+                StreamContent fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024));
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
                 content.Add(fileContent, "formFile", ImageToUpload.Name);
 
@@ -158,14 +153,14 @@ public partial class EditGamePage : ComponentBase
             UpdateGameModel updateGameModel = new UpdateGameModel(
                 Name: Name,
                 Image: image,
-                DevelopersIds: SelectedDevelopersIds,
-                PublishersIds: SelectedPublishersIds,
-                GenresIds: SelectedGenresIds,
+                Developers: ToOrderedIds(SelectedDevelopers),
+                Publishers: ToOrderedIds(SelectedPublishers),
+                Genres: ToOrderedIds(SelectedGenres),
                 LocalizationId: SelectedLocalizationId!.Value,
                 ReleaseDate: ReleaseDate,
                 Description: Description,
                 Trailer: Trailer,
-                PlatformsIds: SelectedPlatformsIds);
+                Platforms: ToOrderedIds(SelectedPlatforms));
 
             Game? updatedGame = await GamesWebManager.UpdateAsync(Id, updateGameModel);
 
@@ -187,4 +182,20 @@ public partial class EditGamePage : ComponentBase
             IsSaving = false;
         }
     }
+
+    private static IEnumerable<OrderedId> ToOrderedIds<T>(IReadOnlyList<T> items, Func<T, long> idSelector)
+        where T : class
+        => items.Select((item, index) => new OrderedId(idSelector(item), index)).ToList();
+
+    private IEnumerable<OrderedId> ToOrderedIds(IReadOnlyList<Developer> items)
+        => ToOrderedIds(items, d => d.Id);
+
+    private IEnumerable<OrderedId> ToOrderedIds(IReadOnlyList<Publisher> items)
+        => ToOrderedIds(items, p => p.Id);
+
+    private IEnumerable<OrderedId> ToOrderedIds(IReadOnlyList<Genre> items)
+        => ToOrderedIds(items, g => g.Id);
+
+    private IEnumerable<OrderedId> ToOrderedIds(IReadOnlyList<Platform> items)
+        => ToOrderedIds(items, p => p.Id);
 }

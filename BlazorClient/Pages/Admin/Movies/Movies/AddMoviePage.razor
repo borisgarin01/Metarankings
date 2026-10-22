@@ -28,7 +28,7 @@
                     <label>
                         Enter name:
                         <InputText @bind-Value="@Name" />
-                        <ValidationMessage For="() => OriginalName" />
+                        <ValidationMessage For="() => Name" />
                     </label>
                 </p>
                 <p>
@@ -45,69 +45,61 @@
                         <ValidationMessage For="() => Description" />
                     </label>
                 </p>
+
                 <TrailerField @bind-Value="Trailer" />
+
                 <p>
                     <label>Select movie director:</label>
-                    @{
-                        var directorSelector = (MovieDirector d) => d.Id;
-                        var directorDisplay = (MovieDirector d) => d.Name;
-                    }
-                    <MultiSelect TItem="MovieDirector"
-                                 TId="long"
-                                 Items="MoviesDirectorsToSelectFrom.ToList()"
-                                 @bind-SelectedIds="SelectedMoviesDirectorsIds"
-                                 IdSelector="directorSelector"
-                                 DisplaySelector="directorDisplay"
-                                 Placeholder="Select directors..."
-                                 LabelPlural="director" />
+                    <OrderedMultiSelect TItem="MovieDirector"
+                                        TId="long"
+                                        Items="SelectedMoviesDirectors"
+                                        AllItems="MoviesDirectorsToSelectFrom.ToList()"
+                                        IdSelector="@(d => d.Id)"
+                                        DisplaySelector="@(d => d.Name)"
+                                        Placeholder="Select directors..."
+                                        LabelPlural="режиссёры"
+                                        ItemsChanged="OnSelectedDirectorsChanged" />
                 </p>
                 <p>
                     <label>Select movie genre:</label>
-                    @{
-                        var movieGenreSelector = (Genre mg) => mg.Id;
-                        var movieGenreDisplay = (Genre mg) => mg.Name;
-                    }
-                    <MultiSelect TItem="Genre"
-                                 TId="long"
-                                 Items="MoviesGenresToSelectFrom.ToList()"
-                                 @bind-SelectedIds="SelectedMoviesGenresIds"
-                                 IdSelector="movieGenreSelector"
-                                 DisplaySelector="movieGenreDisplay"
-                                 Placeholder="Select genres..." />
-                    <ValidationMessage For="() => SelectedMoviesGenres" />
+                    <OrderedMultiSelect TItem="Genre"
+                                        TId="long"
+                                        Items="SelectedMoviesGenres"
+                                        AllItems="MoviesGenresToSelectFrom.ToList()"
+                                        IdSelector="@(g => g.Id)"
+                                        DisplaySelector="@(g => g.Name)"
+                                        Placeholder="Select genres..."
+                                        LabelPlural="жанры"
+                                        ItemsChanged="OnSelectedGenresChanged" />
                 </p>
                 <p>
                     <label>Select movie studio:</label>
-                    @{
-                        var movieStudioSelector = (MovieStudio ms) => ms.Id;
-                        var movieStudioDisplay = (MovieStudio ms) => ms.Name;
-                    }
-                    <MultiSelect TItem="MovieStudio"
-                                 TId="long"
-                                 Items="MoviesStudiosToSelectFrom.ToList()"
-                                 @bind-SelectedIds="SelectedMoviesStudiosIds"
-                                 IdSelector="movieStudioSelector"
-                                 DisplaySelector="movieStudioDisplay"
-                                 Placeholder="Select studios..." />
-                    <ValidationMessage For="() => SelectedMoviesStudios" />
+                    <OrderedMultiSelect TItem="MovieStudio"
+                                        TId="long"
+                                        Items="SelectedMoviesStudios"
+                                        AllItems="MoviesStudiosToSelectFrom.ToList()"
+                                        IdSelector="@(s => s.Id)"
+                                        DisplaySelector="@(s => s.Name)"
+                                        Placeholder="Select studios..."
+                                        LabelPlural="студии"
+                                        ItemsChanged="OnSelectedStudiosChanged" />
                 </p>
                 <p>
                     <label>Страны:</label>
-                    @{
-                        var movieCountrySelector = (MovieCountry mc) => mc.Id;
-                        var movieCountryDisplay = (MovieCountry mc) => mc.Name;
-                    }
-                    <MultiSelect TItem="MovieCountry"
-                                 TId="long"
-                                 Items="MoviesCountriesToSelectFrom.ToList()"
-                                 @bind-SelectedIds="SelectedMoviesCountriesIds"
-                                 IdSelector="movieCountrySelector"
-                                 DisplaySelector="movieCountryDisplay"
-                                 Placeholder="Select countries..."
-                                 LabelPlural="countries" />
+                    <OrderedMultiSelect TItem="MovieCountry"
+                                        TId="long"
+                                        Items="SelectedMoviesCountries"
+                                        AllItems="MoviesCountriesToSelectFrom.ToList()"
+                                        IdSelector="@(c => c.Id)"
+                                        DisplaySelector="@(c => c.Name)"
+                                        Placeholder="Select countries..."
+                                        LabelPlural="страны"
+                                        ItemsChanged="OnSelectedCountriesChanged" />
                     <a href="/admin/movies/movies-countries/add-movie-country" target="_blank">Добавить страну</a>
                 </p>
-                <MovieCrewEditor Texts="CrewTexts" />
+
+                <DragDropCrewEditor Texts="CrewTexts" />
+
                 <p>
                     <label>
                         Enter image:

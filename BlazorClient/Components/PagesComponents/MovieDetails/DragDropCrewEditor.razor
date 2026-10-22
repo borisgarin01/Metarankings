@@ -1,0 +1,38 @@
+﻿@using Domain.Movies
+
+<div class="crew-editor">
+    <div class="crew-editor__add">
+        <select @bind="_newRole" class="crew-editor__role-select">
+            @foreach (MovieCrewRole role in Enum.GetValues<MovieCrewRole>())
+            {
+                <option value="@role">@role</option>
+            }
+        </select>
+        <input type="text" @bind="_newName" placeholder="Имя" class="crew-editor__name-input" />
+        <button type="button" class="crew-editor__add-button" @onclick="AddMember">Добавить</button>
+    </div>
+
+    @if (Members.Count == 0)
+    {
+        <p class="ordered-multiselect__empty">Ничего не добавлено</p>
+    }
+    else
+    {
+        <ul @ref="_listElement" class="ordered-multiselect__list">
+            @foreach (CrewEntry member in Members)
+            {
+                <li data-id="@member.Key" class="ordered-multiselect__item">
+                    <span class="ordered-multiselect__handle" title="Перетащите для изменения порядка">☰</span>
+                    <span class="crew-editor__role">@member.Role</span>
+                    <span class="ordered-multiselect__label">@member.Name</span>
+                    <button type="button"
+                            class="ordered-multiselect__remove"
+                            title="Убрать"
+                            @onclick="() => RemoveMember(member)">
+                        ×
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+</div>
