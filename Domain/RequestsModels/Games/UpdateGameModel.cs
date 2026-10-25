@@ -1,3 +1,5 @@
+using Domain.Common;
+
 namespace Domain.RequestsModels.Games;
 
 public sealed record UpdateGameModel(
@@ -9,24 +11,24 @@ public sealed record UpdateGameModel(
 
     [property: JsonPropertyName("image")]
     [Required(ErrorMessage = "Image should be set")]
-    [MaxLength(511, ErrorMessage = "Image's max length is 1023")]
+    [MaxLength(511, ErrorMessage = "Image's max length is 511")]
     [MinLength(1, ErrorMessage = "Image should be not empty")]
     string Image,
 
-    [property: JsonPropertyName("developersIds")]
-    [Required(ErrorMessage = "Developers ids should be set")]
-    [MinLength(1, ErrorMessage = "Developers ids should be not empty")]
-    IEnumerable<long> DevelopersIds,
+    [property: JsonPropertyName("developers")]
+    [Required(ErrorMessage = "Developers should be set")]
+    [MinLength(1, ErrorMessage = "Developers should be not empty")]
+    IEnumerable<OrderedId> Developers,
 
-    [property: JsonPropertyName("publishersIds")]
-    [Required(ErrorMessage = "Publishers ids should be set")]
-    [MinLength(1, ErrorMessage = "Publishers ids should be not empty")]
-    IEnumerable<long> PublishersIds,
+    [property: JsonPropertyName("publishers")]
+    [Required(ErrorMessage = "Publishers should be set")]
+    [MinLength(1, ErrorMessage = "Publishers should be not empty")]
+    IEnumerable<OrderedId> Publishers,
 
-    [property: JsonPropertyName("genresIds")]
-    [Required(ErrorMessage = "Genres ids should be set")]
-    [MinLength(1, ErrorMessage = "Genres ids should be not empty")]
-    IEnumerable<long> GenresIds,
+    [property: JsonPropertyName("genres")]
+    [Required(ErrorMessage = "Genres should be set")]
+    [MinLength(1, ErrorMessage = "Genres should be not empty")]
+    IEnumerable<OrderedId> Genres,
 
     [property: JsonPropertyName("localizationId")]
     [Required(ErrorMessage = "LocalizationId should be set")]
@@ -43,9 +45,9 @@ public sealed record UpdateGameModel(
     string Description,
 
     [property: JsonPropertyName("trailer")]
-    string? Trailer,
+    string Trailer,
 
-    [property: JsonPropertyName("platformsIds")]
-    [Required(ErrorMessage = "Platforms ids should be set")]
-    [MinLength(1, ErrorMessage = "Platforms ids should be not empty")]
-    IEnumerable<long> PlatformsIds);
+    [property: JsonPropertyName("platforms")]
+    [Required(ErrorMessage = "Platforms should be set")]
+    [MinLength(1, ErrorMessage = "Platforms should be not empty")]
+    IEnumerable<OrderedId> Platforms);

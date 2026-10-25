@@ -46,9 +46,15 @@ public sealed partial class AddMoviePage : ComponentBase
     public IEnumerable<MovieStudio> MoviesStudiosToSelectFrom { get; set; }
     public IEnumerable<MovieCountry> MoviesCountriesToSelectFrom { get; set; }
 
-    public List<MovieDirector> SelectedMoviesDirectors { get; set; } = new List<MovieDirector>();
-    public List<Genre> SelectedMoviesGenres { get; set; } = new List<Genre>();
-    public List<MovieStudio> SelectedMoviesStudios { get; set; } = new List<MovieStudio>();
+    public List<MovieDirector> SelectedMoviesDirectors { get; private set; } = new();
+    public List<Genre> SelectedMoviesGenres { get; private set; } = new();
+    public List<MovieStudio> SelectedMoviesStudios { get; private set; } = new();
+    public List<MovieCountry> SelectedMoviesCountries { get; private set; } = new();
+
+    private List<long> SelectedMoviesDirectorsIds => SelectedMoviesDirectors.Select(d => d.Id).ToList();
+    private List<long> SelectedMoviesGenresIds => SelectedMoviesGenres.Select(g => g.Id).ToList();
+    private List<long> SelectedMoviesStudiosIds => SelectedMoviesStudios.Select(s => s.Id).ToList();
+    private List<long> SelectedMoviesCountriesIds => SelectedMoviesCountries.Select(c => c.Id).ToList();
 
     [EditorRequired]
     public string Name { get; set; }
@@ -58,17 +64,13 @@ public sealed partial class AddMoviePage : ComponentBase
 
     [EditorRequired]
     public string Description { get; set; }
+
     public string ImageSource { get; private set; }
 
     public string? Trailer { get; set; }
 
     [EditorRequired]
     public DateTime? PremierDate { get; set; }
-
-    public List<long> SelectedMoviesDirectorsIds { get; private set; } = new List<long>();
-    public List<long> SelectedMoviesGenresIds { get; private set; } = new List<long>();
-    public List<long> SelectedMoviesStudiosIds { get; private set; } = new List<long>();
-    public List<long> SelectedMoviesCountriesIds { get; private set; } = new List<long>();
 
     public Dictionary<MovieCrewRole, string> CrewTexts { get; } = MovieCrewEditor.CreateTexts();
 
@@ -90,30 +92,27 @@ public sealed partial class AddMoviePage : ComponentBase
         });
     }
 
-    private Task SelectMovieDirector(ChangeEventArgs e)
+    private Task OnSelectedDirectorsChanged(IReadOnlyList<MovieDirector> list)
     {
-        SelectedMoviesDirectorsIds = ((string[])e.Value)
-            .Select(idString => long.Parse(idString))
-            .ToList();
-
+        SelectedMoviesDirectors = list.ToList();
         return Task.CompletedTask;
     }
 
-    private Task SelectMovieGenre(ChangeEventArgs e)
+    private Task OnSelectedGenresChanged(IReadOnlyList<Genre> list)
     {
-        SelectedMoviesGenresIds = ((string[])e.Value)
-            .Select(idString => long.Parse(idString))
-            .ToList();
-
+        SelectedMoviesGenres = list.ToList();
         return Task.CompletedTask;
     }
 
-    private Task SelectMovieStudio(ChangeEventArgs e)
+    private Task OnSelectedStudiosChanged(IReadOnlyList<MovieStudio> list)
     {
-        SelectedMoviesStudiosIds = ((string[])e.Value)
-            .Select(idString => long.Parse(idString))
-            .ToList();
+        SelectedMoviesStudios = list.ToList();
+        return Task.CompletedTask;
+    }
 
+    private Task OnSelectedCountriesChanged(IReadOnlyList<MovieCountry> list)
+    {
+        SelectedMoviesCountries = list.ToList();
         return Task.CompletedTask;
     }
 
@@ -128,81 +127,70 @@ public sealed partial class AddMoviePage : ComponentBase
 
     private bool MovieModelToAddConfigured()
     {
-        return !SelectedMoviesDirectorsIds.Contains(-1)
-            && !SelectedMoviesGenresIds.Contains(-1)
-            && !SelectedMoviesStudiosIds.Contains(-1)
-            && ImageToUpload is not null;
+        return SelectedMoviesDirectorsIds.Count > 0
+            && SelectedMoviesGenresIds.Count > 0
+            && SelectedMoviesStudiosIds.Count > 0
+            && ImageToUpload is not null
+            && PremierDate.HasValue;
     }
 
     private async Task AddMovieAsync()
     {
-        if (MovieModelToAddConfigured())
+        if (!MovieModelToAddConfigured())
         {
-            try
+            ToastService.ShowWarning("Выберите режиссёра, жанр, студию, дату премьеры и загрузите постер.");
+            return;
+        }
+
+        try
+        {
+            MultipartFormDataContent content = new MultipartFormDataContent();
+            StreamContent fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
+            content.Add(fileContent, "formFile", ImageToUpload.Name);
+
+            string uploadingImageName = Uri.EscapeDataString(Path.GetRandomFileName());
+            string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
+
+            string url = $"/api/movies/Images/{PremierDate!.Value.Year}/{PremierDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
+
+            HttpResponseMessage response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
             {
-                // Create multipart form data
-                MultipartFormDataContent content = new MultipartFormDataContent();
-                StreamContent fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024)); // 50MB max
-                fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
-                content.Add(fileContent, "formFile", ImageToUpload.Name);
-
-                string uploadingImageName = Uri.EscapeDataString(Path.GetRandomFileName());
-                string uploadingFileNameWithCorrectExtention = Path.ChangeExtension(uploadingImageName, Path.GetExtension(ImageToUpload.Name));
-
-                string url = $"/api/movies/Images/{PremierDate.Value.Year}/{PremierDate.Value.Month}/{uploadingFileNameWithCorrectExtention}";
-
-                // Send the request with authentication token
-                var response = await HttpClientFactory.CreateClient("AuthorizedClient").PostAsync(url, content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    AddMovieModel addMovieModel = new AddMovieModel(
-                        Name: Name,
-                        OriginalName: OriginalName,
-                        Description: Description,
-                        ImageSource: url,
-                        PremierDate: PremierDate.Value,
-                        MoviesDirectorsNames: MoviesDirectorsToSelectFrom
-                            .Where(d => SelectedMoviesDirectorsIds.Contains(d.Id)).Select(b => b.Name)
-                            .ToList(),
-                        MoviesGenresNames: MoviesGenresToSelectFrom
-                            .Where(g => SelectedMoviesGenresIds.Contains(g.Id))
-                            .Select(b => b.Name)
-                            .ToList(),
-                        MoviesStudiosNames: MoviesStudiosToSelectFrom
-                            .Where(s => SelectedMoviesStudiosIds.Contains(s.Id))
-                            .Select(b => b.Name)
-                            .ToList(),
-                        Trailer: Trailer,
-                        MoviesCountriesNames: MoviesCountriesToSelectFrom
-                            .Where(c => SelectedMoviesCountriesIds.Contains(c.Id))
-                            .Select(c => c.Name)
-                            .ToList(),
-                        MoviesCrew: MovieCrewEditor.ToModels(CrewTexts)
-                    );
-
-                    HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addMovieModel);
-
-                    if (addingMovieResponseMessage.IsSuccessStatusCode)
-                    {
-                        NavigationManager.NavigateTo("/admin/movies/list-movies");
-                    }
-                    else
-                    {
-                        string error = await addingMovieResponseMessage.Content.ReadAsStringAsync();
-                        ToastService.ShowError($"Failed to add movie: {error}");
-                    }
-                }
-                else
-                {
-                    string problemDetails = await response.Content.ReadAsStringAsync();
-                    ToastService.ShowError(problemDetails);
-                }
+                string problemDetails = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(problemDetails);
+                return;
             }
-            catch (Exception ex)
+
+            AddMovieModel addMovieModel = new AddMovieModel(
+                Name: Name,
+                OriginalName: OriginalName,
+                Description: Description,
+                ImageSource: url,
+                PremierDate: PremierDate.Value,
+                MoviesDirectorsNames: SelectedMoviesDirectors.Select(d => d.Name).ToList(),
+                MoviesGenresNames: SelectedMoviesGenres.Select(g => g.Name).ToList(),
+                MoviesStudiosNames: SelectedMoviesStudios.Select(s => s.Name).ToList(),
+                Trailer: Trailer,
+                MoviesCountriesNames: SelectedMoviesCountries.Select(c => c.Name).ToList(),
+                MoviesCrew: MovieCrewEditor.ToModels(CrewTexts));
+
+            HttpResponseMessage addingMovieResponseMessage = await MoviesWebManager.AddAsync(addMovieModel);
+
+            if (addingMovieResponseMessage.IsSuccessStatusCode)
             {
-                ToastService.ShowError(ex.Message);
+                NavigationManager.NavigateTo("/admin/movies/list-movies");
             }
+            else
+            {
+                string error = await addingMovieResponseMessage.Content.ReadAsStringAsync();
+                ToastService.ShowError($"Failed to add movie: {error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(ex.Message);
         }
     }
 }

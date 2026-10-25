@@ -42,35 +42,27 @@
                 <TrailerField @bind-Value="Trailer" />
 
                 <p>
-                    <label>Разработчики:</label>
-                    @{
-                        var devSelector = (Developer d) => d.Id;
-                        var devDisplay = (Developer d) => d.Name;
-                    }
-                    <MultiSelect TItem="Developer"
-                                 TId="long"
-                                 Items="DevelopersToSelectFrom.ToList()"
-                                 @bind-SelectedIds="SelectedDevelopersIds"
-                                 IdSelector="devSelector"
-                                 DisplaySelector="devDisplay"
-                                 Placeholder="Select developers..."
-                                 LabelPlural="developers" />
+                    <label>Разработчики (перетащите для изменения порядка):</label>
+                    <OrderedMultiSelect TItem="Developer"
+                                        TId="long"
+                                        AllItems="DevelopersToSelectFrom.ToList()"
+                                        IdSelector="d => d.Id"
+                                        DisplaySelector="d => d.Name"
+                                        Placeholder="Select developers..."
+                                        LabelPlural="разработчиков"
+                                        @bind-Items="SelectedDevelopers" />
                 </p>
 
                 <p>
-                    <label>Жанры:</label>
-                    @{
-                        var genreSelector = (Genre g) => g.Id;
-                        var genreDisplay = (Genre g) => g.Name;
-                    }
-                    <MultiSelect TItem="Genre"
-                                 TId="long"
-                                 Items="GenresToSelectFrom.ToList()"
-                                 @bind-SelectedIds="SelectedGenresIds"
-                                 IdSelector="genreSelector"
-                                 DisplaySelector="genreDisplay"
-                                 Placeholder="Select genres..."
-                                 LabelPlural="genres" />
+                    <label>Жанры (перетащите для изменения порядка):</label>
+                    <OrderedMultiSelect TItem="Genre"
+                                        TId="long"
+                                        AllItems="GenresToSelectFrom.ToList()"
+                                        IdSelector="g => g.Id"
+                                        DisplaySelector="g => g.Name"
+                                        Placeholder="Select genres..."
+                                        LabelPlural="жанров"
+                                        @bind-Items="SelectedGenres" />
                 </p>
 
                 <p>
@@ -89,35 +81,27 @@
                 </p>
 
                 <p>
-                    <label>Платформы:</label>
-                    @{
-                        var platSelector = (Platform p) => p.Id;
-                        var platDisplay = (Platform p) => p.Name;
-                    }
-                    <MultiSelect TItem="Platform"
-                                 TId="long"
-                                 Items="PlatformsToSelectFrom.ToList()"
-                                 @bind-SelectedIds="SelectedPlatformsIds"
-                                 IdSelector="platSelector"
-                                 DisplaySelector="platDisplay"
-                                 Placeholder="Select platforms..."
-                                 LabelPlural="platforms" />
+                    <label>Платформы (перетащите для изменения порядка):</label>
+                    <OrderedMultiSelect TItem="Platform"
+                                        TId="long"
+                                        AllItems="PlatformsToSelectFrom.ToList()"
+                                        IdSelector="p => p.Id"
+                                        DisplaySelector="p => p.Name"
+                                        Placeholder="Select platforms..."
+                                        LabelPlural="платформ"
+                                        @bind-Items="SelectedPlatforms" />
                 </p>
 
                 <p>
-                    <label>Издатели:</label>
-                    @{
-                        var pubSelector = (Publisher p) => p.Id;
-                        var pubDisplay = (Publisher p) => p.Name;
-                    }
-                    <MultiSelect TItem="Publisher"
-                                 TId="long"
-                                 Items="PublishersToSelectFrom.ToList()"
-                                 @bind-SelectedIds="SelectedPublishersIds"
-                                 IdSelector="pubSelector"
-                                 DisplaySelector="pubDisplay"
-                                 Placeholder="Select publishers..."
-                                 LabelPlural="publishers" />
+                    <label>Издатели (перетащите для изменения порядка):</label>
+                    <OrderedMultiSelect TItem="Publisher"
+                                        TId="long"
+                                        AllItems="PublishersToSelectFrom.ToList()"
+                                        IdSelector="p => p.Id"
+                                        DisplaySelector="p => p.Name"
+                                        Placeholder="Select publishers..."
+                                        LabelPlural="издателей"
+                                        @bind-Items="SelectedPublishers" />
                 </p>
 
                 <p>

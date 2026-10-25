@@ -1,4 +1,6 @@
-﻿using Data.Extensions;
+﻿using System.Text;
+using Dapper;
+using Data.Extensions;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Common;
 using Domain.Games;
@@ -6,6 +8,7 @@ using Domain.Games.Collections;
 using Domain.RequestsModels.Games;
 using Domain.Reviews;
 using IdentityLibrary.DTOs;
+using Npgsql;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
@@ -15,12 +18,17 @@ public sealed class GamesRepository : Repository<Game, AddGameModel, UpdateGameM
     {
     }
 
+    // =====================================================================
+    //  ADD
+    // =====================================================================
+
     public override async Task<long> AddAsync(AddGameModel entity)
     {
         using NpgsqlConnection connection = CreateConnection();
         connection.Open();
 
         using NpgsqlTransaction transaction = connection.BeginTransaction();
+
         Game insertedGame = await connection.QueryFirstAsync<Game>(@"INSERT INTO Games 
 (Name, Image, LocalizationId, ReleaseDate, Description, Trailer) 
 VALUES
@@ -35,71 +43,57 @@ RETURNING Id, Name, Image, LocalizationId, ReleaseDate, Description, Trailer;", 
             Trailer = TrailerUrl.ToEmbed(entity.Trailer)
         }, transaction: transaction);
 
-        foreach (long genreId in entity.GenresIds)
-        {
-            GameGenre insertedGameGenre = await connection.QueryFirstAsync<GameGenre>(@"INSERT INTO GamesGenres (GameId, GenreId) 
-VALUES (@GameId, @GenreId)
-RETURNING Id, GameId, GenreId;", new { GameId = insertedGame.Id, GenreId = genreId }, transaction: transaction);
-        }
+        foreach (OrderedId genre in entity.Genres)
+            await connection.ExecuteAsync(
+                @"INSERT INTO GamesGenres (GameId, GenreId, Position)
+                  VALUES (@GameId, @GenreId, @Position);",
+                new { GameId = insertedGame.Id, GenreId = genre.Id, Position = (short)genre.Position },
+                transaction: transaction);
 
-        foreach (long publisherId in entity.PublishersIds)
-        {
-            GamePublisher insertedGamePublisher = await connection.QueryFirstAsync<GamePublisher>(@"INSERT INTO GamesPublishers (GameId, PublisherId) 
-VALUES (@GameId, @PublisherId)
-RETURNING GameId, PublisherId;", new { GameId = insertedGame.Id, PublisherId = publisherId }, transaction: transaction);
-        }
+        foreach (OrderedId publisher in entity.Publishers)
+            await connection.ExecuteAsync(
+                @"INSERT INTO GamesPublishers (GameId, PublisherId, Position)
+                  VALUES (@GameId, @PublisherId, @Position);",
+                new { GameId = insertedGame.Id, PublisherId = publisher.Id, Position = (short)publisher.Position },
+                transaction: transaction);
 
-        foreach (long platformId in entity.PlatformsIds)
-        {
-            GamePlatform insertedGamePlatform = await connection.QueryFirstAsync<GamePlatform>(@"INSERT INTO GamesPlatforms 
-(GameId, PlatformId)
-VALUES (@GameId, @PlatformId)
-RETURNING GameId, PlatformId;", new { GameId = insertedGame.Id, PlatformId = platformId }, transaction: transaction);
-        }
+        foreach (OrderedId platform in entity.Platforms)
+            await connection.ExecuteAsync(
+                @"INSERT INTO GamesPlatforms (GameId, PlatformId, Position)
+                  VALUES (@GameId, @PlatformId, @Position);",
+                new { GameId = insertedGame.Id, PlatformId = platform.Id, Position = (short)platform.Position },
+                transaction: transaction);
 
-        foreach (long developerId in entity.DevelopersIds)
-        {
-            IEnumerable<dynamic> insertedGameDeveloper = await connection.QueryAsync(@"INSERT INTO GamesDevelopers(GameId, DeveloperId)
-VALUES(@GameId, @DeveloperId)
-RETURNING Id, GameId, DeveloperId;", new { GameId = insertedGame.Id, DeveloperId = developerId }, transaction: transaction);
-        }
+        foreach (OrderedId developer in entity.Developers)
+            await connection.ExecuteAsync(
+                @"INSERT INTO GamesDevelopers (GameId, DeveloperId, Position)
+                  VALUES (@GameId, @DeveloperId, @Position);",
+                new { GameId = insertedGame.Id, DeveloperId = developer.Id, Position = (short)developer.Position },
+                transaction: transaction);
 
         await transaction.CommitAsync();
 
         return insertedGame.Id;
     }
 
+    // =====================================================================
+    //  READ — first / last / all
+    // =====================================================================
+
     public async Task<IEnumerable<Game>> GetFirstAsync(int offset, int limit)
     {
         using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
 g.Id, g.name, g.image, g.releasedate, g.description,
--- Статистика отзывов
-COALESCE((
-    SELECT AVG(Score)::float 
-    FROM GamesPlayersReviews 
-    WHERE GameId = g.Id
-), 0) AS UsersScore,
-COALESCE((
-    SELECT COUNT(*) 
-    FROM GamesPlayersReviews 
-    WHERE GameId = g.Id
-), 0) AS UsersReviewsCount,
-COALESCE((
-    SELECT AVG(Score)::float 
-    FROM GamesCriticsReviews 
-    WHERE GameId = g.Id
-), 0) AS CriticsScore,
-COALESCE((
-    SELECT COUNT(*) 
-    FROM GamesCriticsReviews 
-    WHERE GameId = g.Id
-), 0) AS CriticsReviewsCount,
-d.id, d.name, 
-p.id, p.name, 
-gen.id, gen.name, 
+COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
+COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
+COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
+d.id, d.name,
+p.id, p.name,
+gen.id, gen.name,
 l.id, l.name,
-plat.id, plat.name, 
+plat.id, plat.name,
 gs.Id, gs.GameId, gs.ImageUrl,
 gc.Id, gc.Name, gc.Description,
 gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date
@@ -118,7 +112,8 @@ gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
     LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
     LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId
-    LEFT JOIN gamesPlayersReviews gpr on gpr.GameId = g.Id";
+    LEFT JOIN gamesPlayersReviews gpr on gpr.GameId = g.Id
+    ORDER BY g.Id, gd.Position, gg.Position, gplatf.Position, gpub.Position, gs.Position";
 
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
@@ -130,9 +125,12 @@ gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date
                 {
                     gameEntry = game;
                     gameEntry.Developers = new List<Developer>();
+                    gameEntry.Publishers = new List<Publisher>();
                     gameEntry.Genres = new List<Genre>();
                     gameEntry.Platforms = new List<Platform>();
                     gameEntry.Screenshots = new List<GameScreenshot>();
+                    gameEntry.GameCollections = new List<GamesCollection>();
+                    gameEntry.GamesPlayersReviews = new List<GameReview>();
                     gameDictionary.Add(gameEntry.Id, gameEntry);
                 }
 
@@ -162,13 +160,12 @@ gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date
 
                 return gameEntry;
             }, new { offset, limit },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id"
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id"
         );
 
-        List<Game> result = gameDictionary.Values.ToList();
-
-        return result;
+        return gameDictionary.Values.ToList();
     }
+
     public async Task<IEnumerable<Game>> GetLastAsync(int offset, int limit)
     {
         using NpgsqlConnection connection = CreateConnection();
@@ -178,11 +175,11 @@ COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id)
 COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
 COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
 COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
-d.id, d.name, 
-p.id, p.name, 
-gen.id, gen.name, 
+d.id, d.name,
+p.id, p.name,
+gen.id, gen.name,
 l.id, l.name,
-plat.id, plat.name, 
+plat.id, plat.name,
 gs.Id, gs.GameId, gs.ImageUrl,
 gc.Id, gc.Name, gc.Description
     FROM (select Id, Name, Image, ReleaseDate, Description, LocalizationId 
@@ -199,7 +196,8 @@ gc.Id, gc.Name, gc.Description
     LEFT JOIN platforms plat ON plat.id = gplatf.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
     LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
-    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId";
+    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId
+    ORDER BY g.Id, gd.Position, gg.Position, gplatf.Position, gpub.Position, gs.Position";
 
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
@@ -211,9 +209,11 @@ gc.Id, gc.Name, gc.Description
                 {
                     gameEntry = game;
                     gameEntry.Developers = new List<Developer>();
+                    gameEntry.Publishers = new List<Publisher>();
                     gameEntry.Genres = new List<Genre>();
                     gameEntry.Platforms = new List<Platform>();
                     gameEntry.Screenshots = new List<GameScreenshot>();
+                    gameEntry.GameCollections = new List<GamesCollection>();
                     gameDictionary.Add(gameEntry.Id, gameEntry);
                 }
 
@@ -241,12 +241,10 @@ gc.Id, gc.Name, gc.Description
                 return gameEntry;
             },
             new { offset, limit },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id"
         );
 
-        List<Game> result = gameDictionary.Values.ToList();
-
-        return result;
+        return gameDictionary.Values.ToList();
     }
 
     public async Task<IEnumerable<Game>> GetNearestAsync(short offset, short limit)
@@ -300,11 +298,11 @@ COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id)
 COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
 COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
 COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
-d.id, d.name, 
-p.id, p.name, 
-gen.id, gen.name, 
+d.id, d.name,
+p.id, p.name,
+gen.id, gen.name,
 l.id, l.name,
-platf.id, platf.name, 
+platf.id, platf.name,
 gs.id, gs.gameid, gs.imageUrl,
 gc.Id, gc.Name, gc.Description
     FROM games g
@@ -319,7 +317,8 @@ gc.Id, gc.Name, gc.Description
     LEFT JOIN platforms platf ON platf.id = gplatf.platformid
     LEFT JOIN gamesscreenshots gs ON gs.gameid = g.id
     LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
-    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId";
+    LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId
+    ORDER BY g.Id, gd.Position, gg.Position, gplatf.Position, gpub.Position, gs.Position";
 
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
@@ -362,12 +361,10 @@ gc.Id, gc.Name, gc.Description
 
                 return gameEntry;
             },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id"
         );
 
-        List<Game> result = gameDictionary.Values.ToList();
-
-        return result;
+        return gameDictionary.Values.ToList();
     }
 
     public override async Task<Game> GetAsync(long id)
@@ -379,11 +376,11 @@ COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id)
 COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
 COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
 COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
-d.id, d.name, 
-p.id, p.name, 
-gen.id, gen.name, 
+d.id, d.name,
+p.id, p.name,
+gen.id, gen.name,
 l.id, l.name,
-platf.id, platf.name, 
+platf.id, platf.name,
 gs.id, gs.gameid, gs.imageUrl,
 gc.Id, gc.Name, gc.Description,
 gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
@@ -406,7 +403,8 @@ LEFT JOIN gamescollections gc on gc.Id=gci.GameCollectionId
 LEFT JOIN GamesPlayersReviews gpr on gpr.gameid=g.Id
 LEFT JOIN GamesPlayersReviewsShifts gprs on gprs.GamePlayerReviewId=gpr.Id
 LEFT JOIN ApplicationUsers au on au.Id=gpr.UserId
-WHERE g.Id=@id";
+WHERE g.Id=@id
+ORDER BY g.Id, gd.Position, gg.Position, gplatf.Position, gpub.Position, gs.Position";
 
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
         Dictionary<long, GameReview> reviewDictionary = new Dictionary<long, GameReview>();
@@ -486,18 +484,25 @@ WHERE g.Id=@id";
                 return gameEntry;
             },
             new { id },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview, GamePlayerReviewShift
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id,Id"
         );
 
         return gameDictionary.Values.FirstOrDefault();
     }
 
+    // =====================================================================
+    //  REMOVE
+    // =====================================================================
+
     public override async Task RemoveAsync(long id)
     {
         using NpgsqlConnection connection = CreateConnection();
-        await connection.ExecuteAsync(@"DELETE FROM Games
-WHERE Id=@id", new { id });
+        await connection.ExecuteAsync(@"DELETE FROM Games WHERE Id=@id", new { id });
     }
+
+    // =====================================================================
+    //  UPDATE
+    // =====================================================================
 
     public override async Task<Game> UpdateAsync(UpdateGameModel entity, long id)
     {
@@ -528,21 +533,30 @@ DELETE FROM GamesPublishers WHERE GameId=@Id;
 DELETE FROM GamesPlatforms WHERE GameId=@Id;
 DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: transaction);
 
-        foreach (long genreId in entity.GenresIds.Distinct())
-            await connection.ExecuteAsync("INSERT INTO GamesGenres (GameId, GenreId) VALUES (@GameId, @GenreId);",
-                new { GameId = id, GenreId = genreId }, transaction: transaction);
+        // Distinct() намеренно НЕ используется: порядок в списке = Position.
+        foreach (OrderedId genre in entity.Genres)
+            await connection.ExecuteAsync(
+                "INSERT INTO GamesGenres (GameId, GenreId, Position) VALUES (@GameId, @GenreId, @Position);",
+                new { GameId = id, GenreId = genre.Id, Position = (short)genre.Position },
+                transaction: transaction);
 
-        foreach (long publisherId in entity.PublishersIds.Distinct())
-            await connection.ExecuteAsync("INSERT INTO GamesPublishers (GameId, PublisherId) VALUES (@GameId, @PublisherId);",
-                new { GameId = id, PublisherId = publisherId }, transaction: transaction);
+        foreach (OrderedId publisher in entity.Publishers)
+            await connection.ExecuteAsync(
+                "INSERT INTO GamesPublishers (GameId, PublisherId, Position) VALUES (@GameId, @PublisherId, @Position);",
+                new { GameId = id, PublisherId = publisher.Id, Position = (short)publisher.Position },
+                transaction: transaction);
 
-        foreach (long platformId in entity.PlatformsIds.Distinct())
-            await connection.ExecuteAsync("INSERT INTO GamesPlatforms (GameId, PlatformId) VALUES (@GameId, @PlatformId);",
-                new { GameId = id, PlatformId = platformId }, transaction: transaction);
+        foreach (OrderedId platform in entity.Platforms)
+            await connection.ExecuteAsync(
+                "INSERT INTO GamesPlatforms (GameId, PlatformId, Position) VALUES (@GameId, @PlatformId, @Position);",
+                new { GameId = id, PlatformId = platform.Id, Position = (short)platform.Position },
+                transaction: transaction);
 
-        foreach (long developerId in entity.DevelopersIds.Distinct())
-            await connection.ExecuteAsync("INSERT INTO GamesDevelopers (GameId, DeveloperId) VALUES (@GameId, @DeveloperId);",
-                new { GameId = id, DeveloperId = developerId }, transaction: transaction);
+        foreach (OrderedId developer in entity.Developers)
+            await connection.ExecuteAsync(
+                "INSERT INTO GamesDevelopers (GameId, DeveloperId, Position) VALUES (@GameId, @DeveloperId, @Position);",
+                new { GameId = id, DeveloperId = developer.Id, Position = (short)developer.Position },
+                transaction: transaction);
 
         await transaction.CommitAsync();
 
@@ -554,15 +568,19 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
         throw new NotImplementedException();
     }
 
+    // =====================================================================
+    //  FILTERED / SEARCH
+    // =====================================================================
+
     public async Task<IEnumerable<Game>> GetByParametersAsync(
-    long[]? genresIds,
-    long[]? platformsIds,
-    int[]? years,
-    long[]? developersIds,
-    long[]? publishersIds,
-    long[]? localizationsIds,
-    int skip,
-    int take)
+        long[]? genresIds,
+        long[]? platformsIds,
+        int[]? years,
+        long[]? developersIds,
+        long[]? publishersIds,
+        long[]? localizationsIds,
+        int skip,
+        int take)
     {
         using NpgsqlConnection connection = CreateConnection();
 
@@ -653,7 +671,7 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
     LEFT JOIN gamescollectionsitems gci ON gci.GameId = g.Id
     LEFT JOIN gamescollections gc ON gc.Id = gci.GameCollectionId
     WHERE g.Id = ANY(@GameIds)
-    ORDER BY g.Name";
+    ORDER BY g.Name, gd.Position, gg.Position, gplatf.Position, gpub.Position, gs.Position";
 
         parameters.Add("GameIds", gameIds);
 
@@ -699,7 +717,7 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
                 return gameEntry;
             },
             parameters,
-            splitOn: "Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id"
         );
 
         return gameDictionary.Values.ToList();
@@ -714,11 +732,11 @@ COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id)
 COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
 COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
 COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
-d.id, d.name, 
-p.id, p.name, 
-gen.id, gen.name, 
+d.id, d.name,
+p.id, p.name,
+gen.id, gen.name,
 l.id, l.name,
-platf.id, platf.name, 
+platf.id, platf.name,
 gs.id, gs.gameid, gs.imageUrl,
 gc.Id, gc.Name, gc.Description,
 gpr.Id, gpr.GameId, gpr.UserId, gpr.Score, gpr.TextContent, gpr.Date,
@@ -739,7 +757,7 @@ au.Id, au.UserName, au.NormalizedUserName, au.Email, au.NormalizedEmail, au.Emai
     LEFT JOIN GamesPlayersReviews gpr on gpr.gameid=g.Id
     LEFT JOIN ApplicationUsers au on au.Id=gpr.UserId
 WHERE g.name ILIKE '%' || @name || '%'
-        ORDER BY g.Id DESC;";
+        ORDER BY g.Id DESC, gd.Position, gg.Position, gplatf.Position, gpub.Position, gs.Position;";
 
         Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
 
@@ -791,19 +809,19 @@ WHERE g.name ILIKE '%' || @name || '%'
                 return gameEntry;
             },
             new { name },
-            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id" // Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, GameReview
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id"
         );
 
         return gameDictionary.Values;
     }
 
     public async Task<int> GetCountByParametersAsync(
-    long[]? genresIds,
-    long[]? platformsIds,
-    int[]? years,
-    long[]? developersIds,
-    long[]? publishersIds,
-    long[]? localizationsIds)
+        long[]? genresIds,
+        long[]? platformsIds,
+        int[]? years,
+        long[]? developersIds,
+        long[]? publishersIds,
+        long[]? localizationsIds)
     {
         using NpgsqlConnection connection = CreateConnection();
 
@@ -819,7 +837,6 @@ WHERE g.name ILIKE '%' || @name || '%'
 
         DynamicParameters parameters = new DynamicParameters();
 
-        // Применяем те же фильтры, что и в GetByParametersAsync
         if (genresIds != null && genresIds.Length > 0)
         {
             countSql.Append(" AND gg.genreid = ANY(@GenresIds)");
@@ -861,10 +878,10 @@ WHERE g.name ILIKE '%' || @name || '%'
     }
 
     public async Task<IEnumerable<Game>> GetNearestByParametersAsync(
-    long[]? genresIds,
-    long[]? platformsIds,
-    short offset,
-    short limit)
+        long[]? genresIds,
+        long[]? platformsIds,
+        short offset,
+        short limit)
     {
         using NpgsqlConnection connection = CreateConnection();
 
@@ -906,8 +923,8 @@ WHERE g.name ILIKE '%' || @name || '%'
     }
 
     public async Task<int> GetNearestCountByParametersAsync(
-    long[]? genresIds,
-    long[]? platformsIds)
+        long[]? genresIds,
+        long[]? platformsIds)
     {
         using NpgsqlConnection connection = CreateConnection();
 

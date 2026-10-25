@@ -59,14 +59,18 @@ public sealed partial class EditMoviePage : ComponentBase
     public DateTime? PremierDate { get; set; }
     public string? Trailer { get; set; }
 
-    public List<long> SelectedMoviesDirectorsIds { get; private set; } = new List<long>();
-    public List<long> SelectedMoviesGenresIds { get; private set; } = new List<long>();
-    public List<long> SelectedMoviesStudiosIds { get; private set; } = new List<long>();
-    public List<long> SelectedMoviesCountriesIds { get; private set; } = new List<long>();
+    public List<MovieDirector> SelectedMoviesDirectors { get; private set; } = new();
+    public List<Genre> SelectedMoviesGenres { get; private set; } = new();
+    public List<MovieStudio> SelectedMoviesStudios { get; private set; } = new();
+    public List<MovieCountry> SelectedMoviesCountries { get; private set; } = new();
+
+    private List<long> SelectedMoviesDirectorsIds => SelectedMoviesDirectors.Select(d => d.Id).ToList();
+    private List<long> SelectedMoviesGenresIds => SelectedMoviesGenres.Select(g => g.Id).ToList();
+    private List<long> SelectedMoviesStudiosIds => SelectedMoviesStudios.Select(s => s.Id).ToList();
+    private List<long> SelectedMoviesCountriesIds => SelectedMoviesCountries.Select(c => c.Id).ToList();
 
     public Dictionary<MovieCrewRole, string> CrewTexts { get; private set; } = MovieCrewEditor.CreateTexts();
 
-    /// <summary>Data-url нового постера или текущий постер фильма.</summary>
     public string ImagePreview { get; private set; }
     public IBrowserFile? ImageToUpload { get; private set; }
 
@@ -88,10 +92,10 @@ public sealed partial class EditMoviePage : ComponentBase
 
         await Task.WhenAll(moviesDirectorsGettingTask, moviesGenresGettingTask, moviesStudiosGettingTask, moviesCountriesGettingTask);
 
-        MoviesDirectorsToSelectFrom = moviesDirectorsGettingTask.Result;
-        MoviesGenresToSelectFrom = moviesGenresGettingTask.Result;
-        MoviesStudiosToSelectFrom = moviesStudiosGettingTask.Result;
-        MoviesCountriesToSelectFrom = moviesCountriesGettingTask.Result;
+        MoviesDirectorsToSelectFrom = await moviesDirectorsGettingTask;
+        MoviesGenresToSelectFrom = await moviesGenresGettingTask;
+        MoviesStudiosToSelectFrom = await moviesStudiosGettingTask;
+        MoviesCountriesToSelectFrom = await moviesCountriesGettingTask;
 
         if (Movie is null)
         {
@@ -106,11 +110,35 @@ public sealed partial class EditMoviePage : ComponentBase
         Trailer = Movie.Trailer;
         ImagePreview = Movie.ImageSource;
 
-        SelectedMoviesDirectorsIds = Movie.MoviesDirectors.Select(d => d.Id).ToList();
-        SelectedMoviesGenresIds = Movie.MovieGenres.Select(g => g.Id).ToList();
-        SelectedMoviesStudiosIds = Movie.MoviesStudios.Select(s => s.Id).ToList();
-        SelectedMoviesCountriesIds = Movie.MoviesCountries.Select(c => c.Id).ToList();
+        SelectedMoviesDirectors = Movie.MoviesDirectors.ToList();
+        SelectedMoviesGenres = Movie.MovieGenres.ToList();
+        SelectedMoviesStudios = Movie.MoviesStudios.ToList();
+        SelectedMoviesCountries = Movie.MoviesCountries.ToList();
         CrewTexts = MovieCrewEditor.CreateTexts(Movie.MoviesCrew);
+    }
+
+    private Task OnSelectedDirectorsChanged(IReadOnlyList<MovieDirector> list)
+    {
+        SelectedMoviesDirectors = list.ToList();
+        return Task.CompletedTask;
+    }
+
+    private Task OnSelectedGenresChanged(IReadOnlyList<Genre> list)
+    {
+        SelectedMoviesGenres = list.ToList();
+        return Task.CompletedTask;
+    }
+
+    private Task OnSelectedStudiosChanged(IReadOnlyList<MovieStudio> list)
+    {
+        SelectedMoviesStudios = list.ToList();
+        return Task.CompletedTask;
+    }
+
+    private Task OnSelectedCountriesChanged(IReadOnlyList<MovieCountry> list)
+    {
+        SelectedMoviesCountries = list.ToList();
+        return Task.CompletedTask;
     }
 
     private async Task FileUploaded(InputFileChangeEventArgs e)
@@ -147,7 +175,7 @@ public sealed partial class EditMoviePage : ComponentBase
             if (ImageToUpload is not null)
             {
                 MultipartFormDataContent content = new MultipartFormDataContent();
-                StreamContent fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024)); // 50MB max
+                StreamContent fileContent = new StreamContent(ImageToUpload.OpenReadStream(50 * 1024 * 1024));
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageToUpload.ContentType);
                 content.Add(fileContent, "formFile", ImageToUpload.Name);
 

@@ -1,0 +1,43 @@
+﻿@typeparam TItem
+@typeparam TId
+
+<div class="ordered-multiselect">
+    @if (!Items.Any())
+    {
+        <p class="ordered-multiselect__empty">Ничего не выбрано</p>
+    }
+    else
+    {
+        <ul @ref="_listElement" class="ordered-multiselect__list">
+            @foreach (TItem item in Items)
+            {
+                <li data-id="@IdSelector(item)?.ToString()" class="ordered-multiselect__item">
+                    <span class="ordered-multiselect__handle" title="Перетащите для изменения порядка">☰</span>
+                    <span class="ordered-multiselect__label">@DisplaySelector(item)</span>
+                    <button type="button"
+                            class="ordered-multiselect__remove"
+                            title="Убрать"
+                            @onclick="() => RemoveAsync(item)">
+                        ×
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+
+    <div class="ordered-multiselect__add">
+        <select @bind="_idToAdd" class="ordered-multiselect__select">
+            <option value="">— выберите @LabelPlural —</option>
+            @foreach (TItem item in AvailableItems)
+            {
+                <option value="@IdSelector(item)?.ToString()">@DisplaySelector(item)</option>
+            }
+        </select>
+        <button type="button"
+                class="ordered-multiselect__add-button"
+                disabled="@(string.IsNullOrEmpty(_idToAdd))"
+                @onclick="AddAsync">
+            Добавить
+        </button>
+    </div>
+</div>
