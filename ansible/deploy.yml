@@ -147,6 +147,9 @@
           - "--exclude=/API/Games/Images"
           - "--exclude=/API/Movies/Images"
           - "--exclude=DvlErrLog.txt"
+          # Защита загруженных картинок от удаления при delete: true
+          - "--filter=protect /API/Games/Images/***"
+          - "--filter=protect /API/Movies/Images/***"
 
     - name: Build API image
       ansible.builtin.shell:
