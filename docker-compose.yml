@@ -19,8 +19,8 @@
       ConnectionStrings__PostgresConnection: Host=db; Port=5432; Database=${DB_NAME}; Trust Server Certificate=true; Username=${DB_USER}; Password=${DB_PASSWORD}
       ConnectionStrings__RedisConnection: redis:6379,password=${REDIS_PASSWORD},abortConnect=false
     volumes:
-      - ./Games:/app/Games
-      - ./Movies:/app/Movies
+      - ./games:/app/games
+      - ./movies:/app/movies
     restart: unless-stopped
 
   db:

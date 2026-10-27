@@ -304,6 +304,8 @@ internal class Program
 
         _ = app.MapControllers();
 
+        _ = app.MapGet("/test", () => Results.Ok("TEST"));
+
         _ = app.MapControllers();
 
         _ = app.UseResponseCompression();

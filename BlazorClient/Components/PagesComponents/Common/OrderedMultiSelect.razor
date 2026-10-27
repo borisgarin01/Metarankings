@@ -6,24 +6,24 @@
     {
         <p class="ordered-multiselect__empty">Ничего не выбрано</p>
     }
-    else
-    {
-        <ul @ref="_listElement" class="ordered-multiselect__list">
-            @foreach (TItem item in Items)
-            {
-                <li data-id="@IdSelector(item)?.ToString()" class="ordered-multiselect__item">
-                    <span class="ordered-multiselect__handle" title="Перетащите для изменения порядка">☰</span>
-                    <span class="ordered-multiselect__label">@DisplaySelector(item)</span>
-                    <button type="button"
-                            class="ordered-multiselect__remove"
-                            title="Убрать"
-                            @onclick="() => RemoveAsync(item)">
-                        ×
-                    </button>
-                </li>
-            }
-        </ul>
-    }
+
+    @* <ul> рендерится всегда, чтобы SortableJS был привязан к одному и тому же элементу,
+       даже если список изначально пуст (страница добавления). *@
+    <ul @ref="_listElement" class="ordered-multiselect__list" hidden="@(!Items.Any())">
+        @foreach (TItem item in Items)
+        {
+            <li data-id="@IdSelector(item)?.ToString()" class="ordered-multiselect__item">
+                <span class="ordered-multiselect__handle" title="Перетащите для изменения порядка">☰</span>
+                <span class="ordered-multiselect__label">@DisplaySelector(item)</span>
+                <button type="button"
+                        class="ordered-multiselect__remove"
+                        title="Убрать"
+                        @onclick="() => RemoveAsync(item)">
+                    ×
+                </button>
+            </li>
+        }
+    </ul>
 
     <div class="ordered-multiselect__add">
         <select @bind="_idToAdd" class="ordered-multiselect__select">

@@ -4,7 +4,7 @@ namespace API.Controllers.Games;
 public sealed class ImagesController : ImagesControllerBase
 {
     public ImagesController(IWebHostEnvironment webHostEnvironment)
-        : base(webHostEnvironment, "Games", "/api/games/Images")
+        : base(webHostEnvironment, "games", "/api/games/Images")
     {
     }
 }

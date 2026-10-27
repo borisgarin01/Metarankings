@@ -30,7 +30,6 @@ public partial class OrderedMultiSelect<TItem, TId> : ComponentBase, IAsyncDispo
     private string? _idToAdd;
     private DotNetObjectReference<OrderedMultiSelect<TItem, TId>>? _selfRef;
     private bool _sortableInitialized;
-    private int _lastRenderedCount = -1;
 
     private IEnumerable<TItem> AvailableItems =>
         AllItems.Where(a => !Items.Any(i => EqualityComparer<TId>.Default
@@ -38,24 +37,13 @@ public partial class OrderedMultiSelect<TItem, TId> : ComponentBase, IAsyncDispo
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && Items.Count > 0)
+        // <ul> присутствует в DOM всегда, поэтому SortableJS достаточно инициализировать один раз —
+        // новые элементы он подхватывает сам.
+        if (firstRender)
         {
             _selfRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("sortableInterop.create", _listElement, _selfRef, nameof(OnOrderChanged));
             _sortableInitialized = true;
-            _lastRenderedCount = Items.Count;
-        }
-        else if (_sortableInitialized && _lastRenderedCount != Items.Count)
-        {
-            // если список был пуст и появился — нужно инициализировать SortableJS
-            if (_lastRenderedCount <= 0 && Items.Count > 0)
-            {
-                _selfRef ??= DotNetObjectReference.Create(this);
-                await JS.InvokeVoidAsync("sortableInterop.create", _listElement, _selfRef, nameof(OnOrderChanged));
-            }
-
-            _lastRenderedCount = Items.Count;
-            await JS.InvokeVoidAsync("sortableInterop.refresh", _listElement);
         }
     }
 
