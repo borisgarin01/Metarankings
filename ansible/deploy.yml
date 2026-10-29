@@ -209,23 +209,6 @@
   become: true
 
   tasks:
-    - name: Check if certificate already exists
-      ansible.builtin.stat:
-        path: "/etc/letsencrypt/live/{{domain}}/fullchain.pem"
-      register: cert_file
-
-    # Certbot в standalone-режиме занимает 80 порт; останавливаем nginx только при первичном выпуске
-    - name: Stop nginx before issuing certificate
-      community.docker.docker_container:
-        name: nginx
-        state: stopped
-      failed_when: false
-      when: not cert_file.stat.exists
-
-    - name: Install Certbot and generate Certificate
-      ansible.builtin.include_role:
-        name: borisgarin01.certbot
-
     - name: Create nginx directory
       ansible.builtin.file:
         path: "{{app_dir}}/nginx"
