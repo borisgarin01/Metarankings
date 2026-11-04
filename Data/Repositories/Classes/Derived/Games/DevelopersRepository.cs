@@ -1,12 +1,10 @@
-﻿using Data.Repositories.Interfaces;
-using Data.Repositories.Interfaces.Derived;
+﻿using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.RequestsModels.Games.Developers;
-using Npgsql;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class DevelopersRepository : Repository<Developer, AddDeveloperModel, UpdateDeveloperModel>, IDevelopersRepository
+public sealed class DevelopersRepository : Repository<Developer, AddDeveloperModel, UpdateDeveloperModel>, IByNameGettingRepository<Developer>
 {
     public DevelopersRepository(string connectionString) : base(connectionString)
     {

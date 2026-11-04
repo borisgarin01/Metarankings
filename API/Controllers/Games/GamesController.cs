@@ -1,7 +1,7 @@
 ﻿using API.Json;
+using Data.Repositories.Classes.Derived.Games;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
-using Domain.RequestsModels;
 using Domain.RequestsModels.Games;
 using Domain.ResponsesModels;
 
@@ -10,123 +10,52 @@ namespace API.Controllers.Games;
 [ApiController]
 [OutputCache(PolicyName = CachePolicies.PublicRead, Tags = new[] { CacheTags.Games })]
 [Route("api/games/[controller]")]
-public sealed class GamesController : ControllerBase
+public sealed class GamesController : CrudControllerBase<Game, AddGameModel, UpdateGameModel>
 {
-    private JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
-    private readonly IGamesRepository _gamesRepository;
+    private readonly GamesRepository _gamesRepository;
     private readonly ILogger<GamesController> _logger;
 
-    public GamesController(IGamesRepository gamesRepository, ILogger<GamesController> logger)
+    public GamesController(GamesRepository repository, ILogger<GamesController> logger) : base(repository)
     {
-        jsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("yyyy-MM-dd"));
-        _gamesRepository = gamesRepository;
+        _gamesRepository = repository;
         _logger = logger;
     }
 
+    // =====================================================================
+    //  УНИКАЛЬНЫЕ ЭНДПОИНТЫ (в CrudControllerBase их нет)
+    // =====================================================================
+
     [HttpGet("First/{offset:int}/{limit:int}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetFirstAsync(int offset = 0, int limit = 25, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<Game>>> GetFirstAsync(
+        int offset = 0,
+        int limit = 25,
+        CancellationToken cancellationToken = default)
     {
         IEnumerable<Game> games = await _gamesRepository.GetFirstAsync(offset, limit);
         return Ok(games);
     }
 
     [HttpGet("Last/{offset:int}/{limit:int}")]
-    public async Task<ActionResult<IEnumerable<Game>>> GetLastAsync(int offset = 0, int limit = 25, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<Game>>> GetLastAsync(
+        int offset = 0,
+        int limit = 25,
+        CancellationToken cancellationToken = default)
     {
         IEnumerable<Game> games = await _gamesRepository.GetLastAsync(offset, limit);
         return Ok(games);
     }
 
-    [HttpPost]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<long>> AddAsync(AddGameModel addGameModel)
-    {
-        long createdGameId = await _gamesRepository.AddAsync(addGameModel);
-
-        Game createdGame = await _gamesRepository.GetAsync(createdGameId);
-
-        return Created($"api/games/{createdGame.Id}", createdGame);
-    }
-
-    [HttpPut("{id:long}")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<Game>> UpdateAsync(long id, UpdateGameModel updateGameModel)
-    {
-        try
-        {
-            Game? updatedGame = await _gamesRepository.UpdateAsync(updateGameModel, id);
-
-            if (updatedGame is null)
-                return NotFound();
-
-            return Ok(updatedGame);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"{ex.Message}\t{ex.StackTrace}");
-            return StatusCode(500, ex.Message);
-        }
-    }
-
-    [HttpDelete("{id:long}")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
-    public async Task<ActionResult<long>> RemoveAsync(long id)
-    {
-        Game game = await _gamesRepository.GetAsync(id);
-        if (game is null)
-            return NotFound();
-        try
-        {
-            await _gamesRepository.RemoveAsync(id);
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"{ex.Message}\t{ex.StackTrace}");
-            return StatusCode(500, ex);
-        }
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Game>>> GetAllAsync(CancellationToken cancellationToken = default)
-    {
-        IEnumerable<Game> games = await _gamesRepository.GetAllAsync();
-        return Ok(games);
-    }
-
-    [HttpGet("{id:long}")]
-    public async Task<ActionResult<Game>> GetAsync(long id)
-    {
-        try
-        {
-            Game? game = await _gamesRepository.GetAsync(id);
-
-            if (game is null)
-                return NotFound();
-
-            return Ok(game);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, ex.Message, ex.StackTrace);
-            return StatusCode(500, new { ex.Message, ex.StackTrace });
-        }
-    }
-
     [HttpPost("byParameters")]
     public async Task<ActionResult<PagedResponse<Game>>> GetByParametersAsync(GameFilterRequest filter)
     {
-        // Получаем общее количество
         int totalCount = await _gamesRepository.GetCountByParametersAsync(
             filter.GenresIds,
             filter.PlatformsIds,
             filter.Years,
             filter.DevelopersIds,
             filter.PublishersIds,
-            filter.LocalizationIds
-        );
+            filter.LocalizationIds);
 
-        // Получаем элементы для текущей страницы
         IEnumerable<Game> games = await _gamesRepository.GetByParametersAsync(
             filter.GenresIds,
             filter.PlatformsIds,
@@ -135,8 +64,7 @@ public sealed class GamesController : ControllerBase
             filter.PublishersIds,
             filter.LocalizationIds,
             filter.Skip,
-            filter.Take
-        );
+            filter.Take);
 
         int page = (filter.Skip / filter.Take) + 1;
 
@@ -154,15 +82,15 @@ public sealed class GamesController : ControllerBase
     [HttpGet("search")]
     public async Task<ActionResult<IEnumerable<Game>>> Search([FromQuery] string name)
     {
-        return Ok(await _gamesRepository.GetByNameAsync(name));
+        return Ok(await _gamesRepository.SearchByNameAsync(name));
     }
 
     [HttpGet("games-releases-dates/{offset}/{limit}")]
     public async Task<ActionResult<IEnumerable<Game>>> GamesReleasesDates(
-    short offset,
-    short limit,
-    [FromQuery] long[]? genresIds = null,
-    [FromQuery] long[]? platformsIds = null)
+        short offset,
+        short limit,
+        [FromQuery] long[]? genresIds = null,
+        [FromQuery] long[]? platformsIds = null)
     {
         if (genresIds?.Length > 0 || platformsIds?.Length > 0)
         {
@@ -200,5 +128,19 @@ public sealed class GamesController : ControllerBase
         [FromQuery] long[]? platformsIds = null)
     {
         return Ok(await _gamesRepository.GetMostWaitingCountAsync(genresIds, platformsIds));
+    }
+
+    // =====================================================================
+    //  ХУК БАЗОВОГО КОНТРОЛЛЕРА
+    // =====================================================================
+
+    protected override async Task<ActionResult?> ValidateAddAsync(AddGameModel addGameModel)
+    {
+        Game? existingGame = await _gamesRepository.GetByNameAsync(addGameModel.Name);
+
+        if (existingGame is not null)
+            return BadRequest($"Игра с названием {addGameModel.Name} уже существует");
+
+        return null;
     }
 }

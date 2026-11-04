@@ -1,4 +1,6 @@
 ﻿using BlazorClient.Components.PagesComponents.Home;
+using Data.Repositories.Classes.Derived.Games;
+using Data.Repositories.Classes.Derived.Movies;
 using Data.Repositories.Interfaces;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Common;
@@ -21,13 +23,13 @@ public sealed class HomeController : ControllerBase
     private readonly ILogger<HomeController> _logger;
 
     private readonly IGamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
-    private readonly IGamesRepository _gamesRepository;
-    private readonly IMoviesRepository _moviesRepository;
+    private readonly GamesRepository _gamesRepository;
+    private readonly MoviesRepository _moviesRepository;
     private readonly IMoviesViewersReviewsRepository _moviesViewersReviewsRepository;
-    private readonly IRepository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> _gamesCollectionsRepository;
+    private readonly GamesCollectionsRepository _gamesCollectionsRepository;
     private readonly IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> _moviesCollectionsRepository;
 
-    public HomeController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, ILogger<HomeController> logger, IGamesRepository gamesRepository, IRepository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel> gamesCollectionsRepository, IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> moviesCollectionsRepository, IMoviesRepository moviesRepository, IMoviesViewersReviewsRepository moviesViewersReviewsRepository)
+    public HomeController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, ILogger<HomeController> logger, GamesRepository gamesRepository, GamesCollectionsRepository gamesCollectionsRepository, IRepository<MoviesCollection, AddMoviesCollectionModel, UpdateMoviesCollectionModel> moviesCollectionsRepository, MoviesRepository moviesRepository, IMoviesViewersReviewsRepository moviesViewersReviewsRepository)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _logger = logger;

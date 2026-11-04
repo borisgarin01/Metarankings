@@ -1,10 +1,9 @@
-﻿using Data.Repositories.Interfaces;
-using Domain.Games;
+﻿using Domain.Games;
 using Domain.RequestsModels.Games.Platforms;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class PlatformsRepository : Repository<Platform, AddPlatformModel, UpdatePlatformModel>
+public sealed class PlatformsRepository : Repository<Platform, AddPlatformModel, UpdatePlatformModel>, IByNameGettingRepository<Platform>
 {
     public PlatformsRepository(string connectionString) : base(connectionString)
     {
@@ -201,6 +200,66 @@ RETURNING Id;"
         );
 
         return platformDictionary.Values;
+    }
+
+    public async Task<Platform> GetByNameAsync(string name)
+    {
+        using NpgsqlConnection connection = CreateConnection();
+        Dictionary<long, Platform> platformDictionary = new Dictionary<long, Platform>();
+        Dictionary<long, Game> gameDictionary = new Dictionary<long, Game>();
+
+        await connection.QueryAsync<Platform, Game, Platform, Platform>(@"
+        SELECT 
+            p1.Id, p1.Name,
+            g.Id, g.Name, g.Image, g.LocalizationId,
+            g.ReleaseDate, g.Description, g.Trailer,
+            COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+            COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
+            COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
+            COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
+            p2.Id, p2.Name
+        FROM Platforms p1
+        LEFT JOIN GamesPlatforms gp ON gp.PlatformId = p1.Id
+        LEFT JOIN Games g ON g.Id = gp.GameId
+        LEFT JOIN GamesPlatforms gp2 ON gp2.GameId = g.Id
+        LEFT JOIN Platforms p2 ON p2.Id = gp2.PlatformId
+        WHERE LOWER(TRIM(p1.name)) = LOWER(TRIM(@Name))",
+            (platform, game, gamePlatform) =>
+            {
+                if (!platformDictionary.TryGetValue(platform.Id, out var platformEntry))
+                {
+                    platformEntry = platform;
+                    platformEntry.Games = new List<Game>();
+                    platformDictionary.Add(platformEntry.Id, platformEntry);
+                }
+
+                if (game != null)
+                {
+                    if (!gameDictionary.TryGetValue(game.Id, out var gameEntry))
+                    {
+                        gameEntry = game;
+                        gameEntry.Platforms = new List<Platform>();
+                        gameDictionary.Add(gameEntry.Id, gameEntry);
+
+                        if (!platformEntry.Games.Any(g => g.Id == game.Id))
+                        {
+                            platformEntry.Games.Add(gameEntry);
+                        }
+                    }
+
+                    if (gamePlatform != null && !gameEntry.Platforms.Any(p => p.Id == gamePlatform.Id))
+                    {
+                        gameEntry.Platforms.Add(gamePlatform);
+                    }
+                }
+
+                return platformEntry;
+            },
+            new { Name = name },
+            splitOn: "Id,Id,Id"
+        );
+
+        return platformDictionary.Values.FirstOrDefault();
     }
 
     public override async Task RemoveAsync(long id)

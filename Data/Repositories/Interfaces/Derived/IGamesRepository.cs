@@ -42,8 +42,6 @@ public interface IGamesRepository : IRepository<Game, AddGameModel, UpdateGameMo
         long[]? genresIds,
         long[]? platformsIds);
 
-    Task<IEnumerable<Game>> GetByNameAsync(string name);
-
     Task<IEnumerable<Game>> GetMostWaitingAsync(long[]? genresIds, long[]? platformsIds, int skip, int take);
 
     Task<int> GetMostWaitingCountAsync(long[]? genresIds, long[]? platformsIds);

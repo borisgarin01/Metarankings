@@ -15,12 +15,12 @@ namespace API.Controllers.Movies;
 public sealed class MoviesViewersReviewsController : ControllerBase
 {
     private readonly IMoviesViewersReviewsRepository _moviesViewersReviewsRepository;
-    private readonly IMoviesRepository _moviesRepository;
+    private readonly MoviesRepository _moviesRepository;
     private readonly MoviesViewersReviewsShiftsRepository _moviesViewersReviewsShiftsRepository;
 
     private readonly ILogger<MoviesViewersReviewsController> _logger;
 
-    public MoviesViewersReviewsController(IMoviesViewersReviewsRepository moviesViewersReviewsRepository, IMoviesRepository moviesRepository, ILogger<MoviesViewersReviewsController> logger, MoviesViewersReviewsShiftsRepository moviesViewersReviewsShiftsRepository)
+    public MoviesViewersReviewsController(IMoviesViewersReviewsRepository moviesViewersReviewsRepository, MoviesRepository moviesRepository, ILogger<MoviesViewersReviewsController> logger, MoviesViewersReviewsShiftsRepository moviesViewersReviewsShiftsRepository)
     {
         _moviesViewersReviewsRepository = moviesViewersReviewsRepository;
         _moviesViewersReviewsShiftsRepository = moviesViewersReviewsShiftsRepository;

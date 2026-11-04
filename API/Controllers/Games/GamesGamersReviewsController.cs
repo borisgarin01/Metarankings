@@ -15,12 +15,12 @@ namespace API.Controllers.Games;
 public sealed class GamesGamersReviewsController : ControllerBase
 {
     private readonly IGamesPlayersReviewsRepository _gamesPlayersReviewsRepository;
-    private readonly IGamesRepository _gamesRepository;
+    private readonly GamesRepository _gamesRepository;
     private readonly GamesPlayersReviewsShiftsRepository _gamePlayerReviewsShiftsRepository;
 
     private readonly ILogger<GamesGamersReviewsController> _logger;
 
-    public GamesGamersReviewsController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, IGamesRepository gamesRepository, ILogger<GamesGamersReviewsController> logger, GamesPlayersReviewsShiftsRepository gamePlayerReviewsShiftsRepository)
+    public GamesGamersReviewsController(IGamesPlayersReviewsRepository gamesPlayersReviewsRepository, GamesRepository gamesRepository, ILogger<GamesGamersReviewsController> logger, GamesPlayersReviewsShiftsRepository gamePlayerReviewsShiftsRepository)
     {
         _gamesPlayersReviewsRepository = gamesPlayersReviewsRepository;
         _gamesRepository = gamesRepository;

@@ -31,21 +31,21 @@ public static class RepositoriesRegistrator
     {
         string metarankingsConnectionString = configuration.GetConnectionString("PostgresConnection");
 
-        services.AddScoped<IDevelopersRepository, DevelopersRepository>(instance => new DevelopersRepository(metarankingsConnectionString));
+        services.AddScoped(instance => new DevelopersRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Domain.Games.Genre, AddGameGenreModel, UpdateGameGenreModel>, GamesGenresRepository>(instance => new GamesGenresRepository(metarankingsConnectionString));
+        services.AddScoped(instance => new GamesGenresRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Platform, AddPlatformModel, UpdatePlatformModel>, PlatformsRepository>(instance => new PlatformsRepository(metarankingsConnectionString));
+        services.AddScoped(instance => new PlatformsRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<Localization, AddLocalizationModel, UpdateLocalizationModel>, LocalizationsRepository>(instance => new LocalizationsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<Publisher, AddPublisherModel, UpdatePublisherModel>, PublishersRepository>(instance => new PublishersRepository(metarankingsConnectionString));
+        services.AddScoped(instance => new PublishersRepository(metarankingsConnectionString));
 
-        services.AddScoped<IGamesRepository, GamesRepository>(instance => new GamesRepository(metarankingsConnectionString));
+        services.AddScoped(instance => new GamesRepository(metarankingsConnectionString));
 
-        services.AddScoped<ILocalizationsRepository>(instance => new LocalizationsRepository(metarankingsConnectionString));
+        services.AddScoped(instance => new LocalizationsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IMoviesRepository, MoviesRepository>(instance => new MoviesRepository(metarankingsConnectionString));
+        services.AddScoped(instance => new MoviesRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<MovieDirector, AddMovieDirectorModel, UpdateMovieDirectorModel>, MoviesDirectorsRepository>(instance => new MoviesDirectorsRepository(metarankingsConnectionString));
 
@@ -61,7 +61,7 @@ public static class RepositoriesRegistrator
 
         services.AddScoped<IMoviesViewersReviewsRepository, MoviesViewersReviewsRepository>(instance => new MoviesViewersReviewsRepository(metarankingsConnectionString));
 
-        services.AddScoped<IRepository<GamesCollection, AddGamesCollectionModel, UpdateGamesCollectionModel>, GamesCollectionsRepository>(instance => new GamesCollectionsRepository(metarankingsConnectionString));
+        services.AddScoped(instance => new GamesCollectionsRepository(metarankingsConnectionString));
 
         services.AddScoped<IRepository<GamesCollectionItem, AddGamesCollectionItemModel, UpdateGamesCollectionItemModel>, GamesCollectionsItemsRepository>(instance => new GamesCollectionsItemsRepository(metarankingsConnectionString));
 

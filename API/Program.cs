@@ -211,12 +211,7 @@ internal class Program
         {
             options.AddPolicy("AllowBlazorFrontend", policy =>
             {
-                policy.WithOrigins(
-                        "https://rankings-meta.ru",
-                        "https://www.rankings-meta.ru",
-                        "http://localhost:5000",
-                        "https://localhost:5001")
-                      .AllowAnyMethod()
+                policy.AllowAnyMethod()
                       .AllowAnyHeader()
                       .AllowCredentials()
                       .WithExposedHeaders("Location");  // ← для 302

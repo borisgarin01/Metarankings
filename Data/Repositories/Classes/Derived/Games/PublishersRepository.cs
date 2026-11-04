@@ -1,10 +1,9 @@
-﻿using Data.Repositories.Interfaces;
-using Domain.Games;
+﻿using Domain.Games;
 using Domain.RequestsModels.Games.Publishers;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class PublishersRepository : Repository<Publisher, AddPublisherModel, UpdatePublisherModel>
+public sealed class PublishersRepository : Repository<Publisher, AddPublisherModel, UpdatePublisherModel>, IByNameGettingRepository<Publisher>
 {
     public PublishersRepository(string connectionString) : base(connectionString)
     {
@@ -12,160 +11,259 @@ public sealed class PublishersRepository : Repository<Publisher, AddPublisherMod
 
     public override async Task<long> AddAsync(AddPublisherModel publisher)
     {
-        using NpgsqlConnection connection = CreateConnection();
-        long id = await connection.QueryFirstAsync<long>(@"INSERT INTO Publishers
-(Name)
-VALUES (@Name)
-RETURNING Id;"
-, new
-{
-    publisher.Name
-});
-        return id;
+        using (var connection = CreateConnection())
+        {
+            var id = await connection.QueryFirstAsync<long>(@"
+                INSERT INTO Publishers (Name)
+                VALUES (@Name)
+                RETURNING Id;",
+                new { publisher.Name });
+            return id;
+        }
     }
 
     public override async Task<IEnumerable<Publisher>> GetAllAsync()
     {
-        using NpgsqlConnection connection = CreateConnection();
-        Dictionary<long, Publisher> publisherDictionary = new Dictionary<long, Publisher>();
+        using (var connection = CreateConnection())
+        {
+            var publishersDictionary = new Dictionary<long, Publisher>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
-        await connection.QueryAsync<Publisher, Game, Publisher>(
-            @"SELECT 
-                p.Id, p.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId,
-                g.ReleaseDate, g.Description, g.Trailer
-              FROM Publishers p
-              LEFT JOIN GamesPublishers gp on gp.PublisherId = p.Id
-              LEFT JOIN Games g ON g.Id = gp.GameId",
-            (publisher, game) =>
-            {
-                if (!publisherDictionary.TryGetValue(publisher.Id, out Publisher? publisherEntry))
+            await connection.QueryAsync<Publisher, Game, Platform, Publisher>(@"
+                SELECT 
+                    publishers.id, publishers.name, 
+                    games.Id, games.Name, games.Image, 
+                    games.releasedate, 
+                    games.description, games.trailer,
+                    platforms.id, platforms.name
+                FROM publishers
+                LEFT JOIN gamespublishers ON gamespublishers.publisherid = publishers.id
+                LEFT JOIN games ON games.id = gamespublishers.gameid
+                LEFT JOIN gamesplatforms ON gamesplatforms.gameid = games.id
+                LEFT JOIN platforms ON platforms.id = gamesplatforms.platformid",
+                (publisher, game, platform) =>
                 {
-                    publisherEntry = publisher;
-                    publisherEntry.Games = new List<Game>();
-                    publisherDictionary.Add(publisherEntry.Id, publisherEntry);
-                }
+                    if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                    {
+                        publisherEntry = publisher;
+                        publisherEntry = publisherEntry with { Games = new List<Game>() };
+                        publishersDictionary.Add(publisherEntry.Id, publisherEntry);
+                    }
 
-                if (game != null)
-                {
-                    publisherEntry.Games.Add(game);
-                }
+                    if (game != null)
+                    {
+                        if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
+                        {
+                            gameEntry = game;
+                            gameEntry.Platforms = new List<Platform>();
+                            gamesDictionary.Add(gameEntry.Id, gameEntry);
+                            publisherEntry.Games.Add(gameEntry);
+                        }
 
-                return publisherEntry;
-            },
-            splitOn: "Id"  // Split point between Publisher and Game columns
-        );
+                        if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                        {
+                            gameEntry.Platforms.Add(platform);
+                        }
+                    }
 
-        return publisherDictionary.Values;
+                    return publisherEntry;
+                },
+                splitOn: "Id,Id"
+            );
+
+            return publishersDictionary.Values;
+        }
     }
 
     public override async Task<Publisher> GetAsync(long id)
     {
-        using NpgsqlConnection connection = CreateConnection();
-        Dictionary<long, Publisher> publisherDictionary = new Dictionary<long, Publisher>();
+        using (var connection = CreateConnection())
+        {
+            var publishersDictionary = new Dictionary<long, Publisher>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
-        await connection.QueryAsync<Publisher, Game, Platform, Publisher>(
-            @"SELECT 
-                p.Id, p.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId,
-                g.ReleaseDate, g.Description, g.Trailer,
-                COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
-                COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
-                COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
-                COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
-                platf.Id, platf.Name
-              FROM Publishers p
-              LEFT JOIN GamesPublishers gp on gp.PublisherId = p.Id
-              LEFT JOIN Games g ON g.Id = gp.GameId
-              LEFT JOIN GamesPlatforms
-                ON GamesPlatforms.Gameid=g.id
-              LEFT JOIN Platforms platf
-                on platf.Id=GamesPlatforms.PlatformId
-              WHERE p.Id = @id",
-            (publisher, game, platform) =>
-            {
-                if (!publisherDictionary.TryGetValue(publisher.Id, out Publisher? publisherEntry))
+            await connection.QueryAsync<Publisher, Game, Platform, Publisher>(@"
+                SELECT 
+                    publishers.id, publishers.name, 
+                    games.Id, games.Name, games.Image, 
+                    games.releasedate, 
+                    games.description, games.trailer,
+                    COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = games.Id), 0) AS UsersScore,
+                    COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = games.Id), 0) AS UsersReviewsCount,
+                    COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = games.Id), 0) AS CriticsScore,
+                    COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = games.Id), 0) AS CriticsReviewsCount,
+                    platforms.id, platforms.name
+                FROM publishers
+                LEFT JOIN gamespublishers ON gamespublishers.publisherid = publishers.id
+                LEFT JOIN games ON games.id = gamespublishers.gameid
+                LEFT JOIN gamesplatforms ON gamesplatforms.gameid = games.id
+                LEFT JOIN platforms ON platforms.id = gamesplatforms.platformid
+                WHERE publishers.id = @id",
+                (publisher, game, platform) =>
                 {
-                    publisherEntry = publisher;
-                    publisherEntry.Games = new List<Game>();
-                    publisherDictionary.Add(publisherEntry.Id, publisherEntry);
-                }
+                    if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                    {
+                        publisherEntry = publisher;
+                        publisherEntry = publisherEntry with { Games = new List<Game>() };
+                        publishersDictionary.Add(publisherEntry.Id, publisherEntry);
+                    }
 
-                if (game is not null && !publisherEntry.Games.Any(g => g.Id == game.Id))
-                {
-                    if (platform is not null)
-                        game.Platforms.Add(platform);
-                    publisherEntry.Games.Add(game);
-                }
+                    if (game != null)
+                    {
+                        if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
+                        {
+                            gameEntry = game;
+                            gameEntry.Platforms = new List<Platform>();
+                            gamesDictionary.Add(gameEntry.Id, gameEntry);
+                            publisherEntry.Games.Add(gameEntry);
+                        }
 
-                return publisherEntry;
-            },
-            new { id },  // Correct parameter passing
-            splitOn: "Id,Id"  // Split point between Publisher and Game columns
-        );
+                        if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                        {
+                            gameEntry.Platforms.Add(platform);
+                        }
+                    }
 
-        return publisherDictionary.Values.SingleOrDefault();
+                    return publisherEntry;
+                },
+                splitOn: "Id,Id",
+                param: new { id }
+            );
+
+            return publishersDictionary.Values.FirstOrDefault();
+        }
     }
 
     public override async Task<IEnumerable<Publisher>> GetAsync(long offset, long limit)
     {
-        using NpgsqlConnection connection = CreateConnection();
-        Dictionary<long, Publisher> publisherDictionary = new Dictionary<long, Publisher>();
+        using (var connection = CreateConnection())
+        {
+            var publishersDictionary = new Dictionary<long, Publisher>();
+            var gamesDictionary = new Dictionary<long, Game>();
 
-        await connection.QueryAsync<Publisher, Game, Publisher>(@"
+            await connection.QueryAsync<Publisher, Game, Platform, Publisher>(@"
+                SELECT 
+                    publishers.id, publishers.name, 
+                    games.Id, games.Name, games.Image, 
+                    games.releasedate, 
+                    games.description, games.trailer,
+                    platforms.id, platforms.name
+                FROM (
+                    SELECT id, name 
+                    FROM publishers
+                    ORDER BY id asc
+                    OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
+                ) AS publishers
+                LEFT JOIN gamespublishers ON gamespublishers.publisherid = publishers.id
+                LEFT JOIN games ON games.id = gamespublishers.gameid
+                LEFT JOIN gamesplatforms ON gamesplatforms.gameid = games.id
+                LEFT JOIN platforms ON platforms.id = gamesplatforms.platformid",
+                (publisher, game, platform) =>
+                {
+                    if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
+                    {
+                        publisherEntry = publisher;
+                        publisherEntry = publisherEntry with { Games = new List<Game>() };
+                        publishersDictionary.Add(publisherEntry.Id, publisherEntry);
+                    }
+
+                    if (game != null)
+                    {
+                        if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
+                        {
+                            gameEntry = game;
+                            gameEntry.Platforms = new List<Platform>();
+                            gamesDictionary.Add(gameEntry.Id, gameEntry);
+                            publisherEntry.Games.Add(gameEntry);
+                        }
+
+                        if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                        {
+                            gameEntry.Platforms.Add(platform);
+                        }
+                    }
+
+                    return publisherEntry;
+                },
+                new { Offset = offset, Limit = limit },
+                splitOn: "Id,Id"
+            );
+
+            return publishersDictionary.Values;
+        }
+    }
+
+    public async Task<Publisher> GetByNameAsync(string name)
+    {
+        using var connection = CreateConnection();
+        var publishersDictionary = new Dictionary<long, Publisher>();
+        var gamesDictionary = new Dictionary<long, Game>();
+
+        await connection.QueryAsync<Publisher, Game, Platform, Publisher>(@"
             SELECT 
-                p.Id, p.Name,
-                g.Id, g.Name, g.Image, g.LocalizationId,
-                g.ReleaseDate, g.Description, g.Trailer
-            FROM (
-                SELECT Id, Name 
-                FROM Publishers 
-                ORDER BY Id
-                OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY
-            ) p
-            LEFT JOIN GamesPublishers gp on gp.PublisherId = p.Id
-            LEFT JOIN Games g ON g.Id = gp.GameId",
-            (publisher, game) =>
+                publishers.id, publishers.name, 
+                games.Id, games.Name, games.Image, 
+                games.releasedate, 
+                games.description, games.trailer,
+                platforms.id, platforms.name
+            FROM publishers
+            LEFT JOIN gamespublishers ON gamespublishers.publisherid = publishers.id
+            LEFT JOIN games ON games.id = gamespublishers.gameid
+            LEFT JOIN gamesplatforms ON gamesplatforms.gameid = games.id
+            LEFT JOIN platforms ON platforms.id = gamesplatforms.platformid
+            WHERE LOWER(TRIM(publishers.name)) = LOWER(TRIM(@Name))",
+            (publisher, game, platform) =>
             {
-                if (!publisherDictionary.TryGetValue(publisher.Id, out Publisher? publisherEntry))
+                if (!publishersDictionary.TryGetValue(publisher.Id, out var publisherEntry))
                 {
                     publisherEntry = publisher;
-                    publisherEntry.Games = new List<Game>();
-                    publisherDictionary.Add(publisherEntry.Id, publisherEntry);
+                    publisherEntry = publisherEntry with { Games = new List<Game>() };
+                    publishersDictionary.Add(publisherEntry.Id, publisherEntry);
                 }
 
                 if (game != null)
                 {
-                    publisherEntry.Games.Add(game);
+                    if (!gamesDictionary.TryGetValue(game.Id, out var gameEntry))
+                    {
+                        gameEntry = game;
+                        gameEntry.Platforms = new List<Platform>();
+                        gamesDictionary.Add(gameEntry.Id, gameEntry);
+                        publisherEntry.Games.Add(gameEntry);
+                    }
+
+                    if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                    {
+                        gameEntry.Platforms.Add(platform);
+                    }
                 }
 
                 return publisherEntry;
             },
-            new { offset, limit },
-            splitOn: "Id"
+            splitOn: "Id,Id",
+            param: new { Name = name }
         );
 
-        return publisherDictionary.Values;
+        return publishersDictionary.Values.FirstOrDefault();
     }
 
     public override async Task RemoveAsync(long id)
     {
-        using NpgsqlConnection connection = CreateConnection();
-        await connection.ExecuteAsync(@"DELETE FROM 
-Publishers WHERE Id=@id", new { id });
+        using var connection = CreateConnection();
+        await connection.ExecuteAsync(@"DELETE FROM Publishers WHERE Id = @id", new { id });
     }
 
     public override async Task<Publisher> UpdateAsync(UpdatePublisherModel publisher, long id)
     {
-        using NpgsqlConnection connection = CreateConnection();
-        Publisher? updatedPublisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"UPDATE Publishers set Name=@Name 
-RETURNING Name, Id
-WHERE Id=@Id;", new
+        using (var connection = CreateConnection())
         {
-            publisher.Name,
-            id
-        });
+            var updatedPublisher = await connection.QueryFirstOrDefaultAsync<Publisher>(@"
+                UPDATE Publishers 
+                SET Name = @Name 
+                WHERE Id = @id 
+                RETURNING Name, Id;",
+                new { publisher.Name, id });
 
-        return updatedPublisher;
+            return updatedPublisher;
+        }
     }
 }

@@ -4,7 +4,7 @@ using Domain.RequestsModels.Games.Localizations;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class LocalizationsRepository : Repository<Localization, AddLocalizationModel, UpdateLocalizationModel>, ILocalizationsRepository
+public sealed class LocalizationsRepository : Repository<Localization, AddLocalizationModel, UpdateLocalizationModel>, ILocalizationsRepository, IByNameGettingRepository<Localization>
 {
     public LocalizationsRepository(string connectionString) : base(connectionString)
     {
@@ -348,5 +348,77 @@ RETURNING Name, Href, Id;", new
         });
 
         return updatedLocalization;
+    }
+
+    public async Task<Localization> GetByNameAsync(string name)
+    {
+        using var connection = CreateConnection();
+        var localizationsDictionary = new Dictionary<long, Localization>();
+        var gamesDictionary = new Dictionary<long, Game>();
+
+        IEnumerable<Localization> localization = await connection.QueryAsync<Localization, Game, Platform, Developer, Publisher, Localization>(@"
+            SELECT 
+loc.Id, loc.Name,
+g.Id, g.Name, g.Image, g.LocalizationId, g.ReleaseDate, g.Description, g.Trailer,                 
+p.Id, p.Name,
+d.Id, d.Name,
+publ.Id, publ.Name
+FROM Localizations loc
+LEFT JOIN Games g ON g.LocalizationId = loc.Id
+LEFT JOIN GamesPlatforms gplatf ON gplatf.GameId = g.Id
+LEFT JOIN Platforms p ON p.Id = gplatf.PlatformId
+LEFT JOIN GamesDevelopers gd ON gd.GameId = g.Id
+LEFT JOIN Developers d ON d.Id = gd.DeveloperId
+LEFT JOIN GamesPublishers gpubl ON gpubl.GameId = g.Id
+LEFT JOIN Publishers publ on publ.Id = gpubl.PublisherId
+WHERE loc.Name = @Name",
+            (loc, game, platform, developer, publisher) =>
+            {
+                // Get or create localization
+                if (!localizationsDictionary.TryGetValue(loc.Id, out Localization? locEntry))
+                {
+                    locEntry = loc;
+                    locEntry.Games = new List<Game>();
+                    localizationsDictionary.Add(loc.Id, locEntry);
+                }
+
+                if (game != null)
+                {
+                    // Get or create game
+                    if (!gamesDictionary.TryGetValue(game.Id, out Game? gameEntry))
+                    {
+                        gameEntry = game;
+                        gameEntry.Platforms = new List<Platform>();
+                        gameEntry.Developers = new List<Developer>();
+                        gamesDictionary.Add(game.Id, gameEntry);
+                        locEntry.Games.Add(gameEntry);
+                    }
+
+                    // Add platform if exists
+                    if (platform != null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                    {
+                        gameEntry.Platforms.Add(platform);
+                    }
+
+                    // Add developer if exists
+                    if (developer != null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
+                    {
+                        gameEntry.Developers.Add(developer);
+                    }
+
+                    // Set publisher if exists and not set
+                    if (publisher != null && gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                    {
+                        gameEntry.Publishers.Add(publisher);
+                    }
+                }
+
+                return locEntry;
+            },
+            new { Name = name },
+            splitOn: "Id,Id,Id,Id"
+        );
+
+        return localizationsDictionary.Values.FirstOrDefault();
     }
 }

@@ -1,3 +1,4 @@
+using Data.Repositories.Classes.Derived.Games;
 using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.RequestsModels.Games.Localizations;
@@ -8,9 +9,9 @@ namespace API.Controllers.Games;
 [Route("api/games/[controller]")]
 public sealed class LocalizationsController : CrudControllerBase<Localization, AddLocalizationModel, UpdateLocalizationModel>
 {
-    private readonly ILocalizationsRepository _localizationsRepository;
+    private readonly LocalizationsRepository _localizationsRepository;
 
-    public LocalizationsController(ILocalizationsRepository localizationsRepository) : base(localizationsRepository)
+    public LocalizationsController(LocalizationsRepository localizationsRepository) : base(localizationsRepository)
     {
         _localizationsRepository = localizationsRepository;
     }
@@ -23,5 +24,15 @@ public sealed class LocalizationsController : CrudControllerBase<Localization, A
             return NotFound();
 
         return Ok(localization);
+    }
+
+    protected override async Task<ActionResult?> ValidateAddAsync(AddLocalizationModel addLocalizationModel)
+    {
+        Localization? existingLocalization = await _localizationsRepository.GetByNameAsync(addLocalizationModel.Name);
+
+        if (existingLocalization is not null)
+            return BadRequest($"Локализация с названием {existingLocalization.Name} уже существует");
+
+        return null;
     }
 }

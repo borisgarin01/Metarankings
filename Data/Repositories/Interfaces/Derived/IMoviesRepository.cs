@@ -5,10 +5,9 @@ using Domain.RequestsModels.Movies.Movies;
 
 namespace Data.Repositories.Interfaces.Derived;
 
-public interface IMoviesRepository : IRepository<Movie, AddMovieModel, UpdateMovieModel>
+public interface IMoviesRepository : IRepository<Movie, AddMovieModel, UpdateMovieModel>, IByNameGettingRepository<Movie>
 {
     public Task<IEnumerable<Movie>> GetAsync(DateTime dateFrom, DateTime dateTo);
-    Task<IEnumerable<Movie>> GetByNameAsync(string name);
     Task<IEnumerable<Movie>> GetByGenreAsync(long genreId);
     Task<IEnumerable<Movie>> GetByParametersAsync(MovieFilterRequest filter);
 

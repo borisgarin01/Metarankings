@@ -4,7 +4,7 @@ using Domain.RequestsModels.Games.Genres;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesGenresRepository : Repository<Genre, AddGameGenreModel, UpdateGameGenreModel>
+public sealed class GamesGenresRepository : Repository<Genre, AddGameGenreModel, UpdateGameGenreModel>, IByNameGettingRepository<Genre>
 {
     public GamesGenresRepository(string connectionString) : base(connectionString)
     {
@@ -113,6 +113,44 @@ OFFSET @offset
 LIMIT @limit;", new { offset, limit });
 
             return genres;
+        }
+    }
+
+    public async Task<Genre?> GetByNameAsync(string name)
+    {
+        using (var connection = CreateConnection())
+        {
+            var genres = await connection.QueryAsync<Genre, Game, Genre>(@"
+SELECT Genres.Id, Genres.Name,
+       Games.Id, Games.Name, Games.Image,
+       Games.LocalizationId, Games.ReleaseDate,
+       Games.Description, Games.Trailer,
+       COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = Games.Id), 0) AS UsersScore,
+       COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = Games.Id), 0) AS UsersReviewsCount,
+       COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = Games.Id), 0) AS CriticsScore,
+       COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = Games.Id), 0) AS CriticsReviewsCount
+FROM Genres
+LEFT JOIN GamesGenres ON GamesGenres.GenreId = Genres.Id
+LEFT JOIN Games ON Games.Id = GamesGenres.GameId
+WHERE Genres.Name = @Name", (genre, game) =>
+            {
+                if (game is not null)
+                    genre.Games.Add(game);
+                return genre;
+            }, new { Name = name });
+
+            var genresResult = genres
+                .GroupBy(d => d.Id)
+                .Select(g =>
+                {
+                    Genre groupedGenre = g.First() with
+                    {
+                        Games = g.SelectMany(d => d.Games).ToList()
+                    };
+                    return groupedGenre;
+                });
+
+            return genresResult.FirstOrDefault();
         }
     }
 

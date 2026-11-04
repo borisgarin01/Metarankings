@@ -1,4 +1,5 @@
-using Data.Repositories.Interfaces;
+using Data.Repositories.Classes.Derived.Games;
+using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.RequestsModels.Games.Platforms;
 
@@ -8,7 +9,19 @@ namespace API.Controllers.Games;
 [Route("api/games/[controller]")]
 public sealed class PlatformsController : CrudControllerBase<Platform, AddPlatformModel, UpdatePlatformModel>
 {
-    public PlatformsController(IRepository<Platform, AddPlatformModel, UpdatePlatformModel> platformsRepository) : base(platformsRepository)
+    private readonly PlatformsRepository _platformsRepository;
+    public PlatformsController(PlatformsRepository platformsRepository) : base(platformsRepository)
     {
+        _platformsRepository = platformsRepository;
+    }
+
+    protected override async Task<ActionResult?> ValidateAddAsync(AddPlatformModel addPlatformModel)
+    {
+        Platform? existingPlatform = await _platformsRepository.GetByNameAsync(addPlatformModel.Name);
+
+        if (existingPlatform is not null)
+            return BadRequest($"Платформа с названием {existingPlatform.Name} уже существует");
+
+        return null;
     }
 }

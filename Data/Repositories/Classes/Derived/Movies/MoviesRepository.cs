@@ -774,4 +774,64 @@ DELETE FROM MoviesMoviesDirectors WHERE MovieId=@Id;", new { Id = id }, transact
 
         return await GetAsync(id);
     }
+
+    async Task<Movie> IByNameGettingRepository<Movie>.GetByNameAsync(string name)
+    {
+        using NpgsqlConnection connection = CreateConnection();
+
+        string sql = @"SELECT
+        m.Id, m.Name, m.ImageSource, m.OriginalName, m.PremierDate, m.Description, m.Trailer,
+        COALESCE((SELECT AVG(Score)::float FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersScore,
+        COALESCE((SELECT COUNT(*) FROM ViewersMoviesReviews WHERE MovieId = m.Id), 0) AS UsersReviewsCount,
+        COALESCE((SELECT AVG(Score)::float FROM MoviesCriticsReviews WHERE MovieId = m.Id), 0) AS CriticsScore,
+        COALESCE((SELECT COUNT(*) FROM MoviesCriticsReviews WHERE MovieId = m.Id), 0) AS CriticsReviewsCount,
+        mg.Id, mg.Name,
+        ms.Id, ms.Name,
+        md.Id, md.Name
+    FROM Movies m
+    LEFT JOIN MoviesMoviesGenres mmg ON mmg.MovieId = m.Id
+    LEFT JOIN MoviesGenres mg ON mg.Id = mmg.MovieGenreId
+    LEFT JOIN MoviesMoviesStudios mms ON mms.MovieId = m.Id
+    LEFT JOIN MoviesStudios ms ON ms.Id = mms.MovieStudioId
+    LEFT JOIN MoviesMoviesDirectors mmd ON mmd.MovieId = m.Id
+    LEFT JOIN MoviesDirectors md ON md.Id = mmd.MovieDirectorId
+    WHERE m.Name = @Name
+    ORDER BY m.Id, mmg.Id, mms.Id, mmd.Id;";
+
+        Dictionary<long, Movie> moviesDictionary = new();
+
+        await connection.QueryAsync(
+            sql,
+            (Movie movie, Domain.Movies.Genre movieGenre, MovieStudio movieStudio, MovieDirector movieDirector) =>
+            {
+                if (!moviesDictionary.TryGetValue(movie.Id, out Movie? movieEntry))
+                {
+                    movieEntry = movie;
+                    movieEntry.MovieGenres = new List<Domain.Movies.Genre>();
+                    movieEntry.MoviesStudios = new List<MovieStudio>();
+                    movieEntry.MoviesDirectors = new List<MovieDirector>();
+                    moviesDictionary.Add(movieEntry.Id, movieEntry);
+                }
+
+                if (movieGenre is not null && !movieEntry.MovieGenres.Any(g => g.Id == movieGenre.Id))
+                    movieEntry.MovieGenres.Add(movieGenre);
+
+                if (movieStudio is not null && !movieEntry.MoviesStudios.Any(s => s.Id == movieStudio.Id))
+                    movieEntry.MoviesStudios.Add(movieStudio);
+
+                if (movieDirector is not null && !movieEntry.MoviesDirectors.Any(d => d.Id == movieDirector.Id))
+                    movieEntry.MoviesDirectors.Add(movieDirector);
+
+                return movieEntry;
+            },
+            new { Name = name },
+            splitOn: "Id,Id,Id,Id");
+
+        Movie? result = moviesDictionary.Values.FirstOrDefault();
+
+        if (result is not null)
+            await LoadCountriesAndCrewAsync(connection, result);
+
+        return result;
+    }
 }

@@ -1,4 +1,5 @@
-﻿using Data.Repositories.Interfaces.Derived;
+﻿using Data.Repositories.Classes.Derived.Games;
+using Data.Repositories.Interfaces.Derived;
 using Domain.Games;
 using Domain.RequestsModels.Games.Developers;
 using ExcelProcessors;
@@ -9,10 +10,10 @@ namespace API.Controllers.Games;
 [Route("api/games/[controller]")]
 public sealed class DevelopersController : CrudControllerBase<Developer, AddDeveloperModel, UpdateDeveloperModel>
 {
-    private readonly IDevelopersRepository _developersRepository;
+    private readonly DevelopersRepository _developersRepository;
     private readonly IExcelDataReader<AddDeveloperModel> _developersExcelDataReader;
 
-    public DevelopersController(IDevelopersRepository developersRepository, IExcelDataReader<AddDeveloperModel> developersExcelDataReader) : base(developersRepository)
+    public DevelopersController(DevelopersRepository developersRepository, IExcelDataReader<AddDeveloperModel> developersExcelDataReader) : base(developersRepository)
     {
         _developersRepository = developersRepository;
         _developersExcelDataReader = developersExcelDataReader;

@@ -1,9 +1,5 @@
-﻿using API.Controllers.Games;
-using Data.Repositories.Classes.Derived.Games;
-using Data.Repositories.Classes.Derived.Movies;
-using Data.Repositories.Interfaces.Derived;
+﻿using Data.Repositories.Classes.Derived.Movies;
 using Domain.Movies;
-using Domain.RequestsModels.Games;
 using Domain.RequestsModels.Movies;
 using Domain.RequestsModels.Movies.Movies;
 using Domain.ResponsesModels;
@@ -16,12 +12,12 @@ namespace API.Controllers.Movies;
 public sealed class MoviesController : ControllerBase
 {
     private readonly IConfiguration _configuration;
-    private readonly IMoviesRepository _moviesModelsRepository;
+    private readonly MoviesRepository _moviesModelsRepository;
     private readonly ILogger<MoviesController> _logger;
 
     private JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
-    public MoviesController(IConfiguration configuration, IMoviesRepository moviesModelsRepository, ILogger<MoviesController> logger)
+    public MoviesController(IConfiguration configuration, MoviesRepository moviesModelsRepository, ILogger<MoviesController> logger)
     {
         _configuration = configuration;
         _moviesModelsRepository = moviesModelsRepository;

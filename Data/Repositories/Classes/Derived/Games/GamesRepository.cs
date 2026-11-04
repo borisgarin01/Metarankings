@@ -12,7 +12,7 @@ using Npgsql;
 
 namespace Data.Repositories.Classes.Derived.Games;
 
-public sealed class GamesRepository : Repository<Game, AddGameModel, UpdateGameModel>, IGamesRepository
+public sealed class GamesRepository : Repository<Game, AddGameModel, UpdateGameModel>, IGamesRepository, IByNameGettingRepository<Game>
 {
     public GamesRepository(string connectionString) : base(connectionString)
     {
@@ -723,7 +723,7 @@ DELETE FROM GamesDevelopers WHERE GameId=@Id;", new { Id = id }, transaction: tr
         return gameDictionary.Values.ToList();
     }
 
-    public async Task<IEnumerable<Game>> GetByNameAsync(string name)
+    public async Task<IEnumerable<Game>> SearchByNameAsync(string name)
     {
         using NpgsqlConnection connection = CreateConnection();
         string sql = @"SELECT         
@@ -1006,5 +1006,85 @@ OFFSET @Skip LIMIT @Take;",
                 GenresIds = genresIds is { Length: > 0 } ? genresIds : null,
                 PlatformsIds = platformsIds is { Length: > 0 } ? platformsIds : null
             });
+    }
+
+    public async Task<Game> GetByNameAsync(string name)
+    {
+        using NpgsqlConnection connection = CreateConnection();
+
+        string sql = @"SELECT
+        g.Id, g.Name, g.Image, g.ReleaseDate, g.Description, g.Trailer, g.LocalizationId,
+        COALESCE((SELECT AVG(Score)::float FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersScore,
+        COALESCE((SELECT COUNT(*) FROM GamesPlayersReviews WHERE GameId = g.Id), 0) AS UsersReviewsCount,
+        COALESCE((SELECT AVG(Score)::float FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsScore,
+        COALESCE((SELECT COUNT(*) FROM GamesCriticsReviews WHERE GameId = g.Id), 0) AS CriticsReviewsCount,
+        d.Id, d.Name,
+        p.Id, p.Name,
+        gen.Id, gen.Name,
+        l.Id, l.Name,
+        platf.Id, platf.Name,
+        gs.Id, gs.GameId, gs.ImageUrl,
+        gc.Id, gc.Name, gc.Description
+    FROM Games g
+    LEFT JOIN GamesDevelopers gd   ON gd.GameId = g.Id
+    LEFT JOIN Developers d         ON d.Id = gd.DeveloperId
+    LEFT JOIN GamesPublishers gpub ON gpub.GameId = g.Id
+    LEFT JOIN Publishers p         ON p.Id = gpub.PublisherId
+    LEFT JOIN GamesGenres gg       ON gg.GameId = g.Id
+    LEFT JOIN Genres gen           ON gen.Id = gg.GenreId
+    LEFT JOIN Localizations l      ON l.Id = g.LocalizationId
+    LEFT JOIN GamesPlatforms gplatf ON gplatf.GameId = g.Id
+    LEFT JOIN Platforms platf      ON platf.Id = gplatf.PlatformId
+    LEFT JOIN GamesScreenshots gs  ON gs.GameId = g.Id
+    LEFT JOIN GamesCollectionsItems gci ON gci.GameId = g.Id
+    LEFT JOIN GamesCollections gc  ON gc.Id = gci.GameCollectionId
+    WHERE g.Name = @Name
+    ORDER BY g.Id, gd.Position, gg.Position, gplatf.Position, gpub.Position, gs.Position;";
+
+        Dictionary<long, Game> gameDictionary = new();
+
+        await connection.QueryAsync<Game, Developer, Publisher, Genre, Localization, Platform, GameScreenshot, GamesCollection, Game>(
+            sql,
+            (game, developer, publisher, genre, localization, platform, screenshot, gameCollection) =>
+            {
+                if (!gameDictionary.TryGetValue(game.Id, out Game? gameEntry))
+                {
+                    gameEntry = game;
+                    gameEntry.Developers = new List<Developer>();
+                    gameEntry.Publishers = new List<Publisher>();
+                    gameEntry.Genres = new List<Genre>();
+                    gameEntry.Platforms = new List<Platform>();
+                    gameEntry.Screenshots = new List<GameScreenshot>();
+                    gameEntry.GameCollections = new List<GamesCollection>();
+                    gameDictionary.Add(gameEntry.Id, gameEntry);
+                }
+
+                if (developer is not null && !gameEntry.Developers.Any(d => d.Id == developer.Id))
+                    gameEntry.Developers.Add(developer);
+
+                if (publisher is not null && !gameEntry.Publishers.Any(p => p.Id == publisher.Id))
+                    gameEntry.Publishers.Add(publisher);
+
+                if (genre is not null && !gameEntry.Genres.Any(g => g.Id == genre.Id))
+                    gameEntry.Genres.Add(genre);
+
+                if (localization is not null && gameEntry.Localization == null)
+                    gameEntry.Localization = localization;
+
+                if (platform is not null && !gameEntry.Platforms.Any(p => p.Id == platform.Id))
+                    gameEntry.Platforms.Add(platform);
+
+                if (screenshot is not null && !gameEntry.Screenshots.Any(s => s.Id == screenshot.Id))
+                    gameEntry.Screenshots.Add(screenshot);
+
+                if (gameCollection is not null && !gameEntry.GameCollections.Any(b => b.Id == gameCollection.Id))
+                    gameEntry.GameCollections.Add(gameCollection);
+
+                return gameEntry;
+            },
+            new { Name = name },
+            splitOn: "Id,Id,Id,Id,Id,Id,Id,Id");
+
+        return gameDictionary.Values.FirstOrDefault();
     }
 }
