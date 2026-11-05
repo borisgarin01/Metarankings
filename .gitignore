@@ -20,3 +20,4 @@ certbot/conf/accounts/acme-v02.api.letsencrypt.org/directory
 
 # Ansible Vault password
 .vaultpassword
+ansible/group_vars/all/vault.yml
