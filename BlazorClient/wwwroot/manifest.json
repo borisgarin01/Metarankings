@@ -1,7 +1,7 @@
 {
-  "name": "MetaRankings",
-  "short_name": "MetaRankings",
-  "description": "MetaRankings - рейтинг фильмов и игр",
+  "name": "RateItAll",
+  "short_name": "RateItAll",
+  "description": "RateItAll - рейтинг фильмов и игр",
   "display": "standalone",
   "start_url": "/",
   "background_color": "#fff",

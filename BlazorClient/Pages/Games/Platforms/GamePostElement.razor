@@ -7,7 +7,6 @@
     <a class="name" href="/games/details/@Game.Id">@Game.Name</a>
     <div class="post-meta"><p>@string.Join(", ", Game.Platforms.Select(b => b.Name))</p></div>
     <div class="post-meta">
-
         <a href="/games/details/@Game.Id/#reviews" title="@Game.Name - обзоры и рецензии">Обзоры критиков (@Game.CriticsReviewsCount)</a> <a href="/games/details/@Game.Id/#comments" title="@Game.Name - отзывы">Отзывы игроков (@Game.UsersReviewsCount)</a>
     </div>
     <div class="post-content">@Game.Description</div>
