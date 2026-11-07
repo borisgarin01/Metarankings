@@ -1,0 +1,73 @@
+﻿@page "/user-reviews/games"
+@using Domain.Common.News
+@using Domain.Reviews
+
+<div id="content" class="lcol">
+    <div class="content-title">
+        <h1>Обзоры игр</h1>
+    </div>
+    @if (GamesReviews is null || News is null)
+    {
+        <p>Загружается...</p>
+    }
+    else
+    {
+        <div class="post-reviews">
+            @foreach (GameReview review in GamesReviews)
+            {
+                <div class="reviews-text mark-@review.Score">
+                    <div class="thumb-mini">
+                        <a href="/games/Details/@review.GameId" title="@review.Game.Name">
+                            <img width="50" height="70" src="@review.Game.Image" class="attachment-mini-thumbnail wp-post-image" alt="@review.Game.Name">
+                        </a>
+                    </div>
+                    <div class="reviews-content">
+                        <div class="small-score mark-@review.Score">
+                            <span>@review.Score</span>
+                            <meta content="0">
+                            <meta content="10">
+                        </div>
+                        <div class="title-reviews">
+                            <a href="/user-reviews/games/@review.Id">@review.Game.Name</a>
+                        </div>
+                        <div class="reviews-author">@review.ApplicationUser.UserName</div>
+                    </div>
+                </div>
+            }
+            <div class="navi">
+                @if (PageNumber > 1)
+                {
+                    <a href="/user-reviews/games/?nav=@(PageNumber - 1)&size=@PageSize">←</a>
+                }
+                @for (int p = 1; p <= TotalPages; p++)
+                {
+                    if (p == PageNumber)
+                    {
+                        <span>@p</span>
+                    }
+                    else
+                    {
+                        <a href="/user-reviews/games/?nav=@p&size=@PageSize">@p</a>
+                    }
+                }
+                @if (PageNumber < TotalPages)
+                {
+                    <a href="/user-reviews/games/?nav=@(PageNumber + 1)&size=@PageSize">→</a>
+                }
+            </div>
+        </div>
+        <div class="news-module">
+            @foreach (NewsItem newsItem in News)
+            {
+                <div class="news-item">
+                    <a href="/news/@newsItem.Id" title="@newsItem.Title">
+                        <img class="news-thumb" src="@newsItem.ImageSource" alt="@newsItem.Title">
+                        <span class="news-title">
+                            @TextTruncater.Truncate(newsItem.TextContent, 150)
+                        </span>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
